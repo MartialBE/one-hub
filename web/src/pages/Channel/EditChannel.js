@@ -124,30 +124,78 @@ const EditChannel = () => {
         value: model.id
       }));
       setOriginModelOptions(localModelOptions);
-      setFullOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('code-') || model.id.startsWith('tts-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-      
-      setfullNo32KOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1') && !model.id.startsWith('gpt-4-32k');
-      }).map((model) => model.id));
+      // setFullOPENAIModels(res.data.data.filter((model) => {
+      //   return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('code-') || model.id.startsWith('tts-')) && !model.id.startsWith('text-embedding-v1');
+      // }).map((model) => model.id));
 
-      setBasicModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-3') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
+      // setfullNo32KOPENAIModels(res.data.data.filter((model) => {
+      //   return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1') && !model.id.startsWith('gpt-4-32k');
+      // }).map((model) => model.id));
 
-      setGPT3NoInstructModels(res.data.data.filter((model) => {
-        return model.id.startsWith('gpt-3') && !model.id.endsWith('instruct');
-    }).map((model) => model.id));    
-      
-      setBasicNoGPTModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-      
+      // setBasicModels(res.data.data.filter((model) => {
+      //   return (model.id.startsWith('gpt-3') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
+      // }).map((model) => model.id));
+
+      // setGPT3NoInstructModels(res.data.data.filter((model) => {
+      //   return model.id.startsWith('gpt-3') && !model.id.endsWith('instruct');
+      // }).map((model) => model.id));
+
+      // setBasicNoGPTModels(res.data.data.filter((model) => {
+      //   return (model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
+      // }).map((model) => model.id));
+
+      const fullRules = [
+        id => id.startsWith('gpt-') ||
+          id.startsWith('text-') ||
+          id.startsWith('dall-') ||
+          id.startsWith('whisper-') ||
+          id.startsWith('code-') ||
+          id.startsWith('tts-'),
+        id => !id.startsWith('text-embedding-v1')
+      ];
+      setFullOPENAIModels(filterModels(res.data.data, fullRules));
+
+      const no32kRules = [...fullRules, id => !id.startsWith('gpt-4-32k')];
+      setfullNo32KOPENAIModels(filterModels(res.data.data, no32kRules));
+
+      const basicRules = [...fullRules, id => !id.startsWith('gpt-3')];
+      setBasicModels(filterModels(res.data.data, basicRules));
+
+      const gpt3Rules = [id => id.startsWith('gpt-3'), id => !id.startsWith('gpt-3.5-turbo-16k'), id => !id.endsWith('instruct')];
+      setGPT3NoInstructModels(filterModels(res.data.data, gpt3Rules));
+
+      const noGptRules = [
+        id => id.startsWith('text-') ||
+          id.startsWith('dall-') ||
+          id.startsWith('whisper-') ||
+          id.startsWith('tts-') ||
+          id.startsWith('code-'),
+        id => !id.startsWith('text-embedding-v1')
+      ];
+      setBasicNoGPTModels(filterModels(res.data.data, noGptRules));
+
     } catch (error) {
       showError(error.message);
     }
   };
+
+
+
+
+  // 新增的代码
+
+  // 从原始模型数据中，根据规则过滤出需要的模型列表
+  const filterModels = (models, rules) => {
+    return models.filter(model => rules.every(rule => rule(model.id))).map(model => model.id);
+  };
+
+  // 创建模型设置点击处理事件
+  const createHandleClick = (models) => () => {
+    handleInputChange(null, { name: 'models', value: models });
+  };
+
+
+
 
   const fetchGroups = async () => {
     try {
@@ -246,6 +294,22 @@ const EditChannel = () => {
     handleInputChange(null, { name: 'models', value: localModels });
   };
 
+  const buttonContentMapping = {
+    "gpt4-turbo": { "gpt-4-turbo": "gpt-4-1106-preview", "gpt-4-turbo-vision": "gpt-4-vision-preview" },
+    "gpt3.5/1106": { "gpt-3.5-turbo": "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0613": "gpt-3.5-turbo-1106","gpt-3.5-turbo-0301":"gpt-3.5-turbo-1106" },
+    "清除": {},
+    
+  };
+  const handleFixContent = (fixedContent) => {
+    handleInputChange(null, {
+      name: 'model_mapping',
+      value: JSON.stringify(fixedContent, null, 2),
+    });
+  };
+
+
+
+
   return (
     <>
       <Segment loading={loading}>
@@ -266,8 +330,7 @@ const EditChannel = () => {
               <>
                 <Message>
                   注意，<strong>模型部署名称必须和模型名称保持一致</strong>，因为 CZL Oapi 会把请求体中的 model
-                  参数替换为你的部署名称（模型名称中的点会被剔除），<a target='_blank'
-                                                                    href='https://github.com/songquanpeng/one-api/issues/133?notification_referrer_id=NT_kwDOAmJSYrM2NjIwMzI3NDgyOjM5OTk4MDUw#issuecomment-1571602271'>图片演示</a>。
+                  参数替换为你的部署名称（模型名称中的点会被剔除）。
                 </Message>
                 <Form.Field>
                   <Form.Input
@@ -390,43 +453,38 @@ const EditChannel = () => {
               autoComplete='new-password'
               options={modelOptions}
             />
+            <div style={{ lineHeight: '40px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <Button type={'button'} onClick={createHandleClick(basicNoGPTModels)}>基础无gpt模型</Button>
+                <Button type={'button'} onClick={createHandleClick(GPT3NoInstructModels)}>gpt3对话模型</Button>
+                <Button type={'button'} onClick={createHandleClick(basicModels)}>基础OPENAI模型</Button>
+                <Button type={'button'} onClick={createHandleClick(fullNo32KOPENAIModels)}>无32K OPENAI模型</Button>
+                <Button type={'button'} onClick={createHandleClick(fullOPENAIModels)}>OPENAI模型</Button>
+                <Button type={'button'} onClick={createHandleClick([])}>清除</Button>
+              </div>
+
+              {/* 添加自定义模型的输入框和按钮 */}
+              <div>
+                <Input
+                  action={
+                    <Button type={'button'} onClick={addCustomModel}>填入</Button>
+                  }
+                  placeholder='输入自定义模型名称'
+                  value={customModel}
+                  onChange={(e, { value }) => {
+                    setCustomModel(value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      addCustomModel();
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+            </div>
           </Form.Field>
-          <div style={{ lineHeight: '40px', marginBottom: '12px' }}>
-          <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: basicNoGPTModels });
-            }}>基础无gpt模型</Button>
-            <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: GPT3NoInstructModels });
-            }}>gpt3对话模型</Button>
-            <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: basicModels });
-            }}>基础OPENAI模型</Button>
-            <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: fullNo32KOPENAIModels });
-            }}>无32K OPENAI模型</Button>
-            <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: fullOPENAIModels });
-            }}>OPENAI模型</Button>
-            <Button type={'button'} onClick={() => {
-              handleInputChange(null, { name: 'models', value: [] });
-            }}>清除</Button>
-            <Input
-              action={
-                <Button type={'button'} onClick={addCustomModel}>填入</Button>
-              }
-              placeholder='输入自定义模型名称'
-              value={customModel}
-              onChange={(e, { value }) => {
-                setCustomModel(value);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  addCustomModel();
-                  e.preventDefault();
-                }
-              }}
-            />
-          </div>
+
           <Form.Field>
             <Form.TextArea
               label='模型重定向'
@@ -437,7 +495,13 @@ const EditChannel = () => {
               style={{ minHeight: 150, fontFamily: 'JetBrains Mono, Consolas' }}
               autoComplete='new-password'
             />
+            {Object.entries(buttonContentMapping).map(([buttonText, content]) => (
+              <Button key={buttonText} onClick={() => handleFixContent(content)} primary>
+                {buttonText}
+              </Button>
+            ))}
           </Form.Field>
+
           {
             batch ? <Form.Field>
               <Form.TextArea
