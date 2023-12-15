@@ -328,7 +328,7 @@ const LogsTable = () => {
             </Form.Field>
           </Form.Group>
         </Form>
-        <Table basic compact size='small'>
+        <Table  celled padded selectable singleLine compact >
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell

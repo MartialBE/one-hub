@@ -194,7 +194,7 @@ const UsersTable = () => {
         />
       </Form>
 
-      <Table basic compact size='small'>
+      <Table celled padded selectable singleLine compact>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell
@@ -221,13 +221,37 @@ const UsersTable = () => {
             >
               分组
             </Table.HeaderCell> */}
-            <Table.HeaderCell
+            {/* <Table.HeaderCell
               style={{ cursor: 'pointer' }}
               onClick={() => {
                 sortUser('quota');
               }}
             >
               统计信息
+            </Table.HeaderCell> */}
+            <Table.HeaderCell
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                sortUser('quota');
+              }}
+            >
+              剩余
+            </Table.HeaderCell>
+            <Table.HeaderCell
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                sortUser('used_quota');
+              }}
+            >
+              已用
+            </Table.HeaderCell>
+            <Table.HeaderCell
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                sortUser('request_count');
+              }}
+            >
+              次数
             </Table.HeaderCell>
             <Table.HeaderCell
               style={{ cursor: 'pointer' }}
@@ -270,11 +294,14 @@ const UsersTable = () => {
                     />
                   </Table.Cell>
                   {/* <Table.Cell>{renderGroup(user.group)}</Table.Cell> */}
-                  <Table.Cell>
+                  {/* <Table.Cell>
                     <Popup content='剩余额度' trigger={<Label basic>{renderQuota(user.quota)}</Label>} />
                     <Popup content='已用额度' trigger={<Label basic>{renderQuota(user.used_quota)}</Label>} />
                     <Popup content='请求次数' trigger={<Label basic>{renderNumber(user.request_count)}</Label>} />
-                  </Table.Cell>
+                  </Table.Cell> */}
+                  <Table.Cell>{renderQuota(user.quota)}</Table.Cell>
+                  <Table.Cell>{renderQuota(user.used_quota)}</Table.Cell>
+                  <Table.Cell>{renderNumber(user.request_count)}</Table.Cell>
                   <Table.Cell>{renderRole(user.role)}</Table.Cell>
                   <Table.Cell>{renderStatus(user.status)}</Table.Cell>
                   <Table.Cell>
@@ -357,7 +384,7 @@ const UsersTable = () => {
 
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell colSpan='7'>
+            <Table.HeaderCell colSpan='8'>
               <Button size='small' as={Link} to='/user/add' loading={loading}>
                 添加新的用户
               </Button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Grid, Header, Segment, Statistic } from 'semantic-ui-react';
+import { Button, Form, Grid, Header, Segment, Statistic, Label } from 'semantic-ui-react';
 import { API, showError, showInfo, showSuccess } from '../../helpers';
 import { renderQuota } from '../../helpers/render';
 
@@ -74,6 +74,12 @@ const TopUp = () => {
   return (
     <Segment>
       <Header as='h3'>充值额度</Header>
+      {/* <p style={{ color: 'var(--czl-error-color)', fontSize: '0.9em', borderRadius: '5px' }}>
+          充值$5即可升级VIP，线路更快更稳定
+        </p> */}
+      <Label as='a' color='red' ribbon>
+        充值$5即可升级VIP，线路更快更稳定
+      </Label>
       <Grid columns={2} stackable>
         <Grid.Column>
           <Form>
@@ -98,12 +104,13 @@ const TopUp = () => {
               icon='exchange'
               labelPosition='left'
               content={isSubmitting ? '兑换中...' : '兑换'}
-              style={{ backgroundColor: '#FFFFFF00',color: 'var(--czl-blue-700)',border: '1px solid var(--czl-blue-200)' }}
+              style={{ backgroundColor: '#FFFFFF00', color: 'var(--czl-blue-700)', border: '1px solid var(--czl-blue-200)' }}
               onClick={topUp}
               disabled={isSubmitting}
             />
 
           </Form>
+
         </Grid.Column>
         <Grid.Column>
           <Statistic.Group widths='one'>
