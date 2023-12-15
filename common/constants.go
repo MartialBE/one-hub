@@ -28,8 +28,8 @@ var SessionSecret = uuid.New().String()
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
-var ItemsPerPage = 20
-var MaxRecentItems = 100
+var ItemsPerPage = 50    //页面显示的条目数
+var MaxRecentItems = 200 //最近使用过的项目数
 
 var PasswordLoginEnabled = true
 var PasswordRegisterEnabled = true

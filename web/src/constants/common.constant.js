@@ -1,1 +1,1 @@
-export const ITEMS_PER_PAGE = 20; // this value must keep same as the one defined in backend!
+export const ITEMS_PER_PAGE = 50; //页面显示的条目数
