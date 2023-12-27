@@ -28,8 +28,9 @@ var SessionSecret = uuid.New().String()
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
-var ItemsPerPage = 50    //页面显示的条目数
-var MaxRecentItems = 200 //最近使用过的项目数
+// 页面显示条目数
+var ItemsPerPage = 50
+var MaxRecentItems = 500
 
 var PasswordLoginEnabled = true
 var PasswordRegisterEnabled = true
@@ -122,7 +123,7 @@ var (
 	GlobalApiRateLimitNum            = GetOrDefault("GLOBAL_API_RATE_LIMIT", 180)
 	GlobalApiRateLimitDuration int64 = 3 * 60
 
-	GlobalWebRateLimitNum            = GetOrDefault("GLOBAL_WEB_RATE_LIMIT", 60)
+	GlobalWebRateLimitNum            = GetOrDefault("GLOBAL_WEB_RATE_LIMIT", 100)
 	GlobalWebRateLimitDuration int64 = 3 * 60
 
 	UploadRateLimitNum            = 10
@@ -187,7 +188,8 @@ const (
 	ChannelTypeAIProxyLibrary = 21
 	ChannelTypeFastGPT        = 22
 	ChannelTypeTencent        = 23
-	ChannelTypeGemini         = 24
+	ChannelTypeAzureSpeech    = 24
+	ChannelTypeGemini         = 25
 )
 
 var ChannelBaseURLs = []string{
@@ -216,4 +218,20 @@ var ChannelBaseURLs = []string{
 	"https://fastgpt.run/api/openapi",   // 22
 	"https://hunyuan.cloud.tencent.com", //23
 	"",                                  //24
+	"",                                  //25
 }
+
+const (
+	RelayModeUnknown = iota
+	RelayModeChatCompletions
+	RelayModeCompletions
+	RelayModeEmbeddings
+	RelayModeModerations
+	RelayModeImagesGenerations
+	RelayModeImagesEdits
+	RelayModeImagesVariations
+	RelayModeEdits
+	RelayModeAudioSpeech
+	RelayModeAudioTranscription
+	RelayModeAudioTranslation
+)

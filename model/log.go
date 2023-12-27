@@ -3,8 +3,9 @@ package model
 import (
 	"context"
 	"fmt"
-	"gorm.io/gorm"
 	"one-api/common"
+
+	"gorm.io/gorm"
 )
 
 type Log struct {
@@ -20,6 +21,15 @@ type Log struct {
 	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`
 	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
 	ChannelId        int    `json:"channel" gorm:"index"`
+}
+
+type LogStatistic struct {
+	Day              string `gorm:"column:day"`
+	ModelName        string `gorm:"column:model_name"`
+	RequestCount     int    `gorm:"column:request_count"`
+	Quota            int    `gorm:"column:quota"`
+	PromptTokens     int    `gorm:"column:prompt_tokens"`
+	CompletionTokens int    `gorm:"column:completion_tokens"`
 }
 
 const (
@@ -134,7 +144,7 @@ func SearchUserLogs(userId int, keyword string) (logs []*Log, err error) {
 }
 
 func SumUsedQuota(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string, channel int) (quota int) {
-	tx := DB.Table("logs").Select("ifnull(sum(quota),0)")
+	tx := DB.Table("logs").Select(assembleSumSelectStr("quota"))
 	if username != "" {
 		tx = tx.Where("username = ?", username)
 	}
@@ -158,7 +168,7 @@ func SumUsedQuota(logType int, startTimestamp int64, endTimestamp int64, modelNa
 }
 
 func SumUsedToken(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string) (token int) {
-	tx := DB.Table("logs").Select("ifnull(sum(prompt_tokens),0) + ifnull(sum(completion_tokens),0)")
+	tx := DB.Table("logs").Select(assembleSumSelectStr("prompt_tokens") + " + " + assembleSumSelectStr("completion_tokens"))
 	if username != "" {
 		tx = tx.Where("username = ?", username)
 	}
@@ -181,4 +191,46 @@ func SumUsedToken(logType int, startTimestamp int64, endTimestamp int64, modelNa
 func DeleteOldLog(targetTimestamp int64) (int64, error) {
 	result := DB.Where("created_at < ?", targetTimestamp).Delete(&Log{})
 	return result.RowsAffected, result.Error
+}
+
+func SearchLogsByDayAndModel(user_id, start, end int) (LogStatistics []*LogStatistic, err error) {
+	groupSelect := "DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m-%d') as day"
+
+	if common.UsingPostgreSQL {
+		groupSelect = "TO_CHAR(date_trunc('day', to_timestamp(created_at)), 'YYYY-MM-DD') as day"
+	}
+
+	if common.UsingSQLite {
+		groupSelect = "strftime('%Y-%m-%d', datetime(created_at, 'unixepoch')) as day"
+	}
+
+	err = DB.Raw(`
+		SELECT `+groupSelect+`,
+		model_name, count(1) as request_count,
+		sum(quota) as quota,
+		sum(prompt_tokens) as prompt_tokens,
+		sum(completion_tokens) as completion_tokens
+		FROM logs
+		WHERE type=2
+		AND user_id= ?
+		AND created_at BETWEEN ? AND ?
+		GROUP BY day, model_name
+		ORDER BY day, model_name
+	`, user_id, start, end).Scan(&LogStatistics).Error
+
+	fmt.Println(user_id, start, end)
+
+	return LogStatistics, err
+}
+
+func assembleSumSelectStr(selectStr string) string {
+	sumSelectStr := "%s(sum(%s),0)"
+	nullfunc := "ifnull"
+	if common.UsingPostgreSQL {
+		nullfunc = "coalesce"
+	}
+
+	sumSelectStr = fmt.Sprintf(sumSelectStr, nullfunc, selectStr)
+
+	return sumSelectStr
 }

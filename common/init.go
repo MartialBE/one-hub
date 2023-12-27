@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -16,12 +18,18 @@ var (
 )
 
 func printHelp() {
-	fmt.Println("CZL Oapi " + Version + " - All in CZL Oapi service for OpenAI API.")
-	fmt.Println("Copyright (C) 2023 CZL. All rights reserved.")
+	fmt.Println("CZL Oapi " + Version + " - All in one API service for OpenAI API.")
+	fmt.Println("Copyright (C) 2023 JustSong. All rights reserved.")
+	fmt.Println("GitHub: https://github.com/songquanpeng/one-api")
 	fmt.Println("Usage: one-api [--port <port>] [--log-dir <log directory>] [--version] [--help]")
 }
 
 func init() {
+	// 加载.env文件
+	err := godotenv.Load()
+	if err != nil {
+		SysLog("failed to load .env file: " + err.Error())
+	}
 	flag.Parse()
 
 	if *PrintVersion {

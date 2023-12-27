@@ -7,6 +7,8 @@ import (
 	"one-api/common"
 	"one-api/model"
 	"strconv"
+	"time"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -172,7 +174,6 @@ func Register(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func GetAllUsers(c *gin.Context) {
@@ -193,7 +194,6 @@ func GetAllUsers(c *gin.Context) {
 		"message": "",
 		"data":    users,
 	})
-	return
 }
 
 func SearchUsers(c *gin.Context) {
@@ -211,7 +211,6 @@ func SearchUsers(c *gin.Context) {
 		"message": "",
 		"data":    users,
 	})
-	return
 }
 
 func GetUser(c *gin.Context) {
@@ -244,7 +243,30 @@ func GetUser(c *gin.Context) {
 		"message": "",
 		"data":    user,
 	})
-	return
+}
+
+func GetUserDashboard(c *gin.Context) {
+	id := c.GetInt("id")
+	// 获取7天前 00:00:00 和 今天23:59:59  的秒时间戳
+	now := time.Now()
+	toDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	endOfDay := toDay.Add(time.Hour * 24).Add(-time.Second).Unix()
+	startOfDay := toDay.AddDate(0, 0, -7).Unix()
+
+	dashboards, err := model.SearchLogsByDayAndModel(id, int(startOfDay), int(endOfDay))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "无法获取统计信息.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    dashboards,
+	})
 }
 
 func GenerateAccessToken(c *gin.Context) {
@@ -280,7 +302,6 @@ func GenerateAccessToken(c *gin.Context) {
 		"message": "",
 		"data":    user.AccessToken,
 	})
-	return
 }
 
 func GetAffCode(c *gin.Context) {
@@ -308,7 +329,6 @@ func GetAffCode(c *gin.Context) {
 		"message": "",
 		"data":    user.AffCode,
 	})
-	return
 }
 
 func GetSelf(c *gin.Context) {
@@ -326,7 +346,6 @@ func GetSelf(c *gin.Context) {
 		"message": "",
 		"data":    user,
 	})
-	return
 }
 
 func UpdateUser(c *gin.Context) {
@@ -390,7 +409,6 @@ func UpdateUser(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func UpdateSelf(c *gin.Context) {
@@ -437,7 +455,6 @@ func UpdateSelf(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func DeleteUser(c *gin.Context) {
@@ -499,7 +516,6 @@ func DeleteSelf(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func CreateUser(c *gin.Context) {
@@ -548,12 +564,11 @@ func CreateUser(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 type ManageRequest struct {
 	Username string `json:"username"`
-	Action    string `json:"action"` 
+	Action   string `json:"action"`
 	NewGroup string `json:"newGroup"`
 }
 
@@ -569,11 +584,10 @@ func ManageUser(c *gin.Context) {
 		})
 		return
 	}
-
 	user := model.User{
 		Username: req.Username,
 	}
-
+	// Fill attributes
 	model.DB.Where(&user).First(&user)
 	if user.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{
@@ -582,7 +596,6 @@ func ManageUser(c *gin.Context) {
 		})
 		return
 	}
-
 	myRole := c.GetInt("role")
 	if myRole <= user.Role && myRole != common.RoleRootUser {
 		c.JSON(http.StatusOK, gin.H{
@@ -591,7 +604,6 @@ func ManageUser(c *gin.Context) {
 		})
 		return
 	}
-
 	switch req.Action {
 	case "disable":
 		user.Status = common.UserStatusDisabled
@@ -651,9 +663,9 @@ func ManageUser(c *gin.Context) {
 			return
 		}
 		user.Role = common.RoleCommonUser
-	case "changeGroup":
-		user.Group = req.NewGroup
 	}
+	// 更新用户分组
+	user.Group = req.NewGroup
 
 	if err := user.Update(false); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -662,22 +674,17 @@ func ManageUser(c *gin.Context) {
 		})
 		return
 	}
-
 	clearUser := model.User{
-		Group:  user.Group,
 		Role:   user.Role,
 		Status: user.Status,
+		Group:  user.Group,
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
 		"data":    clearUser,
 	})
-	return
 }
-
-
 
 func EmailBind(c *gin.Context) {
 	email := c.Query("email")
@@ -718,7 +725,6 @@ func EmailBind(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 type topUpRequest struct {
@@ -736,7 +742,7 @@ func TopUp(c *gin.Context) {
 		return
 	}
 	id := c.GetInt("id")
-	quota, upgradedToVIP, err := model.Redeem(req.Key, id)  // 调用合并了升级逻辑的 Redeem
+	quota, err := model.Redeem(req.Key, id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -748,7 +754,5 @@ func TopUp(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    quota,
-		"upgradedToVIP": upgradedToVIP,  // 返回升级信息
 	})
-	return
 }
