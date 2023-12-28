@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"one-api/common"
 	"one-api/model"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllTokens(c *gin.Context) {
@@ -27,7 +28,6 @@ func GetAllTokens(c *gin.Context) {
 		"message": "",
 		"data":    tokens,
 	})
-	return
 }
 
 func SearchTokens(c *gin.Context) {
@@ -46,7 +46,6 @@ func SearchTokens(c *gin.Context) {
 		"message": "",
 		"data":    tokens,
 	})
-	return
 }
 
 func GetToken(c *gin.Context) {
@@ -72,7 +71,6 @@ func GetToken(c *gin.Context) {
 		"message": "",
 		"data":    token,
 	})
-	return
 }
 
 func GetTokenStatus(c *gin.Context) {
@@ -112,7 +110,7 @@ func AddToken(c *gin.Context) {
 	if len(token.Name) > 30 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "Key名称过长",
+			"message": "令牌名称过长",
 		})
 		return
 	}
@@ -138,7 +136,6 @@ func AddToken(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func DeleteToken(c *gin.Context) {
@@ -156,7 +153,6 @@ func DeleteToken(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func UpdateToken(c *gin.Context) {
@@ -174,7 +170,7 @@ func UpdateToken(c *gin.Context) {
 	if len(token.Name) > 30 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "Key名称过长,不能超过30位",
+			"message": "令牌名称过长",
 		})
 		return
 	}
@@ -190,14 +186,14 @@ func UpdateToken(c *gin.Context) {
 		if cleanToken.Status == common.TokenStatusExpired && cleanToken.ExpiredTime <= common.GetTimestamp() && cleanToken.ExpiredTime != -1 {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "Key已过期，无法启用，请先修改Key过期时间，或者设置为永不过期",
+				"message": "令牌已过期，无法启用，请先修改令牌过期时间，或者设置为永不过期",
 			})
 			return
 		}
 		if cleanToken.Status == common.TokenStatusExhausted && cleanToken.RemainQuota <= 0 && !cleanToken.UnlimitedQuota {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "Key可用额度已用尽，无法启用，请先修改Key剩余额度，或者设置为无限额度",
+				"message": "令牌可用额度已用尽，无法启用，请先修改令牌剩余额度，或者设置为无限额度",
 			})
 			return
 		}
@@ -224,5 +220,4 @@ func UpdateToken(c *gin.Context) {
 		"message": "",
 		"data":    cleanToken,
 	})
-	return
 }

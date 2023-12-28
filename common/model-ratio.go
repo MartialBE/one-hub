@@ -43,15 +43,15 @@ var ModelRatio = map[string]float64{
 	"gpt-4-32k":                 30,
 	"gpt-4-32k-0314":            30,
 	"gpt-4-32k-0613":            30,
-	"gpt-4-1106-preview":        5,
-	"gpt-4-vision-preview":      5,
-	"gpt-3.5-turbo":             0.75,
+	"gpt-4-1106-preview":        5,    // $0.01 / 1K tokens
+	"gpt-4-vision-preview":      5,    // $0.01 / 1K tokens
+	"gpt-3.5-turbo":             0.75, // $0.0015 / 1K tokens
 	"gpt-3.5-turbo-0301":        0.75,
 	"gpt-3.5-turbo-0613":        0.75,
-	"gpt-3.5-turbo-16k":         1.5,
+	"gpt-3.5-turbo-16k":         1.5, // $0.003 / 1K tokens
 	"gpt-3.5-turbo-16k-0613":    1.5,
-	"gpt-3.5-turbo-instruct":    0.75,
-	"gpt-3.5-turbo-1106":        0.5,
+	"gpt-3.5-turbo-instruct":    0.75, // $0.0015 / 1K tokens
+	"gpt-3.5-turbo-1106":        0.5,  // $0.001 / 1K tokens
 	"text-ada-001":              0.2,
 	"text-babbage-001":          0.25,
 	"text-curie-001":            1,
@@ -59,7 +59,7 @@ var ModelRatio = map[string]float64{
 	"text-davinci-003":          10,
 	"text-davinci-edit-001":     10,
 	"code-davinci-edit-001":     10,
-	"whisper-1":                 15,
+	"whisper-1":                 15,  // $0.006 / minute -> $0.006 / 150 words -> $0.006 / 200 tokens -> $0.03 / 1k tokens
 	"tts-1":                     7.5, // $0.015 / 1K characters
 	"tts-1-1106":                7.5,
 	"tts-1-hd":                  15, // $0.030 / 1K characters
@@ -72,16 +72,16 @@ var ModelRatio = map[string]float64{
 	"text-search-ada-doc-001":   10,
 	"text-moderation-stable":    0.1,
 	"text-moderation-latest":    0.1,
-	"dall-e-2":                  8,  // $0.016 - $0.020 / image
-	"dall-e-3":                  20, // $0.040 - $0.120 / image
-	"claude-instant-1":          0.815,
-	"claude-2":                  5.51,
-	"claude-2.0":                5.51,
-	"claude-2.1":                5.51,
-	"ERNIE-Bot":                 0.8572,
-	"ERNIE-Bot-turbo":           0.5715,
-	"ERNIE-Bot-4":               8.572,
-	"Embedding-V1":              0.1429,
+	"dall-e-2":                  8,      // $0.016 - $0.020 / image
+	"dall-e-3":                  20,     // $0.040 - $0.120 / image
+	"claude-instant-1":          0.815,  // $1.63 / 1M tokens
+	"claude-2":                  5.51,   // $11.02 / 1M tokens
+	"claude-2.0":                5.51,   // $11.02 / 1M tokens
+	"claude-2.1":                5.51,   // $11.02 / 1M tokens
+	"ERNIE-Bot":                 0.8572, // ￥0.012 / 1k tokens
+	"ERNIE-Bot-turbo":           0.5715, // ￥0.008 / 1k tokens
+	"ERNIE-Bot-4":               8.572,  // ￥0.12 / 1k tokens
+	"Embedding-V1":              0.1429, // ￥0.002 / 1k tokens
 	"PaLM-2":                    1,
 	"gemini-pro":                1,      // $0.00025 / 1k characters -> $0.001 / 1k tokens
 	"gemini-pro-vision":         1,      // $0.00025 / 1k characters -> $0.001 / 1k tokens

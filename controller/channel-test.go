@@ -1,105 +1,96 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
+	"net/http/httptest"
 	"one-api/common"
 	"one-api/model"
+	"one-api/providers"
+	providers_base "one-api/providers/base"
+	"one-api/types"
 	"strconv"
 	"sync"
 	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
-func testChannel(channel *model.Channel, request ChatRequest) (err error, openaiErr *OpenAIError) {
-	switch channel.Type {
-	case common.ChannelTypePaLM:
-		fallthrough
-	case common.ChannelTypeGemini:
-		fallthrough
-	case common.ChannelTypeAnthropic:
-		fallthrough
-	case common.ChannelTypeBaidu:
-		fallthrough
-	case common.ChannelTypeZhipu:
-		fallthrough
-	case common.ChannelTypeAli:
-		fallthrough
-	case common.ChannelType360:
-		fallthrough
-	case common.ChannelTypeXunfei:
-		return errors.New("该渠道类型当前版本不支持测试，请手动测试"), nil
-	case common.ChannelTypeAzure:
-		request.Model = "gpt-35-turbo"
-		defer func() {
-			if err != nil {
-				err = errors.New("请确保已在 Azure 上创建了 gpt-35-turbo 模型，并且 apiVersion 已正确填写！")
-			}
-		}()
-	default:
-		request.Model = "gpt-3.5-turbo"
-	}
-	requestURL := common.ChannelBaseURLs[channel.Type]
-	if channel.Type == common.ChannelTypeAzure {
-		requestURL = getFullRequestURL(channel.GetBaseURL(), fmt.Sprintf("/openai/deployments/%s/chat/completions?api-version=2023-03-15-preview", request.Model), channel.Type)
-	} else {
-		if baseURL := channel.GetBaseURL(); len(baseURL) > 0 {
-			requestURL = baseURL
-		}
-
-		requestURL = getFullRequestURL(requestURL, "/v1/chat/completions", channel.Type)
-	}
-	jsonData, err := json.Marshal(request)
+func testChannel(channel *model.Channel, request types.ChatCompletionRequest) (err error, openaiErr *types.OpenAIError) {
+	// 创建一个 http.Request
+	req, err := http.NewRequest("POST", "/v1/chat/completions", nil)
 	if err != nil {
 		return err, nil
-	}
-	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return err, nil
-	}
-	if channel.Type == common.ChannelTypeAzure {
-		req.Header.Set("api-key", channel.Key)
-	} else {
-		req.Header.Set("Authorization", "Bearer "+channel.Key)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := httpClient.Do(req)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+
+	// 创建映射
+	channelTypeToModel := map[int]string{
+		common.ChannelTypePaLM:      "PaLM-2",
+		common.ChannelTypeAnthropic: "claude-2",
+		common.ChannelTypeBaidu:     "ERNIE-Bot",
+		common.ChannelTypeZhipu:     "chatglm_lite",
+		common.ChannelTypeAli:       "qwen-turbo",
+		common.ChannelType360:       "360GPT_S2_V9",
+		common.ChannelTypeXunfei:    "SparkDesk",
+		common.ChannelTypeTencent:   "hunyuan",
+		common.ChannelTypeAzure:     "gpt-3.5-turbo",
+	}
+
+	// 从映射中获取模型名称
+	model, ok := channelTypeToModel[channel.Type]
+	if !ok {
+		model = "gpt-3.5-turbo" // 默认值
+	}
+	request.Model = model
+
+	provider := providers.GetProvider(channel, c)
+	if provider == nil {
+		return errors.New("channel not implemented"), nil
+	}
+	chatProvider, ok := provider.(providers_base.ChatInterface)
+	if !ok {
+		return errors.New("channel not implemented"), nil
+	}
+
+	modelMap, err := parseModelMapping(channel.GetModelMapping())
 	if err != nil {
 		return err, nil
 	}
-	defer resp.Body.Close()
-	var response TextResponse
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err, nil
+	if modelMap != nil && modelMap[request.Model] != "" {
+		request.Model = modelMap[request.Model]
 	}
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return fmt.Errorf("Error: %s\nResp body: %s", err, body), nil
+
+	promptTokens := common.CountTokenMessages(request.Messages, request.Model)
+	Usage, openAIErrorWithStatusCode := chatProvider.ChatAction(&request, true, promptTokens)
+	if openAIErrorWithStatusCode != nil {
+		return nil, &openAIErrorWithStatusCode.OpenAIError
 	}
-	if response.Usage.CompletionTokens == 0 {
-		if response.Error.Message == "" {
-			response.Error.Message = "补全 tokens 非预期返回 0"
-		}
-		return errors.New(fmt.Sprintf("type %s, code %v, message %s", response.Error.Type, response.Error.Code, response.Error.Message)), &response.Error
+
+	if Usage.CompletionTokens == 0 {
+		return fmt.Errorf("channel %s, message 补全 tokens 非预期返回 0", channel.Name), nil
 	}
+
 	return nil, nil
 }
 
-func buildTestRequest() *ChatRequest {
-	testRequest := &ChatRequest{
-		Model:     "", // this will be set later
+func buildTestRequest() *types.ChatCompletionRequest {
+	testRequest := &types.ChatCompletionRequest{
+		Messages: []types.ChatCompletionMessage{
+			{
+				Role:    "user",
+				Content: "You just need to output 'hi' next.",
+			},
+		},
+		Model:     "",
 		MaxTokens: 1,
+		Stream:    false,
 	}
-	testMessage := Message{
-		Role:    "user",
-		Content: "hi",
-	}
-	testRequest.Messages = append(testRequest.Messages, testMessage)
 	return testRequest
 }
 
@@ -140,7 +131,6 @@ func TestChannel(c *gin.Context) {
 		"message": "",
 		"time":    consumedTime,
 	})
-	return
 }
 
 var testAllChannelsLock sync.Mutex
@@ -199,8 +189,8 @@ func testAllChannels(notify bool) error {
 			err, openaiErr := testChannel(channel, *testRequest)
 			tok := time.Now()
 			milliseconds := tok.Sub(tik).Milliseconds()
-			if isChannelEnabled && milliseconds > disableThreshold {
-				err = errors.New(fmt.Sprintf("响应时间 %.2fs 超过阈值 %.2fs", float64(milliseconds)/1000.0, float64(disableThreshold)/1000.0))
+			if milliseconds > disableThreshold {
+				err = fmt.Errorf("响应时间 %.2fs 超过阈值 %.2fs", float64(milliseconds)/1000.0, float64(disableThreshold)/1000.0)
 				disableChannel(channel.Id, channel.Name, err.Error())
 			}
 			if isChannelEnabled && shouldDisableChannel(openaiErr, -1) {
@@ -238,7 +228,6 @@ func TestAllChannels(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func AutomaticallyTestChannels(frequency int) {

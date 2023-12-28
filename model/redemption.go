@@ -3,8 +3,9 @@ package model
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"one-api/common"
+
+	"gorm.io/gorm"
 )
 
 type Redemption struct {
@@ -27,7 +28,7 @@ func GetAllRedemptions(startIdx int, num int) ([]*Redemption, error) {
 }
 
 func SearchRedemptions(keyword string) (redemptions []*Redemption, err error) {
-	err = DB.Where("id = ? or name LIKE ?", keyword, keyword+"%").Find(&redemptions).Error
+	err = DB.Where("id = ? or name LIKE ?", common.String2Int(keyword), keyword+"%").Find(&redemptions).Error
 	return redemptions, err
 }
 
@@ -40,7 +41,6 @@ func GetRedemptionById(id int) (*Redemption, error) {
 	err = DB.First(&redemption, "id = ?", id).Error
 	return &redemption, err
 }
-
 func Redeem(key string, userId int) (quota int, upgradedToVIP bool, err error) {
 	upgradedToVIP = false // 初始化升级状态为 false（注意：这里不需要使用 var）
 	if key == "" {
@@ -78,24 +78,24 @@ func Redeem(key string, userId int) (quota int, upgradedToVIP bool, err error) {
 	}
 	RecordLog(userId, LogTypeTopup, fmt.Sprintf("通过兑换码充值 %s", common.LogQuota(redemption.Quota)))
 
-    // 获取用户信息
-    user := &User{}
-    err = DB.Where("id = ?", userId).First(user).Error
-    if err != nil {
-        return redemption.Quota, upgradedToVIP, errors.New("查询用户信息失败")
-    }
+	// 获取用户信息
+	user := &User{}
+	err = DB.Where("id = ?", userId).First(user).Error
+	if err != nil {
+		return redemption.Quota, upgradedToVIP, errors.New("查询用户信息失败")
+	}
 
-    // 检查是否需要升级为 VIP
-    if user.Group != "vip" && user.Group != "svip" && user.Quota >= 5*500000 {
-        // 升级用户到 VIP
-        err = DB.Model(&User{}).Where("id = ?", userId).Update("group", "vip").Error
-        if err != nil {
-            return redemption.Quota, upgradedToVIP, errors.New("升级 VIP 失败")
-        }
-        upgradedToVIP = true // 设置升级状态为 true
-    }
+	// 检查是否需要升级为 VIP
+	if user.Group != "vip" && user.Group != "svip" && user.Quota >= 5*500000 {
+		// 升级用户到 VIP
+		err = DB.Model(&User{}).Where("id = ?", userId).Update("group", "vip").Error
+		if err != nil {
+			return redemption.Quota, upgradedToVIP, errors.New("升级 VIP 失败")
+		}
+		upgradedToVIP = true // 设置升级状态为 true
+	}
 
-    return redemption.Quota, upgradedToVIP, nil
+	return redemption.Quota, upgradedToVIP, nil
 }
 
 func (redemption *Redemption) Insert() error {
