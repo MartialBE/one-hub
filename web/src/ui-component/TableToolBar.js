@@ -16,7 +16,7 @@ export default function TableToolBar({ filterName, handleFilterName, placeholder
   return (
     <Toolbar
       sx={{
-        height: 80,
+        height: 64,
         display: 'flex',
         justifyContent: 'space-between',
         p: (theme) => theme.spacing(0, 1, 0, 3)

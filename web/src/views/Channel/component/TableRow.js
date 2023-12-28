@@ -13,27 +13,33 @@ import {
   IconButton,
   FormControl,
   InputLabel,
-  InputAdornment,
-  Input,
+  // InputAdornment,
+  // Input,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Tooltip,
-  Button
+  Button,
+  OutlinedInput
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-import GroupLabel from './GroupLabel';
+// import GroupLabel from './GroupLabel';
 import NameLabel from './NameLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconPencil } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+// IconPencil
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
+import Checkbox from '@mui/material/Checkbox';
+import { red, grey, purple } from '@mui/material/colors';
+// import { IconCaretUp, IconCaretDown } from "@tabler/icons-react";
+
+export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, monthlyQuotas }) {
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
@@ -41,6 +47,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   const [responseTimeData, setResponseTimeData] = useState({ test_time: item.test_time, response_time: item.response_time });
   const [itemBalance, setItemBalance] = useState(item.balance);
 
+  const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
   const handleDeleteOpen = () => {
     handleCloseMenu();
     setOpenDelete(true);
@@ -82,7 +89,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   };
 
   const updateChannelBalance = async () => {
-    const res = await API.get(`/api/channel/update_balance/${item.id}`);
+    const res = await API.get(`/api/channel/update_balance/${item.id}/`);
     const { success, message, balance } = res.data;
     if (success) {
       setItemBalance(balance);
@@ -98,6 +105,29 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     await manageChannel(item.id, 'delete', '');
   };
 
+  // 月已用额度
+  const monthlyQuotasValue = (monthlyQuotas[item.id] || 0).toFixed(2);
+  // 总已用额度
+  const usedQuotaValue = (item.used_quota / quotaPerUnit || 0).toFixed(2);
+
+  // 剩余额度
+  // const balanceValue = (item.balance / quotaPerUnit).toFixed(2);
+
+  // 改变用户组的显示方式
+  function renderCheckbox(checked, color) {
+    return (
+      <Checkbox
+        checked={checked}
+        style={{
+          color: color,
+          padding: '4px',
+        }}
+      />
+    );
+  }
+
+
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -107,9 +137,16 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           <NameLabel name={item.name} models={item.models} />
         </TableCell>
 
-        <TableCell>
+        {/* <TableCell>
           <GroupLabel group={item.group} />
+        </TableCell> */}
+        <TableCell>
+          {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
+          {renderCheckbox(item.group.split(',').includes('vip'), red[500])}
+          {renderCheckbox(item.group.split(',').includes('svip'), purple[500])}
         </TableCell>
+
+
 
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
@@ -134,12 +171,16 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             handle_action={handleResponseTime}
           />
         </TableCell>
+        {/* 月已用额度 */}
+        <TableCell>{monthlyQuotasValue}</TableCell>
+        {/*  总已用额度 */}
+        <TableCell>{usedQuotaValue}</TableCell>
         <TableCell>
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(itemBalance)}
           </Tooltip>
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
             <InputLabel htmlFor={`priority-${item.id}`}>优先级</InputLabel>
             <Input
@@ -155,6 +196,19 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                   </IconButton>
                 </InputAdornment>
               }
+            />
+          </FormControl>
+        </TableCell> */}
+        <TableCell>
+          <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
+            <InputLabel htmlFor={`priority-${item.id}`}>优先级</InputLabel>
+            <OutlinedInput
+              id={`priority-${item.id}`}
+              type="number"
+              value={priorityValve}
+              onChange={(e) => setPriority(e.target.value)}
+              onBlur={handlePriority}
+              sx={{ textAlign: 'center' }}
             />
           </FormControl>
         </TableCell>
@@ -212,7 +266,8 @@ ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalChannelId: PropTypes.func
+  setModalChannelId: PropTypes.func,
+  monthlyQuotas: PropTypes.object,
 };
 
 function renderBalance(type, balance) {

@@ -15,13 +15,13 @@ import {
   Button,
   Tooltip,
   Stack,
+  ButtonGroup
 } from '@mui/material';
 
 import TableSwitch from 'ui-component/Switch';
 import { renderQuota, showSuccess, timestamp2string } from 'utils/common';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
-
 
 
 
@@ -103,19 +103,10 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     }
   ]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText('your_text_here');
-    showSuccess('已复制到剪贴板！');
-  };
-
-
-
-
 
   return (
     <>
       <TableRow tabIndex={item.id}>
-        
         <TableCell>{item.name}</TableCell>
 
         <TableCell>
@@ -155,13 +146,17 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
 
         <TableCell>
           <Stack direction="row" spacing={1}>
-            <Button
-              color="primary"
-              onClick={handleCopy}
-            >
-              复制
-            </Button>
-
+            <ButtonGroup size="small" aria-label="split button">
+              <Button
+                color="primary"
+                onClick={() => {
+                  navigator.clipboard.writeText(`sk-${item.key}`);
+                  showSuccess('已复制到剪贴板！');
+                }}
+              >
+                复制
+              </Button>   
+            </ButtonGroup>
             <IconButton onClick={(e) => handleOpenMenu(e, 'action')} sx={{ color: 'rgb(99, 115, 129)' }}>
               <IconDotsVertical />
             </IconButton>
@@ -182,9 +177,9 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除Token</DialogTitle>
+        <DialogTitle>删除Key</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除Token {item.name}？</DialogContentText>
+          <DialogContentText>是否删除Key {item.name}？</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteClose}>关闭</Button>

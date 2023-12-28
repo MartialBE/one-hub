@@ -20,8 +20,9 @@ export default function componentStyleOverrides(theme) {
           }
         }
       }
-    }, //MuiAutocomplete-popper MuiPopover-root
-    MuiAutocomplete: {
+    }, 
+ 
+   MuiAutocomplete: {
       styleOverrides: {
         popper: {
           // 继承 MuiPopover-root
@@ -39,7 +40,7 @@ export default function componentStyleOverrides(theme) {
           fontSize: '16px',
           fontWeight: '400',
           lineHeight: '1.334em',
-          alignItems: 'center',
+          alignItems: 'left',
           paddingTop: '6px',
           paddingBottom: '6px',
           paddingLeft: '16px',
@@ -227,7 +228,8 @@ export default function componentStyleOverrides(theme) {
       styleOverrides: {
         root: {
           borderBottom: '1px solid rgb(241, 243, 244)',
-          textAlign: 'center'
+          textAlign: 'left',
+          borderRight: "1px solid rgba(34,36,38,.05)", // 添加列的分割线
         },
         head: {
           color: theme.darkTextSecondary,

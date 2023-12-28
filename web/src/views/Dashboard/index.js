@@ -48,6 +48,16 @@ const Dashboard = () => {
     loadUser();
   }, []);
 
+  // 会员组颜色
+  let cardClass;
+  if (users?.group === "default" || !users?.group) {
+    cardClass = "default-group";
+  } else if (users?.group === "vip") {
+    cardClass = "vip-group";
+  } else if (users?.group === "svip") {
+    cardClass = "svip-group";
+  }
+
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
@@ -71,7 +81,7 @@ const Dashboard = () => {
           <Grid item lg={4} xs={12}>
             <StatisticalLineChartCard
               isLoading={isLoading}
-              title="今日Key"
+              title="今日Token"
               chartData={tokenChart?.chartData}
               todayValue={tokenChart?.todayValue}
             />
@@ -83,9 +93,24 @@ const Dashboard = () => {
           <Grid item lg={8} xs={12}>
             <StatisticalBarChart isLoading={isLoading} chartDatas={statisticalData} />
           </Grid>
-          <Grid item lg={4} xs={12}>
-            <UserCard>
+          <Grid item lg={4} xs={12} > 
+          
+          <div className={cardClass}>
+            <UserCard >
+            
               <Grid container spacing={gridSpacing} justifyContent="center" alignItems="center" paddingTop={'20px'}>
+                <Grid item xs={4}>
+                  <Typography variant="h4">用户组:</Typography>
+                </Grid>
+                <Grid item xs={8}>
+                  <Typography variant="h3">
+                    {users?.group
+                      ? users.group === "default"
+                        ? "普通用户"
+                        : users.group
+                      : "未知"}
+                  </Typography>
+                </Grid>
                 <Grid item xs={4}>
                   <Typography variant="h4">余 额:</Typography>
                 </Grid>
@@ -105,7 +130,10 @@ const Dashboard = () => {
                   <Typography variant="h3"> {users?.request_count || '未知'}</Typography>
                 </Grid>
               </Grid>
+              
             </UserCard>
+            </div>
+            
           </Grid>
         </Grid>
       </Grid>

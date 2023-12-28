@@ -569,7 +569,6 @@ func CreateUser(c *gin.Context) {
 type ManageRequest struct {
 	Username string `json:"username"`
 	Action   string `json:"action"`
-	NewGroup string `json:"newGroup"`
 }
 
 // ManageUser Only admin user can do this
@@ -664,8 +663,6 @@ func ManageUser(c *gin.Context) {
 		}
 		user.Role = common.RoleCommonUser
 	}
-	// 更新用户分组
-	user.Group = req.NewGroup
 
 	if err := user.Update(false); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -677,7 +674,6 @@ func ManageUser(c *gin.Context) {
 	clearUser := model.User{
 		Role:   user.Role,
 		Status: user.Status,
-		Group:  user.Group,
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -742,7 +738,7 @@ func TopUp(c *gin.Context) {
 		return
 	}
 	id := c.GetInt("id")
-	quota, err := model.Redeem(req.Key, id)
+	quota, upgradedToVIP, err := model.Redeem(req.Key, id) // 调用合并了升级逻辑的 Redeem
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -751,8 +747,9 @@ func TopUp(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-		"data":    quota,
+		"success":       true,
+		"message":       "",
+		"data":          quota,
+		"upgradedToVIP": upgradedToVIP, // 返回升级信息
 	})
 }

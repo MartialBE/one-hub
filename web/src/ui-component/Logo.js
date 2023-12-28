@@ -1,5 +1,5 @@
 // material-ui
-import logo from 'assets/images/logo.png';
+import logo from 'assets/images/logo.svg';
 import { useSelector } from 'react-redux';
 
 /**
@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 const Logo = () => {
   const siteInfo = useSelector((state) => state.siteInfo);
 
-  return <img src={siteInfo.logo || logo} alt={siteInfo.system_name} width="60" />;
+  return <img src={siteInfo.logo || logo} alt={siteInfo.system_name} width="50" />;
 };
 
 export default Logo;

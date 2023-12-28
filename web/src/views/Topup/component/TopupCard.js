@@ -4,7 +4,6 @@ import { useTheme } from '@mui/material/styles';
 import SubCard from 'ui-component/cards/SubCard';
 import UserCard from 'ui-component/cards/UserCard';
 
-
 import { API } from 'utils/api';
 import React, { useEffect, useState } from 'react';
 import { showError, showInfo, showSuccess, renderQuota } from 'utils/common';
@@ -15,29 +14,6 @@ const TopupCard = () => {
   const [topUpLink, setTopUpLink] = useState('');
   const [userQuota, setUserQuota] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userGroup, setUserGroup] = useState('');
-
-   // 升级用户组
-   const updateUserGroupIfNecessary = async (quota) => {
-    if (userGroup === 'vip') return; // 添加这一行
-
-    if (quota >= 5*500000) {
-      try {
-        const res = await API.post('/api/user/manage', {
-          username: localStorage.getItem('username'),
-          newGroup: 'vip'
-        });
-        const {success} = res.data;
-        if (success) {
-          showSuccess('已成功升级为 VIP 会员！');
-        } else {
-          showError('请右下角联系客服');
-        }
-      } catch (err) {
-        showError('请右下角联系客服');
-      }
-    }
-  };
 
   const topUp = async () => {
     if (redemptionCode === '') {
@@ -49,22 +25,22 @@ const TopupCard = () => {
       const res = await API.post('/api/user/topup', {
         key: redemptionCode
       });
-      const { success, message, data } = res.data;
+      const { success, message, data, upgradedToVIP  } = res.data;
       if (success) {
-        showSuccess('充值成功！');
+        if (upgradedToVIP) {  // 如果用户成功升级为 VIP
+          showSuccess('充值成功，升级为 VIP 会员');
+        } else {
+          showSuccess('充值成功');
+        }
         setUserQuota((quota) => {
-          // return quota + data;
-          const newQuota = quota + data;
-          updateUserGroupIfNecessary(newQuota);
-          return newQuota;
+          return quota + data;
         });
         setRedemptionCode('');
       } else {
         showError(message);
       }
     } catch (err) {
-      // showError('请求失败');
-      showError('请右下角联系客服');
+      showError('失败,请右下角联系客服');
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +59,6 @@ const TopupCard = () => {
     const { success, message, data } = res.data;
     if (success) {
       setUserQuota(data.quota);
-      setUserGroup(data.group); // 添加这一行
     } else {
       showError(message);
     }
