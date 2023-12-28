@@ -139,7 +139,8 @@ func postConsumeQuota(ctx context.Context, tokenId int, quotaDelta int, totalQuo
 	}
 	// totalQuota is total quota consumed
 	if totalQuota != 0 {
-		logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f", modelRatio, groupRatio)
+		outputPrice := modelRatio * 0.002
+		logContent := fmt.Sprintf("单价: $%.6g/1k tokens", outputPrice)
 		model.RecordConsumeLog(ctx, userId, channelId, totalQuota, 0, modelName, tokenName, totalQuota, logContent)
 		model.UpdateUserUsedQuotaAndRequestCount(userId, totalQuota)
 		model.UpdateChannelUsedQuota(channelId, totalQuota)
@@ -268,7 +269,8 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 		return errors.New("error consuming token remain quota: " + err.Error())
 	}
 	if quota != 0 {
-		logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f", q.modelRatio, q.groupRatio)
+		outputPrice := q.modelRatio * 0.002
+		logContent := fmt.Sprintf("单价: $%.6g", outputPrice)
 		model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent)
 		model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 		model.UpdateChannelUsedQuota(q.channelId, quota)

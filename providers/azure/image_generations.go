@@ -15,7 +15,7 @@ func (c *ImageAzureResponse) ResponseHandler(resp *http.Response) (OpenAIRespons
 		errWithCode = &types.OpenAIErrorWithStatusCode{
 			OpenAIError: types.OpenAIError{
 				Message: c.Error.Message,
-				Type:    "one_api_error",
+				Type:    "czl_oapi_error",
 				Code:    c.Error.Code,
 			},
 			StatusCode: resp.StatusCode,

@@ -1,12 +1,11 @@
 package controller
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"one-api/common"
 	"one-api/model"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 func GetAllLogs(c *gin.Context) {

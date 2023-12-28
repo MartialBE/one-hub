@@ -8,7 +8,7 @@
 
 <div align="center">
 
-# One API
+# CZL OAPI
 
 _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开发而来的，主要将原项目中的模块代码分离，模块化，并修改了前端界面。本项目同样遵循 MIT 协议。_
 
@@ -225,7 +225,7 @@ docker-compose ps
 
 如果部署后访问出现空白页面，详见 [#97](https://github.com/songquanpeng/one-api/issues/97)。
 
-### 部署第三方服务配合 One API 使用
+### 部署第三方服务配合 CZL OAPI 使用
 
 > 欢迎 PR 添加更多示例。
 
@@ -253,7 +253,7 @@ docker run --name chatgpt-web -d -p 3002:3002 -e OPENAI_API_BASE_URL=https://ope
 
 项目主页：https://github.com/RockChinQ/QChatGPT
 
-根据文档完成部署后，在`config.py`设置配置项`openai_config`的`reverse_proxy`为 One API 后端地址，设置`api_key`为 One API 生成的 key，并在配置项`completion_api_params`的`model`参数设置为 One API 支持的模型名称。
+根据文档完成部署后，在`config.py`设置配置项`openai_config`的`reverse_proxy`为 CZL OAPI 后端地址，设置`api_key`为 CZL OAPI 生成的 key，并在配置项`completion_api_params`的`model`参数设置为 CZL OAPI 支持的模型名称。
 
 可安装 [Switcher 插件](https://github.com/RockChinQ/Switcher)在运行时切换所使用的模型。
 
@@ -288,7 +288,7 @@ docker run --name chatgpt-web -d -p 3002:3002 -e OPENAI_API_BASE_URL=https://ope
 6. Deploy 会自动开始，先取消。进入下方 Variable，添加一个 `PORT`，值为 `3000`，再添加一个 `SQL_DSN`，值为 `<username>:<password>@tcp(<addr>:<port>)/one-api` ，然后保存。 注意如果不填写 `SQL_DSN`，数据将无法持久化，重新部署后数据会丢失。
 7. 选择 Redeploy。
 8. 进入下方 Domains，选择一个合适的域名前缀，如 "my-one-api"，最终域名为 "my-one-api.zeabur.app"，也可以 CNAME 自己的域名。
-9. 等待部署完成，点击生成的域名进入 One API。
+9. 等待部署完成，点击生成的域名进入 CZL OAPI。
 
 </div>
 </details>
@@ -318,9 +318,9 @@ Render 可以直接部署 docker 镜像，不需要 fork 仓库：https://dashbo
 
 在`渠道`页面中添加你的 API Key，之后在`令牌`页面中新增访问令牌。
 
-之后就可以使用你的令牌访问 One API 了，使用方式与 [OpenAI API](https://platform.openai.com/docs/api-reference/introduction) 一致。
+之后就可以使用你的令牌访问 CZL OAPI 了，使用方式与 [OpenAI API](https://platform.openai.com/docs/api-reference/introduction) 一致。
 
-你需要在各种用到 OpenAI API 的地方设置 API Base 为你的 One API 的部署地址，例如：`https://openai.justsong.cn`，API Key 则为你在 One API 中生成的令牌。
+你需要在各种用到 OpenAI API 的地方设置 API Base 为你的 CZL OAPI 的部署地址，例如：`https://openai.justsong.cn`，API Key 则为你在 CZL OAPI 中生成的令牌。
 
 注意，具体的 API Base 的格式取决于你所使用的客户端。
 
@@ -334,14 +334,14 @@ OPENAI_API_BASE="https://<HOST>:<PORT>/v1"
 ```mermaid
 graph LR
     A(用户)
-    A --->|使用 One API 分发的 key 进行请求| B(One API)
+    A --->|使用 CZL OAPI 分发的 key 进行请求| B(CZL OAPI)
     B -->|中继请求| C(OpenAI)
     B -->|中继请求| D(Azure)
     B -->|中继请求| E(其他 OpenAI API 格式下游渠道)
     B -->|中继并修改请求体和返回体| F(非 OpenAI API 格式下游渠道)
 ```
 
-可以通过在令牌后面添加渠道 ID 的方式指定使用哪一个渠道处理本次请求，例如：`Authorization: Bearer ONE_API_KEY-CHANNEL_ID`。
+可以通过在令牌后面添加渠道 ID 的方式指定使用哪一个渠道处理本次请求，例如：`Authorization: Bearer czl_oapi_KEY-CHANNEL_ID`。
 注意，需要是管理员用户创建的令牌才能指定渠道 ID。
 
 不加的话将会使用负载均衡的方式使用多个渠道。
@@ -416,11 +416,11 @@ https://openai.justsong.cn
 
 ## 常见问题
 
-1. 额度是什么？怎么计算的？One API 的额度计算有问题？
+1. 额度是什么？怎么计算的？CZL OAPI 的额度计算有问题？
    - 额度 = 分组倍率 _ 模型倍率 _ （提示 token 数 + 补全 token 数 \* 补全倍率）
    - 其中补全倍率对于 GPT3.5 固定为 1.33，GPT4 为 2，与官方保持一致。
    - 如果是非流模式，官方接口会返回消耗的总 token，但是你要注意提示和补全的消耗倍率不一样。
-   - 注意，One API 的默认倍率就是官方倍率，是已经调整过的。
+   - 注意，CZL OAPI 的默认倍率就是官方倍率，是已经调整过的。
 2. 账户额度足够为什么提示额度不足？
    - 请检查你的令牌额度是否足够，这个和账户额度是分开的。
    - 令牌额度仅供用户设置最大使用量，用户可自由设置。

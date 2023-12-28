@@ -4,7 +4,7 @@ const config = {
   basename: '/',
   defaultPath: '/panel/dashboard',
   fontFamily: `system-ui,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
-  borderRadius: 16,
+  borderRadius: 8,
   siteInfo: {
     chat_link: '',
     display_in_currency: true,
@@ -17,7 +17,7 @@ const config = {
     server_address: '',
     start_time: 0,
     system_name: 'CZL Oapi',
-    top_up_link: '',
+    top_up_link: 'https://store0.czl.net',
     turnstile_check: false,
     turnstile_site_key: '',
     version: '',
