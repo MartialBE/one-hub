@@ -3,8 +3,8 @@ const config = {
   // like '/berry-material-react/react/default'
   basename: '/',
   defaultPath: '/panel/dashboard',
-  fontFamily: `system-ui,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
-  borderRadius: 8,
+  fontFamily: `'Roboto', sans-serif, Helvetica, Arial, sans-serif`,
+  borderRadius: 12,
   siteInfo: {
     chat_link: '',
     display_in_currency: true,
@@ -16,7 +16,7 @@ const config = {
     quota_per_unit: 500000,
     server_address: '',
     start_time: 0,
-    system_name: 'CZLOapi',
+    system_name: 'One API',
     top_up_link: '',
     turnstile_check: false,
     turnstile_site_key: '',

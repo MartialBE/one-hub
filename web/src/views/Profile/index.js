@@ -16,13 +16,13 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import SubCard from 'ui-component/cards/SubCard';
-import { IconBrandGithub, IconMail } from '@tabler/icons-react'; //IconBrandWechat,
+import { IconBrandWechat, IconBrandGithub, IconMail } from '@tabler/icons-react';
 import Label from 'ui-component/Label';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
 import { onGitHubOAuthClicked } from 'utils/common';
 import * as Yup from 'yup';
-// import WechatModal from 'views/Authentication/AuthForms/WechatModal';
+import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
 import EmailModal from './component/EmailModal';
 import Turnstile from 'react-turnstile';
@@ -41,17 +41,17 @@ export default function Profile() {
   const [turnstileEnabled, setTurnstileEnabled] = useState(false);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
-  // const [openWechat, setOpenWechat] = useState(false);
+  const [openWechat, setOpenWechat] = useState(false);
   const [openEmail, setOpenEmail] = useState(false);
   const status = useSelector((state) => state.siteInfo);
 
-  // const handleWechatOpen = () => {
-  //   setOpenWechat(true);
-  // };
+  const handleWechatOpen = () => {
+    setOpenWechat(true);
+  };
 
-  // const handleWechatClose = () => {
-  //   setOpenWechat(false);
-  // };
+  const handleWechatClose = () => {
+    setOpenWechat(false);
+  };
 
   const handleInputChange = (event) => {
     let { name, value } = event.target;
@@ -68,20 +68,20 @@ export default function Profile() {
     }
   };
 
-  // const bindWeChat = async (code) => {
-  //   if (code === '') return;
-  //   try {
-  //     const res = await API.get(`/api/oauth/wechat/bind?code=${code}`);
-  //     const { success, message } = res.data;
-  //     if (success) {
-  //       showSuccess('微信账户绑定成功！');
-  //     }
-  //     return { success, message };
-  //   } catch (err) {
-  //     // 请求失败，设置错误信息
-  //     return { success: false, message: '' };
-  //   }
-  // };
+  const bindWeChat = async (code) => {
+    if (code === '') return;
+    try {
+      const res = await API.get(`/api/oauth/wechat/bind?code=${code}`);
+      const { success, message } = res.data;
+      if (success) {
+        showSuccess('微信账户绑定成功！');
+      }
+      return { success, message };
+    } catch (err) {
+      // 请求失败，设置错误信息
+      return { success: false, message: '' };
+    }
+  };
 
   const generateAccessToken = async () => {
     const res = await API.get('/api/user/token');
@@ -128,9 +128,9 @@ export default function Profile() {
         <Card sx={{ paddingTop: '20px' }}>
           <Stack spacing={2}>
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} sx={{ paddingBottom: '20px' }}>
-              {/* <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
+              <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
                 <IconBrandWechat /> {inputs.wechat_id || '未绑定'}
-              </Label> */}
+              </Label>
               <Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
                 <IconBrandGithub /> {inputs.github_id || '未绑定'}
               </Label>
@@ -191,13 +191,13 @@ export default function Profile() {
             </SubCard>
             <SubCard title="账号绑定">
               <Grid container spacing={2}>
-                {/* {status.wechat_login && !inputs.wechat_id && (
+                {status.wechat_login && !inputs.wechat_id && (
                   <Grid xs={12} md={4}>
                     <Button variant="contained" onClick={handleWechatOpen}>
                       绑定微信账号
                     </Button>
                   </Grid>
-                )} */}
+                )}
                 {status.github_oauth && !inputs.github_id && (
                   <Grid xs={12} md={4}>
                     <Button variant="contained" onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}>
@@ -250,7 +250,6 @@ export default function Profile() {
                   <Button
                     variant="contained"
                     color="error"
-                    style={{ display: 'none' }}
                     onClick={() => {
                       setShowAccountDeleteModal(true);
                     }}
@@ -281,7 +280,7 @@ export default function Profile() {
           </Button>
         </DialogActions>
       </Dialog>
-      {/* <WechatModal open={openWechat} handleClose={handleWechatClose} wechatLogin={bindWeChat} qrCode={status.wechat_qrcode} /> */}
+      <WechatModal open={openWechat} handleClose={handleWechatClose} wechatLogin={bindWeChat} qrCode={status.wechat_qrcode} />
       <EmailModal
         open={openEmail}
         turnstileToken={turnstileToken}

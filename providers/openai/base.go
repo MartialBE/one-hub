@@ -20,12 +20,15 @@ type OpenAIProviderFactory struct{}
 
 // 创建 OpenAIProvider
 func (f OpenAIProviderFactory) Create(c *gin.Context) base.ProviderInterface {
-	return CreateOpenAIProvider(c, "")
+	openAIProvider := CreateOpenAIProvider(c, "")
+	openAIProvider.BalanceAction = true
+	return openAIProvider
 }
 
 type OpenAIProvider struct {
 	base.BaseProvider
-	IsAzure bool
+	IsAzure       bool
+	BalanceAction bool
 }
 
 // 创建 OpenAIProvider
@@ -50,7 +53,8 @@ func CreateOpenAIProvider(c *gin.Context, baseURL string) *OpenAIProvider {
 			ImagesVariations:    "/v1/images/variations",
 			Context:             c,
 		},
-		IsAzure: false,
+		IsAzure:       false,
+		BalanceAction: false,
 	}
 }
 
@@ -108,7 +112,7 @@ func (p *OpenAIProvider) GetRequestBody(request any, isModelMapped bool) (reques
 }
 
 // 发送流式请求
-func (p *OpenAIProvider) sendStreamRequest(req *http.Request, response OpenAIProviderStreamResponseHandler) (openAIErrorWithStatusCode *types.OpenAIErrorWithStatusCode, responseText string) {
+func (p *OpenAIProvider) SendStreamRequest(req *http.Request, response OpenAIProviderStreamResponseHandler) (openAIErrorWithStatusCode *types.OpenAIErrorWithStatusCode, responseText string) {
 	defer req.Body.Close()
 
 	client := common.GetHttpClient(p.Channel.Proxy)

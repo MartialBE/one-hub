@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import {
   Popover,
@@ -21,8 +22,22 @@ import {
 import TableSwitch from 'ui-component/Switch';
 import { renderQuota, showSuccess, timestamp2string } from 'utils/common';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled } from '@tabler/icons-react';
 
+const COPY_OPTIONS = [
+  {
+    key: 'next',
+    text: 'ChatGPT Next',
+    url: 'https://chat.oneapi.pro/#/?settings={"key":"sk-{key}","url":"{serverAddress}"}',
+    encode: false
+  },
+  { key: 'ama', text: 'AMA 问天', url: 'ama://set-api-key?server={serverAddress}&key=sk-{key}', encode: true },
+  { key: 'opencat', text: 'OpenCat', url: 'opencat://team/join?domain={serverAddress}&token=sk-{key}', encode: true }
+];
+
+function replacePlaceholders(text, key, serverAddress) {
+  return text.replace('{key}', key).replace('{serverAddress}', serverAddress);
+}
 
 function createMenu(menuItems) {
   return (
@@ -42,6 +57,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
   const [menuItems, setMenuItems] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
+  const siteInfo = useSelector((state) => state.siteInfo);
 
   const handleDeleteOpen = () => {
     handleCloseMenu();
@@ -102,6 +118,53 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     }
   ]);
 
+  const handleCopy = (option, type) => {
+    let serverAddress = '';
+    if (siteInfo?.server_address) {
+      serverAddress = siteInfo.server_address;
+    } else {
+      serverAddress = window.location.host;
+    }
+
+    if (option.encode) {
+      serverAddress = encodeURIComponent(serverAddress);
+    }
+
+    let url = option.url;
+
+    if (option.key === 'next' && siteInfo?.chat_link) {
+      url = siteInfo.chat_link + `/#/?settings={"key":"sk-{key}","url":"{serverAddress}"}`;
+    }
+
+    const key = item.key;
+    const text = replacePlaceholders(url, key, serverAddress);
+    if (type === 'link') {
+      window.open(text);
+    } else {
+      navigator.clipboard.writeText(text);
+      showSuccess('已复制到剪贴板！');
+    }
+    handleCloseMenu();
+  };
+
+  const copyItems = createMenu(
+    COPY_OPTIONS.map((option) => ({
+      text: option.text,
+      icon: undefined,
+      onClick: () => handleCopy(option, 'copy'),
+      color: undefined
+    }))
+  );
+
+  const linkItems = createMenu(
+    COPY_OPTIONS.map((option) => ({
+      text: option.text,
+      icon: undefined,
+      onClick: () => handleCopy(option, 'link'),
+      color: undefined
+    }))
+  );
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -154,6 +217,15 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               >
                 复制
               </Button>
+              <Button size="small" onClick={(e) => handleOpenMenu(e, 'copy')}>
+                <IconCaretDownFilled size={'16px'} />
+              </Button>
+            </ButtonGroup>
+            <ButtonGroup size="small" aria-label="split button">
+              <Button color="primary">聊天</Button>
+              <Button size="small" onClick={(e) => handleOpenMenu(e, 'link')}>
+                <IconCaretDownFilled size={'16px'} />
+              </Button>
             </ButtonGroup>
             <IconButton onClick={(e) => handleOpenMenu(e, 'action')} sx={{ color: 'rgb(99, 115, 129)' }}>
               <IconDotsVertical />
@@ -175,9 +247,9 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除Key</DialogTitle>
+        <DialogTitle>删除Token</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除Key {item.name}？</DialogContentText>
+          <DialogContentText>是否删除Token {item.name}？</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteClose}>关闭</Button>

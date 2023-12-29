@@ -232,7 +232,7 @@ const OtherSetting = () => {
             </Grid>
             <Grid xs={12}>
               <Alert severity="warning">
-                移除 CZLOapi 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。
+                移除 One API 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。
               </Alert>
             </Grid>
             <Grid xs={12}>
@@ -241,7 +241,7 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="Footer"
-                  label="页脚"
+                  label="公告"
                   value={inputs.Footer}
                   name="Footer"
                   onChange={handleInputChange}

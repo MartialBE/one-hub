@@ -8,7 +8,7 @@
 
 <div align="center">
 
-# CZLOapi
+# One API
 
 _このプロジェクトは、[one-api](https://github.com/songquanpeng/one-api)をベースにしており、元のプロジェクトのモジュールコードを分離し、モジュール化し、フロントエンドのインターフェースを変更しました。このプロジェクトも MIT ライセンスに従っています。_
 
@@ -220,7 +220,7 @@ Please refer to the [environment variables](#environment-variables) section for 
 6. 自動デプロイが開始されますが、一旦キャンセルしてください。Variable タブで `PORT` に `3000` を追加し、`SQL_DSN` に `<username>:<password>@tcp(<addr>:<port>)/one-api` を追加します。変更を保存する。SQL_DSN` が設定されていないと、データが永続化されず、再デプロイ後にデータが失われるので注意すること。
 7. 再デプロイを選択します。
 8. Domains タブで、"my-one-api" のような適切なドメイン名の接頭辞を選択する。最終的なドメイン名は "my-one-api.zeabur.app" となります。独自のドメイン名を CNAME することもできます。
-9. デプロイが完了するのを待ち、生成されたドメイン名をクリックして CZLOapi にアクセスします。
+9. デプロイが完了するのを待ち、生成されたドメイン名をクリックして One API にアクセスします。
 
 </div>
 </details>
@@ -237,22 +237,22 @@ Please refer to the [environment variables](#environment-variables) section for 
 
 `Channels` ページで API Key を追加し、`Tokens` ページでアクセストークンを追加する。
 
-アクセストークンを使って CZLOapi にアクセスすることができる。使い方は [OpenAI API](https://platform.openai.com/docs/api-reference/introduction) と同じです。
+アクセストークンを使って One API にアクセスすることができる。使い方は [OpenAI API](https://platform.openai.com/docs/api-reference/introduction) と同じです。
 
-OpenAI API が使用されている場所では、API Base に CZLOapi のデプロイアドレスを設定することを忘れないでください（例: `https://openai.justsong.cn`）。API Key は CZLOapi で生成されたトークンでなければなりません。
+OpenAI API が使用されている場所では、API Base に One API のデプロイアドレスを設定することを忘れないでください（例: `https://openai.justsong.cn`）。API Key は One API で生成されたトークンでなければなりません。
 
 具体的な API Base のフォーマットは、使用しているクライアントに依存することに注意してください。
 
 ```mermaid
 graph LR
     A(ユーザ)
-    A --->|リクエスト| B(CZLOapi)
+    A --->|リクエスト| B(One API)
     B -->|中継リクエスト| C(OpenAI)
     B -->|中継リクエスト| D(Azure)
     B -->|中継リクエスト| E(その他のダウンストリームチャンネル)
 ```
 
-現在のリクエストにどのチャネルを使うかを指定するには、トークンの後に チャネル ID を追加します： 例えば、`Authorization: Bearer czloapi_KEY-CHANNEL_ID` のようにします。
+現在のリクエストにどのチャネルを使うかを指定するには、トークンの後に チャネル ID を追加します： 例えば、`Authorization: Bearer ONE_API_KEY-CHANNEL_ID` のようにします。
 チャンネル ID を指定するためには、トークンは管理者によって作成される必要があることに注意してください。
 
 もしチャネル ID が指定されない場合、ロードバランシングによってリクエストが複数のチャネルに振り分けられます。
@@ -294,7 +294,7 @@ graph LR
 
 ## FAQ
 
-1. ノルマとは何か？どのように計算されますか？CZLOapi にはノルマ計算の問題はありますか？
+1. ノルマとは何か？どのように計算されますか？One API にはノルマ計算の問題はありますか？
    - ノルマ = グループ倍率 _ モデル倍率 _ (プロンプトトークンの数 + 完了トークンの数 \* 完了倍率)
    - 完了倍率は、公式の定義と一致するように、GPT3.5 では 1.33、GPT4 では 2 に固定されています。
    - ストリームモードでない場合、公式 API は消費したトークンの総数を返す。ただし、プロンプトとコンプリートの消費倍率は異なるので注意してください。

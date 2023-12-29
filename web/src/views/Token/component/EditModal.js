@@ -16,7 +16,7 @@ import {
   FormControl,
   InputLabel,
   OutlinedInput,
-  // InputAdornment,
+  InputAdornment,
   Switch,
   FormHelperText
 } from '@mui/material';
@@ -24,11 +24,8 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import {  showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
+import { renderQuotaWithPrompt, showSuccess, showError } from 'utils/common';
 import { API } from 'utils/api';
-
-
-let quotaPerUnit = parseFloat(localStorage.getItem('quota_per_unit'));
 
 const validationSchema = Yup.object().shape({
   is_edit: Yup.boolean(),
@@ -40,8 +37,8 @@ const validationSchema = Yup.object().shape({
 
 const originInputs = {
   is_edit: false,
-  name: '默认key',
-  remain_quota: 100,
+  name: '',
+  remain_quota: 0,
   expired_time: -1,
   unlimited_quota: false
 };
@@ -53,8 +50,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
 
-    // values.remain_quota = parseInt(values.remain_quota);
-    values.remain_quota = parseInt(values.remain_quota)* quotaPerUnit;
+    values.remain_quota = parseInt(values.remain_quota);
     let res;
     if (values.is_edit) {
       res = await API.put(`/api/token/`, { ...values, id: parseInt(tokenId) });
@@ -64,9 +60,9 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
     const { success, message } = res.data;
     if (success) {
       if (values.is_edit) {
-        showSuccess('Key更新成功！');
+        showSuccess('令牌更新成功！');
       } else {
-        showSuccess('Key创建成功，请在列表页面点击复制获取Key！');
+        showSuccess('令牌创建成功，请在列表页面点击复制获取令牌！');
       }
       setSubmitting(false);
       setStatus({ success: true });
@@ -97,11 +93,11 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {tokenId ? '编辑Key' : '新建Key'}
+        {tokenId ? '编辑Token' : '新建Token'}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Alert severity="info">注意，Key的额度仅用于限制Key本身的最大额度使用量，实际的使用受到账户的剩余额度限制。</Alert>
+        <Alert severity="info">注意，令牌的额度仅用于限制令牌本身的最大额度使用量，实际的使用受到账户的剩余额度限制。</Alert>
         <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldError, setFieldValue, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
@@ -174,7 +170,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                   type="number"
                   value={values.remain_quota}
                   name="remain_quota"
-                  // endAdornment={<InputAdornment position="end">{renderQuotaWithPrompt(values.remain_quota)}</InputAdornment>}
+                  endAdornment={<InputAdornment position="end">{renderQuotaWithPrompt(values.remain_quota)}</InputAdornment>}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   aria-describedby="helper-text-channel-remain_quota-label"

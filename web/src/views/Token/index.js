@@ -108,7 +108,7 @@ export default function Token() {
     if (success) {
       showSuccess('操作成功完成！');
       if (action === 'delete') {
-        await loadTokens(0);
+        await handleRefresh();
       }
     } else {
       showError(message);
@@ -119,9 +119,7 @@ export default function Token() {
 
   // 处理刷新
   const handleRefresh = async () => {
-    await loadTokens(0);
-    setActivePage(0);
-    setSearchKeyword('');
+    await loadTokens(activePage);
   };
 
   const handleOpenModal = (tokenId) => {
@@ -144,7 +142,7 @@ export default function Token() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Key</Typography>
+        <Typography variant="h4">Token</Typography>
 
         <Button
           variant="contained"
@@ -154,7 +152,7 @@ export default function Token() {
           }}
           startIcon={<IconPlus />}
         >
-          新建Key
+          新建Token
         </Button>
       </Stack>
       <Stack mb={5}>

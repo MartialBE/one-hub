@@ -10,9 +10,7 @@ const menuItems = {
 // Initialize urlMap
 menuItems.urlMap = menuItems.items.reduce((map, item) => {
   item.children.forEach((child) => {
-    if (child.type !== 'external') {
-      map[child.url] = child;
-    }
+    map[child.url] = child;
   });
   return map;
 }, {});

@@ -4,7 +4,7 @@ import { API } from './api';
 
 export function getSystemName() {
   let system_name = localStorage.getItem('system_name');
-  if (!system_name) return 'CZLOapi';
+  if (!system_name) return 'One API';
   return system_name;
 }
 

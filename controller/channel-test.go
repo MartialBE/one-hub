@@ -18,6 +18,10 @@ import (
 )
 
 func testChannel(channel *model.Channel, request types.ChatCompletionRequest) (err error, openaiErr *types.OpenAIError) {
+	if channel.TestModel == "" {
+		return errors.New("请填写测速模型后再试"), nil
+	}
+
 	// 创建一个 http.Request
 	req, err := http.NewRequest("POST", "/v1/chat/completions", nil)
 	if err != nil {
@@ -28,26 +32,7 @@ func testChannel(channel *model.Channel, request types.ChatCompletionRequest) (e
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-
-	// 创建映射
-	channelTypeToModel := map[int]string{
-		common.ChannelTypePaLM:      "PaLM-2",
-		common.ChannelTypeAnthropic: "claude-2",
-		common.ChannelTypeBaidu:     "ERNIE-Bot",
-		common.ChannelTypeZhipu:     "chatglm_lite",
-		common.ChannelTypeAli:       "qwen-turbo",
-		common.ChannelType360:       "360GPT_S2_V9",
-		common.ChannelTypeXunfei:    "SparkDesk",
-		common.ChannelTypeTencent:   "hunyuan",
-		common.ChannelTypeAzure:     "gpt-3.5-turbo",
-	}
-
-	// 从映射中获取模型名称
-	model, ok := channelTypeToModel[channel.Type]
-	if !ok {
-		model = "gpt-3.5-turbo" // 默认值
-	}
-	request.Model = model
+	request.Model = channel.TestModel
 
 	provider := providers.GetProvider(channel, c)
 	if provider == nil {
@@ -69,12 +54,14 @@ func testChannel(channel *model.Channel, request types.ChatCompletionRequest) (e
 	promptTokens := common.CountTokenMessages(request.Messages, request.Model)
 	Usage, openAIErrorWithStatusCode := chatProvider.ChatAction(&request, true, promptTokens)
 	if openAIErrorWithStatusCode != nil {
-		return nil, &openAIErrorWithStatusCode.OpenAIError
+		return errors.New(openAIErrorWithStatusCode.Message), &openAIErrorWithStatusCode.OpenAIError
 	}
 
 	if Usage.CompletionTokens == 0 {
-		return fmt.Errorf("channel %s, 返回的补全tokens为 0", channel.Name), nil
+		return fmt.Errorf("channel %s, message 补全 tokens 非预期返回 0", channel.Name), nil
 	}
+
+	common.SysLog(fmt.Sprintf("测试模型 %s 返回内容为：%s", channel.Name, w.Body.String()))
 
 	return nil, nil
 }
@@ -149,16 +136,16 @@ func notifyRootUser(subject string, content string) {
 // disable & notify
 func disableChannel(channelId int, channelName string, reason string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusAutoDisabled)
-	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	subject := fmt.Sprintf("通道「%s」（#%d）已被禁用", channelName, channelId)
+	content := fmt.Sprintf("通道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
 	notifyRootUser(subject, content)
 }
 
 // enable & notify
 func enableChannel(channelId int, channelName string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusEnabled)
-	subject := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
-	content := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
+	subject := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
+	content := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
 	notifyRootUser(subject, content)
 }
 
@@ -206,7 +193,7 @@ func testAllChannels(notify bool) error {
 		testAllChannelsRunning = false
 		testAllChannelsLock.Unlock()
 		if notify {
-			err := common.SendEmail("渠道测试完成", common.RootUserEmail, "渠道测试完成，如果没有收到禁用通知，说明所有渠道都正常")
+			err := common.SendEmail("通道测试完成", common.RootUserEmail, "通道测试完成，如果没有收到禁用通知，说明所有通道都正常")
 			if err != nil {
 				common.SysError(fmt.Sprintf("failed to send email: %s", err.Error()))
 			}

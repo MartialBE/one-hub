@@ -84,7 +84,7 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
         </TableCell>
 
         <TableCell>
-          <Stack direction="row" spacing={0.5} alignItems="left" justifyContent="left">
+          <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center">
             <Tooltip title={'剩余额度'} placement="top">
               <Label color={'primary'} variant="outlined">
                 {' '}
@@ -107,7 +107,7 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
         </TableCell>
         <TableCell>{renderRole(item.role)}</TableCell>
         <TableCell>
-          <Stack direction="row" spacing={0.5} alignItems="left" justifyContent="left">
+          <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center">
             <Tooltip title={item.wechat_id ? item.wechat_id : '未绑定'} placement="top">
               <IconBrandWechat color={item.wechat_id ? theme.palette.success.dark : theme.palette.grey[400]} />
             </Tooltip>

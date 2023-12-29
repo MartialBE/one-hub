@@ -40,7 +40,7 @@ const panel = {
     },
     {
       id: 'token',
-      title: 'Key',
+      title: 'Token',
       type: 'item',
       url: '/panel/token',
       icon: icons.IconKey,

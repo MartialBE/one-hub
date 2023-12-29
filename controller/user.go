@@ -738,7 +738,7 @@ func TopUp(c *gin.Context) {
 		return
 	}
 	id := c.GetInt("id")
-	quota, upgradedToVIP, err := model.Redeem(req.Key, id)
+	quota, err := model.Redeem(req.Key, id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -747,9 +747,8 @@ func TopUp(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"success":       true,
-		"message":       "",
-		"data":          quota,
-		"upgradedToVIP": upgradedToVIP,
+		"success": true,
+		"message": "",
+		"data":    quota,
 	})
 }

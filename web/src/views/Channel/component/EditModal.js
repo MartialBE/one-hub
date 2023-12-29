@@ -36,6 +36,7 @@ const validationSchema = Yup.object().shape({
   key: Yup.string().when('is_edit', { is: false, then: Yup.string().required('密钥 不能为空') }),
   other: Yup.string(),
   proxy: Yup.string(),
+  test_model: Yup.string(),
   models: Yup.array().min(1, '模型 不能为空'),
   groups: Yup.array().min(1, '用户组 不能为空'),
   base_url: Yup.string().when('type', {
@@ -68,10 +69,6 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
   const [groupOptions, setGroupOptions] = useState([]);
   const [modelOptions, setModelOptions] = useState([]);
   const [basicModels, setBasicModels] = useState([]);
-  const [GPT3NoInstructModels, setGPT3NoInstructModels] = useState([]);
-  const [basicNoGPTModels, setBasicNoGPTModels] = useState([]);
-  const [fullNo32KOPENAIModels, setfullNo32KOPENAIModels] = useState([]);
-  const [fullOPENAIModels, setFullOPENAIModels] = useState([]);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -94,7 +91,7 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
     if (newInput) {
       Object.keys(newInput).forEach((key) => {
         if (
-          (!Array.isArray(values[key]) && values[key] !== null && values[key] !== undefined) ||
+          (!Array.isArray(values[key]) && values[key] !== null && values[key] !== undefined && values[key] !== '') ||
           (Array.isArray(values[key]) && values[key].length > 0)
         ) {
           return;
@@ -124,20 +121,6 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
           })
           .map((model) => model.id)
       );
-      setGPT3NoInstructModels(res.data.data.filter((model) => {
-        return model.id.startsWith('gpt-3') && !model.id.startsWith('gpt-3.5-turbo-16k') && !model.id.endsWith('instruct');
-      }).map((model) => model.id));
-
-      setBasicNoGPTModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-      setFullOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('code-') || model.id.startsWith('tts-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-
-      setfullNo32KOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1') && !model.id.startsWith('gpt-4-32k');
-      }).map((model) => model.id));
     } catch (error) {
       showError(error.message);
     }
@@ -402,29 +385,7 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                 }}
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
-
-                  <Button onClick={() => {
-                    setFieldValue('models', basicNoGPTModels);
-                  }}>基础无gpt模型</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', GPT3NoInstructModels);
-                  }}>gpt3对话模型</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', basicModels);
-                  }}>基础OPENAI模型</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', fullNo32KOPENAIModels);
-                  }}>无32K OPENAI模型</Button>
-                  
-                  <Button onClick={() => {
-                    setFieldValue('models', fullOPENAIModels);
-                  }}>OPENAI模型</Button>
-
-
-                  {/* <Button
+                  <Button
                     onClick={() => {
                       setFieldValue('models', basicModels);
                     }}
@@ -437,7 +398,7 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                     }}
                   >
                     填入所有模型
-                  </Button> */}
+                  </Button>
                 </ButtonGroup>
               </Container>
               <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
@@ -504,6 +465,29 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                   <FormHelperText id="helper-tex-channel-proxy-label"> {inputPrompt.proxy} </FormHelperText>
                 )}
               </FormControl>
+              {inputPrompt.test_model && (
+                <FormControl fullWidth error={Boolean(touched.test_model && errors.test_model)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-test_model-label">{inputLabel.test_model}</InputLabel>
+                  <OutlinedInput
+                    id="channel-test_model-label"
+                    label={inputLabel.test_model}
+                    type="text"
+                    value={values.test_model}
+                    name="test_model"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                    aria-describedby="helper-text-channel-test_model-label"
+                  />
+                  {touched.test_model && errors.test_model ? (
+                    <FormHelperText error id="helper-tex-channel-test_model-label">
+                      {errors.test_model}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-test_model-label"> {inputPrompt.test_model} </FormHelperText>
+                  )}
+                </FormControl>
+              )}
               <DialogActions>
                 <Button onClick={onCancel}>取消</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">

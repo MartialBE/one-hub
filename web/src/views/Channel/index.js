@@ -8,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
-// import Alert from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -46,7 +46,6 @@ export default function ChannelPage() {
         newChannels.splice(startIdx * ITEMS_PER_PAGE, data.length, ...data);
         setChannels(newChannels);
       }
-      await fetchMonthlyQuotasAndChannels(data);
     } else {
       showError(message);
     }
@@ -117,7 +116,7 @@ export default function ChannelPage() {
     if (success) {
       showSuccess('操作成功完成！');
       if (action === 'delete') {
-        await loadChannels(0);
+        await handleRefresh();
       }
     } else {
       showError(message);
@@ -128,9 +127,7 @@ export default function ChannelPage() {
 
   // 处理刷新
   const handleRefresh = async () => {
-    await loadChannels(0);
-    setActivePage(0);
-    setSearchKeyword('');
+    await loadChannels(activePage);
   };
 
   // 处理测试所有启用渠道
@@ -138,7 +135,7 @@ export default function ChannelPage() {
     const res = await API.get(`/api/channel/test`);
     const { success, message } = res.data;
     if (success) {
-      showInfo('已成功开始测试所有渠道，请刷新页面查看结果。');
+      showInfo('已成功开始测试所有通道，请刷新页面查看结果。');
     } else {
       showError(message);
     }
@@ -162,7 +159,7 @@ export default function ChannelPage() {
     const res = await API.get(`/api/channel/update_balance`);
     const { success, message } = res.data;
     if (success) {
-      showInfo('已更新完毕所有已启用渠道余额！');
+      showInfo('已更新完毕所有已启用通道余额！');
     } else {
       showError(message);
     }
@@ -194,42 +191,6 @@ export default function ChannelPage() {
       });
   }, []);
 
-  const [monthlyQuotas, setMonthlyQuotas] = useState({});
-
-  // 获取本月的开始和结束时间戳
-  function getMonthStartAndEndTimestamps() {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); // 设置到月末的最后一刻
-
-    // 将日期转换为UNIX时间戳（秒数）
-    const startTimestamp = Math.floor(startOfMonth.getTime() / 1000);
-    const endTimestamp = Math.floor(endOfMonth.getTime() / 1000);
-
-    return { startTimestamp, endTimestamp };
-  }
-
-  const fetchMonthlyQuotasAndChannels = async (fetchedChannels) => {
-    const { startTimestamp, endTimestamp } = getMonthStartAndEndTimestamps();
-
-    const quotaRequests = fetchedChannels.map(channel => (
-      API.get(`/api/log/stat?type=0&start_timestamp=${startTimestamp}&end_timestamp=${endTimestamp}&channel=${channel.id}`)
-    ));
-    try {
-      const quotaResponses = await Promise.all(quotaRequests);
-      const quotaPerUnit = localStorage.getItem('quota_per_unit')  || 500000;
-      const newMonthlyQuotas = quotaResponses.reduce((acc, response, index) => {
-        const quota = (response.data.data.quota / quotaPerUnit).toFixed(3);
-        const channelId = fetchedChannels[index].id;
-        acc[channelId] = parseFloat(quota);
-        return acc;
-      }, {});
-      setMonthlyQuotas(newMonthlyQuotas);
-    } catch (error) {
-      console.error('获取月度配额失败:', error);
-    }
-  };
-
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -238,6 +199,13 @@ export default function ChannelPage() {
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
           新建渠道
         </Button>
+      </Stack>
+      <Stack mb={5}>
+        <Alert severity="info">
+          当前版本测试是通过按照 OpenAI API 格式使用 gpt-3.5-turbo
+          模型进行非流式请求实现的，因此测试报错并不一定代表通道不可用，该功能后续会修复。 另外，OpenAI 渠道已经不再支持通过 key
+          获取余额，因此余额显示为 0。对于支持的渠道类型，请点击余额进行刷新。
+        </Alert>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchChannels} noValidate>
@@ -305,7 +273,6 @@ export default function ChannelPage() {
                     key={row.id}
                     handleOpenModal={handleOpenModal}
                     setModalChannelId={setEditChannelId}
-                    monthlyQuotas={monthlyQuotas}
                   />
                 ))}
               </TableBody>

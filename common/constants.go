@@ -11,7 +11,7 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "CZLOapi"
+var SystemName = "One API"
 var ServerAddress = "http://localhost:3000"
 var Footer = ""
 var Logo = ""
@@ -28,8 +28,8 @@ var SessionSecret = uuid.New().String()
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
-var ItemsPerPage = 30 // 修改单页数量
-var MaxRecentItems = 150
+var ItemsPerPage = 10
+var MaxRecentItems = 100
 
 var PasswordLoginEnabled = true
 var PasswordRegisterEnabled = true
@@ -189,6 +189,7 @@ const (
 	ChannelTypeTencent        = 23
 	ChannelTypeAzureSpeech    = 24
 	ChannelTypeGemini         = 25
+	ChannelTypeBaichuan       = 26
 )
 
 var ChannelBaseURLs = []string{
@@ -218,6 +219,7 @@ var ChannelBaseURLs = []string{
 	"https://hunyuan.cloud.tencent.com", //23
 	"",                                  //24
 	"",                                  //25
+	"https://api.baichuan-ai.com",       //26
 }
 
 const (

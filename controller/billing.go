@@ -82,7 +82,7 @@ func GetUsage(c *gin.Context) {
 	if err != nil {
 		openAIError := types.OpenAIError{
 			Message: err.Error(),
-			Type:    "czloapi_error",
+			Type:    "one_api_error",
 		}
 		c.JSON(200, gin.H{
 			"error": openAIError,
