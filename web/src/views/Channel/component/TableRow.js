@@ -29,7 +29,6 @@ import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-import GroupLabel from './GroupLabel';
 import NameLabel from './NameLabel';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';

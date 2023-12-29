@@ -263,7 +263,19 @@ export default function componentStyleOverrides(theme) {
           },
         },
       },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: {
+          padding: '0px 16px',
+        },
+        regular: {
+          minHeight: '56px',
+          '@media (min-width: 600px)': {
+            minHeight: '64px'
+          }
+        }
+      }
     }
   }
 }
-
