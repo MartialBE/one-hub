@@ -24,7 +24,7 @@ var indexPage []byte
 
 func main() {
 	common.SetupLogger()
-	common.SysLog("One API " + common.Version + " started")
+	common.SysLog("CZLOapi " + common.Version + " started")
 	if os.Getenv("GIN_MODE") != "debug" {
 		gin.SetMode(gin.ReleaseMode)
 	}
