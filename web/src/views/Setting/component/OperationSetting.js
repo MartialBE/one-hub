@@ -300,7 +300,7 @@ const OperationSetting = () => {
                 value={inputs.ChannelDisableThreshold}
                 onChange={handleInputChange}
                 label="最长响应时间"
-                placeholder="单位秒，当运行通道全部测试时，超过此时间将自动禁用通道"
+                placeholder="单位秒，当运行渠道全部测试时，超过此时间将自动禁用渠道"
                 disabled={loading}
               />
             </FormControl>
@@ -319,7 +319,7 @@ const OperationSetting = () => {
             </FormControl>
           </Stack>
           <FormControlLabel
-            label="失败时自动禁用通道"
+            label="失败时自动禁用渠道"
             control={
               <Checkbox
                 checked={inputs.AutomaticDisableChannelEnabled === 'true'}
@@ -329,7 +329,7 @@ const OperationSetting = () => {
             }
           />
           <FormControlLabel
-            label="成功时自动启用通道"
+            label="成功时自动启用渠道"
             control={
               <Checkbox
                 checked={inputs.AutomaticEnableChannelEnabled === 'true'}
