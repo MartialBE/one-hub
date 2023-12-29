@@ -14,10 +14,12 @@ import {
   ListItemAvatar,
   ListItemText,
   Typography
+  ListItemIcon
   // linearProgressClasses
 } from '@mui/material';
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
+import { IconHeadset } from '@tabler/icons-react';
 
 // assets
 // import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
@@ -118,6 +120,25 @@ const MenuCard = () => {
                 </Typography>
               }
               secondary={<Typography variant="caption"> 欢迎回来 </Typography>}
+            />
+          </ListItem>
+          {/* 新增的在线客服列表项 */}
+          <ListItem
+            button
+            alignItems="center"
+            sx={{ display: 'flex', justifyContent: 'center' }} // 设置ListItem为flex容器并居中内容
+            onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
+          >
+            <ListItemIcon sx={{ minWidth: 'auto', pr: 2 }}> {/* 调整间距 */}
+              <IconHeadset size={24} /> {/* 默认会使用主题颜色 */}
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Typography variant="subtitle1">
+                  在线客服
+                </Typography>
+              }
+              sx={{ textAlign: 'left' }} // 文字居中对齐
             />
           </ListItem>
         </List>

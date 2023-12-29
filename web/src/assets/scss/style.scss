@@ -126,3 +126,32 @@
     transform: translateX(10px);
   }
 }
+// -------------------------------//
+
+@media (min-width: 1600px) {
+  .css-1xnbu7n-MuiContainer-root {
+    max-width: 1400px;
+  }
+}
+
+.MuiToolbar-gutters {
+  // border: 1px solid rgba(34,36,38,.15);
+  box-shadow: 0 1px 3px 0 rgba(34, 36, 38, .15);
+}
+
+.default-group {
+  box-shadow: 0 0 10px $grey600;
+  border-radius: 16px;
+
+}
+
+.vip-group {
+  box-shadow: 0 0 10px $orangeDark;
+  border-radius: 16px;
+
+}
+
+.svip-group {
+  box-shadow: 0 0 10px $darkSecondary800;
+  border-radius: 16px;
+}
