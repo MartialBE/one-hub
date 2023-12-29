@@ -108,9 +108,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   // 总已用额度
   const usedQuotaValue = (item.used_quota / quotaPerUnit || 0).toFixed(2);
 
-  // 剩余额度
-  // const balanceValue = (item.balance / quotaPerUnit).toFixed(2);
-
   // 改变用户组的显示方式
   function renderCheckbox(checked, color) {
     return (
