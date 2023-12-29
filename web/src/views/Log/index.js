@@ -40,6 +40,7 @@ export default function Log() {
   const loadLogs = async (startIdx) => {
     setSearching(true);
     const url = userIsAdmin ? '/api/log/' : '/api/log/self/';
+    const statUrl = '/api/log/stat';  // 新增
     const query = searchKeyword;
 
     query.p = startIdx;
@@ -48,7 +49,9 @@ export default function Log() {
       delete query.channel;
     }
     const res = await API.get(url, { params: query });
+    const statRes = await API.get(statUrl, { params: query });  // 新增
     const { success, message, data } = res.data;
+    const { success: statSuccess, data: statData } = statRes.data;  // 新增
     if (success) {
       if (startIdx === 0) {
         setLogs(data);
@@ -59,6 +62,10 @@ export default function Log() {
       }
     } else {
       showError(message);
+    }
+    if (statSuccess) {  // 新增
+      const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
+      setQuota(statData.quota / quotaPerUnit);
     }
     setSearching(false);
   };
@@ -82,11 +89,86 @@ export default function Log() {
 
   const handleSearchKeyword = (event) => {
     setSearchKeyword({ ...searchKeyword, [event.target.name]: event.target.value });
+    loadLogs(0);  // 修改
   };
 
   // 处理刷新
   const handleRefresh = () => {
-    setInitPage(true);
+    setSearchKeyword(originalKeyword);
+    loadLogs(0);
+  };
+
+  //新增统计和时间筛选
+  const [quota, setQuota] = useState(0);  // 新增
+
+  // 快速选时间
+  const handleTimePresetClick = (preset) => {
+    let starttime, endtime;
+    const now = new Date();
+
+    switch (preset) {
+      case 'today':
+        starttime = new Date();
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date();
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'yesterday':
+        starttime = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'week':
+        starttime = new Date();
+        starttime.setDate(starttime.getDate() - starttime.getDay() + (starttime.getDay() === 0 ? -6 : 1));
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date();
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'lastWeek':
+        starttime = new Date();
+        starttime.setDate(starttime.getDate() - starttime.getDay() + (starttime.getDay() === 0 ? -13 : -6));
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date(starttime);
+        endtime.setDate(endtime.getDate() + 6);
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case '30days':
+        starttime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date();
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'month':
+        starttime = new Date();
+        starttime.setDate(1);
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date();
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'lastMonth':
+        starttime = new Date();
+        starttime.setDate(1);
+        starttime.setMonth(starttime.getMonth() - 1);
+        starttime.setHours(0, 0, 0, 0);
+        endtime = new Date(starttime);
+        endtime.setMonth(endtime.getMonth() + 1);
+        endtime.setDate(endtime.getDate() - 1);
+        endtime.setHours(23, 59, 59, 999);
+        break;
+      case 'reset':
+        starttime = new Date(0);
+        endtime = new Date(now.getTime() + 3600 * 1000);
+        break;
+      default:
+        break;
+    }
+    setSearchKeyword({
+      // ...searchKeyword,
+      start_timestamp: Math.floor(starttime.getTime() / 1000),  // Convert to seconds
+      end_timestamp: Math.floor(endtime.getTime() / 1000)  // Convert to seconds
+    });
   };
 
   useEffect(() => {
@@ -100,10 +182,15 @@ export default function Log() {
     setInitPage(false);
   }, [initPage]);
 
+  useEffect(() => {
+    loadLogs(0);
+  }, [searchKeyword]);
+
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+      <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
         <Typography variant="h4">日志</Typography>
+        <Typography variant="h5" color="secondary.main">消耗额度：{quota}</Typography>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchLogs} noValidate>
@@ -118,7 +205,25 @@ export default function Log() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: 2,
+              marginRight: 0
+            }}
+          >
+            <ButtonGroup>
+              <Button onClick={() => handleTimePresetClick('today')}>今天</Button>
+              <Button onClick={() => handleTimePresetClick('yesterday')}>昨天</Button>
+              <Button onClick={() => handleTimePresetClick('week')}>本周</Button>
+              <Button onClick={() => handleTimePresetClick('lastWeek')}>上周</Button>
+              <Button onClick={() => handleTimePresetClick('month')}>本月</Button>
+              <Button onClick={() => handleTimePresetClick('lastMonth')}>上月</Button>
+              <Button onClick={() => handleTimePresetClick('30days')}>30天内</Button>
+              <Button onClick={() => handleTimePresetClick('reset')}>重置</Button>
+            </ButtonGroup>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
                 刷新/清除搜索条件

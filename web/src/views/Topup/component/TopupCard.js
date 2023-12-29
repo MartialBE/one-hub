@@ -25,9 +25,13 @@ const TopupCard = () => {
       const res = await API.post('/api/user/topup', {
         key: redemptionCode
       });
-      const { success, message, data } = res.data;
+      const { success, message, data, upgradedToVIP  } = res.data;
       if (success) {
-        showSuccess('充值成功！');
+        if (upgradedToVIP) {  // 如果用户成功升级为 VIP
+          showSuccess('充值成功，升级为 VIP 会员！');
+        } else {
+          showSuccess('充值成功，谢谢。');
+        }
         setUserQuota((quota) => {
           return quota + data;
         });
@@ -36,7 +40,7 @@ const TopupCard = () => {
         showError(message);
       }
     } catch (err) {
-      showError('请求失败');
+      showError('失败,请右下角联系客服');
     } finally {
       setIsSubmitting(false);
     }
