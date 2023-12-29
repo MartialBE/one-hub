@@ -136,16 +136,16 @@ func notifyRootUser(subject string, content string) {
 // disable & notify
 func disableChannel(channelId int, channelName string, reason string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusAutoDisabled)
-	subject := fmt.Sprintf("通道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("通道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
+	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
 	notifyRootUser(subject, content)
 }
 
 // enable & notify
 func enableChannel(channelId int, channelName string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusEnabled)
-	subject := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
-	content := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
+	subject := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
+	content := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
 	notifyRootUser(subject, content)
 }
 
@@ -193,7 +193,7 @@ func testAllChannels(notify bool) error {
 		testAllChannelsRunning = false
 		testAllChannelsLock.Unlock()
 		if notify {
-			err := common.SendEmail("通道测试完成", common.RootUserEmail, "通道测试完成，如果没有收到禁用通知，说明所有通道都正常")
+			err := common.SendEmail("渠道测试完成", common.RootUserEmail, "渠道测试完成，如果没有收到禁用通知，说明所有渠道都正常")
 			if err != nil {
 				common.SysError(fmt.Sprintf("failed to send email: %s", err.Error()))
 			}

@@ -77,7 +77,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     const { success, time } = await manageChannel(item.id, 'test', '');
     if (success) {
       setResponseTimeData({ test_time: Date.now() / 1000, response_time: time * 1000 });
-      showInfo(`通道 ${item.name} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
+      showInfo(`渠道 ${item.name} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
     }
   };
 
@@ -193,9 +193,9 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除通道</DialogTitle>
+        <DialogTitle>删除渠道</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除通道 {item.name}？</DialogContentText>
+          <DialogContentText>是否删除渠道 {item.name}？</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteClose}>关闭</Button>

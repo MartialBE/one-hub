@@ -135,7 +135,7 @@ export default function ChannelPage() {
     const res = await API.get(`/api/channel/test`);
     const { success, message } = res.data;
     if (success) {
-      showInfo('已成功开始测试所有通道，请刷新页面查看结果。');
+      showInfo('已成功开始测试所有渠道，请刷新页面查看结果。');
     } else {
       showError(message);
     }
@@ -159,7 +159,7 @@ export default function ChannelPage() {
     const res = await API.get(`/api/channel/update_balance`);
     const { success, message } = res.data;
     if (success) {
-      showInfo('已更新完毕所有已启用通道余额！');
+      showInfo('已更新完毕所有已启用渠道余额！');
     } else {
       showError(message);
     }
@@ -203,7 +203,7 @@ export default function ChannelPage() {
       <Stack mb={5}>
         <Alert severity="info">
           当前版本测试是通过按照 OpenAI API 格式使用 gpt-3.5-turbo
-          模型进行非流式请求实现的，因此测试报错并不一定代表通道不可用，该功能后续会修复。 另外，OpenAI 渠道已经不再支持通过 key
+          模型进行非流式请求实现的，因此测试报错并不一定代表渠道不可用，该功能后续会修复。 另外，OpenAI 渠道已经不再支持通过 key
           获取余额，因此余额显示为 0。对于支持的渠道类型，请点击余额进行刷新。
         </Alert>
       </Stack>
