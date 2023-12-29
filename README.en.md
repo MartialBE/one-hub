@@ -251,7 +251,7 @@ graph LR
     B -->|Relay Request| E(Other downstream channels)
 ```
 
-To specify which channel to use for the current request, you can add the channel ID after the token, for example: `Authorization: Bearer ONE_API_KEY-CHANNEL_ID`.
+To specify which channel to use for the current request, you can add the channel ID after the token, for example: `Authorization: Bearer czloapi_KEY-CHANNEL_ID`.
 Note that the token needs to be created by an administrator to specify the channel ID.
 
 If the channel ID is not provided, load balancing will be used to distribute the requests to multiple channels.
