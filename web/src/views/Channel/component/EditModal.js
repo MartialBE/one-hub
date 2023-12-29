@@ -407,38 +407,23 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
 
                   <Button onClick={() => {
                     setFieldValue('models', basicNoGPTModels);
-                  }}>基础无gpt模型</Button>
+                  }}>基础无gpt</Button>
 
                   <Button onClick={() => {
                     setFieldValue('models', GPT3NoInstructModels);
-                  }}>gpt3对话模型</Button>
+                  }}>gpt3对话</Button>
 
                   <Button onClick={() => {
                     setFieldValue('models', basicModels);
-                  }}>基础OPENAI模型</Button>
+                  }}>基础OPENAI</Button>
 
                   <Button onClick={() => {
                     setFieldValue('models', fullNo32KOPENAIModels);
-                  }}>无32K OPENAI模型</Button>
+                  }}>无32K OPENAI</Button>
                   
                   <Button onClick={() => {
                     setFieldValue('models', fullOPENAIModels);
-                  }}>OPENAI模型</Button>
-
-                  <Button
-                    onClick={() => {
-                      setFieldValue('models', basicModels);
-                    }}
-                  >
-                    填入基础模型
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setFieldValue('models', modelOptions);
-                    }}
-                  >
-                    填入所有模型
-                  </Button>
+                  }}>OPENAI</Button>
                 </ButtonGroup>
               </Container>
               <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
