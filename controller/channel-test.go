@@ -73,7 +73,7 @@ func testChannel(channel *model.Channel, request types.ChatCompletionRequest) (e
 	}
 
 	if Usage.CompletionTokens == 0 {
-		return fmt.Errorf("channel %s, 补全tokens返回 0", channel.Name), nil
+		return fmt.Errorf("channel %s, 返回的补全tokens为 0", channel.Name), nil
 	}
 
 	return nil, nil

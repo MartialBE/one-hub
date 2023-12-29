@@ -4,7 +4,7 @@
 # sudo systemctl enable one-api
 # sudo systemctl status one-api
 [Unit]
-Description=CZL Oapi Service
+Description=CZLOapi Service
 After=network.target
 
 [Service]

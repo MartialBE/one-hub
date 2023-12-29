@@ -9,28 +9,27 @@ import (
 )
 
 type Log struct {
-	Id               int    `json:"id;index:idx_created_at_id,priority:1"`                                                 // 日志ID，用于排序和索引
-	UserId           int    `json:"user_id" gorm:"index"`                                                                  // 用户ID，用于外键关联
-	CreatedAt        int64  `json:"created_at" gorm:"bigint;index:idx_created_at_id,priority:2;index:idx_created_at_type"` // 创建时间，用于排序和索引
-	Type             int    `json:"type" gorm:"index:idx_created_at_type"`                                                 // 日志类型，用于索引
-	Content          string `json:"content"`                                                                               // 日志内容
-	Username         string `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`                 // 用户名，用于索引和默认值为空字符串
-	TokenName        string `json:"token_name" gorm:"index;default:''"`                                                    // 令牌名称，用于索引和默认值为空字符串
-	ModelName        string `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`         // 模型名称，用于索引和默认值为空字符串
-	Quota            int    `json:"quota" gorm:"default:0"`                                                                // 配额，默认值为0
-	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`                                                        // 提示令牌，默认值为0
-	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`                                                    // 完成令牌，默认值为0
-	ChannelId        int    `json:"channel" gorm:"index"`                                                                  // 频道ID，用于索引
+	Id               int    `json:"id;index:idx_created_at_id,priority:1"`
+	UserId           int    `json:"user_id" gorm:"index"`
+	CreatedAt        int64  `json:"created_at" gorm:"bigint;index:idx_created_at_id,priority:2;index:idx_created_at_type"`
+	Type             int    `json:"type" gorm:"index:idx_created_at_type"`
+	Content          string `json:"content"`
+	Username         string `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
+	TokenName        string `json:"token_name" gorm:"index;default:''"`
+	ModelName        string `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
+	Quota            int    `json:"quota" gorm:"default:0"`
+	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`
+	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
+	ChannelId        int    `json:"channel" gorm:"index"`
 }
 
 type LogStatistic struct {
-	// 日志统计信息结构体
-	Day              string `gorm:"column:day"`               // 日志日期
-	ModelName        string `gorm:"column:model_name"`        // 模型名称
-	RequestCount     int    `gorm:"column:request_count"`     // 请求数量
-	Quota            int    `gorm:"column:quota"`             // 配额
-	PromptTokens     int    `gorm:"column:prompt_tokens"`     // 提示令牌数量
-	CompletionTokens int    `gorm:"column:completion_tokens"` // 完成令牌数量
+	Day              string `gorm:"column:day"`
+	ModelName        string `gorm:"column:model_name"`
+	RequestCount     int    `gorm:"column:request_count"`
+	Quota            int    `gorm:"column:quota"`
+	PromptTokens     int    `gorm:"column:prompt_tokens"`
+	CompletionTokens int    `gorm:"column:completion_tokens"`
 }
 
 const (
@@ -195,8 +194,18 @@ func DeleteOldLog(targetTimestamp int64) (int64, error) {
 }
 
 func SearchLogsByDayAndModel(user_id, start, end int) (LogStatistics []*LogStatistic, err error) {
+	groupSelect := "DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m-%d') as day"
+
+	if common.UsingPostgreSQL {
+		groupSelect = "TO_CHAR(date_trunc('day', to_timestamp(created_at)), 'YYYY-MM-DD') as day"
+	}
+
+	if common.UsingSQLite {
+		groupSelect = "strftime('%Y-%m-%d', datetime(created_at, 'unixepoch')) as day"
+	}
+
 	err = DB.Raw(`
-		SELECT TO_CHAR(date_trunc('day', to_timestamp(created_at)), 'YYYY-MM-DD') as day,
+		SELECT `+groupSelect+`,
 		model_name, count(1) as request_count,
 		sum(quota) as quota,
 		sum(prompt_tokens) as prompt_tokens,

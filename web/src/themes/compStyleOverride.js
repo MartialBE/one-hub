@@ -20,14 +20,13 @@ export default function componentStyleOverrides(theme) {
           }
         }
       }
-    }, 
- 
-   MuiAutocomplete: {
+    }, //MuiAutocomplete-popper MuiPopover-root
+    MuiAutocomplete: {
       styleOverrides: {
         popper: {
           // 继承 MuiPopover-root
           boxShadow: '0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)',
-          borderRadius: '12px',
+          borderRadius: '8px',
           color: '#364152'
         },
         listbox: {
@@ -230,6 +229,8 @@ export default function componentStyleOverrides(theme) {
           borderBottom: '1px solid rgb(241, 243, 244)',
           textAlign: 'left',
           borderRight: "1px solid rgba(34,36,38,.05)", // 添加列的分割线
+          padding: '12px 8px', // 你可以调整这里的数值，以符合你的设计需求
+          fontSize: '12px'
         },
         head: {
           color: theme.darkTextSecondary,
@@ -253,6 +254,15 @@ export default function componentStyleOverrides(theme) {
           background: theme.colors?.grey700
         }
       }
-    }
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          '&.MuiContainer-maxWidthLg': {
+            maxWidth: '1400px', // 例如 '1400px'
+          },
+        },
+      },
+    }    
   };
 }

@@ -11,7 +11,7 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "CZL Oapi"
+var SystemName = "CZLOapi"
 var ServerAddress = "http://localhost:3000"
 var Footer = ""
 var Logo = ""
@@ -28,9 +28,8 @@ var SessionSecret = uuid.New().String()
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
-// 页面显示条目数
-var ItemsPerPage = 50
-var MaxRecentItems = 500
+var ItemsPerPage = 30 // 修改单页数量
+var MaxRecentItems = 150
 
 var PasswordLoginEnabled = true
 var PasswordRegisterEnabled = true
@@ -188,8 +187,8 @@ const (
 	ChannelTypeAIProxyLibrary = 21
 	ChannelTypeFastGPT        = 22
 	ChannelTypeTencent        = 23
-	ChannelTypeAzureSpeech    = 99
-	ChannelTypeGemini         = 24
+	ChannelTypeAzureSpeech    = 24
+	ChannelTypeGemini         = 25
 )
 
 var ChannelBaseURLs = []string{

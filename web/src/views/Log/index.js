@@ -19,7 +19,6 @@ import { isAdmin } from 'utils/common';
 import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 
-
 export default function Log() {
   const originalKeyword = {
     p: 0,
@@ -42,6 +41,7 @@ export default function Log() {
     const url = userIsAdmin ? '/api/log/' : '/api/log/self/';
     const statUrl = '/api/log/stat';  // 新增
     const query = searchKeyword;
+
     query.p = startIdx;
     if (!userIsAdmin) {
       delete query.username;
@@ -90,7 +90,6 @@ export default function Log() {
     setSearchKeyword({ ...searchKeyword, [event.target.name]: event.target.value });
     loadLogs(0);  // 修改
   };
-
 
   // 处理刷新
   const handleRefresh = () => {
@@ -171,8 +170,6 @@ export default function Log() {
     });
   };
 
-
-
   useEffect(() => {
     loadLogs(0);
   }, [searchKeyword]);
@@ -180,53 +177,52 @@ export default function Log() {
   return (
     <>
       <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
-      <Typography variant="h4">日志</Typography>
+        <Typography variant="h4">日志</Typography>
         <Typography variant="h5" color="secondary.main">消耗额度：{quota}</Typography>
-      
-  </Stack>
+      </Stack>
       <Card>
         <Box component="form" onSubmit={searchLogs} noValidate>
-        <TableToolBar filterName={searchKeyword} handleFilterName={handleSearchKeyword} userIsAdmin={userIsAdmin} />
+          <TableToolBar filterName={searchKeyword} handleFilterName={handleSearchKeyword} userIsAdmin={userIsAdmin} />
         </Box>
         <Toolbar
-  sx={{
-    textAlign: 'right',
-    height: 50,
-    display: 'flex',
-    justifyContent: 'space-between',
-    p: (theme) => theme.spacing(0, 1, 0, 3)
-  }}
->
-  <Container
-    sx={{
-      display: 'flex',
-      justifyContent: 'flex-end',
-      alignItems: 'center', 
-      gap: 2,
-      marginRight: 0
-    }}
-  >
-    <ButtonGroup>
-      <Button onClick={() => handleTimePresetClick('today')}>今天</Button>
-      <Button onClick={() => handleTimePresetClick('yesterday')}>昨天</Button>
-      <Button onClick={() => handleTimePresetClick('week')}>本周</Button>
-      <Button onClick={() => handleTimePresetClick('lastWeek')}>上周</Button>
-      <Button onClick={() => handleTimePresetClick('month')}>本月</Button>
-      <Button onClick={() => handleTimePresetClick('lastMonth')}>上月</Button>
-      <Button onClick={() => handleTimePresetClick('30days')}>30天内</Button>
-      <Button onClick={() => handleTimePresetClick('reset')}>重置</Button>
-    </ButtonGroup>
-    <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-      <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-        刷新/清除搜索条件
-      </Button>
+          sx={{
+            textAlign: 'right',
+            height: 50,
+            display: 'flex',
+            justifyContent: 'space-between',
+            p: (theme) => theme.spacing(0, 1, 0, 3)
+          }}
+        >
+          <Container
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: 2,
+              marginRight: 0
+            }}
+          >
+            <ButtonGroup>
+              <Button onClick={() => handleTimePresetClick('today')}>今天</Button>
+              <Button onClick={() => handleTimePresetClick('yesterday')}>昨天</Button>
+              <Button onClick={() => handleTimePresetClick('week')}>本周</Button>
+              <Button onClick={() => handleTimePresetClick('lastWeek')}>上周</Button>
+              <Button onClick={() => handleTimePresetClick('month')}>本月</Button>
+              <Button onClick={() => handleTimePresetClick('lastMonth')}>上月</Button>
+              <Button onClick={() => handleTimePresetClick('30days')}>30天内</Button>
+              <Button onClick={() => handleTimePresetClick('reset')}>重置</Button>
+            </ButtonGroup>
+            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
+              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+                刷新/清除搜索条件
+              </Button>
 
-      <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
-        搜索
-      </Button>
-    </ButtonGroup>
-  </Container>
-</Toolbar>
+              <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
+                搜索
+              </Button>
+            </ButtonGroup>
+          </Container>
+        </Toolbar>
 
         {searching && <LinearProgress />}
         <PerfectScrollbar component="div">

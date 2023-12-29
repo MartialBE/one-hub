@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import SubCard from 'ui-component/cards/SubCard';
-import { IconBrandGithub, IconMail } from '@tabler/icons-react'; //IconBrandWechat, 
+import { IconBrandGithub, IconMail } from '@tabler/icons-react'; //IconBrandWechat,
 import Label from 'ui-component/Label';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
@@ -246,17 +246,18 @@ export default function Profile() {
                   </Button>
                 </Grid>
 
-                {/* <Grid xs={12}>
+                <Grid xs={12}>
                   <Button
                     variant="contained"
                     color="error"
+                    style={{ display: 'none' }}
                     onClick={() => {
                       setShowAccountDeleteModal(true);
                     }}
                   >
                     删除帐号
                   </Button>
-                </Grid> */}
+                </Grid>
               </Grid>
             </SubCard>
           </Stack>

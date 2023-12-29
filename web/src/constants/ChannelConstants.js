@@ -23,10 +23,10 @@ export const CHANNEL_OPTIONS = {
     value: 11,
     color: 'orange'
   },
-  24: {
-    key: 24,
+  25: {
+    key: 25,
     text: 'Google Gemini',
-    value: 24,
+    value: 25,
     color: 'orange'
   },
   15: {
@@ -65,10 +65,10 @@ export const CHANNEL_OPTIONS = {
     value: 23,
     color: 'default'
   },
-  99: {
-    key: 99,
+  24: {
+    key: 24,
     text: 'Azure Speech',
-    value: 99,
+    value: 24,
     color: 'orange'
   },
   8: {

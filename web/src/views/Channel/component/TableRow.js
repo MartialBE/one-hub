@@ -29,11 +29,9 @@ import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-// import GroupLabel from './GroupLabel';
 import NameLabel from './NameLabel';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
-// IconPencil
 
 import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
@@ -89,7 +87,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   };
 
   const updateChannelBalance = async () => {
-    const res = await API.get(`/api/channel/update_balance/${item.id}/`);
+    const res = await API.get(`/api/channel/update_balance/${item.id}`);
     const { success, message, balance } = res.data;
     if (success) {
       setItemBalance(balance);
@@ -126,8 +124,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     );
   }
 
-
-
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -145,8 +141,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           {renderCheckbox(item.group.split(',').includes('vip'), red[500])}
           {renderCheckbox(item.group.split(',').includes('svip'), purple[500])}
         </TableCell>
-
-
 
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
@@ -171,10 +165,12 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             handle_action={handleResponseTime}
           />
         </TableCell>
+
         {/* 月已用额度 */}
         <TableCell>{monthlyQuotasValue}</TableCell>
         {/*  总已用额度 */}
         <TableCell>{usedQuotaValue}</TableCell>
+
         <TableCell>
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(itemBalance)}
@@ -199,6 +195,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             />
           </FormControl>
         </TableCell> */}
+
         <TableCell>
           <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
             <InputLabel htmlFor={`priority-${item.id}`}>优先级</InputLabel>

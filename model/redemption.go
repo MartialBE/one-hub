@@ -41,6 +41,7 @@ func GetRedemptionById(id int) (*Redemption, error) {
 	err = DB.First(&redemption, "id = ?", id).Error
 	return &redemption, err
 }
+
 func Redeem(key string, userId int) (quota int, upgradedToVIP bool, err error) {
 	upgradedToVIP = false // 初始化升级状态为 false（注意：这里不需要使用 var）
 	if key == "" {
@@ -96,6 +97,7 @@ func Redeem(key string, userId int) (quota int, upgradedToVIP bool, err error) {
 	}
 
 	return redemption.Quota, upgradedToVIP, nil
+
 }
 
 func (redemption *Redemption) Insert() error {

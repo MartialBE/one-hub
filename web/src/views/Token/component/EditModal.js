@@ -24,8 +24,9 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { showSuccess, showError } from 'utils/common';
+import {  showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
 import { API } from 'utils/api';
+
 
 let quotaPerUnit = parseFloat(localStorage.getItem('quota_per_unit'));
 
@@ -52,6 +53,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
 
+    // values.remain_quota = parseInt(values.remain_quota);
     values.remain_quota = parseInt(values.remain_quota)* quotaPerUnit;
     let res;
     if (values.is_edit) {
@@ -80,7 +82,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
     const { success, message, data } = res.data;
     if (success) {
       data.is_edit = true;
-      // data.remain_quota = data.remain_quota / quotaPerUnit;
       setInputs(data);
     } else {
       showError(message);
@@ -100,7 +101,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Alert severity="info">注意，Key的额度仅用于限制Key本身的最大额度使用量，实际的使用还会受到账户的剩余额度限制。</Alert>
+        <Alert severity="info">注意，Key的额度仅用于限制Key本身的最大额度使用量，实际的使用受到账户的剩余额度限制。</Alert>
         <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldError, setFieldValue, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>

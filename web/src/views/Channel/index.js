@@ -211,7 +211,7 @@ export default function ChannelPage() {
 
   const fetchMonthlyQuotasAndChannels = async (fetchedChannels) => {
     const { startTimestamp, endTimestamp } = getMonthStartAndEndTimestamps();
-    
+
     const quotaRequests = fetchedChannels.map(channel => (
       API.get(`/api/log/stat?type=0&start_timestamp=${startTimestamp}&end_timestamp=${endTimestamp}&channel=${channel.id}`)
     ));

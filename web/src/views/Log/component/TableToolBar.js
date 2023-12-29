@@ -16,7 +16,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
   return (
     <>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
-        <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+        <FormControl>
           <InputLabel htmlFor="channel-token_name-label">令牌名称</InputLabel>
           <OutlinedInput
             id="token_name"
@@ -35,7 +35,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             }
           />
         </FormControl>
-        <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+        <FormControl>
           <InputLabel htmlFor="channel-model_name-label">模型名称</InputLabel>
           <OutlinedInput
             id="model_name"
@@ -55,7 +55,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
           />
         </FormControl>
 
-        <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+        <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
               label="起始时间"
@@ -78,7 +78,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
           </LocalizationProvider>
         </FormControl>
 
-        <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+        <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
               label="结束时间"
@@ -104,11 +104,14 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
         {userIsAdmin && (
-          <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+          <FormControl>
             <InputLabel htmlFor="channel-channel-label">渠道ID</InputLabel>
             <OutlinedInput
               id="channel"
               name="channel"
+              sx={{
+                minWidth: '100%'
+              }}
               label="渠道ID"
               value={filterName.channel}
               onChange={handleFilterName}
@@ -123,12 +126,14 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
         )}
 
         {userIsAdmin && (
-          <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+          <FormControl>
             <InputLabel htmlFor="channel-username-label">用户名称</InputLabel>
             <OutlinedInput
               id="username"
               name="username"
-              
+              sx={{
+                minWidth: '100%'
+              }}
               label="用户名称"
               value={filterName.username}
               onChange={handleFilterName}
@@ -142,7 +147,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
           </FormControl>
         )}
 
-        <FormControl sx={{ width: { sm: '100%', md: '25%' } }}>
+        <FormControl sx={{ minWidth: '22%' }}>
           <InputLabel htmlFor="channel-type-label">类型</InputLabel>
           <Select
             id="channel-type-label"
@@ -150,8 +155,16 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             value={filterName.type}
             name="type"
             onChange={handleFilterName}
-            
-            
+            sx={{
+              minWidth: '100%'
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200
+                }
+              }
+            }}
           >
             {Object.values(LogType).map((option) => {
               return (
@@ -162,7 +175,6 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             })}
           </Select>
         </FormControl>
-        
       </Stack>
     </>
   );

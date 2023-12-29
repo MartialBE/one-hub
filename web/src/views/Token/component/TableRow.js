@@ -24,7 +24,6 @@ import { renderQuota, showSuccess, timestamp2string } from 'utils/common';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 
 
-
 function createMenu(menuItems) {
   return (
     <>
@@ -103,7 +102,6 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     }
   ]);
 
-
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -155,7 +153,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
                 }}
               >
                 复制
-              </Button>   
+              </Button>
             </ButtonGroup>
             <IconButton onClick={(e) => handleOpenMenu(e, 'action')} sx={{ color: 'rgb(99, 115, 129)' }}>
               <IconDotsVertical />

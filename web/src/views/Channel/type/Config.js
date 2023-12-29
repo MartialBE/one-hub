@@ -120,7 +120,7 @@ const typeConfig = {
       key: '按照如下格式输入：AppId|SecretId|SecretKey'
     }
   },
-  24: {
+  25: {
     inputLabel: {
       other: '版本号'
     },

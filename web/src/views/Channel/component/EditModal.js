@@ -68,6 +68,10 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
   const [groupOptions, setGroupOptions] = useState([]);
   const [modelOptions, setModelOptions] = useState([]);
   const [basicModels, setBasicModels] = useState([]);
+  const [GPT3NoInstructModels, setGPT3NoInstructModels] = useState([]);
+  const [basicNoGPTModels, setBasicNoGPTModels] = useState([]);
+  const [fullNo32KOPENAIModels, setfullNo32KOPENAIModels] = useState([]);
+  const [fullOPENAIModels, setFullOPENAIModels] = useState([]);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -120,6 +124,20 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
           })
           .map((model) => model.id)
       );
+      setGPT3NoInstructModels(res.data.data.filter((model) => {
+        return model.id.startsWith('gpt-3') && !model.id.startsWith('gpt-3.5-turbo-16k') && !model.id.endsWith('instruct');
+      }).map((model) => model.id));
+
+      setBasicNoGPTModels(res.data.data.filter((model) => {
+        return (model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
+      }).map((model) => model.id));
+      setFullOPENAIModels(res.data.data.filter((model) => {
+        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('code-') || model.id.startsWith('tts-')) && !model.id.startsWith('text-embedding-v1');
+      }).map((model) => model.id));
+
+      setfullNo32KOPENAIModels(res.data.data.filter((model) => {
+        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1') && !model.id.startsWith('gpt-4-32k');
+      }).map((model) => model.id));
     } catch (error) {
       showError(error.message);
     }
@@ -384,7 +402,29 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                 }}
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
-                  <Button
+
+                  <Button onClick={() => {
+                    setFieldValue('models', basicNoGPTModels);
+                  }}>基础无gpt模型</Button>
+
+                  <Button onClick={() => {
+                    setFieldValue('models', GPT3NoInstructModels);
+                  }}>gpt3对话模型</Button>
+
+                  <Button onClick={() => {
+                    setFieldValue('models', basicModels);
+                  }}>基础OPENAI模型</Button>
+
+                  <Button onClick={() => {
+                    setFieldValue('models', fullNo32KOPENAIModels);
+                  }}>无32K OPENAI模型</Button>
+                  
+                  <Button onClick={() => {
+                    setFieldValue('models', fullOPENAIModels);
+                  }}>OPENAI模型</Button>
+
+
+                  {/* <Button
                     onClick={() => {
                       setFieldValue('models', basicModels);
                     }}
@@ -397,7 +437,7 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                     }}
                   >
                     填入所有模型
-                  </Button>
+                  </Button> */}
                 </ButtonGroup>
               </Container>
               <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>

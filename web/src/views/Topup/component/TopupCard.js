@@ -28,9 +28,9 @@ const TopupCard = () => {
       const { success, message, data, upgradedToVIP  } = res.data;
       if (success) {
         if (upgradedToVIP) {  // 如果用户成功升级为 VIP
-          showSuccess('充值成功，升级为 VIP 会员');
+          showSuccess('充值成功，升级为 VIP 会员！');
         } else {
-          showSuccess('充值成功');
+          showSuccess('充值成功，谢谢。');
         }
         setUserQuota((quota) => {
           return quota + data;

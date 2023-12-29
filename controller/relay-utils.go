@@ -45,6 +45,8 @@ func fetchChannel(c *gin.Context, modelName string) (channel *model.Channel, pas
 		return
 	}
 
+	c.Set("channel_id", channel.Id)
+
 	return
 }
 
@@ -269,8 +271,15 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 		return errors.New("error consuming token remain quota: " + err.Error())
 	}
 	if quota != 0 {
-		outputPrice := q.modelRatio * 0.002
-		logContent := fmt.Sprintf("单价: $%.6g", outputPrice)
+		inputPrice := q.ratio * 0.002
+		// var logContent string
+
+		// if completionRatio == 1 {
+		// 	logContent = fmt.Sprintf("单价: $%.6g/1k tokens", inputPrice)
+		// } else {
+		outputPrice := inputPrice * completionRatio
+		logContent := fmt.Sprintf("输入:$%.6g/1k tokens, 输出:$%.6g/1k tokens", inputPrice, outputPrice)
+		// }
 		model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent)
 		model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 		model.UpdateChannelUsedQuota(q.channelId, quota)
