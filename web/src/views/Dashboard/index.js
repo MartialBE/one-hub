@@ -8,6 +8,12 @@ import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
 import UserCard from 'ui-component/cards/UserCard';
 
+
+import { Box, ClickAwayListener, Tooltip } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import axios from 'axios';
+import MainCard from 'ui-component/cards/MainCard';
+
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
   const [statisticalData, setStatisticalData] = useState([]);
@@ -48,15 +54,82 @@ const Dashboard = () => {
     loadUser();
   }, []);
 
-   // 会员组颜色
-   let cardClass;
-   if (users?.group === "default" || !users?.group) {
-     cardClass = "default-group";
-   } else if (users?.group === "vip") {
-     cardClass = "vip-group";
-   } else if (users?.group === "svip") {
-     cardClass = "svip-group";
-   }
+  // 会员组颜色
+  let cardClass;
+  if (users?.group === "default" || !users?.group) {
+    cardClass = "default-group";
+  } else if (users?.group === "vip") {
+    cardClass = "vip-group";
+  } else if (users?.group === "svip") {
+    cardClass = "svip-group";
+  }
+
+  const [modelsByOwner, setModelsByOwner] = useState({});
+  const fetchModels = () => {
+    axios.get('/api/token/?p=0')
+      .then(response => {
+        const keys = response.data.data;
+        const validKey = keys.find(item => item.status === 1);
+
+        if (!validKey) {
+          throw new Error('请启用一个Key,用来查询可用模型');
+        }
+
+        const key = 'sk-' + validKey.key;
+        return axios.get('/v1/models', { headers: { Authorization: `Bearer ${key}` } });
+      })
+      .then(response => {
+        const models = response.data.data;
+        const modelsByOwner = models.reduce((result, model) => {
+          const owner = model.owned_by || '未分类';
+
+          if (!result[owner]) {
+            result[owner] = [];
+          }
+
+          result[owner].push(model.id);
+          return result;
+        }, {});
+
+        setModelsByOwner(modelsByOwner);
+      })
+      .catch(error => {
+        // 如果出现错误，就显示提示
+        setModelsByOwner({ 错误: [error.message] });
+      });
+  };
+
+
+
+  useEffect(() => {
+    fetchModels();
+  }, []);  // 添加空数组作为依赖，以确保这段代码只在组件载入时执行一次
+
+  // 模型复制操作
+  const ModelChip = ({ model }) => {
+    const [open, setOpen] = useState(false);
+
+    const handleClick = () => {
+      navigator.clipboard.writeText(model);
+      setOpen(true);
+    };
+
+    const handleClose = (event) => {
+      if (event) {
+        event.stopPropagation();
+      }
+      setOpen(false);
+    };
+
+    return (
+      <ClickAwayListener onClickAway={handleClose}>
+        <Tooltip open={open} onClose={handleClose} title="已复制" placement="top">
+          <Chip label={`${model}`} onClick={handleClick} sx={{ '&:hover': { transform: 'scale(1.1)', transition: 'transform 0.3s' } }} />
+        </Tooltip>
+      </ClickAwayListener>
+    );
+  }
+
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
@@ -93,19 +166,19 @@ const Dashboard = () => {
             <StatisticalBarChart isLoading={isLoading} chartDatas={statisticalData} />
           </Grid>
           <Grid item lg={4} xs={12}>
-          <div className={cardClass}>
+            <div className={cardClass}>
               <UserCard>
                 <Grid container spacing={gridSpacing} justifyContent="center" alignItems="center" paddingTop={'20px'}>
 
                   <Grid item xs={4}>
-                    <Typography variant="h4">用户组:</Typography> 
+                    <Typography variant="h4">用户组:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="h3">
-                      {users?.group  
-                        ? users.group === "default"  
-                          ? "普通用户"  
-                          : users.group 
+                      {users?.group
+                        ? users.group === "default"
+                          ? "普通用户"
+                          : users.group
                         : "未知"}
                     </Typography>
                   </Grid>
@@ -132,8 +205,35 @@ const Dashboard = () => {
               </UserCard>
             </div>
           </Grid>
+
         </Grid>
       </Grid>
+      <Grid item xs={12}>
+        <MainCard>
+          <Grid container spacing={gridSpacing}>
+            <Grid item xs={12}>
+              <Grid container alignItems="center" justifyContent="space-between">
+                <Grid item>
+                  <Typography variant="h3">可用模型</Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              {Object.entries(modelsByOwner).map(([owner, models]) => (
+                <Box key={owner}>
+                  <Typography variant="h6" sx={{ marginBottom: '10px' }}>分类：{owner}</Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                    {models.map(model => (
+                      <ModelChip key={model} model={model} />
+                    ))}
+                  </Box>
+                </Box>
+              ))}
+            </Grid>
+          </Grid>
+        </MainCard>
+      </Grid>
+
     </Grid>
   );
 };
@@ -241,3 +341,6 @@ function getLineCardOption(lineDataGroup, field) {
 
   return { chartData: chartData, todayValue: todayValue };
 }
+
+
+

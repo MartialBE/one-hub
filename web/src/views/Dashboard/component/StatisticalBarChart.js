@@ -64,7 +64,7 @@ StatisticalBarChart.propTypes = {
 export default StatisticalBarChart;
 
 const chartData = {
-  height: 480,
+  height: 320,
   type: 'bar',
   options: {
     colors: [
