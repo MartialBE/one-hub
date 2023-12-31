@@ -54,6 +54,7 @@ const Dashboard = () => {
     loadUser();
   }, []);
 
+  // 获取模型分类
   const [modelsByOwner, setModelsByOwner] = useState({});
   const fetchModels = () => {
     axios.get('/api/token/?p=0')
@@ -88,8 +89,6 @@ const Dashboard = () => {
         setModelsByOwner({ 错误: [error.message] });
       });
   };
-
-
 
   useEffect(() => {
     fetchModels();
