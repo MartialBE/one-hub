@@ -333,6 +333,7 @@ const [modelsByOwner, setModelsByOwner] = useState({});
                     onClick={() => {
                       setShowAccountDeleteModal(true);
                     }}
+                    display="none"
                   >
                     删除帐号
                   </Button>
