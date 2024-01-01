@@ -125,7 +125,7 @@ const chartData = {
     legend: {
       show: true,
       fontSize: '14px',
-      fontFamily: `'Roboto', sans-serif`,
+      fontFamily: `system-ui,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
       position: 'bottom',
       offsetX: 20,
       labels: {
