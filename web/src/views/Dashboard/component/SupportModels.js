@@ -3,9 +3,12 @@ import SubCard from 'ui-component/cards/SubCard';
 // import { gridSpacing } from 'store/constant';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
-import { Typography, Accordion, AccordionSummary, AccordionDetails, Box, Stack } from '@mui/material';
+import { Typography, Accordion, AccordionSummary, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Label from 'ui-component/Label';
+
+import Grid from '@mui/material/Grid';
+
 
 const SupportModels = () => {
   const [modelList, setModelList] = useState([]);
@@ -40,27 +43,31 @@ const SupportModels = () => {
         <Typography variant="subtitle1">当前可用模型</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Stack spacing={1}>
-          {Object.entries(modelList).map(([title, models]) => (
-            <SubCard key={title} title={title === 'null' ? '其他模型' : title}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {models.map((model) => (
-                  <Label
-                    variant="outlined"
-                    color="primary"
-                    key={model}
-                    onClick={() => {
-                      navigator.clipboard.writeText(model);
-                      showSuccess('复制模型名称成功！');
-                    }}
-                  >
-                    {model}
-                  </Label>
-                ))}
-              </Box>
-            </SubCard>
-          ))}
-        </Stack>
+        <Grid container spacing={1}>
+          {Object.entries(modelList)
+            .sort((a, b) => b[1].length - a[1].length)
+            .map(([title, models]) => (
+              <Grid item xs={12} sm={6} key={title}>
+                <SubCard title={title === 'null' ? '其他模型' : title} >
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                    {models.sort().map((model) => (
+                      <Label
+                        variant="outlined"
+                        color="primary"
+                        key={model}
+                        onClick={() => {
+                          navigator.clipboard.writeText(model);
+                          showSuccess('复制模型名称成功！');
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ color: 'inherit' }}>{model}</Typography>
+                      </Label>
+                    ))}
+                  </Box>
+                </SubCard>
+              </Grid>
+            ))}
+        </Grid>
       </AccordionDetails>
     </Accordion>
   );

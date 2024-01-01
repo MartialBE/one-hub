@@ -37,8 +37,8 @@ export default function themeTypography(theme) {
       fontWeight: 700
     },
     subtitle1: {
-      fontSize: '0.875rem',
-      fontWeight: 500,
+      fontSize: '1rem',
+      fontWeight: 700,
       color: theme.textDark
     },
     subtitle2: {
