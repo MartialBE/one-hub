@@ -68,11 +68,6 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
   const [inputPrompt, setInputPrompt] = useState(defaultConfig.prompt);
   const [groupOptions, setGroupOptions] = useState([]);
   const [modelOptions, setModelOptions] = useState([]);
-  const [basicModels, setBasicModels] = useState([]);
-  const [GPT3NoInstructModels, setGPT3NoInstructModels] = useState([]);
-  const [basicNoGPTModels, setBasicNoGPTModels] = useState([]);
-  const [fullNo32KOPENAIModels, setfullNo32KOPENAIModels] = useState([]);
-  const [fullOPENAIModels, setFullOPENAIModels] = useState([]);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -100,9 +95,26 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
         ) {
           return;
         }
+
+        if (key === 'models') {
+          setFieldValue(key, initialModel(newInput[key]));
+          return;
+        }
         setFieldValue(key, newInput[key]);
       });
     }
+  };
+
+  const basicModels = (channelType) => {
+    let modelGroup = typeConfig[channelType]?.modelGroup || defaultConfig.modelGroup;
+    // 循环 modelOptions，找到 modelGroup 对应的模型
+    let modelList = [];
+    modelOptions.forEach((model) => {
+      if (model.group === modelGroup) {
+        modelList.push(model);
+      }
+    });
+    return modelList;
   };
 
   const fetchGroups = async () => {
@@ -117,29 +129,14 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
   const fetchModels = async () => {
     try {
       let res = await API.get(`/api/channel/models`);
-      setModelOptions(res.data.data.map((model) => model.id));
-      setBasicModels(
-        res.data.data
-          .filter((model) => {
-            return model.id.startsWith('gpt-3') || model.id.startsWith('gpt-4');
-          })
-          .map((model) => model.id)
+      setModelOptions(
+        res.data.data.map((model) => {
+          return {
+            id: model.id,
+            group: model.owned_by
+          };
+        })
       );
-      setGPT3NoInstructModels(res.data.data.filter((model) => {
-        return model.id.startsWith('gpt-3') && !model.id.startsWith('gpt-3.5-turbo-16k') && !model.id.endsWith('instruct');
-      }).map((model) => model.id));
-
-      setBasicNoGPTModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-      setFullOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('code-') || model.id.startsWith('tts-')) && !model.id.startsWith('text-embedding-v1');
-      }).map((model) => model.id));
-
-      setfullNo32KOPENAIModels(res.data.data.filter((model) => {
-        return (model.id.startsWith('gpt-') || model.id.startsWith('text-') || model.id.startsWith('dall-') || model.id.startsWith('whisper-') || model.id.startsWith('tts-') || model.id.startsWith('code-')) && !model.id.startsWith('text-embedding-v1') && !model.id.startsWith('gpt-4-32k');
-      }).map((model) => model.id));
-
     } catch (error) {
       showError(error.message);
     }
@@ -157,12 +154,12 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
       values.other = 'v2.1';
     }
     let res;
-    values.models = values.models.join(',');
+    const modelsStr = values.models.map((model) => model.id).join(',');
     values.group = values.groups.join(',');
     if (channelId) {
-      res = await API.put(`/api/channel/`, { ...values, id: parseInt(channelId) });
+      res = await API.put(`/api/channel/`, { ...values, id: parseInt(channelId), models: modelsStr });
     } else {
-      res = await API.post(`/api/channel/`, values);
+      res = await API.post(`/api/channel/`, { ...values, models: modelsStr });
     }
     const { success, message } = res.data;
     if (success) {
@@ -176,10 +173,29 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
       onOk(true);
     } else {
       setStatus({ success: false });
-      // showError(message);
+      showError(message);
       setErrors({ submit: message });
     }
   };
+
+  function initialModel(channelModel) {
+    if (!channelModel) {
+      return [];
+    }
+
+    // 如果 channelModel 是一个字符串
+    if (typeof channelModel === 'string') {
+      channelModel = channelModel.split(',');
+    }
+    let modelList = channelModel.map((model) => {
+      const modelOption = modelOptions.find((option) => option.id === model);
+      if (modelOption) {
+        return modelOption;
+      }
+      return { id: model, group: '自定义：点击或回车输入' };
+    });
+    return modelList;
+  }
 
   const loadChannel = async () => {
     let res = await API.get(`/api/channel/${channelId}`);
@@ -188,7 +204,7 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
       if (data.models === '') {
         data.models = [];
       } else {
-        data.models = data.models.split(',');
+        data.models = initialModel(data.models);
       }
       if (data.group === '') {
         data.groups = [];
@@ -367,12 +383,12 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                   freeSolo
                   id="channel-models-label"
                   options={modelOptions}
-                  value={Array.isArray(values.models) ? values.models : values.models.split(',')}
+                  value={values.models}
                   onChange={(e, value) => {
                     const event = {
                       target: {
                         name: 'models',
-                        value: value
+                        value: value.map((item) => (typeof item === 'string' ? { id: item, group: '自定义：点击或回车输入' } : item))
                       }
                     };
                     handleChange(event);
@@ -380,12 +396,25 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                   onBlur={handleBlur}
                   filterSelectedOptions
                   renderInput={(params) => <TextField {...params} name="models" error={Boolean(errors.models)} label={inputLabel.models} />}
+                  groupBy={(option) => option.group}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') {
+                      return option;
+                    }
+                    if (option.inputValue) {
+                      return option.inputValue;
+                    }
+                    return option.id;
+                  }}
                   filterOptions={(options, params) => {
                     const filtered = filter(options, params);
                     const { inputValue } = params;
-                    const isExisting = options.some((option) => inputValue === option);
+                    const isExisting = options.some((option) => inputValue === option.id);
                     if (inputValue !== '' && !isExisting) {
-                      filtered.push(inputValue);
+                      filtered.push({
+                        id: inputValue,
+                        group: '自定义：点击或回车输入'
+                      });
                     }
                     return filtered;
                   }}
@@ -404,26 +433,20 @@ const EditModal = ({ open, channelId, onCancel, onOk }) => {
                 }}
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
-
-                  <Button onClick={() => {
-                    setFieldValue('models', basicNoGPTModels);
-                  }}>基础无gpt</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', GPT3NoInstructModels);
-                  }}>gpt3对话</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', basicModels);
-                  }}>基础OPENAI</Button>
-
-                  <Button onClick={() => {
-                    setFieldValue('models', fullNo32KOPENAIModels);
-                  }}>无32K OPENAI</Button>
-                  
-                  <Button onClick={() => {
-                    setFieldValue('models', fullOPENAIModels);
-                  }}>OPENAI</Button>
+                  <Button
+                    onClick={() => {
+                      setFieldValue('models', basicModels(values.type));
+                    }}
+                  >
+                    填入渠道支持模型
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setFieldValue('models', modelOptions);
+                    }}
+                  >
+                    填入所有模型
+                  </Button>
                 </ButtonGroup>
               </Container>
               <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
