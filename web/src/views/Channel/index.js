@@ -190,6 +190,7 @@ export default function ChannelPage() {
       .catch((reason) => {
         showError(reason);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [monthlyQuotas, setMonthlyQuotas] = useState({});

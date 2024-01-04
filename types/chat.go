@@ -5,13 +5,25 @@ const (
 	ContentTypeImageURL = "image_url"
 )
 
+type ChatCompletionToolCallsFunction struct {
+	Name      string `json:"name,omitempty"`
+	Arguments string `json:"arguments,omitempty"`
+}
+
+type ChatCompletionToolCalls struct {
+	Id       string                          `json:"id"`
+	Type     string                          `json:"type"`
+	Function ChatCompletionToolCallsFunction `json:"function"`
+	Index    int                             `json:"index"`
+}
+
 type ChatCompletionMessage struct {
-	Role         string  `json:"role"`
-	Content      any     `json:"content"`
-	Name         *string `json:"name,omitempty"`
-	FunctionCall any     `json:"function_call,omitempty"`
-	ToolCalls    any     `json:"tool_calls,omitempty"`
-	ToolCallID   string  `json:"tool_call_id,omitempty"`
+	Role         string                           `json:"role"`
+	Content      any                              `json:"content,omitempty"`
+	Name         *string                          `json:"name,omitempty"`
+	FunctionCall *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
+	ToolCalls    []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
+	ToolCallID   string                           `json:"tool_call_id,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -112,10 +124,30 @@ type ChatCompletionRequest struct {
 	FrequencyPenalty float64                       `json:"frequency_penalty,omitempty"`
 	LogitBias        any                           `json:"logit_bias,omitempty"`
 	User             string                        `json:"user,omitempty"`
-	Functions        any                           `json:"functions,omitempty"`
+	Functions        []*ChatCompletionFunction     `json:"functions,omitempty"`
 	FunctionCall     any                           `json:"function_call,omitempty"`
-	Tools            any                           `json:"tools,omitempty"`
+	Tools            []*ChatCompletionTool         `json:"tools,omitempty"`
 	ToolChoice       any                           `json:"tool_choice,omitempty"`
+}
+
+func (r ChatCompletionRequest) GetFunctionCate() string {
+	if r.Tools != nil {
+		return "tool"
+	} else if r.Functions != nil {
+		return "function"
+	}
+	return ""
+}
+
+type ChatCompletionFunction struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Parameters  any    `json:"parameters"`
+}
+
+type ChatCompletionTool struct {
+	Type     string                 `json:"type"`
+	Function ChatCompletionFunction `json:"function"`
 }
 
 type ChatCompletionChoice struct {
@@ -135,10 +167,10 @@ type ChatCompletionResponse struct {
 }
 
 type ChatCompletionStreamChoiceDelta struct {
-	Content      string `json:"content,omitempty"`
-	Role         string `json:"role,omitempty"`
-	FunctionCall any    `json:"function_call,omitempty"`
-	ToolCalls    any    `json:"tool_calls,omitempty"`
+	Content      string                           `json:"content,omitempty"`
+	Role         string                           `json:"role,omitempty"`
+	FunctionCall *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
+	ToolCalls    []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 }
 
 type ChatCompletionStreamChoice struct {

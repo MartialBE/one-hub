@@ -7,30 +7,45 @@ type XunfeiMessage struct {
 	Content string `json:"content"`
 }
 
+type XunfeiChatPayloadMessage struct {
+	Text []XunfeiMessage `json:"text"`
+}
+
+type XunfeiChatPayloadFunctions struct {
+	Text []*types.ChatCompletionFunction `json:"text"`
+}
+
+type XunfeiChatPayload struct {
+	Message   XunfeiChatPayloadMessage    `json:"message"`
+	Functions *XunfeiChatPayloadFunctions `json:"functions,omitempty"`
+}
+
+type XunfeiParameterChat struct {
+	Domain      string  `json:"domain,omitempty"`
+	Temperature float64 `json:"temperature,omitempty"`
+	TopK        int     `json:"top_k,omitempty"`
+	MaxTokens   int     `json:"max_tokens,omitempty"`
+	Auditing    bool    `json:"auditing,omitempty"`
+}
+
+type XunfeiChatRequestParameter struct {
+	Chat XunfeiParameterChat `json:"chat"`
+}
+
 type XunfeiChatRequest struct {
 	Header struct {
 		AppId string `json:"app_id"`
 	} `json:"header"`
-	Parameter struct {
-		Chat struct {
-			Domain      string  `json:"domain,omitempty"`
-			Temperature float64 `json:"temperature,omitempty"`
-			TopK        int     `json:"top_k,omitempty"`
-			MaxTokens   int     `json:"max_tokens,omitempty"`
-			Auditing    bool    `json:"auditing,omitempty"`
-		} `json:"chat"`
-	} `json:"parameter"`
-	Payload struct {
-		Message struct {
-			Text []XunfeiMessage `json:"text"`
-		} `json:"message"`
-	} `json:"payload"`
+	Parameter XunfeiChatRequestParameter `json:"parameter"`
+	Payload   XunfeiChatPayload          `json:"payload"`
 }
 
 type XunfeiChatResponseTextItem struct {
-	Content string `json:"content"`
-	Role    string `json:"role"`
-	Index   int    `json:"index"`
+	Content      string                                 `json:"content"`
+	Role         string                                 `json:"role"`
+	Index        int                                    `json:"index"`
+	ContentType  string                                 `json:"content_type,omitempty"`
+	FunctionCall *types.ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 }
 
 type XunfeiChatResponse struct {
@@ -47,12 +62,6 @@ type XunfeiChatResponse struct {
 			Text   []XunfeiChatResponseTextItem `json:"text"`
 		} `json:"choices"`
 		Usage struct {
-			//Text struct {
-			//	QuestionTokens   string `json:"question_tokens"`
-			//	PromptTokens     string `json:"prompt_tokens"`
-			//	CompletionTokens string `json:"completion_tokens"`
-			//	TotalTokens      string `json:"total_tokens"`
-			//} `json:"text"`
 			Text types.Usage `json:"text"`
 		} `json:"usage"`
 	} `json:"payload"`
