@@ -39,6 +39,8 @@ func init() {
 		"gpt-3.5-turbo-16k-0613":    {1.5, ChannelTypeOpenAI},
 		"gpt-3.5-turbo-instruct":    {0.75, ChannelTypeOpenAI}, // $0.0015 / 1K tokens
 		"gpt-3.5-turbo-1106":        {0.5, ChannelTypeOpenAI},  // $0.001 / 1K tokens
+		"davinci-002":               {1, ChannelTypeOpenAI},    // $0.002 / 1K tokens
+		"babbage-002":               {0.2, ChannelTypeOpenAI},  // $0.002 / 1K tokens
 		"text-ada-001":              {0.2, ChannelTypeOpenAI},
 		"text-babbage-001":          {0.25, ChannelTypeOpenAI},
 		"text-curie-001":            {1, ChannelTypeOpenAI},
@@ -134,6 +136,35 @@ func ModelRatio2JSONString() string {
 func UpdateModelRatioByJSONString(jsonStr string) error {
 	ModelRatio = make(map[string]float64)
 	return json.Unmarshal([]byte(jsonStr), &ModelRatio)
+}
+
+func MergeModelRatioByJSONString(jsonStr string) (newJsonStr string, err error) {
+	inputModelRatio := make(map[string]float64)
+	err = json.Unmarshal([]byte(jsonStr), &inputModelRatio)
+	if err != nil {
+		return
+	}
+
+	isNew := false
+	// 与现有的ModelRatio进行比较，如果有新增的模型，需要添加
+	for key, value := range ModelRatio {
+		if _, ok := inputModelRatio[key]; !ok {
+			isNew = true
+			inputModelRatio[key] = value
+		}
+	}
+
+	if !isNew {
+		return
+	}
+
+	var jsonBytes []byte
+	jsonBytes, err = json.Marshal(inputModelRatio)
+	if err != nil {
+		SysError("error marshalling model ratio: " + err.Error())
+	}
+	newJsonStr = string(jsonBytes)
+	return
 }
 
 func GetModelRatio(name string) float64 {
