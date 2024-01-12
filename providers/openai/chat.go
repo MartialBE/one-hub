@@ -1,82 +1,122 @@
 package openai
 
 import (
+	"encoding/json"
 	"net/http"
 	"one-api/common"
+	"one-api/common/requester"
+	"one-api/providers/base"
 	"one-api/types"
+	"strings"
 )
 
-func (c *OpenAIProviderChatResponse) ResponseHandler(resp *http.Response) (OpenAIResponse any, errWithCode *types.OpenAIErrorWithStatusCode) {
-	if c.Error.Type != "" {
-		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: c.Error,
-			StatusCode:  resp.StatusCode,
-		}
-		return
-	}
-	return nil, nil
+type OpenAIChatHandler struct {
+	base.BaseHandler
+	Request *types.ChatCompletionRequest
 }
 
-func (c *OpenAIProviderChatStreamResponse) responseStreamHandler() (responseText string) {
-	for _, choice := range c.Choices {
-		responseText += choice.Delta.Content
+func (p *OpenAIProvider) initChat(request *types.ChatCompletionRequest) (chatHandler *OpenAIChatHandler, resp *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
+	chatHandler = &OpenAIChatHandler{
+		BaseHandler: base.BaseHandler{
+			Usage: p.Usage,
+		},
+		Request: request,
 	}
+	resp, errWithCode = chatHandler.getResponse(p)
 
 	return
 }
 
-func (p *OpenAIProvider) ChatAction(request *types.ChatCompletionRequest, isModelMapped bool, promptTokens int) (usage *types.Usage, errWithCode *types.OpenAIErrorWithStatusCode) {
-	requestBody, err := p.GetRequestBody(&request, isModelMapped)
-	if err != nil {
-		return nil, common.ErrorWrapper(err, "json_marshal_failed", http.StatusInternalServerError)
+func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	chatHandler, resp, errWithCode := p.initChat(request)
+	if errWithCode != nil {
+		return
 	}
 
-	fullRequestURL := p.GetFullRequestURL(p.ChatCompletions, request.Model)
+	defer resp.Body.Close()
+
+	response := &OpenAIProviderChatResponse{}
+	err := json.NewDecoder(resp.Body).Decode(response)
+	if err != nil {
+		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
+		return
+	}
+
+	return chatHandler.convertToOpenai(response)
+}
+
+func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (stream requester.StreamReaderInterface[types.ChatCompletionStreamResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
+	chatHandler, resp, errWithCode := p.initChat(request)
+	if errWithCode != nil {
+		return
+	}
+
+	return requester.RequestStream[types.ChatCompletionStreamResponse](p.Requester, resp, chatHandler.handlerStream)
+}
+
+func (h *OpenAIChatHandler) getResponse(p *OpenAIProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
+	url, err := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	if err != nil {
+		return nil, err
+	}
+	// 获取请求地址
+	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+
+	// 获取请求头
 	headers := p.GetRequestHeaders()
-	if request.Stream && headers["Accept"] == "" {
+	if h.Request.Stream {
 		headers["Accept"] = "text/event-stream"
 	}
 
-	client := common.NewClient()
-	req, err := client.NewRequest(p.Context.Request.Method, fullRequestURL, common.WithBody(requestBody), common.WithHeader(headers))
+	// 发送请求
+	return p.SendJsonRequest(http.MethodPost, fullRequestURL, h.Request, headers)
+}
+
+func (h *OpenAIChatHandler) convertToOpenai(response *OpenAIProviderChatResponse) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	error := ErrorHandle(&response.OpenAIErrorResponse)
+	if error != nil {
+		errWithCode = &types.OpenAIErrorWithStatusCode{
+			OpenAIError: *error,
+			StatusCode:  http.StatusBadRequest,
+		}
+		return
+	}
+
+	h.Usage = response.Usage
+
+	return &response.ChatCompletionResponse, nil
+}
+
+func (h *OpenAIChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, response *[]types.ChatCompletionStreamResponse) error {
+	// 如果rawLine 前缀不为data:，则直接返回
+	if !strings.HasPrefix(string(*rawLine), "data: ") {
+		*rawLine = nil
+		return nil
+	}
+
+	// 去除前缀
+	*rawLine = (*rawLine)[5:]
+
+	var openaiResponse OpenAIProviderChatStreamResponse
+	err := json.Unmarshal(*rawLine, &openaiResponse)
 	if err != nil {
-		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		return common.ErrorToOpenAIError(err)
 	}
 
-	if request.Stream {
-		openAIProviderChatStreamResponse := &OpenAIProviderChatStreamResponse{}
-		var textResponse string
-		errWithCode, textResponse = p.SendStreamRequest(req, openAIProviderChatStreamResponse)
-		if errWithCode != nil {
-			return
-		}
-
-		usage = &types.Usage{
-			PromptTokens:     promptTokens,
-			CompletionTokens: common.CountTokenText(textResponse, request.Model),
-			TotalTokens:      promptTokens + common.CountTokenText(textResponse, request.Model),
-		}
-
-	} else {
-		openAIProviderChatResponse := &OpenAIProviderChatResponse{}
-		errWithCode = p.SendRequest(req, openAIProviderChatResponse, true)
-		if errWithCode != nil {
-			return
-		}
-
-		usage = openAIProviderChatResponse.Usage
-
-		if usage.TotalTokens == 0 {
-			completionTokens := 0
-			for _, choice := range openAIProviderChatResponse.Choices {
-				completionTokens += common.CountTokenText(choice.Message.StringContent(), openAIProviderChatResponse.Model)
-			}
-			usage = &types.Usage{
-				PromptTokens:     promptTokens,
-				CompletionTokens: completionTokens,
-				TotalTokens:      promptTokens + completionTokens,
-			}
-		}
+	error := ErrorHandle(&openaiResponse.OpenAIErrorResponse)
+	if error != nil {
+		return error
 	}
-	return
+
+	return h.convertToOpenaiStream(&openaiResponse, response)
+}
+
+func (h *OpenAIChatHandler) convertToOpenaiStream(openaiResponse *OpenAIProviderChatStreamResponse, response *[]types.ChatCompletionStreamResponse) error {
+	countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.Request.Model)
+	h.Usage.CompletionTokens += countTokenText
+	h.Usage.TotalTokens += countTokenText
+
+	*response = append(*response, openaiResponse.ChatCompletionStreamResponse)
+
+	return nil
 }

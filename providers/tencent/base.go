@@ -6,18 +6,17 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"one-api/model"
 	"one-api/providers/base"
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 type TencentProviderFactory struct{}
 
 // 创建 TencentProvider
-func (f TencentProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f TencentProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &TencentProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://hunyuan.cloud.tencent.com",

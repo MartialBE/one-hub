@@ -5,12 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"one-api/common"
+	"one-api/model"
 	"one-api/providers/base"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 // 定义供应商工厂
@@ -18,7 +17,7 @@ type BaiduProviderFactory struct{}
 
 // 创建 BaiduProvider
 
-func (f BaiduProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f BaiduProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &BaiduProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://aip.baidubce.com",

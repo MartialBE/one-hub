@@ -2,51 +2,98 @@ package openai
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/providers/base"
 	"one-api/types"
 )
 
-func (p *OpenAIProvider) ImageEditsAction(request *types.ImageEditRequest, isModelMapped bool, promptTokens int) (usage *types.Usage, errWithCode *types.OpenAIErrorWithStatusCode) {
-	fullRequestURL := p.GetFullRequestURL(p.ImagesEdit, request.Model)
+type OpenaiImageEditHandler struct {
+	base.BaseHandler
+	Request *types.ImageEditRequest
+}
+
+func (p *OpenAIProvider) CreateImageEdits(request *types.ImageEditRequest) (response *types.ImageResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	openaiHandler := &OpenaiImageEditHandler{
+		BaseHandler: base.BaseHandler{
+			Usage: p.Usage,
+		},
+		Request: request,
+	}
+
+	resp, errWithCode := openaiHandler.getResponse(p)
+
+	defer resp.Body.Close()
+
+	openaiResponse := &OpenAIProviderImageResponseResponse{}
+	err := json.NewDecoder(resp.Body).Decode(openaiResponse)
+	if err != nil {
+		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
+		return
+	}
+
+	return openaiHandler.convertToOpenai(openaiResponse)
+}
+
+func (h *OpenaiImageEditHandler) getResponse(p *OpenAIProvider) (response *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
+	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeImagesEdits)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+	// 获取请求地址
+	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+
+	// 获取请求头
 	headers := p.GetRequestHeaders()
 
-	client := common.NewClient()
-
-	var formBody bytes.Buffer
 	var req *http.Request
 	var err error
-	if isModelMapped {
-		builder := client.CreateFormBuilder(&formBody)
-		if err := imagesEditsMultipartForm(request, builder); err != nil {
+	if p.OriginalModel != h.Request.Model {
+		var formBody bytes.Buffer
+		builder := p.Requester.CreateFormBuilder(&formBody)
+		if err := imagesEditsMultipartForm(h.Request, builder); err != nil {
 			return nil, common.ErrorWrapper(err, "create_form_builder_failed", http.StatusInternalServerError)
 		}
-		req, err = client.NewRequest(p.Context.Request.Method, fullRequestURL, common.WithBody(&formBody), common.WithHeader(headers), common.WithContentType(builder.FormDataContentType()))
+		req, err = p.Requester.NewRequest(
+			http.MethodPost,
+			fullRequestURL,
+			p.Requester.WithBody(&formBody),
+			p.Requester.WithHeader(headers),
+			p.Requester.WithContentType(builder.FormDataContentType()))
 		req.ContentLength = int64(formBody.Len())
-
 	} else {
-		req, err = client.NewRequest(p.Context.Request.Method, fullRequestURL, common.WithBody(p.Context.Request.Body), common.WithHeader(headers), common.WithContentType(p.Context.Request.Header.Get("Content-Type")))
+		req, err = p.Requester.NewRequest(
+			http.MethodPost,
+			fullRequestURL,
+			p.Requester.WithBody(p.Context.Request.Body),
+			p.Requester.WithHeader(headers),
+			p.Requester.WithContentType(p.Context.Request.Header.Get("Content-Type")))
 		req.ContentLength = p.Context.Request.ContentLength
 	}
 
 	if err != nil {
-		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
-	}
-
-	openAIProviderImageResponseResponse := &OpenAIProviderImageResponseResponse{}
-	errWithCode = p.SendRequest(req, openAIProviderImageResponseResponse, true)
-	if errWithCode != nil {
+		errWithCode = common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 		return
 	}
 
-	usage = &types.Usage{
-		PromptTokens:     promptTokens,
-		CompletionTokens: 0,
-		TotalTokens:      promptTokens,
+	return p.Requester.SendRequestRaw(req)
+}
+
+func (h *OpenaiImageEditHandler) convertToOpenai(response *OpenAIProviderImageResponseResponse) (openaiResponse *types.ImageResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	error := ErrorHandle(&response.OpenAIErrorResponse)
+	if error != nil {
+		errWithCode = &types.OpenAIErrorWithStatusCode{
+			OpenAIError: *error,
+			StatusCode:  http.StatusBadRequest,
+		}
+		return
 	}
 
-	return
+	h.Usage.TotalTokens = h.Usage.PromptTokens
+
+	return &response.ImageResponse, nil
 }
 
 func imagesEditsMultipartForm(request *types.ImageEditRequest, b common.FormBuilder) error {

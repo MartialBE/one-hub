@@ -1,45 +1,66 @@
 package openai
 
 import (
+	"encoding/json"
 	"net/http"
 	"one-api/common"
+	"one-api/providers/base"
 	"one-api/types"
 )
 
-func (c *OpenAIProviderEmbeddingsResponse) ResponseHandler(resp *http.Response) (OpenAIResponse any, errWithCode *types.OpenAIErrorWithStatusCode) {
-	if c.Error.Type != "" {
+type OpenaiEmbedHandler struct {
+	base.BaseHandler
+	Request *types.EmbeddingRequest
+}
+
+func (p *OpenAIProvider) CreateEmbeddings(request *types.EmbeddingRequest, promptTokens int) (response *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	openaiEmbedHandler := &OpenaiEmbedHandler{
+		BaseHandler: base.BaseHandler{
+			Usage: p.Usage,
+		},
+		Request: request,
+	}
+
+	resp, errWithCode := openaiEmbedHandler.getResponse(p)
+
+	defer resp.Body.Close()
+
+	openaiResponse := &OpenAIProviderEmbeddingsResponse{}
+	err := json.NewDecoder(resp.Body).Decode(openaiResponse)
+	if err != nil {
+		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
+		return
+	}
+
+	return openaiEmbedHandler.convertToOpenai(openaiResponse)
+}
+
+func (h *OpenaiEmbedHandler) getResponse(p *OpenAIProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
+	url, err := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
+	if err != nil {
+		return nil, err
+	}
+	// 获取请求地址
+	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+
+	// 获取请求头
+	headers := p.GetRequestHeaders()
+
+	// 发送请求
+	return p.SendJsonRequest(http.MethodPost, fullRequestURL, h.Request, headers)
+}
+
+func (h *OpenaiEmbedHandler) convertToOpenai(response *OpenAIProviderEmbeddingsResponse) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	error := ErrorHandle(&response.OpenAIErrorResponse)
+	if error != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: c.Error,
-			StatusCode:  resp.StatusCode,
+			OpenAIError: *error,
+			StatusCode:  http.StatusBadRequest,
 		}
 		return
 	}
-	return nil, nil
-}
 
-func (p *OpenAIProvider) EmbeddingsAction(request *types.EmbeddingRequest, isModelMapped bool, promptTokens int) (usage *types.Usage, errWithCode *types.OpenAIErrorWithStatusCode) {
+	h.Usage = response.Usage
 
-	requestBody, err := p.GetRequestBody(&request, isModelMapped)
-	if err != nil {
-		return nil, common.ErrorWrapper(err, "json_marshal_failed", http.StatusInternalServerError)
-	}
-
-	fullRequestURL := p.GetFullRequestURL(p.Embeddings, request.Model)
-	headers := p.GetRequestHeaders()
-
-	client := common.NewClient()
-	req, err := client.NewRequest(p.Context.Request.Method, fullRequestURL, common.WithBody(requestBody), common.WithHeader(headers))
-	if err != nil {
-		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
-	}
-
-	openAIProviderEmbeddingsResponse := &OpenAIProviderEmbeddingsResponse{}
-	errWithCode = p.SendRequest(req, openAIProviderEmbeddingsResponse, true)
-	if errWithCode != nil {
-		return
-	}
-
-	usage = openAIProviderEmbeddingsResponse.Usage
-
-	return
+	return &response.EmbeddingResponse, nil
 }

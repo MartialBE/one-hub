@@ -12,9 +12,25 @@ type OpenAIProviderChatStreamResponse struct {
 	types.OpenAIErrorResponse
 }
 
+func (c *OpenAIProviderChatStreamResponse) getResponseText() (responseText string) {
+	for _, choice := range c.Choices {
+		responseText += choice.Delta.Content
+	}
+
+	return
+}
+
 type OpenAIProviderCompletionResponse struct {
 	types.CompletionResponse
 	types.OpenAIErrorResponse
+}
+
+func (c *OpenAIProviderCompletionResponse) getResponseText() (responseText string) {
+	for _, choice := range c.Choices {
+		responseText += choice.Text
+	}
+
+	return
 }
 
 type OpenAIProviderEmbeddingsResponse struct {

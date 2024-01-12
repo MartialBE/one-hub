@@ -2,16 +2,15 @@ package gemini
 
 import (
 	"fmt"
+	"one-api/model"
 	"one-api/providers/base"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 type GeminiProviderFactory struct{}
 
 // 创建 ClaudeProvider
-func (f GeminiProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f GeminiProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &GeminiProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://generativelanguage.googleapis.com",

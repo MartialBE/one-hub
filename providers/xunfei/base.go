@@ -7,17 +7,16 @@ import (
 	"fmt"
 	"net/url"
 	"one-api/common"
+	"one-api/model"
 	"one-api/providers/base"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type XunfeiProviderFactory struct{}
 
 // 创建 XunfeiProvider
-func (f XunfeiProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f XunfeiProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &XunfeiProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "wss://spark-api.xf-yun.com",

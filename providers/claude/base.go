@@ -1,15 +1,14 @@
 package claude
 
 import (
+	"one-api/model"
 	"one-api/providers/base"
-
-	"github.com/gin-gonic/gin"
 )
 
 type ClaudeProviderFactory struct{}
 
 // 创建 ClaudeProvider
-func (f ClaudeProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f ClaudeProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &ClaudeProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://api.anthropic.com",

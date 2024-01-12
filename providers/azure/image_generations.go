@@ -5,10 +5,40 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/providers/base"
 	"one-api/providers/openai"
 	"one-api/types"
 	"time"
 )
+
+type imageGenerHandler struct {
+	base.BaseHandler
+	Request *types.ImageRequest
+}
+
+func (p *AzureProvider) CreateImageGenerations(request *types.ImageRequest) (response *types.ImageResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	baseHandler, err := p.GetBaseHander(request.Model)
+	if err != nil {
+		errWithCode = common.ErrorWrapper(err, "model_mapping_error", http.StatusInternalServerError)
+		return
+	}
+
+	handler := &imageGenerHandler{
+		BaseHandler: baseHandler,
+		Request:     request,
+	}
+
+	resp, errWithCode := handler.getResponse(p)
+
+	defer resp.Body.Close()
+
+	return handler.convertToOpenai()
+
+}
+
+func (h *aliEmbedHandler) getResponse(p *AliProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
+
+}
 
 func (c *ImageAzureResponse) ResponseHandler(resp *http.Response) (OpenAIResponse any, errWithCode *types.OpenAIErrorWithStatusCode) {
 	if c.Status == "canceled" || c.Status == "failed" {

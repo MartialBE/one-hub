@@ -5,6 +5,23 @@ const (
 	ContentTypeImageURL = "image_url"
 )
 
+const (
+	FinishReasonStop          = "stop"
+	FinishReasonLength        = "length"
+	FinishReasonFunctionCall  = "function_call"
+	FinishReasonToolCalls     = "tool_calls"
+	FinishReasonContentFilter = "content_filter"
+	FinishReasonNull          = "null"
+)
+
+const (
+	ChatMessageRoleSystem    = "system"
+	ChatMessageRoleUser      = "user"
+	ChatMessageRoleAssistant = "assistant"
+	ChatMessageRoleFunction  = "function"
+	ChatMessageRoleTool      = "tool"
+)
+
 type ChatCompletionToolCallsFunction struct {
 	Name      string `json:"name,omitempty"`
 	Arguments string `json:"arguments,omitempty"`
@@ -123,6 +140,8 @@ type ChatCompletionRequest struct {
 	Seed             *int                          `json:"seed,omitempty"`
 	FrequencyPenalty float64                       `json:"frequency_penalty,omitempty"`
 	LogitBias        any                           `json:"logit_bias,omitempty"`
+	LogProbs         bool                          `json:"logprobs,omitempty"`
+	TopLogProbs      int                           `json:"top_logprobs,omitempty"`
 	User             string                        `json:"user,omitempty"`
 	Functions        []*ChatCompletionFunction     `json:"functions,omitempty"`
 	FunctionCall     any                           `json:"function_call,omitempty"`

@@ -3,12 +3,12 @@ package zhipu
 import (
 	"fmt"
 	"one-api/common"
+	"one-api/model"
 	"one-api/providers/base"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -18,7 +18,7 @@ var expSeconds int64 = 24 * 3600
 type ZhipuProviderFactory struct{}
 
 // 创建 ZhipuProvider
-func (f ZhipuProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f ZhipuProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &ZhipuProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://open.bigmodel.cn",

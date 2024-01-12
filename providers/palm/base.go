@@ -2,16 +2,15 @@ package palm
 
 import (
 	"fmt"
+	"one-api/model"
 	"one-api/providers/base"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 type PalmProviderFactory struct{}
 
 // 创建 PalmProvider
-func (f PalmProviderFactory) Create(c *gin.Context) base.ProviderInterface {
+func (f PalmProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &PalmProvider{
 		BaseProvider: base.BaseProvider{
 			BaseURL:         "https://generativelanguage.googleapis.com",
