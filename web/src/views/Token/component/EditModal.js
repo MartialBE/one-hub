@@ -56,35 +56,44 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
     // values.remain_quota = parseInt(values.remain_quota);
     values.remain_quota = parseInt(values.remain_quota)* quotaPerUnit;
     let res;
-    if (values.is_edit) {
-      res = await API.put(`/api/token/`, { ...values, id: parseInt(tokenId) });
-    } else {
-      res = await API.post(`/api/token/`, values);
-    }
-    const { success, message } = res.data;
-    if (success) {
+
+    try {
       if (values.is_edit) {
-        showSuccess('Key更新成功！');
+        res = await API.put(`/api/token/`, { ...values, id: parseInt(tokenId) });
       } else {
-        showSuccess('Key创建成功，请在列表页面点击复制获取Key！');
+        res = await API.post(`/api/token/`, values);
       }
-      setSubmitting(false);
-      setStatus({ success: true });
-      onOk(true);
-    } else {
-      showError(message);
-      setErrors({ submit: message });
+      const { success, message } = res.data;
+      if (success) {
+        if (values.is_edit) {
+          showSuccess('Key更新成功！');
+        } else {
+          showSuccess('Key创建成功，请在列表页面点击复制获取Key！');
+        }
+        setSubmitting(false);
+        setStatus({ success: true });
+        onOk(true);
+      } else {
+        showError(message);
+        setErrors({ submit: message });
+      }
+    } catch (error) {
+      return;
     }
   };
 
   const loadToken = async () => {
-    let res = await API.get(`/api/token/${tokenId}`);
-    const { success, message, data } = res.data;
-    if (success) {
-      data.is_edit = true;
-      setInputs(data);
-    } else {
-      showError(message);
+    try {
+      let res = await API.get(`/api/token/${tokenId}`);
+      const { success, message, data } = res.data;
+      if (success) {
+        data.is_edit = true;
+        setInputs(data);
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      return;
     }
   };
 
