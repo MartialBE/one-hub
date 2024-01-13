@@ -48,25 +48,31 @@ export default function Log() {
       delete query.username;
       delete query.channel;
     }
-    const res = await API.get(url, { params: query });
+
+    try {
+      const res = await API.get(url, { params: query });
     const statRes = await API.get(statUrl, { params: query });  // 新增
-    const { success, message, data } = res.data;
+      const { success, message, data } = res.data;
     const { success: statSuccess, data: statData } = statRes.data;  // 新增
-    if (success) {
-      if (startIdx === 0) {
-        setLogs(data);
+      if (success) {
+        if (startIdx === 0) {
+          setLogs(data);
+        } else {
+          let newLogs = [...logs];
+          newLogs.splice(startIdx * ITEMS_PER_PAGE, data.length, ...data);
+          setLogs(newLogs);
+        }
       } else {
-        let newLogs = [...logs];
-        newLogs.splice(startIdx * ITEMS_PER_PAGE, data.length, ...data);
-        setLogs(newLogs);
+        showError(message);
       }
-    } else {
-      showError(message);
-    }
     if (statSuccess) {  // 新增
       const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
       setQuota(statData.quota / quotaPerUnit);
     }
+    } catch (error) {
+      console.log(error);
+    }
+
     setSearching(false);
   };
 

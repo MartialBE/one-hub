@@ -129,7 +129,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               id={`switch-${item.id}`}
               checked={statusSwitch === 1}
               onChange={handleStatus}
-              disabled={statusSwitch !== 1 && statusSwitch !== 2}
+              // disabled={statusSwitch !== 1 && statusSwitch !== 2}
             />
           </Tooltip>
         </TableCell>
