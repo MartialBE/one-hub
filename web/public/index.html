@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cmn-Hans">
 
 <head>
   <title>CZLOapi</title>
@@ -8,7 +8,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#2296f3" />
-  <meta name="description" content="OpenAI 接口聚合管理，支持多种渠道包括 Azure，可用于二次分发管理 key，仅单可执行文件，已打包好 Docker 镜像，一键部署，开箱即用" />
+  <meta name="description" content="我们提供OPENAI,Claude,Google gemini pro,智谱ChatGLM,百度文心一言,360智脑,阿里通义千文,百川,腾讯混元等AI接口的反代服务，并使用OPENAI统一格式接口，让您轻松访问和开发应用。高性能、可靠、安全，满足您的需求。" />
   <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
@@ -16,15 +16,8 @@
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <noscript>react needs js.</noscript>
   <div id="root"></div>
-
-  <script src="https://n1.czl.net:182/js/iframe.js" id="chatbot-iframe"
-    data-bot-src="https://n1.czl.net:182/chat/share?shareId=8kudohzve90nodg90bim1fct" data-default-open="false"
-    data-drag="true"
-    data-open-icon="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0zNiAzMkM0MC40MTgzIDMyIDQ0IDI4LjQxODMgNDQgMjRDNDQgMTkuNTgxNyA0MC40MTgzIDE2IDM2IDE2IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTM2IDMyVjMyQzQwLjQxODMgMzIgNDQgMjguNDE4MyA0NCAyNEM0NCAxOS41ODE3IDQwLjQxODMgMTYgMzYgMTYiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEyIDE2QzcuNTgxNzIgMTYgNCAxOS41ODE3IDQgMjRDNCAyOC40MTgzIDcuNTgxNzIgMzIgMTIgMzIiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIgMTZDNy41ODE3MiAxNiA0IDE5LjU4MTcgNCAyNEM0IDI4LjQxODMgNy41ODE3MiAzMiAxMiAzMlYzMiIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTIgMzJWMzEuNVYyOVYyNFYxNkMxMiA5LjM3MjU4IDE3LjM3MjYgNCAyNCA0QzMwLjYyNzQgNCAzNiA5LjM3MjU4IDM2IDE2VjMyQzM2IDM4LjYyNzQgMzAuNjI3NCA0NCAyNCA0NCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg=="
-    data-close-icon="data:image/svg+xml;base64,PHN2ZyB0PSIxNjkwNTM1NDQxNTI2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjYzNjciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48cGF0aCBkPSJNNTEyIDEwMjRBNTEyIDUxMiAwIDEgMSA1MTIgMGE1MTIgNTEyIDAgMCAxIDAgMTAyNHpNMzA1Ljk1NjU3MSAzNzAuMzk1NDI5TDQ0Ny40ODggNTEyIDMwNS45NTY1NzEgNjUzLjYwNDU3MWE0NS41NjggNDUuNTY4IDAgMSAwIDY0LjQzODg1OCA2NC40Mzg4NThMNTEyIDU3Ni41MTJsMTQxLjYwNDU3MSAxNDEuNTMxNDI5YTQ1LjU2OCA0NS41NjggMCAwIDAgNjQuNDM4ODU4LTY0LjQzODg1OEw1NzYuNTEyIDUxMmwxNDEuNTMxNDI5LTE0MS42MDQ1NzFhNDUuNTY4IDQ1LjU2OCAwIDEgMC02NC40Mzg4NTgtNjQuNDM4ODU4TDUxMiA0NDcuNDg4IDM3MC4zOTU0MjkgMzA1Ljk1NjU3MWE0NS41NjggNDUuNTY4IDAgMCAwLTY0LjQzODg1OCA2NC40Mzg4NTh6IiBmaWxsPSIjNGU4M2ZkIiBwLWlkPSI2MzY4Ij48L3BhdGg+PC9zdmc+"
-    defer />
 </body>
 
 </html>
