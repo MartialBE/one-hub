@@ -54,12 +54,6 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
 
   const handleOpenMenu = (event, type) => {
     switch (type) {
-      case 'copy':
-        setMenuItems(copyItems);
-        break;
-      case 'link':
-        setMenuItems(linkItems);
-        break;
       default:
         setMenuItems(actionItems);
     }

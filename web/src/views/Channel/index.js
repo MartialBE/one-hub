@@ -47,6 +47,7 @@ export default function ChannelPage() {
           newChannels.splice(startIdx * ITEMS_PER_PAGE, data.length, ...data);
           setChannels(newChannels);
         }
+        await fetchMonthlyQuotasAndChannels(data); //查询月度用额
       } else {
         showError(message);
       }
