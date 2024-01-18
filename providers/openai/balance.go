@@ -41,6 +41,9 @@ func (p *OpenAIProvider) Balance(channel *model.Channel) (float64, error) {
 	}
 	usage := OpenAIUsageResponse{}
 	_, errWithCode = p.Requester.SendRequest(req, &usage, false)
+	if errWithCode != nil {
+		return 0, errWithCode
+	}
 
 	balance := subscription.HardLimitUSD - usage.TotalUsage/100
 	channel.UpdateBalance(balance)

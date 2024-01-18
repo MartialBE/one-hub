@@ -1,6 +1,7 @@
 package baichuan
 
 import (
+	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
 	"one-api/providers/openai"
@@ -15,12 +16,19 @@ func (f BaichuanProviderFactory) Create(channel *model.Channel) base.ProviderInt
 	return &BaichuanProvider{
 		OpenAIProvider: openai.OpenAIProvider{
 			BaseProvider: base.BaseProvider{
-				BaseURL:         "https://api.baichuan-ai.com",
-				ChatCompletions: "/v1/chat/completions",
-				Embeddings:      "/v1/embeddings",
-				Context:         c,
+				Config:    getConfig(),
+				Channel:   channel,
+				Requester: requester.NewHTTPRequester(channel.Proxy, openai.RequestErrorHandle),
 			},
 		},
+	}
+}
+
+func getConfig() base.ProviderConfig {
+	return base.ProviderConfig{
+		BaseURL:         "https://api.baichuan-ai.com",
+		ChatCompletions: "/v1/chat/completions",
+		Embeddings:      "/v1/embeddings",
 	}
 }
 

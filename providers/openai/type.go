@@ -54,7 +54,7 @@ func (a *OpenAIProviderTranscriptionsTextResponse) GetString() *string {
 	return (*string)(a)
 }
 
-type OpenAIProviderImageResponseResponse struct {
+type OpenAIProviderImageResponse struct {
 	types.ImageResponse
 	types.OpenAIErrorResponse
 }

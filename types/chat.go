@@ -24,14 +24,14 @@ const (
 
 type ChatCompletionToolCallsFunction struct {
 	Name      string `json:"name,omitempty"`
-	Arguments string `json:"arguments,omitempty"`
+	Arguments string `json:"arguments"`
 }
 
 type ChatCompletionToolCalls struct {
-	Id       string                          `json:"id"`
-	Type     string                          `json:"type"`
-	Function ChatCompletionToolCallsFunction `json:"function"`
-	Index    int                             `json:"index"`
+	Id       string                           `json:"id"`
+	Type     string                           `json:"type"`
+	Function *ChatCompletionToolCallsFunction `json:"function"`
+	Index    int                              `json:"index"`
 }
 
 type ChatCompletionMessage struct {
@@ -170,19 +170,89 @@ type ChatCompletionTool struct {
 }
 
 type ChatCompletionChoice struct {
-	Index        int                   `json:"index"`
-	Message      ChatCompletionMessage `json:"message"`
-	FinishReason any                   `json:"finish_reason,omitempty"`
+	Index                int                   `json:"index"`
+	Message              ChatCompletionMessage `json:"message"`
+	FinishReason         any                   `json:"finish_reason,omitempty"`
+	ContentFilterResults any                   `json:"content_filter_results,omitempty"`
+	FinishDetails        any                   `json:"finish_details,omitempty"`
 }
 
 type ChatCompletionResponse struct {
-	ID                string                 `json:"id"`
-	Object            string                 `json:"object"`
-	Created           int64                  `json:"created"`
-	Model             string                 `json:"model"`
-	Choices           []ChatCompletionChoice `json:"choices"`
-	Usage             *Usage                 `json:"usage,omitempty"`
-	SystemFingerprint string                 `json:"system_fingerprint,omitempty"`
+	ID                  string                 `json:"id"`
+	Object              string                 `json:"object"`
+	Created             int64                  `json:"created"`
+	Model               string                 `json:"model"`
+	Choices             []ChatCompletionChoice `json:"choices"`
+	Usage               *Usage                 `json:"usage,omitempty"`
+	SystemFingerprint   string                 `json:"system_fingerprint,omitempty"`
+	PromptFilterResults any                    `json:"prompt_filter_results,omitempty"`
+}
+
+func (c ChatCompletionStreamChoice) ConvertOpenaiStream() []ChatCompletionStreamChoice {
+	var function *ChatCompletionToolCallsFunction
+	var functions []*ChatCompletionToolCallsFunction
+	var choices []ChatCompletionStreamChoice
+	var stopFinish string
+	if c.Delta.FunctionCall != nil {
+		function = c.Delta.FunctionCall
+		stopFinish = FinishReasonFunctionCall
+	} else {
+		function = c.Delta.ToolCalls[0].Function
+		stopFinish = FinishReasonToolCalls
+	}
+
+	if function.Name == "" {
+		c.FinishReason = stopFinish
+		choices = append(choices, c)
+		return choices
+	}
+
+	functions = append(functions, &ChatCompletionToolCallsFunction{
+		Name:      function.Name,
+		Arguments: "",
+	})
+
+	if function.Arguments == "" || function.Arguments == "{}" {
+		functions = append(functions, &ChatCompletionToolCallsFunction{
+			Arguments: "{}",
+		})
+	} else {
+		functions = append(functions, &ChatCompletionToolCallsFunction{
+			Arguments: function.Arguments,
+		})
+	}
+
+	// 循环functions, 生成choices
+	for _, function := range functions {
+		choice := ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: ChatCompletionStreamChoiceDelta{
+				Role: c.Delta.Role,
+			},
+		}
+		if stopFinish == FinishReasonFunctionCall {
+			choice.Delta.FunctionCall = function
+		} else {
+			choice.Delta.ToolCalls = []*ChatCompletionToolCalls{
+				{
+					Id:       c.Delta.ToolCalls[0].Id,
+					Index:    0,
+					Type:     "function",
+					Function: function,
+				},
+			}
+		}
+
+		choices = append(choices, choice)
+	}
+
+	choices = append(choices, ChatCompletionStreamChoice{
+		Index:        c.Index,
+		Delta:        ChatCompletionStreamChoiceDelta{},
+		FinishReason: stopFinish,
+	})
+
+	return choices
 }
 
 type ChatCompletionStreamChoiceDelta struct {

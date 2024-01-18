@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"one-api/types"
 )
 
 // 流处理函数，判断依据如下：
@@ -16,7 +15,8 @@ import (
 type HandlerPrefix[T streamable] func(rawLine *[]byte, isFinished *bool, response *[]T) error
 
 type streamable interface {
-	types.ChatCompletionStreamResponse | types.CompletionResponse
+	// types.ChatCompletionStreamResponse | types.CompletionResponse
+	any
 }
 
 type StreamReaderInterface[T streamable] interface {

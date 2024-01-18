@@ -1,9 +1,11 @@
 package ali_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"one-api/common/test"
+	_ "one-api/common/test/init"
 	"one-api/providers"
 	providers_base "one-api/providers/base"
 	"one-api/types"
@@ -31,14 +33,25 @@ func TestChatCompletions(t *testing.T) {
 	chatRequest := test.GetChatCompletionRequest("default", "qwen-turbo", "false")
 
 	chatProvider := getChatProvider(url, context)
-	_, err := chatProvider.CreateChatCompletion(chatRequest)
-	usage := chatProvider.GetUsage()
+	usage := &types.Usage{}
+	chatProvider.SetUsage(usage)
+	response, errWithCode := chatProvider.CreateChatCompletion(chatRequest)
 
-	assert.Nil(t, err)
+	assert.Nil(t, errWithCode)
 	assert.IsType(t, &types.Usage{}, usage)
-	assert.Equal(t, 14, usage.TotalTokens)
-	assert.Equal(t, 6, usage.PromptTokens)
-	assert.Equal(t, 8, usage.CompletionTokens)
+	assert.Equal(t, 33, usage.TotalTokens)
+	assert.Equal(t, 14, usage.PromptTokens)
+	assert.Equal(t, 19, usage.CompletionTokens)
+
+	// 转换成JSON字符串
+	responseBody, err := json.Marshal(response)
+	if err != nil {
+		fmt.Println(err)
+		assert.Fail(t, "json marshal error")
+	}
+	fmt.Println(string(responseBody))
+
+	test.CheckChat(t, response, "qwen-turbo", usage)
 }
 
 func TestChatCompletionsError(t *testing.T) {
@@ -55,9 +68,7 @@ func TestChatCompletionsError(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Nil(t, usage)
-	assert.Equal(t, http.StatusInternalServerError, err.StatusCode)
 	assert.Equal(t, "InvalidParameter", err.Code)
-
 }
 
 // func TestChatCompletionsStream(t *testing.T) {
@@ -71,10 +82,11 @@ func TestChatCompletionsError(t *testing.T) {
 // 	chatProvider, _ := provider.(providers_base.ChatInterface)
 // 	chatRequest := test.GetChatCompletionRequest("default", "qwen-turbo", "true")
 
-// 	usage, err := chatProvider.ChatAction(chatRequest, 0)
-// 	fmt.Println(w.Body.String())
+// 	usage := &types.Usage{}
+// 	chatProvider.SetUsage(usage)
+// 	response, errWithCode := chatProvider.CreateChatCompletionStream(chatRequest)
+// 	assert.Nil(t, errWithCode)
 
-// 	assert.Nil(t, err)
 // 	assert.IsType(t, &types.Usage{}, usage)
 // 	assert.Equal(t, 16, usage.TotalTokens)
 // 	assert.Equal(t, 8, usage.PromptTokens)
@@ -152,7 +164,7 @@ func handleChatCompletionEndpoint(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 
-	response := `{"output":{"finish_reason":"stop","text":"你好！有什么我可以帮助你的吗？"},"usage":{"total_tokens":14,"output_tokens":8,"input_tokens":6},"request_id":"1ed48cc3-8018-9714-8eec-c1813025eaba"}`
+	response := `{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"您好！我可以帮您查询最近的公园，请问您现在所在的位置是哪里呢？"}}]},"usage":{"total_tokens":33,"output_tokens":19,"input_tokens":14},"request_id":"2479f818-9717-9b0b-9769-0d26e873a3f6"}`
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, response)

@@ -5,89 +5,66 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/requester"
-	"one-api/providers/base"
 	"one-api/types"
 	"strings"
 )
 
-type OpenAIChatHandler struct {
-	base.BaseHandler
-	Request *types.ChatCompletionRequest
-}
-
-func (p *OpenAIProvider) initChat(request *types.ChatCompletionRequest) (chatHandler *OpenAIChatHandler, resp *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler = &OpenAIChatHandler{
-		BaseHandler: base.BaseHandler{
-			Usage: p.Usage,
-		},
-		Request: request,
-	}
-	resp, errWithCode = chatHandler.getResponse(p)
-
-	return
+type OpenAIStreamHandler struct {
+	Usage     *types.Usage
+	ModelName string
 }
 
 func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler, resp, errWithCode := p.initChat(request)
+	req, errWithCode := p.GetRequestTextBody(common.RelayModeChatCompletions, request.Model, request)
 	if errWithCode != nil {
-		return
+		return nil, errWithCode
 	}
-
-	defer resp.Body.Close()
+	defer req.Body.Close()
 
 	response := &OpenAIProviderChatResponse{}
-	err := json.NewDecoder(resp.Body).Decode(response)
-	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
-		return
-	}
-
-	return chatHandler.convertToOpenai(response)
-}
-
-func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (stream requester.StreamReaderInterface[types.ChatCompletionStreamResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler, resp, errWithCode := p.initChat(request)
-	if errWithCode != nil {
-		return
-	}
-
-	return requester.RequestStream[types.ChatCompletionStreamResponse](p.Requester, resp, chatHandler.handlerStream)
-}
-
-func (h *OpenAIChatHandler) getResponse(p *OpenAIProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
-	url, err := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
-	if err != nil {
-		return nil, err
-	}
-	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
-
-	// 获取请求头
-	headers := p.GetRequestHeaders()
-	if h.Request.Stream {
-		headers["Accept"] = "text/event-stream"
-	}
-
 	// 发送请求
-	return p.SendJsonRequest(http.MethodPost, fullRequestURL, h.Request, headers)
-}
+	_, errWithCode = p.Requester.SendRequest(req, response, false)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
 
-func (h *OpenAIChatHandler) convertToOpenai(response *OpenAIProviderChatResponse) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := ErrorHandle(&response.OpenAIErrorResponse)
-	if error != nil {
+	// 检测是否错误
+	openaiErr := ErrorHandle(&response.OpenAIErrorResponse)
+	if openaiErr != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *openaiErr,
 			StatusCode:  http.StatusBadRequest,
 		}
-		return
+		return nil, errWithCode
 	}
 
-	h.Usage = response.Usage
+	*p.Usage = *response.Usage
 
 	return &response.ChatCompletionResponse, nil
 }
 
-func (h *OpenAIChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, response *[]types.ChatCompletionStreamResponse) error {
+func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[types.ChatCompletionStreamResponse], *types.OpenAIErrorWithStatusCode) {
+	req, errWithCode := p.GetRequestTextBody(common.RelayModeChatCompletions, request.Model, request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+	defer req.Body.Close()
+
+	// 发送请求
+	resp, errWithCode := p.Requester.SendRequestRaw(req)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	chatHandler := OpenAIStreamHandler{
+		Usage:     p.Usage,
+		ModelName: request.Model,
+	}
+
+	return requester.RequestStream[types.ChatCompletionStreamResponse](p.Requester, resp, chatHandler.HandlerChatStream)
+}
+
+func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, isFinished *bool, response *[]types.ChatCompletionStreamResponse) error {
 	// 如果rawLine 前缀不为data:，则直接返回
 	if !strings.HasPrefix(string(*rawLine), "data: ") {
 		*rawLine = nil
@@ -95,7 +72,13 @@ func (h *OpenAIChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, res
 	}
 
 	// 去除前缀
-	*rawLine = (*rawLine)[5:]
+	*rawLine = (*rawLine)[6:]
+
+	// 如果等于 DONE 则结束
+	if string(*rawLine) == "[DONE]" {
+		*isFinished = true
+		return nil
+	}
 
 	var openaiResponse OpenAIProviderChatStreamResponse
 	err := json.Unmarshal(*rawLine, &openaiResponse)
@@ -108,11 +91,7 @@ func (h *OpenAIChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, res
 		return error
 	}
 
-	return h.convertToOpenaiStream(&openaiResponse, response)
-}
-
-func (h *OpenAIChatHandler) convertToOpenaiStream(openaiResponse *OpenAIProviderChatStreamResponse, response *[]types.ChatCompletionStreamResponse) error {
-	countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.Request.Model)
+	countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.ModelName)
 	h.Usage.CompletionTokens += countTokenText
 	h.Usage.TotalTokens += countTokenText
 

@@ -1,70 +1,53 @@
 package ali
 
 import (
-	"encoding/json"
 	"net/http"
 	"one-api/common"
-	"one-api/providers/base"
 	"one-api/types"
 )
 
-type aliEmbedHandler struct {
-	base.BaseHandler
-	Request *types.EmbeddingRequest
-}
-
-func (p *AliProvider) CreateEmbeddings(request *types.EmbeddingRequest, promptTokens int) (response *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	aliEmbedHandler := &aliEmbedHandler{
-		BaseHandler: base.BaseHandler{
-			Usage: p.Usage,
-		},
-		Request: request,
-	}
-
-	resp, errWithCode := aliEmbedHandler.getResponse(p)
-
-	defer resp.Body.Close()
-
-	aliResponse := &AliEmbeddingResponse{}
-	err := json.NewDecoder(resp.Body).Decode(aliResponse)
-	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
-		return
-	}
-
-	return aliEmbedHandler.convertToOpenai(aliResponse)
-
-}
-
-func (h *aliEmbedHandler) getResponse(p *AliProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
-	url, err := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
-	if err != nil {
-		return nil, err
+func (p *AliProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*types.EmbeddingResponse, *types.OpenAIErrorWithStatusCode) {
+	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
+	if errWithCode != nil {
+		return nil, errWithCode
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+	fullRequestURL := p.GetFullRequestURL(url, request.Model)
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
 
-	aliChatRequest := h.convertFromOpenai()
+	aliRequest := convertFromEmbeddingOpenai(request)
+	// 创建请求
+	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(aliRequest), p.Requester.WithHeader(headers))
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+	}
+	defer req.Body.Close()
+
+	aliResponse := &AliEmbeddingResponse{}
 
 	// 发送请求
-	return p.SendJsonRequest(http.MethodPost, fullRequestURL, aliChatRequest, headers)
+	_, errWithCode = p.Requester.SendRequest(req, aliResponse, false)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	return p.convertToEmbeddingOpenai(aliResponse, request)
 }
 
-func (h *aliEmbedHandler) convertFromOpenai() *AliEmbeddingRequest {
+func convertFromEmbeddingOpenai(request *types.EmbeddingRequest) *AliEmbeddingRequest {
 	return &AliEmbeddingRequest{
 		Model: "text-embedding-v1",
 		Input: struct {
 			Texts []string `json:"texts"`
 		}{
-			Texts: h.Request.ParseInput(),
+			Texts: request.ParseInput(),
 		},
 	}
 }
 
-func (h *aliEmbedHandler) convertToOpenai(response *AliEmbeddingResponse) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+func (p *AliProvider) convertToEmbeddingOpenai(response *AliEmbeddingResponse, request *types.EmbeddingRequest) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
 	error := errorHandle(&response.AliError)
 	if error != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
@@ -77,8 +60,12 @@ func (h *aliEmbedHandler) convertToOpenai(response *AliEmbeddingResponse) (opena
 	openaiResponse = &types.EmbeddingResponse{
 		Object: "list",
 		Data:   make([]types.Embedding, 0, len(response.Output.Embeddings)),
-		Model:  h.Request.Model,
-		Usage:  &types.Usage{TotalTokens: response.Usage.TotalTokens},
+		Model:  request.Model,
+		Usage: &types.Usage{
+			PromptTokens:     response.Usage.TotalTokens,
+			CompletionTokens: response.Usage.OutputTokens,
+			TotalTokens:      response.Usage.TotalTokens,
+		},
 	}
 
 	for _, item := range response.Output.Embeddings {
@@ -88,6 +75,8 @@ func (h *aliEmbedHandler) convertToOpenai(response *AliEmbeddingResponse) (opena
 			Embedding: item.Embedding,
 		})
 	}
+
+	*p.Usage = *openaiResponse.Usage
 
 	return
 }

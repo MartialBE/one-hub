@@ -86,7 +86,7 @@ func (r *HTTPRequester) SendRequest(req *http.Request, response any, outputResp 
 	if outputResp {
 		var buf bytes.Buffer
 		tee := io.TeeReader(resp.Body, &buf)
-		err = json.NewDecoder(tee).Decode(response)
+		err = DecodeResponse(tee, response)
 
 		// 将响应体重新写入 resp.Body
 		resp.Body = io.NopCloser(&buf)
@@ -98,11 +98,7 @@ func (r *HTTPRequester) SendRequest(req *http.Request, response any, outputResp 
 		return nil, common.ErrorWrapper(err, "decode_response_failed", http.StatusInternalServerError)
 	}
 
-	if outputResp {
-		return resp, nil
-	}
-
-	return nil, nil
+	return resp, nil
 }
 
 // 发送请求 RAW
@@ -195,10 +191,39 @@ func HandleErrorResp(resp *http.Response, toOpenAIError HttpErrorHandler) *types
 	return openAIErrorWithStatusCode
 }
 
-func (r *HTTPRequester) SetEventStreamHeaders(c *gin.Context) {
+func SetEventStreamHeaders(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
 	c.Writer.Header().Set("Transfer-Encoding", "chunked")
 	c.Writer.Header().Set("X-Accel-Buffering", "no")
+}
+
+type Stringer interface {
+	GetString() *string
+}
+
+func DecodeResponse(body io.Reader, v any) error {
+	if v == nil {
+		return nil
+	}
+
+	if result, ok := v.(*string); ok {
+		return DecodeString(body, result)
+	}
+
+	if stringer, ok := v.(Stringer); ok {
+		return DecodeString(body, stringer.GetString())
+	}
+
+	return json.NewDecoder(body).Decode(v)
+}
+
+func DecodeString(body io.Reader, output *string) error {
+	b, err := io.ReadAll(body)
+	if err != nil {
+		return err
+	}
+	*output = string(b)
+	return nil
 }

@@ -5,85 +5,116 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/requester"
-	"one-api/providers/base"
 	"one-api/types"
 	"strings"
 )
 
-type aliChatHandler struct {
-	base.BaseHandler
+type aliStreamHandler struct {
+	Usage              *types.Usage
 	Request            *types.ChatCompletionRequest
 	lastStreamResponse string
 }
 
 const AliEnableSearchModelSuffix = "-internet"
 
-func (p *AliProvider) initChat(request *types.ChatCompletionRequest) (chatHandler *aliChatHandler, resp *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler = &aliChatHandler{
-		BaseHandler: base.BaseHandler{
-			Usage: p.Usage,
-		},
-		Request: request,
-	}
-	resp, errWithCode = chatHandler.getResponse(p)
-
-	return
-}
-
-func (p *AliProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler, resp, errWithCode := p.initChat(request)
+func (p *AliProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	req, errWithCode := p.getAliChatRequest(request)
 	if errWithCode != nil {
-		return
+		return nil, errWithCode
 	}
-
-	defer resp.Body.Close()
+	defer req.Body.Close()
 
 	aliResponse := &AliChatResponse{}
-	err := json.NewDecoder(resp.Body).Decode(aliResponse)
-	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
-		return
+	// 发送请求
+	_, errWithCode = p.Requester.SendRequest(req, aliResponse, false)
+	if errWithCode != nil {
+		return nil, errWithCode
 	}
 
-	return chatHandler.convertToOpenai(aliResponse)
+	return p.convertToChatOpenai(aliResponse, request)
 }
 
-func (p *AliProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (stream requester.StreamReaderInterface[types.ChatCompletionStreamResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
-	chatHandler, resp, errWithCode := p.initChat(request)
+func (p *AliProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[types.ChatCompletionStreamResponse], *types.OpenAIErrorWithStatusCode) {
+	req, errWithCode := p.getAliChatRequest(request)
 	if errWithCode != nil {
-		return
+		return nil, errWithCode
+	}
+	defer req.Body.Close()
+
+	// 发送请求
+	resp, errWithCode := p.Requester.SendRequestRaw(req)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	chatHandler := &aliStreamHandler{
+		Usage:   p.Usage,
+		Request: request,
 	}
 
 	return requester.RequestStream[types.ChatCompletionStreamResponse](p.Requester, resp, chatHandler.handlerStream)
 }
 
-func (h *aliChatHandler) getResponse(p *AliProvider) (*http.Response, *types.OpenAIErrorWithStatusCode) {
-	url, err := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
-	if err != nil {
-		return nil, err
+func (p *AliProvider) getAliChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	if errWithCode != nil {
+		return nil, errWithCode
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+	fullRequestURL := p.GetFullRequestURL(url, request.Model)
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
-	if h.Request.Stream {
+	if request.Stream {
 		headers["Accept"] = "text/event-stream"
 		headers["X-DashScope-SSE"] = "enable"
 	}
 
-	aliChatRequest := h.convertFromOpenai()
+	aliRequest := convertFromChatOpenai(request)
+	// 创建请求
+	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(aliRequest), p.Requester.WithHeader(headers))
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+	}
 
-	// 发送请求
-	return p.SendJsonRequest(http.MethodPost, fullRequestURL, aliChatRequest, headers)
+	return req, nil
+}
+
+// 转换为OpenAI聊天请求体
+func (p *AliProvider) convertToChatOpenai(response *AliChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	error := errorHandle(&response.AliError)
+	if error != nil {
+		errWithCode = &types.OpenAIErrorWithStatusCode{
+			OpenAIError: *error,
+			StatusCode:  http.StatusBadRequest,
+		}
+		return
+	}
+
+	openaiResponse = &types.ChatCompletionResponse{
+		ID:      response.RequestId,
+		Object:  "chat.completion",
+		Created: common.GetTimestamp(),
+		Model:   request.Model,
+		Choices: response.Output.ToChatCompletionChoices(),
+		Usage: &types.Usage{
+			PromptTokens:     response.Usage.InputTokens,
+			CompletionTokens: response.Usage.OutputTokens,
+			TotalTokens:      response.Usage.InputTokens + response.Usage.OutputTokens,
+		},
+	}
+
+	*p.Usage = *openaiResponse.Usage
+
+	return
 }
 
 // 阿里云聊天请求体
-func (h *aliChatHandler) convertFromOpenai() *AliChatRequest {
-	messages := make([]AliMessage, 0, len(h.Request.Messages))
-	for i := 0; i < len(h.Request.Messages); i++ {
-		message := h.Request.Messages[i]
-		if h.Request.Model != "qwen-vl-plus" {
+func convertFromChatOpenai(request *types.ChatCompletionRequest) *AliChatRequest {
+	messages := make([]AliMessage, 0, len(request.Messages))
+	for i := 0; i < len(request.Messages); i++ {
+		message := request.Messages[i]
+		if request.Model != "qwen-vl-plus" {
 			messages = append(messages, AliMessage{
 				Content: message.StringContent(),
 				Role:    strings.ToLower(message.Role),
@@ -111,7 +142,7 @@ func (h *aliChatHandler) convertFromOpenai() *AliChatRequest {
 	}
 
 	enableSearch := false
-	aliModel := h.Request.Model
+	aliModel := request.Model
 	if strings.HasSuffix(aliModel, AliEnableSearchModelSuffix) {
 		enableSearch = true
 		aliModel = strings.TrimSuffix(aliModel, AliEnableSearchModelSuffix)
@@ -125,42 +156,13 @@ func (h *aliChatHandler) convertFromOpenai() *AliChatRequest {
 		Parameters: AliParameters{
 			ResultFormat:      "message",
 			EnableSearch:      enableSearch,
-			IncrementalOutput: h.Request.Stream,
+			IncrementalOutput: request.Stream,
 		},
 	}
-}
-
-// 转换为OpenAI聊天请求体
-func (h *aliChatHandler) convertToOpenai(response *AliChatResponse) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.AliError)
-	if error != nil {
-		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
-			StatusCode:  http.StatusBadRequest,
-		}
-		return
-	}
-
-	OpenAIResponse := types.ChatCompletionResponse{
-		ID:      response.RequestId,
-		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
-		Model:   h.Request.Model,
-		Choices: response.Output.ToChatCompletionChoices(),
-		Usage: &types.Usage{
-			PromptTokens:     response.Usage.InputTokens,
-			CompletionTokens: response.Usage.OutputTokens,
-			TotalTokens:      response.Usage.InputTokens + response.Usage.OutputTokens,
-		},
-	}
-
-	h.Usage = OpenAIResponse.Usage
-
-	return
 }
 
 // 转换为OpenAI聊天流式请求体
-func (h *aliChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, response *[]types.ChatCompletionStreamResponse) error {
+func (h *aliStreamHandler) handlerStream(rawLine *[]byte, isFinished *bool, response *[]types.ChatCompletionStreamResponse) error {
 	// 如果rawLine 前缀不为data:，则直接返回
 	if !strings.HasPrefix(string(*rawLine), "data:") {
 		*rawLine = nil
@@ -185,7 +187,7 @@ func (h *aliChatHandler) handlerStream(rawLine *[]byte, isFinished *bool, respon
 
 }
 
-func (h *aliChatHandler) convertToOpenaiStream(aliResponse *AliChatResponse, response *[]types.ChatCompletionStreamResponse) error {
+func (h *aliStreamHandler) convertToOpenaiStream(aliResponse *AliChatResponse, response *[]types.ChatCompletionStreamResponse) error {
 	content := aliResponse.Output.Choices[0].Message.StringContent()
 
 	var choice types.ChatCompletionStreamChoice

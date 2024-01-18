@@ -81,7 +81,13 @@ func (p *BaseProvider) GetOriginalModel() string {
 	return p.OriginalModel
 }
 
-func (p *BaseProvider) GetModelMapping(modelName string) (string, error) {
+func (p *BaseProvider) GetChannel() *model.Channel {
+	return p.Channel
+}
+
+func (p *BaseProvider) ModelMappingHandler(modelName string) (string, error) {
+	p.OriginalModel = modelName
+
 	modelMapping := p.Channel.GetModelMapping()
 
 	if modelMapping == "" || modelMapping == "{}" {
@@ -136,16 +142,4 @@ func (p *BaseProvider) GetSupportedAPIUri(relayMode int) (url string, err *types
 	}
 
 	return
-}
-
-func (p *BaseProvider) SendJsonRequest(method, url string, body any, headers map[string]string) (resp *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
-	// 创建请求
-	req, err := p.Requester.NewRequest(method, url, p.Requester.WithBody(body), p.Requester.WithHeader(headers))
-	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
-		return
-	}
-
-	// 发送请求
-	return p.Requester.SendRequestRaw(req)
 }

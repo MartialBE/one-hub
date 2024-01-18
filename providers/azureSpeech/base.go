@@ -1,6 +1,7 @@
 package azureSpeech
 
 import (
+	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
 )
@@ -12,9 +13,11 @@ type AzureSpeechProviderFactory struct{}
 func (f AzureSpeechProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &AzureSpeechProvider{
 		BaseProvider: base.BaseProvider{
-			BaseURL:     "",
-			AudioSpeech: "/cognitiveservices/v1",
-			Context:     c,
+			Config: base.ProviderConfig{
+				AudioSpeech: "/cognitiveservices/v1",
+			},
+			Channel:   channel,
+			Requester: requester.NewHTTPRequester(channel.Proxy, nil),
 		},
 	}
 }

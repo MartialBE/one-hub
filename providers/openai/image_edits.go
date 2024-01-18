@@ -2,58 +2,58 @@ package openai
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"one-api/common"
-	"one-api/providers/base"
+	"one-api/common/requester"
 	"one-api/types"
 )
 
-type OpenaiImageEditHandler struct {
-	base.BaseHandler
-	Request *types.ImageEditRequest
-}
+func (p *OpenAIProvider) CreateImageEdits(request *types.ImageEditRequest) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
+	req, errWithCode := p.getRequestImageBody(common.RelayModeEdits, request.Model, request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+	defer req.Body.Close()
 
-func (p *OpenAIProvider) CreateImageEdits(request *types.ImageEditRequest) (response *types.ImageResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	openaiHandler := &OpenaiImageEditHandler{
-		BaseHandler: base.BaseHandler{
-			Usage: p.Usage,
-		},
-		Request: request,
+	response := &OpenAIProviderImageResponse{}
+	// 发送请求
+	_, errWithCode = p.Requester.SendRequest(req, response, false)
+	if errWithCode != nil {
+		return nil, errWithCode
 	}
 
-	resp, errWithCode := openaiHandler.getResponse(p)
-
-	defer resp.Body.Close()
-
-	openaiResponse := &OpenAIProviderImageResponseResponse{}
-	err := json.NewDecoder(resp.Body).Decode(openaiResponse)
-	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "decode_response_body_failed", http.StatusInternalServerError)
-		return
+	openaiErr := ErrorHandle(&response.OpenAIErrorResponse)
+	if openaiErr != nil {
+		errWithCode = &types.OpenAIErrorWithStatusCode{
+			OpenAIError: *openaiErr,
+			StatusCode:  http.StatusBadRequest,
+		}
+		return nil, errWithCode
 	}
 
-	return openaiHandler.convertToOpenai(openaiResponse)
+	p.Usage.TotalTokens = p.Usage.PromptTokens
+
+	return &response.ImageResponse, nil
 }
 
-func (h *OpenaiImageEditHandler) getResponse(p *OpenAIProvider) (response *http.Response, errWithCode *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeImagesEdits)
+func (p *OpenAIProvider) getRequestImageBody(relayMode int, ModelName string, request *types.ImageEditRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+	url, errWithCode := p.GetSupportedAPIUri(relayMode)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, h.Request.Model)
+	fullRequestURL := p.GetFullRequestURL(url, ModelName)
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
-
+	// 创建请求
 	var req *http.Request
 	var err error
-	if p.OriginalModel != h.Request.Model {
+	if p.OriginalModel != request.Model {
 		var formBody bytes.Buffer
 		builder := p.Requester.CreateFormBuilder(&formBody)
-		if err := imagesEditsMultipartForm(h.Request, builder); err != nil {
+		if err := imagesEditsMultipartForm(request, builder); err != nil {
 			return nil, common.ErrorWrapper(err, "create_form_builder_failed", http.StatusInternalServerError)
 		}
 		req, err = p.Requester.NewRequest(
@@ -74,29 +74,13 @@ func (h *OpenaiImageEditHandler) getResponse(p *OpenAIProvider) (response *http.
 	}
 
 	if err != nil {
-		errWithCode = common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
-		return
+		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
 
-	return p.Requester.SendRequestRaw(req)
+	return req, nil
 }
 
-func (h *OpenaiImageEditHandler) convertToOpenai(response *OpenAIProviderImageResponseResponse) (openaiResponse *types.ImageResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := ErrorHandle(&response.OpenAIErrorResponse)
-	if error != nil {
-		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
-			StatusCode:  http.StatusBadRequest,
-		}
-		return
-	}
-
-	h.Usage.TotalTokens = h.Usage.PromptTokens
-
-	return &response.ImageResponse, nil
-}
-
-func imagesEditsMultipartForm(request *types.ImageEditRequest, b common.FormBuilder) error {
+func imagesEditsMultipartForm(request *types.ImageEditRequest, b requester.FormBuilder) error {
 	err := b.CreateFormFile("image", request.Image)
 	if err != nil {
 		return fmt.Errorf("creating form image: %w", err)

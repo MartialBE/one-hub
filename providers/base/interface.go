@@ -3,6 +3,7 @@ package base
 import (
 	"net/http"
 	"one-api/common/requester"
+	"one-api/model"
 	"one-api/types"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,8 @@ type ProviderInterface interface {
 	GetOriginalModel() string
 
 	// SupportAPI(relayMode int) bool
-	// SetChannel(channel *model.Channel)
+	GetChannel() *model.Channel
+	ModelMappingHandler(modelName string) (string, error)
 }
 
 // 完成接口
@@ -70,13 +72,13 @@ type SpeechInterface interface {
 // 语音转文字接口
 type TranscriptionsInterface interface {
 	ProviderInterface
-	CreateTranscriptions(request *types.AudioRequest) (*types.AudioResponse, *types.OpenAIErrorWithStatusCode)
+	CreateTranscriptions(request *types.AudioRequest) (*types.AudioResponseWrapper, *types.OpenAIErrorWithStatusCode)
 }
 
 // 语音翻译接口
 type TranslationInterface interface {
 	ProviderInterface
-	CreateTranslation(request *types.AudioRequest) (*types.AudioResponse, *types.OpenAIErrorWithStatusCode)
+	CreateTranslation(request *types.AudioRequest) (*types.AudioResponseWrapper, *types.OpenAIErrorWithStatusCode)
 }
 
 // 图片生成接口
