@@ -158,7 +158,7 @@ export default function Token() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">令牌</Typography>
+        <Typography variant="h4">Key</Typography>
 
         <Button
           variant="contained"
@@ -168,7 +168,7 @@ export default function Token() {
           }}
           startIcon={<IconPlus />}
         >
-          新建令牌
+          新建Key
         </Button>
       </Stack>
       <Stack mb={5}>
@@ -178,7 +178,7 @@ export default function Token() {
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchTokens} noValidate>
-          <TableToolBar filterName={searchKeyword} handleFilterName={handleSearchKeyword} placeholder={'搜索令牌的名称...'} />
+          <TableToolBar filterName={searchKeyword} handleFilterName={handleSearchKeyword} placeholder={'搜索Key的名称...'} />
         </Box>
         <Toolbar
           sx={{

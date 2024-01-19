@@ -17,17 +17,17 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
     <>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
         <FormControl>
-          <InputLabel htmlFor="channel-token_name-label">令牌名称</InputLabel>
+          <InputLabel htmlFor="channel-token_name-label">Key名称</InputLabel>
           <OutlinedInput
             id="token_name"
             name="token_name"
             sx={{
               minWidth: '100%'
             }}
-            label="令牌名称"
+            label="Key名称"
             value={filterName.token_name}
             onChange={handleFilterName}
-            placeholder="令牌名称"
+            placeholder="Key名称"
             startAdornment={
               <InputAdornment position="start">
                 <IconKey stroke={1.5} size="20px" color={grey500} />

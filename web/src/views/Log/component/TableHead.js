@@ -8,7 +8,7 @@ const LogTableHead = ({ userIsAdmin }) => {
         <TableCell>时间</TableCell>
         {userIsAdmin && <TableCell>渠道</TableCell>}
         {userIsAdmin && <TableCell>用户</TableCell>}
-        <TableCell>令牌</TableCell>
+        <TableCell>Key</TableCell>
         <TableCell>类型</TableCell>
         <TableCell>模型</TableCell>
         <TableCell>耗时</TableCell>

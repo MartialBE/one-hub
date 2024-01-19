@@ -142,7 +142,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               <Button
                 color="primary"
                 onClick={() => {
-                  copy(`sk-${item.key}`, '令牌');
+                  copy(`sk-${item.key}`, 'Key');
                 }}
               >
                 复制

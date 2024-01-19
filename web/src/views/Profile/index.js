@@ -92,7 +92,7 @@ export default function Profile() {
       const { success, message, data } = res.data;
       if (success) {
         setInputs((inputs) => ({ ...inputs, access_token: data }));
-        copy(data, '令牌');
+        copy(data, 'Key');
       } else {
         showError(message);
       }
@@ -234,19 +234,19 @@ export default function Profile() {
             <SubCard title="其他">
               <Grid container spacing={2}>
                 <Grid xs={12}>
-                  <Alert severity="info">注意，此处生成的令牌用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。</Alert>
+                  <Alert severity="info">注意，此处生成的Key用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。</Alert>
                 </Grid>
                 {inputs.access_token && (
                   <Grid xs={12}>
                     <Alert severity="error">
-                      你的访问令牌是: <b>{inputs.access_token}</b> <br />
+                      你的访问Key是: <b>{inputs.access_token}</b> <br />
                       请妥善保管。如有泄漏，请立即重置。
                     </Alert>
                   </Grid>
                 )}
                 <Grid xs={12}>
                   <Button variant="contained" onClick={generateAccessToken}>
-                    {inputs.access_token ? '重置访问令牌' : '生成访问令牌'}
+                    {inputs.access_token ? '重置访问Key' : '生成访问Key'}
                   </Button>
                 </Grid>
 
