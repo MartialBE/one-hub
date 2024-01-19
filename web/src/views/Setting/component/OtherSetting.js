@@ -110,12 +110,12 @@ const OtherSetting = () => {
   };
 
   const openGitHubRelease = () => {
-    window.location = 'https://github.com/MartialBE/one-api/releases/latest';
+    window.location = 'https://github.com/woodchen-ink/one-api/releases/latest';
   };
 
   const checkUpdate = async () => {
     try {
-      const res = await API.get('https://api.github.com/repos/MartialBE/one-api/releases/latest');
+      const res = await API.get('https://api.github.com/repos/woodchen-ink/one-api/releases/latest');
       const { tag_name, body } = res.data;
       if (tag_name === process.env.REACT_APP_VERSION) {
         showSuccess(`已是最新版本：${tag_name}`);

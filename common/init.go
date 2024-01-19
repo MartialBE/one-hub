@@ -19,9 +19,7 @@ var (
 
 func printHelp() {
 	fmt.Println("CZLOapi " + Version + " - All in CZLOapi service for OpenAI API.")
-	fmt.Println("Copyright (C) 2023 JustSong. All rights reserved.")
-	fmt.Println("GitHub: https://github.com/songquanpeng/one-api")
-	fmt.Println("Usage: one-api [--port <port>] [--log-dir <log directory>] [--version] [--help]")
+	fmt.Println("Usage: czloapi-api [--port <port>] [--log-dir <log directory>] [--version] [--help]")
 }
 
 func init() {
