@@ -161,8 +161,8 @@ const LoginForm = ({ ...others }) => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('Username is required'),
-          password: Yup.string().max(255).required('Password is required')
+          username: Yup.string().max(255).required('用户名/邮箱是必填项'),
+          password: Yup.string().max(255).required('密码是必填项')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           const { success, message } = await login(values.username, values.password);
@@ -180,7 +180,7 @@ const LoginForm = ({ ...others }) => {
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-username-login">用户名</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-username-login">用户名/邮箱</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-username-login"
                 type="text"
@@ -188,7 +188,7 @@ const LoginForm = ({ ...others }) => {
                 name="username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                label="用户名"
+                label="用户名/邮箱"
                 inputProps={{ autoComplete: 'username' }}
               />
               {touched.username && errors.username && (

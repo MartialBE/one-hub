@@ -8,9 +8,9 @@ type EmbeddingRequest struct {
 }
 
 type Embedding struct {
-	Object    string    `json:"object"`
-	Embedding []float64 `json:"embedding"`
-	Index     int       `json:"index"`
+	Object    string `json:"object"`
+	Embedding any    `json:"embedding"`
+	Index     int    `json:"index"`
 }
 
 type EmbeddingResponse struct {
@@ -34,6 +34,24 @@ func (r EmbeddingRequest) ParseInput() []string {
 			if str, ok := item.(string); ok {
 				input = append(input, str)
 			}
+		}
+	}
+	return input
+}
+
+func (r EmbeddingRequest) ParseInputString() string {
+	if r.Input == nil {
+		return ""
+	}
+
+	var input string
+	switch r.Input.(type) {
+	case string:
+		input = r.Input.(string)
+	case []any:
+		// 取第一个
+		if len(r.Input.([]any)) > 0 {
+			input = r.Input.([]any)[0].(string)
 		}
 	}
 	return input
