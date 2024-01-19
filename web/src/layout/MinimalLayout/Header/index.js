@@ -53,7 +53,7 @@ const Header = () => {
           </Button>
         ) : (
           <Button component={Link} variant="contained" to="/login" color="primary">
-            登入
+            登录
           </Button>
         )}
       </Stack>
