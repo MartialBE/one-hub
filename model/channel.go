@@ -9,7 +9,7 @@ import (
 type Channel struct {
 	Id                 int     `json:"id"`
 	Type               int     `json:"type" gorm:"default:0"`
-	Key                string  `json:"key" gorm:"not null;index"`
+	Key                string  `json:"key" gorm:"type:varchar(767);not null;index"`
 	Status             int     `json:"status" gorm:"default:1"`
 	Name               string  `json:"name" gorm:"index"`
 	Weight             *uint   `json:"weight" gorm:"default:0"`
@@ -25,7 +25,7 @@ type Channel struct {
 	UsedQuota          int64   `json:"used_quota" gorm:"bigint;default:0"`
 	ModelMapping       *string `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
 	Priority           *int64  `json:"priority" gorm:"bigint;default:0"`
-	Proxy              string  `json:"proxy" gorm:"type:varchar(255);default:''"`
+	Proxy              *string `json:"proxy" gorm:"type:varchar(255);default:''"`
 	TestModel          string  `json:"test_model" gorm:"type:varchar(50);default:''"`
 }
 
