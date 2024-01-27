@@ -30,9 +30,11 @@ func init() {
 		"gpt-4-32k":                 {30, ChannelTypeOpenAI},
 		"gpt-4-32k-0314":            {30, ChannelTypeOpenAI},
 		"gpt-4-32k-0613":            {30, ChannelTypeOpenAI},
-		"gpt-4-preview":             {5, ChannelTypeOpenAI},    // $0.01 / 1K tokens
-		"gpt-4-1106-preview":        {5, ChannelTypeOpenAI},    // $0.01 / 1K tokens
-		"gpt-4-0125-preview":        {5, ChannelTypeOpenAI},    // $0.01 / 1K tokens
+		"gpt-4-turbo":               {5, ChannelTypeOpenAI},
+		"gpt-4-turbo-preview":       {5, ChannelTypeOpenAI}, // $0.01 / 1K tokens
+		"gpt-4-1106-preview":        {5, ChannelTypeOpenAI}, // $0.01 / 1K tokens
+		"gpt-4-0125-preview":        {5, ChannelTypeOpenAI},
+		"gpt-4-vision":              {5, ChannelTypeOpenAI},    // $0.01 / 1K tokens
 		"gpt-4-vision-preview":      {5, ChannelTypeOpenAI},    // $0.01 / 1K tokens
 		"gpt-3.5-turbo":             {0.75, ChannelTypeOpenAI}, // $0.0015 / 1K tokens
 		"gpt-3.5-turbo-0301":        {0.75, ChannelTypeOpenAI},
@@ -153,6 +155,7 @@ func UpdateModelRatioByJSONString(jsonStr string) error {
 }
 
 func MergeModelRatioByJSONString(jsonStr string) (newJsonStr string, err error) {
+	// 将JSON字符串解析为map[string]float64类型的inputModelRatio变量
 	inputModelRatio := make(map[string]float64)
 	err = json.Unmarshal([]byte(jsonStr), &inputModelRatio)
 	if err != nil {
@@ -173,6 +176,7 @@ func MergeModelRatioByJSONString(jsonStr string) (newJsonStr string, err error) 
 	}
 
 	var jsonBytes []byte
+	// 将inputModelRatio变量转换为JSON字符串
 	jsonBytes, err = json.Marshal(inputModelRatio)
 	if err != nil {
 		SysError("error marshalling model ratio: " + err.Error())
@@ -182,27 +186,35 @@ func MergeModelRatioByJSONString(jsonStr string) (newJsonStr string, err error) 
 }
 
 func GetModelRatio(name string) float64 {
+	// 如果模型名称以 "qwen-" 开头，并以 "-internet" 结尾
 	if strings.HasPrefix(name, "qwen-") && strings.HasSuffix(name, "-internet") {
+		// 去掉结尾的 "-internet"
 		name = strings.TrimSuffix(name, "-internet")
 	}
+
+	// 检查是否存在模型比例的映射关系
 	ratio, ok := ModelRatio[name]
 	if !ok {
+		// 如果不存在，记录错误并返回默认比例30
 		SysError("model ratio not found: " + name)
 		return 30
 	}
+
+	// 返回对应的模型比例
 	return ratio
 }
 
+// GetCompletionRatio 根据名称获取完成率
 func GetCompletionRatio(name string) float64 {
 	if strings.HasPrefix(name, "gpt-3.5") {
 		if strings.HasSuffix(name, "1106") {
 			return 2
 		}
 		if name == "gpt-3.5-turbo" || name == "gpt-3.5-turbo-16k" {
-			// TODO: clear this after 2023-12-11
+			// TODO: 2023年12月11日后清除此注释
 			now := time.Now()
 			// https://platform.openai.com/docs/models/continuous-model-upgrades
-			// if after 2023-12-11, use 2
+			// 如果在2023年12月11日后，则使用2
 			if now.After(time.Date(2023, 12, 11, 0, 0, 0, 0, time.UTC)) {
 				return 2
 			}
@@ -210,7 +222,7 @@ func GetCompletionRatio(name string) float64 {
 		return 1.333333
 	}
 	if strings.HasPrefix(name, "gpt-4") {
-		if strings.HasSuffix(name, "preview") {
+		if strings.HasSuffix(name, "preview") || strings.HasSuffix(name, "turbo") || strings.HasSuffix(name, "vision") {
 			return 3
 		}
 		return 2
