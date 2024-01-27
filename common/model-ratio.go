@@ -81,10 +81,6 @@ func init() {
 		"PaLM-2":                    {1, ChannelTypePaLM},
 		"gemini-pro":                {1, ChannelTypeGemini},        // $0.00025 / 1k characters -> $0.001 / 1k tokens
 		"gemini-pro-vision":         {1, ChannelTypeGemini},        // $0.00025 / 1k characters -> $0.001 / 1k tokens
-		"chatglm_turbo":             {0.3572, ChannelTypeZhipu},    // ￥0.005 / 1k tokens
-		"chatglm_pro":               {0.7143, ChannelTypeZhipu},    // ￥0.01 / 1k tokens
-		"chatglm_std":               {0.3572, ChannelTypeZhipu},    // ￥0.005 / 1k tokens
-		"chatglm_lite":              {0.1429, ChannelTypeZhipu},    // ￥0.002 / 1k tokens
 		"glm-3-turbo":               {0.3572, ChannelTypeZhipu},    // ￥0.005 / 1k tokens
 		"glm-4":                     {0.7143, ChannelTypeZhipu},    // ￥0.01 / 1k tokens
 		"glm-4v":                    {0.7143, ChannelTypeZhipu},    // ￥0.01 / 1k tokens
