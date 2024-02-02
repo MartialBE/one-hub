@@ -82,8 +82,8 @@ func init() {
 		"gemini-pro":                {1, ChannelTypeGemini},        // $0.00025 / 1k characters -> $0.001 / 1k tokens
 		"gemini-pro-vision":         {1, ChannelTypeGemini},        // $0.00025 / 1k characters -> $0.001 / 1k tokens
 		"glm-3-turbo":               {0.3572, ChannelTypeZhipu},    // ￥0.005 / 1k tokens
-		"glm-4":                     {0.7143, ChannelTypeZhipu},    // ￥0.01 / 1k tokens
-		"glm-4v":                    {0.7143, ChannelTypeZhipu},    // ￥0.01 / 1k tokens
+		"glm-4":                     {7.143, ChannelTypeZhipu},    // ￥0.1 / 1k tokens
+		"glm-4v":                    {7.143, ChannelTypeZhipu},    // ￥0.1 / 1k tokens
 		"embedding-2":               {0.0357, ChannelTypeZhipu},    // ￥0.0005 / 1k tokens
 		"cogview-3":                 {17.8571, ChannelTypeZhipu},   // ￥0.25 / 1张图片
 		"qwen-turbo":                {0.5715, ChannelTypeAli},      // ￥0.008 / 1k tokens  // https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-thousand-questions-metering-and-billing
@@ -106,6 +106,8 @@ func init() {
 		"abab5.5-chat":              {1.0714, ChannelTypeMiniMax},  // ¥0.015 / 1k tokens
 		"abab6-chat":                {14.2857, ChannelTypeMiniMax}, // ¥0.2 / 1k tokens
 		"embo-01":                   {0.0357, ChannelTypeMiniMax},  // ¥0.0005 / 1k tokens
+		"deepseek-coder":            {0.75, ChannelTypeDeepseek},   // 暂定 $0.0015 / 1K tokens
+		"deepseek-chat":             {0.75, ChannelTypeDeepseek},   // 暂定 $0.0015 / 1K tokens
 	}
 
 	ModelRatio = make(map[string]float64)
