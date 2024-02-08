@@ -26,3 +26,4 @@ export default LogTableHead;
 LogTableHead.propTypes = {
   userIsAdmin: PropTypes.bool
 };
+
