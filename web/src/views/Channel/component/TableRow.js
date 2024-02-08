@@ -37,7 +37,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
 // import { IconCaretUp, IconCaretDown } from "@tabler/icons-react';
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, monthlyQuotas }) {
+export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
@@ -106,8 +106,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     await manageChannel(item.id, 'delete', '');
   };
 
-  // 月已用额度
-  const monthlyQuotasValue = (monthlyQuotas[item.id] || 0).toFixed(2);
+
   // 总已用额度
   const usedQuotaValue = (item.used_quota / quotaPerUnit || 0).toFixed(2);
 
@@ -162,8 +161,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           />
         </TableCell>
 
-        {/* 月已用额度 */}
-        <TableCell>{monthlyQuotasValue}</TableCell>
         {/*  总已用额度 */}
         <TableCell>{usedQuotaValue}</TableCell>
 
@@ -240,8 +237,7 @@ ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalChannelId: PropTypes.func,
-  monthlyQuotas: PropTypes.object,
+  setModalChannelId: PropTypes.func
 };
 
 function renderBalance(type, balance) {

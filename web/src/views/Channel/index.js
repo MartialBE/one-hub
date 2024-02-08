@@ -303,7 +303,6 @@ export default function ChannelPage() {
                     key={row.id}
                     handleOpenModal={handleOpenModal}
                     setModalChannelId={setEditChannelId}
-                    monthlyQuotas={monthlyQuotas}
                   />
                 ))}
               </TableBody>

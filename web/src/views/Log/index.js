@@ -124,7 +124,6 @@ export default function Log() {
     <>
       <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
         <Typography variant="h4">日志</Typography>
-        <Typography variant="h5" color="secondary.main">消耗额度：{quota}</Typography>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -148,16 +147,6 @@ export default function Log() {
               marginRight: 0
             }}
           >
-            <ButtonGroup>
-              <Button onClick={() => handleTimePresetClick('today')}>今天</Button>
-              <Button onClick={() => handleTimePresetClick('yesterday')}>昨天</Button>
-              <Button onClick={() => handleTimePresetClick('week')}>本周</Button>
-              <Button onClick={() => handleTimePresetClick('lastWeek')}>上周</Button>
-              <Button onClick={() => handleTimePresetClick('month')}>本月</Button>
-              <Button onClick={() => handleTimePresetClick('lastMonth')}>上月</Button>
-              <Button onClick={() => handleTimePresetClick('30days')}>30天内</Button>
-              <Button onClick={() => handleTimePresetClick('reset')}>重置</Button>
-            </ButtonGroup>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
                 刷新/清除搜索条件
