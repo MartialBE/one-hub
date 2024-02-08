@@ -290,6 +290,7 @@ export default function ChannelPage() {
                   { id: 'type', label: '类型', disableSort: false },
                   { id: 'status', label: '状态', disableSort: false },
                   { id: 'response_time', label: '响应时间', disableSort: false },
+                  { id: 'usedQuotaValue', label: '总已用', disableSort: false },
                   { id: 'balance', label: '余额', disableSort: false },
                   { id: 'priority', label: '优先级', disableSort: false },
                   { id: 'action', label: '操作', disableSort: true }
