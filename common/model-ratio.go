@@ -211,6 +211,9 @@ func GetCompletionRatio(name string) float64 {
 		if strings.HasSuffix(name, "1106") {
 			return 2
 		}
+		if strings.HasSuffix(name, "0125") {
+			return 3
+		}
 		if name == "gpt-3.5-turbo" || name == "gpt-3.5-turbo-16k" {
 			// TODO: 2023年12月11日后清除此注释
 			now := time.Now()
