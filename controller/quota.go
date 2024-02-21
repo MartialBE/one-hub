@@ -28,7 +28,9 @@ type QuotaInfo struct {
 	HandelStatus      bool
 }
 
+// generateQuotaInfo 生成 QuotaInfo 结构体实例，并进行预消费配额操作
 func generateQuotaInfo(c *gin.Context, modelName string, promptTokens int) (*QuotaInfo, *types.OpenAIErrorWithStatusCode) {
+	// 创建 QuotaInfo 实例
 	quotaInfo := &QuotaInfo{
 		modelName:    modelName,
 		promptTokens: promptTokens,
@@ -37,8 +39,10 @@ func generateQuotaInfo(c *gin.Context, modelName string, promptTokens int) (*Quo
 		tokenId:      c.GetInt("token_id"),
 		HandelStatus: false,
 	}
+	// 初始化 QuotaInfo 实例的 group 字段
 	quotaInfo.initQuotaInfo(c.GetString("group"))
 
+	// 进行预消费配额操作
 	errWithCode := quotaInfo.preQuotaConsumption()
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -128,14 +132,16 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 				requestTime = int(time.Since(requestStartTime).Milliseconds())
 			}
 		}
-		var modelRatioStr string
+
+		var logContent string
 		if q.modelRatio[0] == q.modelRatio[1] {
-			modelRatioStr = fmt.Sprintf("%.2f", q.modelRatio[0])
+			// 如果两个值相等，则只输出一个经过乘以0.002处理的值
+			logContent = fmt.Sprintf("单价: $%.4f/1k tokens", q.modelRatio[0]*0.002)
 		} else {
-			modelRatioStr = fmt.Sprintf("%.2f (输入)/%.2f (输出)", q.modelRatio[0], q.modelRatio[1])
+			// 如果两个值不相等，则分别输出提示和输出的乘以0.002的结果
+			logContent = fmt.Sprintf("提示: $%.4f/1k tokens, 补全: $%.4f/1k tokens", q.modelRatio[0]*0.002, q.modelRatio[1]*0.002)
 		}
 
-		logContent := fmt.Sprintf("模型倍率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 		model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
 		model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 		model.UpdateChannelUsedQuota(q.channelId, quota)
