@@ -109,7 +109,7 @@ const typeConfig = {
       other: '版本号'
     },
     input: {
-      models: ['SparkDesk']
+      models: ['SparkDesk', 'SparkDesk-v1.1', 'SparkDesk-v2.1', 'SparkDesk-v3.1', 'SparkDesk-v3.5']
     },
     prompt: {
       key: '按照如下格式输入：APPID|APISecret|APIKey',
@@ -184,7 +184,7 @@ const typeConfig = {
   },
   29: {
     input: {
-      models: ['moonshot-v1-8k', 'moonshot-v1-16k', 'moonshot-v1-128k'],
+      models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'],
       test_model: 'moonshot-v1-8k'
     }
   }

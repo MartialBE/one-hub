@@ -18,7 +18,7 @@ type QuotaInfo struct {
 	modelName         string
 	promptTokens      int
 	preConsumedTokens int
-	modelRatio        float64
+	modelRatio        []float64
 	groupRatio        float64
 	ratio             float64
 	preConsumedQuota  int
@@ -51,7 +51,7 @@ func (q *QuotaInfo) initQuotaInfo(groupName string) {
 	modelRatio := common.GetModelRatio(q.modelName)
 	groupRatio := common.GetGroupRatio(groupName)
 	preConsumedTokens := common.PreConsumedQuota
-	ratio := modelRatio * groupRatio
+	ratio := modelRatio[0] * groupRatio
 	preConsumedQuota := int(float64(q.promptTokens+preConsumedTokens) * ratio)
 
 	q.preConsumedTokens = preConsumedTokens
@@ -97,10 +97,10 @@ func (q *QuotaInfo) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 
 func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName string, ctx context.Context) error {
 	quota := 0
-	completionRatio := common.GetCompletionRatio(q.modelName)
+	completionRatio := q.modelRatio[1] * q.groupRatio
 	promptTokens := usage.PromptTokens
 	completionTokens := usage.CompletionTokens
-	quota = int(math.Ceil((float64(promptTokens) + float64(completionTokens)*completionRatio) * q.ratio))
+	quota = int(math.Ceil((float64(promptTokens) + float64(completionTokens)*completionRatio)))
 	if q.ratio != 0 && quota <= 0 {
 		quota = 1
 	}
@@ -128,10 +128,14 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 				requestTime = int(time.Since(requestStartTime).Milliseconds())
 			}
 		}
+		var modelRatioStr string
+		if q.modelRatio[0] == q.modelRatio[1] {
+			modelRatioStr = fmt.Sprintf("%.2f", q.modelRatio[0])
+		} else {
+			modelRatioStr = fmt.Sprintf("%.2f (输入)/%.2f (输出)", q.modelRatio[0], q.modelRatio[1])
+		}
 
-		inputPrice := q.ratio * 0.002
-		outputPrice := inputPrice * completionRatio
-		logContent := fmt.Sprintf("输入:$%.6g/1k tokens, 输出:$%.6g/1k tokens", inputPrice, outputPrice)
+		logContent := fmt.Sprintf("模型倍率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 		model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
 		model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 		model.UpdateChannelUsedQuota(q.channelId, quota)
