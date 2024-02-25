@@ -3,7 +3,7 @@ const config = {
   // like '/berry-material-react/react/default'
   basename: '/',
   defaultPath: '/panel/dashboard',
-  fontFamily: `system-ui,-apple-system,BlinkMacSystemFont,czl,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
+  fontFamily: `czl,system-ui,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
   borderRadius: 8,
   siteInfo: {
     chat_link: '',
