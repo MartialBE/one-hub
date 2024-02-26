@@ -1,8 +1,8 @@
 package model
 
 import (
-	"fmt"
 	"one-api/common"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -27,7 +27,7 @@ type Channel struct {
 	ModelMapping       *string `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
 	Priority           *int64  `json:"priority" gorm:"bigint;default:0"`
 	Proxy              *string `json:"proxy" gorm:"type:varchar(255);default:''"`
-	TestModel          string  `json:"test_model" gorm:"type:varchar(50);default:''"`
+	TestModel          string  `json:"test_model" form:"test_model" gorm:"type:varchar(50);default:''"`
 }
 
 var allowedChannelOrderFields = map[string]bool{
@@ -50,8 +50,6 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	var channels []*Channel
 
 	db := DB.Omit("key")
-
-	fmt.Println("params", params)
 
 	if params.Type != 0 {
 		db = db.Where("type = ?", params.Type)
@@ -79,6 +77,10 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 
 	if params.Key != "" {
 		db = db.Where(quotePostgresField("key")+" = ?", params.Key)
+	}
+
+	if params.TestModel != "" {
+		db = db.Where("test_model LIKE ?", params.TestModel+"%")
 	}
 
 	return PaginateAndOrder[Channel](db, &params.PaginationParams, &channels, allowedChannelOrderFields)
@@ -114,6 +116,45 @@ func BatchInsertChannels(channels []Channel) error {
 		}
 	}
 	return nil
+}
+
+type BatchChannelsParams struct {
+	Value string `json:"value" form:"value" binding:"required"`
+	Ids   []int  `json:"ids" form:"ids" binding:"required"`
+}
+
+func BatchUpdateChannelsAzureApi(params *BatchChannelsParams) (int64, error) {
+	db := DB.Model(&Channel{}).Where("id IN ?", params.Ids).Update("other", params.Value)
+	if db.Error != nil {
+		return 0, db.Error
+	}
+	return db.RowsAffected, nil
+}
+
+func BatchDelModelChannels(params *BatchChannelsParams) (int64, error) {
+	var count int64
+
+	var channels []*Channel
+	err := DB.Select("id, models, "+quotePostgresField("group")).Find(&channels, "id IN ?", params.Ids).Error
+	if err != nil {
+		return 0, err
+	}
+
+	for _, channel := range channels {
+		modelsSlice := strings.Split(channel.Models, ",")
+		for i, m := range modelsSlice {
+			if m == params.Value {
+				modelsSlice = append(modelsSlice[:i], modelsSlice[i+1:]...)
+				break
+			}
+		}
+
+		channel.Models = strings.Join(modelsSlice, ",")
+		channel.Update()
+		count++
+	}
+
+	return count, nil
 }
 
 func (channel *Channel) GetPriority() int64 {

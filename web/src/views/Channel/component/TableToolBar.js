@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-import { IconKey, IconBrandGithubCopilot, IconSitemap } from '@tabler/icons-react';
+import { IconKey, IconBrandGithubCopilot, IconSitemap, IconVersions } from '@tabler/icons-react';
 import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material'; //
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 // ----------------------------------------------------------------------
@@ -51,7 +51,26 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
           />
         </FormControl>
         <FormControl>
-          <InputLabel htmlFor="channel-models-label">key</InputLabel>
+          <InputLabel htmlFor="channel-test_model-label">测试模型</InputLabel>
+          <OutlinedInput
+            id="test_model"
+            name="test_model"
+            sx={{
+              minWidth: '100%'
+            }}
+            label="测试模型"
+            value={filterName.test_model}
+            onChange={handleFilterName}
+            placeholder="测试模型"
+            startAdornment={
+              <InputAdornment position="start">
+                <IconBrandGithubCopilot stroke={1.5} size="20px" color={grey500} />
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+        <FormControl>
+          <InputLabel htmlFor="channel-key-label">key</InputLabel>
           <OutlinedInput
             id="key"
             name="key"
@@ -69,7 +88,28 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             }
           />
         </FormControl>
+        <FormControl>
+          <InputLabel htmlFor="channel-other-label">其他参数</InputLabel>
+          <OutlinedInput
+            id="other"
+            name="other"
+            sx={{
+              minWidth: '100%'
+            }}
+            label="其他参数"
+            value={filterName.other}
+            onChange={handleFilterName}
+            placeholder="其他参数"
+            startAdornment={
+              <InputAdornment position="start">
+                <IconVersions stroke={1.5} size="20px" color={grey500} />
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+      </Stack>
 
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
         <FormControl sx={{ minWidth: '22%' }}>
           <InputLabel htmlFor="channel-type-label">渠道类型</InputLabel>
           <Select
@@ -102,9 +142,6 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             })}
           </Select>
         </FormControl>
-      </Stack>
-
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
         <FormControl sx={{ minWidth: '22%' }}>
           <InputLabel htmlFor="channel-status-label">状态</InputLabel>
           <Select

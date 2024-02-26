@@ -8,7 +8,6 @@ import TableContainer from '@mui/material/TableContainer';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
-import Alert from '@mui/material/Alert';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -17,10 +16,11 @@ import { Button, IconButton, Card, Box, Stack, Container, Typography, Divider } 
 import ChannelTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import { IconRefresh, IconHttpDelete, IconPlus, IconBrandSpeedtest, IconCoinYuan, IconSearch } from '@tabler/icons-react';
+import { IconRefresh, IconHttpDelete, IconPlus, IconMenu2, IconBrandSpeedtest, IconCoinYuan, IconSearch } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { ITEMS_PER_PAGE } from 'constants';
 import TableToolBar from './component/TableToolBar';
+import BatchModal from './component/BatchModal';
 
 const originalKeyword = {
   type: 0,
@@ -28,8 +28,36 @@ const originalKeyword = {
   name: '',
   group: '',
   models: '',
-  key: ''
+  key: '',
+  test_model: '',
+  other: ''
 };
+
+export async function fetchChannelData(page, rowsPerPage, keyword, order, orderBy) {
+  try {
+    if (orderBy) {
+      orderBy = order === 'desc' ? '-' + orderBy : orderBy;
+    }
+    const res = await API.get(`/api/channel/`, {
+      params: {
+        page: page + 1,
+        size: rowsPerPage,
+        order: orderBy,
+        ...keyword
+      }
+    });
+    const { success, message, data } = res.data;
+    if (success) {
+      return data;
+    } else {
+      showError(message);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return false;
+}
 
 // ----------------------------------------------------------------------
 // CHANNEL_OPTIONS,
@@ -51,6 +79,7 @@ export default function ChannelPage() {
   const matchUpMd = useMediaQuery(theme.breakpoints.up('sm'));
   const [openModal, setOpenModal] = useState(false);
   const [editChannelId, setEditChannelId] = useState(0);
+  const [openBatchModal, setOpenBatchModal] = useState(false);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -202,28 +231,11 @@ export default function ChannelPage() {
 
   const fetchData = async (page, rowsPerPage, keyword, order, orderBy) => {
     setSearching(true);
-    try {
-      if (orderBy) {
-        orderBy = order === 'desc' ? '-' + orderBy : orderBy;
-      }
-      const res = await API.get(`/api/channel/`, {
-        params: {
-          page: page + 1,
-          size: rowsPerPage,
-          // keyword: keyword,
-          order: orderBy,
-          ...keyword
-        }
-      });
-      const { success, message, data } = res.data;
-      if (success) {
-        setListCount(data.total_count);
-        setChannels(data.data);
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      console.error(error);
+    const data = await fetchChannelData(page, rowsPerPage, keyword, order, orderBy);
+
+    if (data) {
+      setListCount(data.total_count);
+      setChannels(data.data);
     }
     setSearching(false);
   };
@@ -250,16 +262,14 @@ export default function ChannelPage() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">渠道</Typography>
 
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建渠道
-        </Button>
-      </Stack>
-      <Stack mb={5}>
-        <Alert severity="info">
-          当前版本测试是通过按照 OpenAI API 格式使用 gpt-3.5-turbo
-          模型进行非流式请求实现的，因此测试报错并不一定代表通道不可用，该功能后续会修复。 另外，OpenAI 渠道已经不再支持通过 key
-          获取余额，因此余额显示为 0。对于支持的渠道类型，请点击余额进行刷新。
-        </Alert>
+        <ButtonGroup variant="contained" aria-label="outlined small primary button group">
+          <Button color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+            新建渠道
+          </Button>
+          <Button color="primary" startIcon={<IconMenu2 />} onClick={() => setOpenBatchModal(true)}>
+            批量处理
+          </Button>
+        </ButtonGroup>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -369,6 +379,7 @@ export default function ChannelPage() {
         />
       </Card>
       <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} />
+      <BatchModal open={openBatchModal} setOpen={setOpenBatchModal} />
     </>
   );
 }
