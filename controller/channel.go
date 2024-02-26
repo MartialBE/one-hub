@@ -11,7 +11,7 @@ import (
 )
 
 func GetChannelsList(c *gin.Context) {
-	var params model.GenericParams
+	var params model.SearchChannelsParams
 	if err := c.ShouldBindQuery(&params); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return

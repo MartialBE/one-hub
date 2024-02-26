@@ -16,11 +16,20 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Button, IconButton, Card, Box, Stack, Container, Typography, Divider } from '@mui/material';
 import ChannelTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
-import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
-import { IconRefresh, IconHttpDelete, IconPlus, IconBrandSpeedtest, IconCoinYuan } from '@tabler/icons-react';
+import { IconRefresh, IconHttpDelete, IconPlus, IconBrandSpeedtest, IconCoinYuan, IconSearch } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { ITEMS_PER_PAGE } from 'constants';
+import TableToolBar from './component/TableToolBar';
+
+const originalKeyword = {
+  type: 0,
+  status: 0,
+  name: '',
+  group: '',
+  models: '',
+  key: ''
+};
 
 // ----------------------------------------------------------------------
 // CHANNEL_OPTIONS,
@@ -30,10 +39,13 @@ export default function ChannelPage() {
   const [orderBy, setOrderBy] = useState('id');
   const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
   const [listCount, setListCount] = useState(0);
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [searching, setSearching] = useState(false);
   const [channels, setChannels] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
+
+  const [groupOptions, setGroupOptions] = useState([]);
+  const [toolBarValue, setToolBarValue] = useState(originalKeyword);
+  const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
 
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('sm'));
@@ -57,11 +69,15 @@ export default function ChannelPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const searchChannels = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
+  const searchChannels = async () => {
+    // event.preventDefault();
+    // const formData = new FormData(event.target);
     setPage(0);
-    setSearchKeyword(formData.get('keyword'));
+    setSearchKeyword(toolBarValue);
+  };
+
+  const handleToolBarValue = (event) => {
+    setToolBarValue({ ...toolBarValue, [event.target.name]: event.target.value });
   };
 
   const manageChannel = async (id, action, value) => {
@@ -113,6 +129,8 @@ export default function ChannelPage() {
   const handleRefresh = async () => {
     setOrderBy('id');
     setOrder('desc');
+    setToolBarValue(originalKeyword);
+    setSearchKeyword(originalKeyword);
     setRefreshFlag(!refreshFlag);
   };
 
@@ -192,8 +210,9 @@ export default function ChannelPage() {
         params: {
           page: page + 1,
           size: rowsPerPage,
-          keyword: keyword,
-          order: orderBy
+          // keyword: keyword,
+          order: orderBy,
+          ...keyword
         }
       });
       const { success, message, data } = res.data;
@@ -209,9 +228,22 @@ export default function ChannelPage() {
     setSearching(false);
   };
 
+  const fetchGroups = async () => {
+    try {
+      let res = await API.get(`/api/group/`);
+      setGroupOptions(res.data.data);
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
+
+  useEffect(() => {
+    fetchGroups().then();
+  }, []);
 
   return (
     <>
@@ -230,9 +262,10 @@ export default function ChannelPage() {
         </Alert>
       </Stack>
       <Card>
-        <Box component="form" onSubmit={searchChannels} noValidate>
-          <TableToolBar placeholder={'搜索渠道的 ID，名称和密钥 ...'} />
+        <Box component="form" noValidate>
+          <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} groupOptions={groupOptions} />
         </Box>
+
         <Toolbar
           sx={{
             textAlign: 'right',
@@ -246,7 +279,10 @@ export default function ChannelPage() {
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
                 <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                  刷新
+                  刷新/清除搜索条件
+                </Button>
+                <Button onClick={searchChannels} startIcon={<IconSearch width={'18px'} />}>
+                  搜索
                 </Button>
                 <Button onClick={testAllChannels} startIcon={<IconBrandSpeedtest width={'18px'} />}>
                   测试启用渠道
@@ -268,6 +304,9 @@ export default function ChannelPage() {
               >
                 <IconButton onClick={handleRefresh} size="large">
                   <IconRefresh />
+                </IconButton>
+                <IconButton onClick={searchChannels} size="large">
+                  <IconSearch />
                 </IconButton>
                 <IconButton onClick={testAllChannels} size="large">
                   <IconBrandSpeedtest />
@@ -328,7 +367,7 @@ export default function ChannelPage() {
           showLastButton
         />
       </Card>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} />
+      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} />
     </>
   );
 }

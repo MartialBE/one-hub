@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"one-api/common"
 
 	"gorm.io/gorm"
@@ -8,20 +9,20 @@ import (
 
 type Channel struct {
 	Id                 int     `json:"id"`
-	Type               int     `json:"type" gorm:"default:0"`
-	Key                string  `json:"key" gorm:"type:varchar(767);not null;index"`
-	Status             int     `json:"status" gorm:"default:1"`
-	Name               string  `json:"name" gorm:"index"`
+	Type               int     `json:"type" form:"type" gorm:"default:0"`
+	Key                string  `json:"key" form:"key" gorm:"type:varchar(767);not null;index"`
+	Status             int     `json:"status" form:"status" gorm:"default:1"`
+	Name               string  `json:"name" form:"name" gorm:"index"`
 	Weight             *uint   `json:"weight" gorm:"default:0"`
 	CreatedTime        int64   `json:"created_time" gorm:"bigint"`
 	TestTime           int64   `json:"test_time" gorm:"bigint"`
 	ResponseTime       int     `json:"response_time"` // in milliseconds
 	BaseURL            *string `json:"base_url" gorm:"column:base_url;default:''"`
-	Other              string  `json:"other"`
+	Other              string  `json:"other" form:"other"`
 	Balance            float64 `json:"balance"` // in USD
 	BalanceUpdatedTime int64   `json:"balance_updated_time" gorm:"bigint"`
-	Models             string  `json:"models"`
-	Group              string  `json:"group" gorm:"type:varchar(32);default:'default'"`
+	Models             string  `json:"models" form:"models"`
+	Group              string  `json:"group" form:"group" gorm:"type:varchar(32);default:'default'"`
 	UsedQuota          int64   `json:"used_quota" gorm:"bigint;default:0"`
 	ModelMapping       *string `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
 	Priority           *int64  `json:"priority" gorm:"bigint;default:0"`
@@ -40,16 +41,44 @@ var allowedChannelOrderFields = map[string]bool{
 	"priority":      true,
 }
 
-func GetChannelsList(params *GenericParams) (*DataResult[Channel], error) {
+type SearchChannelsParams struct {
+	Channel
+	PaginationParams
+}
+
+func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error) {
 	var channels []*Channel
 
 	db := DB.Omit("key")
-	if params.Keyword != "" {
-		keyCol := "`key`"
-		if common.UsingPostgreSQL {
-			keyCol = `"key"`
-		}
-		db = db.Where("id = ? or name LIKE ? or "+keyCol+" = ?", common.String2Int(params.Keyword), params.Keyword+"%", params.Keyword)
+
+	fmt.Println("params", params)
+
+	if params.Type != 0 {
+		db = db.Where("type = ?", params.Type)
+	}
+
+	if params.Status != 0 {
+		db = db.Where("status = ?", params.Status)
+	}
+
+	if params.Name != "" {
+		db = db.Where("name LIKE ?", params.Name+"%")
+	}
+
+	if params.Group != "" {
+		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE "+quotePostgresField("group")+" = ?)", params.Group)
+	}
+
+	if params.Models != "" {
+		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE model IN (?))", params.Models)
+	}
+
+	if params.Other != "" {
+		db = db.Where("other LIKE ?", params.Other+"%")
+	}
+
+	if params.Key != "" {
+		db = db.Where(quotePostgresField("key")+" = ?", params.Key)
 	}
 
 	return PaginateAndOrder[Channel](db, &params.PaginationParams, &channels, allowedChannelOrderFields)
