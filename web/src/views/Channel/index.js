@@ -330,6 +330,7 @@ export default function ChannelPage() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
+                  { id: 'collapse', label: '', disableSort: true },
                   { id: 'id', label: 'ID', disableSort: false },
                   { id: 'name', label: '名称', disableSort: false },
                   { id: 'group', label: '分组', disableSort: true },
