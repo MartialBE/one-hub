@@ -46,6 +46,9 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   const [priorityValve, setPriority] = useState(item.priority);
   const [responseTimeData, setResponseTimeData] = useState({ test_time: item.test_time, response_time: item.response_time });
   const [itemBalance, setItemBalance] = useState(item.balance);
+  
+  // 获取localStorage中存储的quotaPerUnit，如果不存在则默认为500000
+const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
 
   const [openRow, setOpenRow] = useState(false);
   let modelMap = [];
