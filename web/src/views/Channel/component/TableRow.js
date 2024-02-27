@@ -13,8 +13,6 @@ import {
   IconButton,
   FormControl,
   InputLabel,
-  // InputAdornment,
-  // Input,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,19 +23,22 @@ import {
   Grid,
   Collapse,
   Typography,
-  Box
+  Box,
+  OutlinedInput
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-import GroupLabel from './GroupLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconPencil } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy } from 'utils/common';
+
+import Checkbox from '@mui/material/Checkbox';
+import { red, grey, purple } from '@mui/material/colors';
 
 export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const [open, setOpen] = useState(null);
