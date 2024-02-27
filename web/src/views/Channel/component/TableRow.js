@@ -22,20 +22,22 @@ import {
   DialogTitle,
   Tooltip,
   Button,
-  OutlinedInput
+  Grid,
+  Collapse,
+  Typography,
+  Box
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-import NameLabel from './NameLabel';
+import GroupLabel from './GroupLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
-
-import Checkbox from '@mui/material/Checkbox';
-import { red, grey, purple } from '@mui/material/colors';
-// import { IconCaretUp, IconCaretDown } from "@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash, IconPencil } from '@tabler/icons-react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { copy } from 'utils/common';
 
 export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const [open, setOpen] = useState(null);
@@ -44,7 +46,12 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   const [priorityValve, setPriority] = useState(item.priority);
   const [responseTimeData, setResponseTimeData] = useState({ test_time: item.test_time, response_time: item.response_time });
   const [itemBalance, setItemBalance] = useState(item.balance);
-  const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
+
+  const [openRow, setOpenRow] = useState(false);
+  let modelMap = [];
+  modelMap = item.models.split(',');
+  modelMap.sort();
+
   const handleDeleteOpen = () => {
     handleCloseMenu();
     setOpenDelete(true);
@@ -125,11 +132,15 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   return (
     <>
       <TableRow tabIndex={item.id}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpenRow(!openRow)}>
+            {openRow ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+
         <TableCell>{item.id}</TableCell>
 
-        <TableCell>
-          <NameLabel name={item.name} models={item.models} />
-        </TableCell>
+        <TableCell>{item.name}</TableCell>
 
         <TableCell>
           {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
@@ -148,7 +159,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             </Label>
           )}
         </TableCell>
-
         <TableCell>
           <TableSwitch id={`switch-${item.id}`} checked={statusSwitch === 1} onChange={handleStatus} />
         </TableCell>
@@ -217,6 +227,81 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </MenuItem>
       </Popover>
 
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={10}>
+          <Collapse in={openRow} timeout="auto" unmountOnExit>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
+                  <Typography variant="h6" gutterBottom component="div">
+                    可用模型:
+                  </Typography>
+                  {modelMap.map((model) => (
+                    <Label
+                      variant="outlined"
+                      color="primary"
+                      key={model}
+                      onClick={() => {
+                        copy(model, '模型名称');
+                      }}
+                    >
+                      {model}
+                    </Label>
+                  ))}
+                </Box>
+              </Grid>
+              {item.test_model && (
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
+                    <Typography variant="h6" gutterBottom component="div">
+                      测速模型:
+                    </Typography>
+                    <Label
+                      variant="outlined"
+                      color="default"
+                      key={item.test_model}
+                      onClick={() => {
+                        copy(item.test_model, '测速模型');
+                      }}
+                    >
+                      {item.test_model}
+                    </Label>
+                  </Box>
+                </Grid>
+              )}
+              {item.proxy && (
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
+                    <Typography variant="h6" gutterBottom component="div">
+                      代理地址:
+                    </Typography>
+                    {item.proxy}
+                  </Box>
+                </Grid>
+              )}
+              {item.other && (
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
+                    <Typography variant="h6" gutterBottom component="div">
+                      其他参数:
+                    </Typography>
+                    <Label
+                      variant="outlined"
+                      color="default"
+                      key={item.other}
+                      onClick={() => {
+                        copy(item.other, '其他参数');
+                      }}
+                    >
+                      {item.other}
+                    </Label>
+                  </Box>
+                </Grid>
+              )}
+            </Grid>
+          </Collapse>
+        </TableCell>
+      </TableRow>
       <Dialog open={openDelete} onClose={handleDeleteClose}>
         <DialogTitle>删除渠道</DialogTitle>
         <DialogContent>
