@@ -12,7 +12,8 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-  Divider
+  Divider,
+  Typography
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
@@ -115,7 +116,7 @@ const OtherSetting = () => {
 
   const checkUpdate = async () => {
     try {
-      const res = await API.get('https://api.github.com/repos/woodchen-ink/one-api/releases/latest');
+      const res = await API.get('https://api.github.com/repos/MartialBE/one-api/releases/latest');
       const { tag_name, body } = res.data;
       if (tag_name === process.env.REACT_APP_VERSION) {
         showSuccess(`已是最新版本：${tag_name}`);
@@ -137,6 +138,9 @@ const OtherSetting = () => {
         <SubCard title="通用设置">
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
+              <Typography variant="h6" gutterBottom>
+                当前版本：{process.env.REACT_APP_VERSION}
+              </Typography>
               <Button variant="contained" onClick={checkUpdate}>
                 检查更新
               </Button>
