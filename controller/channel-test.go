@@ -140,17 +140,6 @@ func notifyRootUser(subject string, content string) {
 	}
 }
 
-<<<<<<< HEAD
-// disable & notify
-func disableChannel(channelId int, channelName string, reason string) {
-	model.UpdateChannelStatusById(channelId, common.ChannelStatusAutoDisabled)
-	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
-	notifyRootUser(subject, content)
-}
-
-=======
->>>>>>> 07c18dfb91b2d8334b62a63f2df05dcbc0b25471
 // enable & notify
 func enableChannel(channelId int, channelName string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusEnabled)
