@@ -42,7 +42,7 @@ func Relay(c *gin.Context) {
 	}
 
 	for i := retryTimes; i > 0; i-- {
-		// 冻结通道
+		// 冻结渠道
 		model.ChannelGroup.Cooldowns(channel.Id)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue

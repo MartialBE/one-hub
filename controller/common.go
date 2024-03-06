@@ -45,8 +45,8 @@ func ShouldDisableChannel(err *types.OpenAIError, statusCode int) bool {
 // disable & notify
 func DisableChannel(channelId int, channelName string, reason string) {
 	model.UpdateChannelStatusById(channelId, common.ChannelStatusAutoDisabled)
-	subject := fmt.Sprintf("通道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("通道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
+	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
 	notifyRootUser(subject, content)
 }
 
