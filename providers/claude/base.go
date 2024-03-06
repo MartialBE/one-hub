@@ -73,7 +73,7 @@ func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 
 func stopReasonClaude2OpenAI(reason string) string {
 	switch reason {
-	case "stop_sequence":
+	case "end_turn":
 		return types.FinishReasonStop
 	case "max_tokens":
 		return types.FinishReasonLength

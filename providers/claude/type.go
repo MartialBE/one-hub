@@ -52,13 +52,13 @@ type Delta struct {
 	Text         string `json:"text,omitempty"`
 	StopReason   string `json:"stop_reason,omitempty"`
 	StopSequence string `json:"stop_sequence,omitempty"`
-	Usage        `json:"usage,omitempty"`
 }
 
 type ClaudeStreamResponse struct {
 	Type    string         `json:"type"`
 	Message ClaudeResponse `json:"message,omitempty"`
 	Index   int            `json:"index,omitempty"`
-	Delta   `json:"delta,omitempty"`
-	Error   ClaudeError `json:"error,omitempty"`
+	Delta   Delta          `json:"delta,omitempty"`
+	Usage   Usage          `json:"usage,omitempty"`
+	Error   ClaudeError    `json:"error,omitempty"`
 }
