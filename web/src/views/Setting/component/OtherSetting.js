@@ -12,7 +12,8 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-  Divider
+  Divider,
+  Typography
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
@@ -137,6 +138,9 @@ const OtherSetting = () => {
         <SubCard title="通用设置">
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
+              <Typography variant="h6" gutterBottom>
+                当前版本：{process.env.REACT_APP_VERSION}
+              </Typography>
               <Button variant="contained" onClick={checkUpdate}>
                 检查更新
               </Button>

@@ -1,4 +1,4 @@
-package controller
+package relay
 
 import (
 	"context"
@@ -150,7 +150,7 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 	return nil
 }
 
-func (q *QuotaInfo) undo(c *gin.Context, errWithCode *types.OpenAIErrorWithStatusCode) {
+func (q *QuotaInfo) undo(c *gin.Context) {
 	tokenId := c.GetInt("token_id")
 	if q.HandelStatus {
 		go func(ctx context.Context) {
@@ -161,7 +161,6 @@ func (q *QuotaInfo) undo(c *gin.Context, errWithCode *types.OpenAIErrorWithStatu
 			}
 		}(c.Request.Context())
 	}
-	errorHelper(c, errWithCode)
 }
 
 func (q *QuotaInfo) consume(c *gin.Context, usage *types.Usage) {
