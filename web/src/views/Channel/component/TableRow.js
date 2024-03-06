@@ -34,7 +34,7 @@ import TableSwitch from 'ui-component/Switch';
 import ResponseTimeLabel from './ResponseTimeLabel';
 import GroupLabel from './GroupLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconPencil } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash, IconPencil, IconCopy } from '@tabler/icons-react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy } from 'utils/common';
@@ -243,6 +243,16 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           <IconEdit style={{ marginRight: '16px' }} />
           编辑
         </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+            manageChannel(item.id, 'copy');
+          }}
+        >
+          <IconCopy style={{ marginRight: '16px' }} /> 复制{' '}
+        </MenuItem>
+
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
           删除

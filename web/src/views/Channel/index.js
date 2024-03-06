@@ -117,6 +117,19 @@ export default function ChannelPage() {
 
     try {
       switch (action) {
+        case 'copy': {
+          let oldRes = await API.get(`/api/channel/${id}`);
+          const { success, message, data } = oldRes.data;
+          if (!success) {
+            showError(message);
+            return;
+          }
+          // 删除 data.id
+          delete data.id;
+          data.name = data.name + '_copy';
+          res = await API.post(`/api/channel/`, { ...data });
+          break;
+        }
         case 'delete':
           res = await API.delete(url + id);
           break;
@@ -151,7 +164,7 @@ export default function ChannelPage() {
       const { success, message } = res.data;
       if (success) {
         showSuccess('操作成功完成！');
-        if (action === 'delete') {
+        if (action === 'delete' || action === 'copy') {
           await handleRefresh();
         }
       } else {
