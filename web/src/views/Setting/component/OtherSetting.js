@@ -229,18 +229,18 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="About"
-                  label="关于"
+                  label="接口"
                   value={inputs.About}
                   name="About"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。"
+                  placeholder="在此输入新的接口内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为接口页面。"
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitAbout}>
-                保存关于
+                保存接口
               </Button>
             </Grid>
             <Grid xs={12}>

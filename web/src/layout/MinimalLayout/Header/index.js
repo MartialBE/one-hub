@@ -36,7 +36,7 @@ const Header = () => {
           首页
         </Button>
         <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
-          关于
+          接口
         </Button>
         <Button
           variant="text"
@@ -46,6 +46,15 @@ const Header = () => {
           color={pathname === 'https://work.weixin.qq.com/kfid/kfce787ac8bbad50026' ? 'primary' : 'inherit'}
         >
           客服
+        </Button>
+        <Button
+          variant="text"
+          href="https://chat.czl.net" // 使用href而不是to
+          target="_blank" // 在新标签页中打开链接
+          rel="noopener noreferrer" // 出于安全考虑，防止链接到不安全的地方
+          color={pathname === 'https://chat.czl.net' ? 'primary' : 'inherit'}
+        >
+          对话平台
         </Button>
         {account.user ? (
           <Button component={Link} variant="contained" to="/panel" color="primary">
