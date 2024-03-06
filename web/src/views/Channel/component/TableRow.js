@@ -25,20 +25,19 @@ import {
   Grid,
   Collapse,
   Typography,
-  Box,
-  OutlinedInput
+  Box
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
+import GroupLabel from './GroupLabel';
 
 import { IconDotsVertical, IconEdit, IconTrash, IconPencil, IconCopy } from '@tabler/icons-react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy } from 'utils/common';
-
 import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
 
@@ -50,9 +49,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   const [weightValve, setWeight] = useState(item.weight);
   const [responseTimeData, setResponseTimeData] = useState({ test_time: item.test_time, response_time: item.response_time });
   const [itemBalance, setItemBalance] = useState(item.balance);
-  
-  // 获取localStorage中存储的quotaPerUnit，如果不存在则默认为500000
-const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
 
   const [openRow, setOpenRow] = useState(false);
   let modelMap = [];
@@ -139,10 +135,10 @@ const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
     await manageChannel(item.id, 'delete', '');
   };
 
-
+  // 获取localStorage中存储的quotaPerUnit，如果不存在则默认为500000
+  const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
   // 总已用额度
   const usedQuotaValue = (item.used_quota / quotaPerUnit || 0).toFixed(2);
-
   // 改变用户组的显示方式
   function renderCheckbox(checked, color) {
     return (
@@ -155,6 +151,7 @@ const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
       />
     );
   }
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -169,7 +166,7 @@ const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
         <TableCell>{item.name}</TableCell>
 
         <TableCell>
-          {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
+        {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
           {renderCheckbox(item.group.split(',').includes('vip'), red[500])}
           {renderCheckbox(item.group.split(',').includes('svip'), purple[500])}
         </TableCell>
@@ -196,11 +193,8 @@ const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
             handle_action={handleResponseTime}
           />
         </TableCell>
-
         {/*  总已用额度 */}
         <TableCell>{usedQuotaValue}</TableCell>
-
-
         <TableCell>
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
@@ -209,9 +203,9 @@ const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
         <TableCell>
           <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
             <InputLabel htmlFor={`priority-${item.id}`}>优先级</InputLabel>
-            <OutlinedInput
+            <Input
               id={`priority-${item.id}`}
-              type="number"
+              type="text"
               value={priorityValve}
               onChange={(e) => setPriority(e.target.value)}
               sx={{ textAlign: 'center' }}
