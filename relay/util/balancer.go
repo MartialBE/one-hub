@@ -1,16 +1,17 @@
-package model
+package util
 
 import (
 	"errors"
 	"math/rand"
 	"one-api/common"
+	"one-api/model"
 	"strings"
 	"sync"
 	"time"
 )
 
 type ChannelChoice struct {
-	Channel       *Channel
+	Channel       *model.Channel
 	CooldownsTime int64
 }
 
@@ -34,7 +35,7 @@ func (cc *ChannelsChooser) Cooldowns(channelId int) bool {
 	return true
 }
 
-func (cc *ChannelsChooser) Balancer(channelIds []int) *Channel {
+func (cc *ChannelsChooser) Balancer(channelIds []int) *model.Channel {
 	nowTime := time.Now().Unix()
 	totalWeight := 0
 
@@ -67,9 +68,9 @@ func (cc *ChannelsChooser) Balancer(channelIds []int) *Channel {
 	return nil
 }
 
-func (cc *ChannelsChooser) Next(group, model string) (*Channel, error) {
+func (cc *ChannelsChooser) Next(group, modelName string) (*model.Channel, error) {
 	if !common.MemoryCacheEnabled {
-		return GetRandomSatisfiedChannel(group, model)
+		return model.GetRandomSatisfiedChannel(group, modelName)
 	}
 	cc.RLock()
 	defer cc.RUnlock()
@@ -77,11 +78,11 @@ func (cc *ChannelsChooser) Next(group, model string) (*Channel, error) {
 		return nil, errors.New("group not found")
 	}
 
-	if _, ok := cc.Rule[group][model]; !ok {
+	if _, ok := cc.Rule[group][modelName]; !ok {
 		return nil, errors.New("model not found")
 	}
 
-	channelsPriority := cc.Rule[group][model]
+	channelsPriority := cc.Rule[group][modelName]
 	if len(channelsPriority) == 0 {
 		return nil, errors.New("channel not found")
 	}
@@ -98,7 +99,7 @@ func (cc *ChannelsChooser) Next(group, model string) (*Channel, error) {
 
 func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 	if !common.MemoryCacheEnabled {
-		return GetGroupModels(group)
+		return model.GetGroupModels(group)
 	}
 
 	cc.RLock()
@@ -119,10 +120,10 @@ func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 var ChannelGroup = ChannelsChooser{}
 
 func InitChannelGroup() {
-	var channels []*Channel
-	DB.Where("status = ?", common.ChannelStatusEnabled).Find(&channels)
+	var channels []*model.Channel
+	model.DB.Where("status = ?", common.ChannelStatusEnabled).Find(&channels)
 
-	abilities, err := GetAbilityChannelGroup()
+	abilities, err := model.GetAbilityChannelGroup()
 	if err != nil {
 		common.SysLog("get enabled abilities failed: " + err.Error())
 		return

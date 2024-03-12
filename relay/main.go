@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
-	"one-api/model"
+	"one-api/relay/util"
 	"one-api/types"
 
 	"github.com/gin-gonic/gin"
@@ -43,7 +43,7 @@ func Relay(c *gin.Context) {
 
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
-		model.ChannelGroup.Cooldowns(channel.Id)
+		util.ChannelGroup.Cooldowns(channel.Id)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue
 		}
@@ -87,8 +87,8 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 
 	relay.getProvider().SetUsage(usage)
 
-	var quotaInfo *QuotaInfo
-	quotaInfo, err = generateQuotaInfo(relay.getContext(), relay.getModelName(), promptTokens)
+	var quota *util.Quota
+	quota, err = util.NewQuota(relay.getContext(), relay.getModelName(), promptTokens)
 	if err != nil {
 		done = true
 		return
@@ -97,10 +97,10 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 	err, done = relay.send()
 
 	if err != nil {
-		quotaInfo.undo(relay.getContext())
+		quota.Undo(relay.getContext())
 		return
 	}
 
-	quotaInfo.consume(relay.getContext(), usage)
+	quota.Consume(relay.getContext(), usage)
 	return
 }

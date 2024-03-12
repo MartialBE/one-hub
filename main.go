@@ -8,6 +8,7 @@ import (
 	"one-api/controller"
 	"one-api/middleware"
 	"one-api/model"
+	"one-api/relay/util"
 	"one-api/router"
 	"os"
 	"strconv"
@@ -59,11 +60,11 @@ func main() {
 	if common.MemoryCacheEnabled {
 		common.SysLog("memory cache enabled")
 		common.SysError(fmt.Sprintf("sync frequency: %d seconds", common.SyncFrequency))
-		model.InitChannelGroup()
+		util.InitChannelGroup()
 	}
 	if common.MemoryCacheEnabled {
 		go model.SyncOptions(common.SyncFrequency)
-		go model.SyncChannelGroup(common.SyncFrequency)
+		go util.SyncChannelGroup(common.SyncFrequency)
 	}
 	if os.Getenv("CHANNEL_UPDATE_FREQUENCY") != "" {
 		frequency, err := strconv.Atoi(os.Getenv("CHANNEL_UPDATE_FREQUENCY"))

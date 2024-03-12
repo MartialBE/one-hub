@@ -13,6 +13,7 @@ import (
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
+	"one-api/relay/util"
 	"one-api/types"
 	"strings"
 
@@ -90,7 +91,7 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("group")
-	channel, err := model.ChannelGroup.Next(group, modelName)
+	channel, err := util.ChannelGroup.Next(group, modelName)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 		if channel != nil {

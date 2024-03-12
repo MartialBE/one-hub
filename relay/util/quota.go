@@ -1,4 +1,4 @@
-package relay
+package util
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type QuotaInfo struct {
+type Quota struct {
 	modelName         string
 	promptTokens      int
 	preConsumedTokens int
@@ -28,8 +28,8 @@ type QuotaInfo struct {
 	HandelStatus      bool
 }
 
-func generateQuotaInfo(c *gin.Context, modelName string, promptTokens int) (*QuotaInfo, *types.OpenAIErrorWithStatusCode) {
-	quotaInfo := &QuotaInfo{
+func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *types.OpenAIErrorWithStatusCode) {
+	quota := &Quota{
 		modelName:    modelName,
 		promptTokens: promptTokens,
 		userId:       c.GetInt("id"),
@@ -37,17 +37,17 @@ func generateQuotaInfo(c *gin.Context, modelName string, promptTokens int) (*Quo
 		tokenId:      c.GetInt("token_id"),
 		HandelStatus: false,
 	}
-	quotaInfo.initQuotaInfo(c.GetString("group"))
+	quota.init(c.GetString("group"))
 
-	errWithCode := quotaInfo.preQuotaConsumption()
+	errWithCode := quota.preQuotaConsumption()
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
-	return quotaInfo, nil
+	return quota, nil
 }
 
-func (q *QuotaInfo) initQuotaInfo(groupName string) {
+func (q *Quota) init(groupName string) {
 	modelRatio := common.GetModelRatio(q.modelName)
 	groupRatio := common.GetGroupRatio(groupName)
 	preConsumedTokens := common.PreConsumedQuota
@@ -62,7 +62,7 @@ func (q *QuotaInfo) initQuotaInfo(groupName string) {
 
 }
 
-func (q *QuotaInfo) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
+func (q *Quota) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 	userQuota, err := model.CacheGetUserQuota(q.userId)
 	if err != nil {
 		return common.ErrorWrapper(err, "get_user_quota_failed", http.StatusInternalServerError)
@@ -95,7 +95,7 @@ func (q *QuotaInfo) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 	return nil
 }
 
-func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName string, ctx context.Context) error {
+func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, ctx context.Context) error {
 	quota := 0
 	completionRatio := q.modelRatio[1] * q.groupRatio
 	promptTokens := usage.PromptTokens
@@ -144,7 +144,7 @@ func (q *QuotaInfo) completedQuotaConsumption(usage *types.Usage, tokenName stri
 	return nil
 }
 
-func (q *QuotaInfo) undo(c *gin.Context) {
+func (q *Quota) Undo(c *gin.Context) {
 	tokenId := c.GetInt("token_id")
 	if q.HandelStatus {
 		go func(ctx context.Context) {
@@ -157,7 +157,7 @@ func (q *QuotaInfo) undo(c *gin.Context) {
 	}
 }
 
-func (q *QuotaInfo) consume(c *gin.Context, usage *types.Usage) {
+func (q *Quota) Consume(c *gin.Context, usage *types.Usage) {
 	tokenName := c.GetString("token_name")
 	// 如果没有报错，则消费配额
 	go func(ctx context.Context) {
