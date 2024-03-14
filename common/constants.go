@@ -1,8 +1,6 @@
 package common
 
 import (
-	"os"
-	"strconv"
 	"sync"
 	"time"
 
@@ -52,8 +50,7 @@ var EmailDomainWhitelist = []string{
 	"foxmail.com",
 }
 
-var DebugEnabled = os.Getenv("DEBUG") == "true"
-var MemoryCacheEnabled = os.Getenv("MEMORY_CACHE_ENABLED") == "true"
+var MemoryCacheEnabled = false
 
 var LogConsumeEnabled = true
 
@@ -88,22 +85,12 @@ var RetryCooldownSeconds = 5
 
 var RootUserEmail = ""
 
-var IsMasterNode = os.Getenv("NODE_TYPE") != "slave"
+var IsMasterNode = true
 
-var requestInterval, _ = strconv.Atoi(os.Getenv("POLLING_INTERVAL"))
-var RequestInterval = time.Duration(requestInterval) * time.Second
-
-var SyncFrequency = GetOrDefault("SYNC_FREQUENCY", 10*60) // unit is second
+var RequestInterval time.Duration
 
 var BatchUpdateEnabled = false
-var BatchUpdateInterval = GetOrDefault("BATCH_UPDATE_INTERVAL", 5)
-
-var RelayTimeout = GetOrDefault("RELAY_TIMEOUT", 600)   // unit is second
-var ConnectTimeout = GetOrDefault("CONNECT_TIMEOUT", 5) // unit is second
-
-const (
-	RequestIdKey = "X-Oneapi-Request-Id"
-)
+var BatchUpdateInterval = 5
 
 const (
 	RoleGuestUser  = 0
@@ -117,25 +104,6 @@ var (
 	FileDownloadPermission  = RoleGuestUser
 	ImageUploadPermission   = RoleGuestUser
 	ImageDownloadPermission = RoleGuestUser
-)
-
-// All duration's unit is seconds
-// Shouldn't larger then RateLimitKeyExpirationDuration
-var (
-	GlobalApiRateLimitNum            = GetOrDefault("GLOBAL_API_RATE_LIMIT", 180)
-	GlobalApiRateLimitDuration int64 = 3 * 60
-
-	GlobalWebRateLimitNum            = GetOrDefault("GLOBAL_WEB_RATE_LIMIT", 100)
-	GlobalWebRateLimitDuration int64 = 3 * 60
-
-	UploadRateLimitNum            = 10
-	UploadRateLimitDuration int64 = 60
-
-	DownloadRateLimitNum            = 10
-	DownloadRateLimitDuration int64 = 60
-
-	CriticalRateLimitNum            = 20
-	CriticalRateLimitDuration int64 = 20 * 60
 )
 
 var RateLimitKeyExpirationDuration = 20 * time.Minute
