@@ -112,17 +112,5 @@ export const CHANNEL_OPTIONS = {
     text: '自定义渠道',
     value: 8,
     color: 'primary'
-  },
-  22: {
-    key: 22,
-    text: '知识库：FastGPT',
-    value: 22,
-    color: 'default'
-  },
-  21: {
-    key: 21,
-    text: '知识库：AI Proxy',
-    value: 21,
-    color: 'purple'
   }
 };

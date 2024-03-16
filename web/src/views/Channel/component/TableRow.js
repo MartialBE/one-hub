@@ -384,18 +384,8 @@ function renderBalance(type, balance) {
   switch (type) {
     case 1: // OpenAI
       return <span>${balance.toFixed(2)}</span>;
-    case 4: // CloseAI
-      return <span>¥{balance.toFixed(2)}</span>;
     case 8: // 自定义
       return <span>${balance.toFixed(2)}</span>;
-    case 5: // OpenAI-SB
-      return <span>¥{(balance / 10000).toFixed(2)}</span>;
-    case 10: // AI Proxy
-      return <span>{renderNumber(balance)}</span>;
-    case 12: // API2GPT
-      return <span>¥{balance.toFixed(2)}</span>;
-    case 13: // AIGC2D
-      return <span>{renderNumber(balance)}</span>;
     default:
       return <span>不支持</span>;
   }
