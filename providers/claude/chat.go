@@ -72,7 +72,7 @@ func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 		headers["Accept"] = "text/event-stream"
 	}
 
-	claudeRequest, errWithCode := convertFromChatOpenai(request)
+	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -86,7 +86,7 @@ func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 	return req, nil
 }
 
-func convertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest, *types.OpenAIErrorWithStatusCode) {
+func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest, *types.OpenAIErrorWithStatusCode) {
 	claudeRequest := ClaudeRequest{
 		Model:         request.Model,
 		Messages:      []Message{},

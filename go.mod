@@ -25,6 +25,11 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1 // indirect
+	github.com/aws/smithy-go v1.20.1 // indirect
+)
+
+require (
 	github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.24 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
