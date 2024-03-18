@@ -4,34 +4,33 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/requester"
-	"one-api/providers/claude"
+	"one-api/providers/bedrock/category"
 	"one-api/types"
-	"strings"
 )
 
-type claudeStreamHandler struct {
-	Usage   *types.Usage
-	Request *types.ChatCompletionRequest
-}
-
 func (p *BedrockProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
-	if errWithCode != nil {
-		return nil, errWithCode
-	}
-	defer req.Body.Close()
-
-	claudeResponse := &ClaudeResponse{}
 	// 发送请求
-	_, errWithCode = p.Requester.SendRequest(req, claudeResponse, false)
+	response, errWithCode := p.Send(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
-	return p.convertToChatOpenai(claudeResponse, request)
+	defer response.Body.Close()
+
+	return p.Category.ResponseChatComplete(p, response, request)
 }
 
 func (p *BedrockProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	// 发送请求
+	response, errWithCode := p.Send(request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	return RequestStream(response, p.Category.ResponseChatCompleteStrem(p, request))
+}
+
+func (p *BedrockProvider) Send(request *types.ChatCompletionRequest) (*http.Response, *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -39,20 +38,16 @@ func (p *BedrockProvider) CreateChatCompletionStream(request *types.ChatCompleti
 	defer req.Body.Close()
 
 	// 发送请求
-	resp, errWithCode := p.Requester.SendRequestRaw(req)
-	if errWithCode != nil {
-		return nil, errWithCode
-	}
-
-	chatHandler := &claudeStreamHandler{
-		Usage:   p.Usage,
-		Request: request,
-	}
-
-	return requester.RequestStream[string](p.Requester, resp, chatHandler.handlerStream)
+	return p.Requester.SendRequestRaw(req)
 }
 
 func (p *BedrockProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+	var err error
+	p.Category, err = category.GetCategory(request.Model)
+	if err != nil || p.Category.ChatComplete == nil || p.Category.ResponseChatComplete == nil {
+		return nil, common.StringErrorWrapper("bedrock provider not found", "bedrock_err", http.StatusInternalServerError)
+	}
+
 	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -63,14 +58,14 @@ func (p *BedrockProvider) getChatRequest(request *types.ChatCompletionRequest) (
 	}
 
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url, p.Category.ModelName)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(nil, "invalid_claude_config", http.StatusInternalServerError)
 	}
 
 	headers := p.GetRequestHeaders()
 
-	bedrockRequest, errWithCode := convertFromChatOpenai(request)
+	bedrockRequest, errWithCode := p.Category.ChatComplete(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -80,26 +75,7 @@ func (p *BedrockProvider) getChatRequest(request *types.ChatCompletionRequest) (
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
-
 	p.Sign(req)
 
 	return req, nil
-}
-
-func convertFromChatOpenai(request *types.ChatCompletionRequest) (any, *types.OpenAIErrorWithStatusCode) {
-	// 如果前缀是claude，那么就是claude的请求
-	if strings.HasPrefix(request.Model, "claude") {
-		rawRequest, err := claude.ConvertFromChatOpenai(request)
-		if err != nil {
-			return nil, err
-		}
-
-		claudeRequest := &ClaudeRequest{}
-		claudeRequest.ClaudeRequest = rawRequest
-		claudeRequest.AnthropicVersion = anthropicVersion
-
-		return claudeRequest, nil
-	}
-
-	return nil, nil
 }

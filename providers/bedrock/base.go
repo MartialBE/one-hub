@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"one-api/providers/bedrock/category"
 	"one-api/providers/bedrock/sigv4"
 )
 
@@ -42,6 +43,7 @@ type BedrockProvider struct {
 	AccessKeyID     string
 	SecretAccessKey string
 	SessionToken    string
+	Category        *category.Category
 }
 
 func getConfig() base.ProviderConfig {
@@ -75,9 +77,6 @@ func errorHandle(bedrockError *BedrockError) *types.OpenAIError {
 
 func (p *BedrockProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
-	if value, exists := bedrockMap[modelName]; exists {
-		modelName = value
-	}
 
 	return fmt.Sprintf(baseURL+requestURL, p.Region, modelName)
 }
@@ -85,6 +84,7 @@ func (p *BedrockProvider) GetFullRequestURL(requestURL string, modelName string)
 func (p *BedrockProvider) GetRequestHeaders() (headers map[string]string) {
 	headers = make(map[string]string)
 	p.CommonRequestHeaders(headers)
+	headers["Accept"] = "*/*"
 
 	return headers
 }
@@ -98,7 +98,7 @@ func getKeyConfig(bedrock *BedrockProvider) {
 	bedrock.Region = keys[0]
 	bedrock.AccessKeyID = keys[1]
 	bedrock.SecretAccessKey = keys[2]
-	if len(keys) == 4 {
+	if len(keys) == 4 && keys[3] != "" {
 		bedrock.SessionToken = keys[3]
 	}
 }
