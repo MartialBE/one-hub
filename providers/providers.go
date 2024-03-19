@@ -9,6 +9,7 @@ import (
 	"one-api/providers/baichuan"
 	"one-api/providers/baidu"
 	"one-api/providers/base"
+	"one-api/providers/bedrock"
 	"one-api/providers/claude"
 	"one-api/providers/deepseek"
 	"one-api/providers/gemini"
@@ -50,6 +51,7 @@ func init() {
 	providerFactories[common.ChannelTypeDeepseek] = deepseek.DeepseekProviderFactory{}
 	providerFactories[common.ChannelTypeMistral] = mistral.MistralProviderFactory{}
 	providerFactories[common.ChannelTypeGroq] = groq.GroqProviderFactory{}
+	providerFactories[common.ChannelTypeBedrock] = bedrock.BedrockProviderFactory{}
 
 }
 
