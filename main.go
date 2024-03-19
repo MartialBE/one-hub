@@ -10,7 +10,6 @@ import (
 	"one-api/controller"
 	"one-api/middleware"
 	"one-api/model"
-	"one-api/relay/util"
 	"one-api/router"
 
 	"github.com/gin-contrib/sessions"
@@ -61,9 +60,7 @@ func initMemoryCache() {
 
 	common.SysLog("memory cache enabled")
 	common.SysError(fmt.Sprintf("sync frequency: %d seconds", syncFrequency))
-	util.InitChannelGroup()
 	go model.SyncOptions(syncFrequency)
-	go util.SyncChannelGroup(syncFrequency)
 }
 
 func initSync() {

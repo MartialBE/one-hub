@@ -1,17 +1,16 @@
-package util
+package model
 
 import (
 	"errors"
 	"math/rand"
 	"one-api/common"
-	"one-api/model"
 	"strings"
 	"sync"
 	"time"
 )
 
 type ChannelChoice struct {
-	Channel       *model.Channel
+	Channel       *Channel
 	CooldownsTime int64
 }
 
@@ -35,7 +34,7 @@ func (cc *ChannelsChooser) Cooldowns(channelId int) bool {
 	return true
 }
 
-func (cc *ChannelsChooser) Balancer(channelIds []int) *model.Channel {
+func (cc *ChannelsChooser) balancer(channelIds []int) *Channel {
 	nowTime := time.Now().Unix()
 	totalWeight := 0
 
@@ -68,9 +67,9 @@ func (cc *ChannelsChooser) Balancer(channelIds []int) *model.Channel {
 	return nil
 }
 
-func (cc *ChannelsChooser) Next(group, modelName string) (*model.Channel, error) {
+func (cc *ChannelsChooser) Next(group, modelName string) (*Channel, error) {
 	if !common.MemoryCacheEnabled {
-		return model.GetRandomSatisfiedChannel(group, modelName)
+		return GetRandomSatisfiedChannel(group, modelName)
 	}
 	cc.RLock()
 	defer cc.RUnlock()
@@ -88,7 +87,7 @@ func (cc *ChannelsChooser) Next(group, modelName string) (*model.Channel, error)
 	}
 
 	for _, priority := range channelsPriority {
-		channel := cc.Balancer(priority)
+		channel := cc.balancer(priority)
 		if channel != nil {
 			return channel, nil
 		}
@@ -99,7 +98,7 @@ func (cc *ChannelsChooser) Next(group, modelName string) (*model.Channel, error)
 
 func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 	if !common.MemoryCacheEnabled {
-		return model.GetGroupModels(group)
+		return GetGroupModels(group)
 	}
 
 	cc.RLock()
@@ -119,11 +118,11 @@ func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 
 var ChannelGroup = ChannelsChooser{}
 
-func InitChannelGroup() {
-	var channels []*model.Channel
-	model.DB.Where("status = ?", common.ChannelStatusEnabled).Find(&channels)
+func (cc *ChannelsChooser) Load() {
+	var channels []*Channel
+	DB.Where("status = ?", common.ChannelStatusEnabled).Find(&channels)
 
-	abilities, err := model.GetAbilityChannelGroup()
+	abilities, err := GetAbilityChannelGroup()
 	if err != nil {
 		common.SysLog("get enabled abilities failed: " + err.Error())
 		return
@@ -161,17 +160,9 @@ func InitChannelGroup() {
 		newGroup[ability.Group][ability.Model] = append(newGroup[ability.Group][ability.Model], priorityIds)
 	}
 
-	ChannelGroup.Lock()
-	ChannelGroup.Rule = newGroup
-	ChannelGroup.Channels = newChannels
-	ChannelGroup.Unlock()
-	common.SysLog("channels synced from database")
-}
-
-func SyncChannelGroup(frequency int) {
-	for {
-		time.Sleep(time.Duration(frequency) * time.Second)
-		common.SysLog("syncing channels from database")
-		InitChannelGroup()
-	}
+	cc.Lock()
+	cc.Rule = newGroup
+	cc.Channels = newChannels
+	cc.Unlock()
+	common.SysLog("channels Load success")
 }

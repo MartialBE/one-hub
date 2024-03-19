@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/model"
 	"one-api/relay/util"
 	"one-api/types"
 
@@ -43,7 +44,7 @@ func Relay(c *gin.Context) {
 
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
-		util.ChannelGroup.Cooldowns(channel.Id)
+		model.ChannelGroup.Cooldowns(channel.Id)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue
 		}

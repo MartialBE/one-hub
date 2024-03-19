@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/model"
-	"one-api/relay/util"
 	"one-api/types"
 	"sort"
 
@@ -77,7 +76,7 @@ func ListModels(c *gin.Context) {
 		groupName = user.Group
 	}
 
-	models, err := util.ChannelGroup.GetGroupModels(groupName)
+	models, err := model.ChannelGroup.GetGroupModels(groupName)
 	if err != nil {
 		common.AbortWithMessage(c, http.StatusServiceUnavailable, err.Error())
 		return
