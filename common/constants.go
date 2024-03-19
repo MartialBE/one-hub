@@ -99,13 +99,6 @@ const (
 	RoleRootUser   = 100
 )
 
-var (
-	FileUploadPermission    = RoleGuestUser
-	FileDownloadPermission  = RoleGuestUser
-	ImageUploadPermission   = RoleGuestUser
-	ImageDownloadPermission = RoleGuestUser
-)
-
 var RateLimitKeyExpirationDuration = 20 * time.Minute
 
 const (
