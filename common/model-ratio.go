@@ -92,10 +92,14 @@ func init() {
 		// $0.80/million tokens $2.40/million tokens
 		"claude-instant-1.2": {[]float64{0.4, 1.2}, ChannelTypeAnthropic},
 		// $8.00/million tokens $24.00/million tokens
-		"claude-2.0":               {[]float64{4, 12}, ChannelTypeAnthropic},
-		"claude-2.1":               {[]float64{4, 12}, ChannelTypeAnthropic},
-		"claude-3-opus-20240229":   {[]float64{7.5, 22.5}, ChannelTypeAnthropic},
+		"claude-2.0": {[]float64{4, 12}, ChannelTypeAnthropic},
+		"claude-2.1": {[]float64{4, 12}, ChannelTypeAnthropic},
+		// $15 / M $75 / M
+		"claude-3-opus-20240229": {[]float64{7.5, 22.5}, ChannelTypeAnthropic},
+		//  $3 / M $15 / M
 		"claude-3-sonnet-20240229": {[]float64{1.3, 3.9}, ChannelTypeAnthropic},
+		//  $0.25 / M $1.25 / M  0.00025$ / 1k tokens 0.00125$ / 1k tokens
+		"claude-3-haiku-20240307": {[]float64{0.125, 0.625}, ChannelTypeAnthropic},
 
 		// ￥0.004 / 1k tokens ￥0.008 / 1k tokens
 		"ERNIE-Speed": {[]float64{0.2857, 0.5714}, ChannelTypeBaidu},
@@ -194,6 +198,13 @@ func init() {
 		"gemma-7b-it":    {[]float64{0.05, 0.05}, ChannelTypeGroq},
 		// $0.27/$0.27 /1M Tokens 0.00027$ / 1k tokens
 		"mixtral-8x7b-32768": {[]float64{0.135, 0.135}, ChannelTypeGroq},
+
+		// 2.5 元 / 1M tokens 0.0025 / 1k tokens
+		"yi-34b-chat-0205": {[]float64{0.1786, 0.1786}, ChannelTypeLingyi},
+		// 12 元 / 1M tokens 0.012 / 1k tokens
+		"yi-34b-chat-200k": {[]float64{0.8571, 0.8571}, ChannelTypeLingyi},
+		// 	6 元 / 1M tokens 0.006 / 1k tokens
+		"yi-vl-plus": {[]float64{0.4286, 0.4286}, ChannelTypeLingyi},
 	}
 
 	ModelRatio = make(map[string][]float64)
