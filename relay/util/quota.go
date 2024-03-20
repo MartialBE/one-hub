@@ -137,12 +137,12 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 
 	// logContent := fmt.Sprintf("模型倍率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 	if q.modelRatio[0] == q.modelRatio[1] {
-		modelRatioStr = fmt.Sprintf("$%g/1k tokens", q.modelRatio[0]*0.002)
+		modelRatioStr = fmt.Sprintf("单价: $%g/1k tokens", q.modelRatio[0]*0.002)
 	} else {
-		modelRatioStr = fmt.Sprintf("$%g/1k tokens(提示)/ $%g/1k tokens(补全)", q.modelRatio[0]*0.002, q.modelRatio[1]*0.002)
+		modelRatioStr = fmt.Sprintf("提示: $%g/1k tokens, 补全: $%g/1k tokens", q.modelRatio[0]*0.002, q.modelRatio[1]*0.002)
 	}
 
-	logContent := fmt.Sprintf("单价: %s", modelRatioStr)
+	logContent := fmt.Sprintf(" %s", modelRatioStr)
 	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)
