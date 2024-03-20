@@ -27,17 +27,7 @@ var indexPage []byte
 func main() {
 	config.InitConf()
 	common.SetupLogger()
-<<<<<<< HEAD
 	common.SysLog("CZLOapi " + common.Version + " started")
-	if os.Getenv("GIN_MODE") != "debug" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-	if common.DebugEnabled {
-		common.SysLog("running in debug mode")
-	}
-=======
-	common.SysLog("One API " + common.Version + " started")
->>>>>>> 71171c63f5ac2be88eb0be9f56648d959dfcaef2
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
