@@ -119,27 +119,26 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	if err != nil {
 		return errors.New("error consuming token remain quota: " + err.Error())
 	}
-	if quota != 0 {
-		requestTime := 0
-		requestStartTimeValue := ctx.Value("requestStartTime")
-		if requestStartTimeValue != nil {
-			requestStartTime, ok := requestStartTimeValue.(time.Time)
-			if ok {
-				requestTime = int(time.Since(requestStartTime).Milliseconds())
-			}
-		}
-		var modelRatioStr string
-		if q.modelRatio[0] == q.modelRatio[1] {
-			modelRatioStr = fmt.Sprintf("%.2f", q.modelRatio[0])
-		} else {
-			modelRatioStr = fmt.Sprintf("%.2f (输入)/%.2f (输出)", q.modelRatio[0], q.modelRatio[1])
-		}
 
-		logContent := fmt.Sprintf("模型倍率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
-		model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
-		model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
-		model.UpdateChannelUsedQuota(q.channelId, quota)
+	requestTime := 0
+	requestStartTimeValue := ctx.Value("requestStartTime")
+	if requestStartTimeValue != nil {
+		requestStartTime, ok := requestStartTimeValue.(time.Time)
+		if ok {
+			requestTime = int(time.Since(requestStartTime).Milliseconds())
+		}
 	}
+	var modelRatioStr string
+	if q.modelRatio[0] == q.modelRatio[1] {
+		modelRatioStr = fmt.Sprintf("%.2f", q.modelRatio[0])
+	} else {
+		modelRatioStr = fmt.Sprintf("%.2f (输入)/%.2f (输出)", q.modelRatio[0], q.modelRatio[1])
+	}
+
+	logContent := fmt.Sprintf("模型倍率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
+	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
+	model.UpdateChannelUsedQuota(q.channelId, quota)
 
 	return nil
 }
