@@ -54,7 +54,7 @@ const Header = () => {
           rel="noopener noreferrer" // 出于安全考虑，防止链接到不安全的地方
           color={pathname === 'https://chat.czl.net' ? 'primary' : 'inherit'}
         >
-          对话平台
+          对话
         </Button>
         {account.user ? (
           <Button component={Link} variant="contained" to="/panel" color="primary">
