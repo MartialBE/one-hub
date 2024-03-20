@@ -6,7 +6,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <Container sx={{ display: 'none', justifyContent: 'center', alignItems: 'center', height: '0px' }}>
+    <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '0px' }}>
     </Container>
   );
 };

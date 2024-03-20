@@ -24,9 +24,6 @@ var ModelRatio map[string][]float64
 
 func init() {
 	ModelTypes = map[string]ModelType{
-		"czl-3":        {[]float64{0.25, 0.75}, ChannelTypeOpenAI},
-		"czl-4":        {[]float64{5, 15}, ChannelTypeOpenAI},
-		"czl-4-vision": {[]float64{5, 15}, ChannelTypeOpenAI},
 		// 	$0.03 / 1K tokens	$0.06 / 1K tokens
 		"gpt-4":      {[]float64{15, 30}, ChannelTypeOpenAI},
 		"gpt-4-0314": {[]float64{15, 30}, ChannelTypeOpenAI},

@@ -244,7 +244,6 @@
   "保存首页内容": "Save Home Page Content",
   "在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面": "Enter new about content here, supports Markdown & HTML code. If a link is entered, it will be used as the src attribute of the iframe, allowing you to set any webpage as the about page.",
   "保存关于": "Save About",
-  "移除 CZLOapi 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目": "Removal of CZLOapi copyright mark must first be authorized. Project maintenance requires a lot of effort. If this project is meaningful to you, please actively support it.",
   "页脚": "Footer",
   "在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码": "Enter the new footer here, leave blank to use the default footer, supports HTML code.",
   "设置页脚": "Set Footer",
