@@ -11,10 +11,6 @@ import {
   MenuItem,
   TableCell,
   IconButton,
-  FormControl,
-  InputLabel,
-  InputAdornment,
-  Input,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,6 +21,9 @@ import {
   Grid,
   Collapse,
   Typography,
+  TextField,
+  Stack,
+  Menu,
   Box
 } from '@mui/material';
 
@@ -34,15 +33,54 @@ import TableSwitch from 'ui-component/Switch';
 import ResponseTimeLabel from './ResponseTimeLabel';
 import GroupLabel from './GroupLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconPencil, IconCopy, IconWorldWww } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@tabler/icons-react';
+import { styled, alpha } from '@mui/material/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy } from 'utils/common';
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right'
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right'
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0'
+    },
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5)
+      },
+      '&:active': {
+        backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+      }
+    }
+  }
+}));
 import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
 
 export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const [open, setOpen] = useState(null);
+  const [openTest, setOpenTest] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
   const [priorityValve, setPriority] = useState(item.priority);
@@ -68,6 +106,10 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     setOpen(event.currentTarget);
   };
 
+  const handleTestModel = (event) => {
+    setOpenTest(event.currentTarget);
+  };
+
   const handleCloseMenu = () => {
     setOpen(null);
   };
@@ -80,37 +122,51 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
   };
 
-  const handlePriority = async () => {
-    if (priorityValve === '' || priorityValve === item.priority) {
+  const handlePriority = async (event) => {
+    const currentValue = parseInt(event.target.value);
+    if (isNaN(currentValue) || currentValue === priorityValve) {
       return;
     }
 
-    if (priorityValve < 0) {
+    if (currentValue < 0) {
       showError('优先级不能小于 0');
       return;
     }
 
-    await manageChannel(item.id, 'priority', priorityValve);
+    await manageChannel(item.id, 'priority', currentValue);
+    setPriority(currentValue);
   };
 
-  const handleWeight = async () => {
-    if (weightValve === '' || weightValve === item.weight) {
+  const handleWeight = async (event) => {
+    const currentValue = parseInt(event.target.value);
+    if (isNaN(currentValue) || currentValue === weightValve) {
       return;
     }
 
-    if (weightValve <= 0) {
-      showError('权重不能小于 0');
+    if (currentValue < 1) {
+      showError('权重不能小于 1');
       return;
     }
 
-    await manageChannel(item.id, 'weight', weightValve);
+    await manageChannel(item.id, 'weight', currentValue);
+    setWeight(currentValue);
   };
 
-  const handleResponseTime = async () => {
-    const { success, time } = await manageChannel(item.id, 'test', '');
+  const handleResponseTime = async (modelName) => {
+    setOpenTest(null);
+
+    if (typeof modelName !== 'string') {
+      modelName = item.test_model;
+    }
+
+    if (modelName == '') {
+      showError('请先设置测试模型');
+      return;
+    }
+    const { success, time } = await manageChannel(item.id, 'test', modelName);
     if (success) {
       setResponseTimeData({ test_time: Date.now() / 1000, response_time: time * 1000 });
-      showInfo(`渠道 ${item.name} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
+      showInfo(`渠道 ${item.name}: ${modelName} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
     }
   };
 
@@ -201,48 +257,47 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           </Tooltip>
         </TableCell>
         <TableCell>
-          <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
-            <InputLabel htmlFor={`priority-${item.id}`}>优先级</InputLabel>
-            <Input
-              id={`priority-${item.id}`}
-              type="text"
-              value={priorityValve}
-              onChange={(e) => setPriority(e.target.value)}
-              sx={{ textAlign: 'center' }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={handlePriority} sx={{ color: 'rgb(99, 115, 129)' }} size="small">
-                    <IconPencil />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
+          <TextField
+            id={`priority-${item.id}`}
+            onBlur={handlePriority}
+            type="number"
+            label="优先级"
+            variant="standard"
+            defaultValue={item.priority}
+            inputProps={{ min: '0' }}
+          />
         </TableCell>
         <TableCell>
-          <FormControl sx={{ m: 1, width: '70px' }} variant="standard">
-            <InputLabel htmlFor={`priority-${item.id}`}>权重</InputLabel>
-            <Input
-              id={`weight-${item.id}`}
-              type="text"
-              value={weightValve}
-              onChange={(e) => setWeight(e.target.value)}
-              sx={{ textAlign: 'center' }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={handleWeight} sx={{ color: 'rgb(99, 115, 129)' }} size="small">
-                    <IconPencil />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
+          <TextField
+            id={`weight-${item.id}`}
+            onBlur={handleWeight}
+            type="number"
+            label="权重"
+            variant="standard"
+            defaultValue={item.weight}
+            inputProps={{ min: '1' }}
+          />
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-            <IconDotsVertical />
-          </IconButton>
+          <Stack direction="row" spacing={1}>
+            <Button
+              id="test-model-button"
+              aria-controls={openTest ? 'test-model-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={openTest ? 'true' : undefined}
+              variant="outlined"
+              disableElevation
+              onClick={handleTestModel}
+              endIcon={<KeyboardArrowDownIcon />}
+            >
+              测试
+            </Button>
+
+            <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
+              <IconDotsVertical />
+            </IconButton>
+          </Stack>
         </TableCell>
       </TableRow>
 
@@ -294,6 +349,28 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </MenuItem>
       </Popover>
 
+      <StyledMenu
+        id="test-model-menu"
+        MenuListProps={{
+          'aria-labelledby': 'test-model-button'
+        }}
+        anchorEl={openTest}
+        open={!!openTest}
+        onClose={() => {
+          setOpenTest(null);
+        }}
+      >
+        {modelMap.map((model) => (
+          <MenuItem
+            key={'test_model-' + model}
+            onClick={() => {
+              handleResponseTime(model);
+            }}
+          >
+            {model}
+          </MenuItem>
+        ))}
+      </StyledMenu>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={10}>
           <Collapse in={openRow} timeout="auto" unmountOnExit>

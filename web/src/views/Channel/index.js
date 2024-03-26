@@ -157,7 +157,9 @@ export default function ChannelPage() {
           });
           break;
         case 'test':
-          res = await API.get(url + `test/${id}`);
+          res = await API.get(url + `test/${id}`, {
+            params: { model: value }
+          });
           break;
       }
       const { success, message } = res.data;
@@ -362,8 +364,8 @@ export default function ChannelPage() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'collapse', label: '', disableSort: true },
-                  { id: 'id', label: 'ID', disableSort: false },
+                  { id: 'collapse', label: '', disableSort: true, width: '50px' },
+                  { id: 'id', label: 'ID', disableSort: false, width: '80px' },
                   { id: 'name', label: '名称', disableSort: false },
                   { id: 'group', label: '分组', disableSort: true },
                   { id: 'type', label: '类型', disableSort: false },
@@ -371,8 +373,8 @@ export default function ChannelPage() {
                   { id: 'response_time', label: '响应时间', disableSort: false },
                   { id: 'usedQuotaValue', label: '总已用', disableSort: false },
                   { id: 'balance', label: '余额', disableSort: false },
-                  { id: 'priority', label: '优先级', disableSort: false },
-                  { id: 'weight', label: '权重', disableSort: false },
+                  { id: 'priority', label: '优先级', disableSort: false, width: '80px' },
+                  { id: 'weight', label: '权重', disableSort: false, width: '80px' },
                   { id: 'action', label: '操作', disableSort: true }
                 ]}
               />
