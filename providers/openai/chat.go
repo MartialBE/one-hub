@@ -8,7 +8,6 @@ import (
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
-	"time"
 )
 
 type OpenAIStreamHandler struct {
@@ -100,10 +99,10 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 
 	dataChan <- string(*rawLine)
 
-	if h.isAzure {
-		// 阻塞 20ms
-		time.Sleep(20 * time.Millisecond)
-	}
+	// if h.isAzure {
+	// 	// 阻塞 20ms
+	// 	time.Sleep(20 * time.Millisecond)
+	// }
 
 	countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.ModelName)
 	h.Usage.CompletionTokens += countTokenText
