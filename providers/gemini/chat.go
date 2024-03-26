@@ -108,8 +108,8 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			},
 		},
 		GenerationConfig: GeminiChatGenerationConfig{
-			// Temperature:     request.Temperature,
-			// TopP:            request.TopP,
+			Temperature:     request.Temperature,
+			TopP:            request.TopP,
 			MaxOutputTokens: request.MaxTokens,
 		},
 	}
