@@ -133,11 +133,11 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	} else {
 		// 如果输入费率和输出费率一样，则只显示一个费率
 		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("单价: $%g/1k", q.price.FetchInputCurrencyPrice(model.DollarRate)*0.002)
+			modelRatioStr = fmt.Sprintf("单价: $%g/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
 		} else {
 			modelRatioStr = fmt.Sprintf(" 提示: $%g/1k tokens, 补全: $%g/1k tokens",
-				q.price.FetchInputCurrencyPrice(model.DollarRate)*0.002,
-				q.price.FetchOutputCurrencyPrice(model.DollarRate)*0.002)
+				q.price.FetchInputCurrencyPrice(model.DollarRate),
+				q.price.FetchOutputCurrencyPrice(model.DollarRate))
 		}
 	}
 
