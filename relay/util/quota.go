@@ -133,13 +133,15 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	} else {
 		// 如果输入费率和输出费率一样，则只显示一个费率
 		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("$%g/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
+			modelRatioStr = fmt.Sprintf("单价: $%g/1k", q.price.FetchInputCurrencyPrice(model.DollarRate)*0.002)
 		} else {
-			modelRatioStr = fmt.Sprintf("$%g/1k (输入) | $%g/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
+			modelRatioStr = fmt.Sprintf(" 提示: $%g/1k tokens, 补全: $%g/1k tokens",
+				q.price.FetchInputCurrencyPrice(model.DollarRate)*0.002,
+				q.price.FetchOutputCurrencyPrice(model.DollarRate)*0.002)
 		}
 	}
 
-	logContent := fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	logContent := modelRatioStr
 	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)
