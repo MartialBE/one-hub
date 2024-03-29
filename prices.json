@@ -518,7 +518,42 @@
     "output": 1
   },
   {
+    "model": "gemini-1.0-pro-001",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
+    "model": "gemini-1.0-pro-latest",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
+    "model": "gemini-1.0-ultra-latest",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
     "model": "gemini-1.5-pro",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
+    "model": "gemini-1.5-pro-latest",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
+    "model": "gemini-ultra",
     "type": "tokens",
     "channel_type": 25,
     "input": 1,
@@ -533,6 +568,13 @@
   },
   {
     "model": "gemini-pro-vision",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1,
+    "output": 1
+  },
+  {
+    "model": "gemini-1.0-pro-vision-latest",
     "type": "tokens",
     "channel_type": 25,
     "input": 1,
