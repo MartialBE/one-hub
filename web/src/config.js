@@ -4,7 +4,7 @@ const config = {
   basename: '/',
   defaultPath: '/panel/dashboard',
   fontFamily: `czl,system-ui,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif`,
-  borderRadius: 8,
+  borderRadius: 12,
   siteInfo: {
     chat_link: '',
     display_in_currency: true,
