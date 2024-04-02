@@ -514,22 +514,22 @@
     "model": "gemini-1.0-pro",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "gemini-1.0-pro-001",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "gemini-1.0-pro-latest",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "gemini-1.0-ultra-latest",
@@ -542,15 +542,15 @@
     "model": "gemini-1.5-pro",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 3.5,
+    "output": 10.5
   },
   {
     "model": "gemini-1.5-pro-latest",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 3.5,
+    "output": 10.5
   },
   {
     "model": "gemini-ultra",
@@ -563,22 +563,22 @@
     "model": "gemini-pro",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "gemini-pro-vision",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "gemini-1.0-pro-vision-latest",
     "type": "tokens",
     "channel_type": 25,
-    "input": 1,
-    "output": 1
+    "input": 0.25,
+    "output": 0.75
   },
   {
     "model": "Baichuan-Text-Embedding",
