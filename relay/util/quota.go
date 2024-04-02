@@ -135,7 +135,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		if q.price.GetInput() == q.price.GetOutput() {
 			modelRatioStr = fmt.Sprintf("单价: $%g/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
 		} else {
-			modelRatioStr = fmt.Sprintf(" 提示: $%g/1k tokens, 补全: $%g/1k tokens",
+			modelRatioStr = fmt.Sprintf(" 提示: $%g/1k, 补全: $%g/1k",
 				q.price.FetchInputCurrencyPrice(model.DollarRate),
 				q.price.FetchOutputCurrencyPrice(model.DollarRate))
 		}
