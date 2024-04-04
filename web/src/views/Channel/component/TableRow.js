@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-import { showInfo, showError, renderNumber } from 'utils/common';
+import { showInfo, showError } from 'utils/common';
 import { API } from 'utils/api';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 
@@ -31,7 +31,7 @@ import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
-import GroupLabel from './GroupLabel';
+// import GroupLabel from './GroupLabel';
 
 import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@tabler/icons-react';
 import { styled, alpha } from '@mui/material/styles';
@@ -202,7 +202,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         checked={checked}
         style={{
           color: color,
-          padding: '4px',
+          padding: '4px'
         }}
       />
     );
@@ -222,7 +222,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         <TableCell>{item.name}</TableCell>
 
         <TableCell>
-        {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
+          {renderCheckbox(item.group.split(',').includes('default'), grey[500])}
           {renderCheckbox(item.group.split(',').includes('vip'), red[500])}
           {renderCheckbox(item.group.split(',').includes('svip'), purple[500])}
         </TableCell>

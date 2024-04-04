@@ -78,7 +78,7 @@ const Dashboard = () => {
           <Grid item lg={4} xs={12}>
             <StatisticalLineChartCard
               isLoading={isLoading}
-              title="今日请求量"
+              title="今日请求"
               chartData={requestChart?.chartData}
               todayValue={requestChart?.todayValue}
             />
