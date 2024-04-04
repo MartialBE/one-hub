@@ -85,7 +85,7 @@ func GetAllUserTask(userId int, params *TaskQueryParams) (*DataResult[Midjourney
 		query = query.Where("submit_time <= ?", params.EndTimestamp)
 	}
 
-	return PaginateAndOrder[Midjourney](query, &params.PaginationParams, &tasks, allowedMidjourneyOrderFields)
+	return PaginateAndOrder(query, &params.PaginationParams, &tasks, allowedMidjourneyOrderFields)
 }
 
 func GetAllTasks(params *TaskQueryParams) (*DataResult[Midjourney], error) {
@@ -108,7 +108,7 @@ func GetAllTasks(params *TaskQueryParams) (*DataResult[Midjourney], error) {
 		query = query.Where("submit_time <= ?", params.EndTimestamp)
 	}
 
-	return PaginateAndOrder[Midjourney](query, &params.PaginationParams, &tasks, allowedMidjourneyOrderFields)
+	return PaginateAndOrder(query, &params.PaginationParams, &tasks, allowedMidjourneyOrderFields)
 }
 
 func GetAllUnFinishTasks() []*Midjourney {

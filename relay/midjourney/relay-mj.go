@@ -141,7 +141,7 @@ func coverMidjourneyTaskDto(originTask *model.Midjourney) (midjourneyTask provid
 }
 
 func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
-	mjProvider, errWithMJ := getMJProvider(c, provider.RelayModeMidjourneySwapFace, 0)
+	mjProvider, errWithMJ := getMJProvider(c, provider.RelayModeMidjourneySwapFace, 0, nil)
 	if errWithMJ != nil {
 		return errWithMJ
 	}
@@ -171,7 +171,7 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 		return &mjResp.Response
 	}
 	if mjResp.StatusCode == 200 && mjResp.Response.Code == 1 {
-		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 1000, PromptTokens: 0, TotalTokens: 1000})
+		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1000, TotalTokens: 1000})
 	} else {
 		quotaInstance.Undo(c)
 	}
@@ -225,7 +225,7 @@ func RelayMidjourneyTaskImageSeed(c *gin.Context) *provider.MidjourneyResponse {
 		return provider.MidjourneyErrorWrapper(provider.MjRequestError, "task_no_found")
 	}
 
-	mjProvider, errWithMJ := getMJProvider(c, provider.RelayModeMidjourneyTaskImageSeed, originTask.ChannelId)
+	mjProvider, errWithMJ := getMJProvider(c, provider.RelayModeMidjourneyTaskImageSeed, originTask.ChannelId, nil)
 	if errWithMJ != nil {
 		return errWithMJ
 	}
@@ -314,11 +314,7 @@ func RelayMidjourneyTask(c *gin.Context, relayMode int) *provider.MidjourneyResp
 }
 
 func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyResponse {
-	mjProvider, errWithMJ := getMJProvider(c, relayMode, 0)
-	if errWithMJ != nil {
-		return errWithMJ
-	}
-
+	channelId := 0
 	userId := c.GetInt("id")
 	consumeQuota := true
 	var midjRequest provider.MidjourneyRequest
@@ -382,12 +378,8 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		} else if originTask.Status != "SUCCESS" && relayMode != provider.RelayModeMidjourneyModal {
 			return provider.MidjourneyErrorWrapper(provider.MjRequestError, "task_status_not_success")
 		} else { //原任务的Status=SUCCESS，则可以做放大UPSCALE、变换VARIATION等动作，此时必须使用原来的请求地址才能正确处理
-			mjProvider, errWithMJ = getMJProvider(c, relayMode, originTask.ChannelId)
-			if errWithMJ != nil {
-				return errWithMJ
-			}
-
-			log.Printf("检测到此操作为放大、变换、重绘，获取原channel信息: %s,%s", strconv.Itoa(originTask.ChannelId), mjProvider.Channel.GetBaseURL())
+			channelId = originTask.ChannelId
+			log.Printf("检测到此操作为放大、变换、重绘，获取原channel信息: %d", originTask.ChannelId)
 		}
 		midjRequest.Prompt = originTask.Prompt
 
@@ -401,6 +393,11 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 
 	if midjRequest.Action == provider.MjActionInPaint || midjRequest.Action == provider.MjActionCustomZoom {
 		consumeQuota = false
+	}
+
+	mjProvider, errWithMJ := getMJProvider(c, relayMode, channelId, &midjRequest)
+	if errWithMJ != nil {
+		return errWithMJ
 	}
 
 	//baseURL := common.ChannelBaseURLs[channelType]
@@ -423,7 +420,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 	}
 
 	if consumeQuota && midjResponseWithStatus.StatusCode == 200 {
-		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 1000, PromptTokens: 0, TotalTokens: 1000})
+		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
 	} else {
 		quotaInstance.Undo(c)
 	}
@@ -547,26 +544,18 @@ func getQuota(c *gin.Context, modelName string) (*util.Quota, *types.OpenAIError
 	return util.NewQuota(c, modelName, 1000)
 }
 
-func getMJProvider(c *gin.Context, relayMode, channel_id int) (*provider.MidjourneyProvider, *provider.MidjourneyResponse) {
+func getMJProvider(c *gin.Context, relayMode, channel_id int, request *provider.MidjourneyRequest) (*provider.MidjourneyProvider, *provider.MidjourneyResponse) {
 	var baseProvider providersBase.ProviderInterface
 	modelName := ""
-	if channel_id > 0 ||
-		relayMode == provider.RelayModeMidjourneyTaskFetch ||
-		relayMode == provider.RelayModeMidjourneyTaskFetchByCondition ||
-		relayMode == provider.RelayModeMidjourneyNotify ||
-		relayMode == provider.RelayModeMidjourneyTaskImageSeed {
+	if channel_id > 0 {
 		c.Set("specific_channel_id", channel_id)
-	} else {
-		midjourneyRequest := provider.MidjourneyRequest{}
-		if err := common.UnmarshalBodyReusable(c, &midjourneyRequest); err != nil {
-			return nil, MidjourneyErrorFromInternal(provider.MjErrorUnknown, "无效的请求, "+err.Error())
-		}
+	}
 
-		midjourneyModel, mjErr, _ := GetMjRequestModel(relayMode, &midjourneyRequest)
+	if request != nil {
+		midjourneyModel, mjErr, _ := GetMjRequestModel(relayMode, request)
 		if mjErr != nil {
 			return nil, MidjourneyErrorFromInternal(mjErr.Code, mjErr.Description)
 		}
-
 		if midjourneyModel == "" {
 			return nil, MidjourneyErrorFromInternal(provider.MjErrorUnknown, "无效的请求, 无法解析模型")
 		}

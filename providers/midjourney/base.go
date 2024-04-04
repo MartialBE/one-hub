@@ -47,7 +47,7 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 			return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "read_request_body_failed", http.StatusInternalServerError), nullBytes, err
 		}
 		delete(mapResult, "accountFilter")
-		if !MjNotifyEnabled {
+		if !common.MjNotifyEnabled {
 			delete(mapResult, "notifyHook")
 		}
 	}
