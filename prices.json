@@ -761,5 +761,110 @@
     "channel_type": 33,
     "input": 0.4286,
     "output": 0.4286
+  },
+  {
+    "model": "mj_blend",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_custom_zoom",
+    "type": "times",
+    "channel_type": 34,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "mj_describe",
+    "type": "times",
+    "channel_type": 34,
+    "input": 25,
+    "output": 25
+  },
+  {
+    "model": "mj_high_variation",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_imagine",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_inpaint",
+    "type": "times",
+    "channel_type": 34,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "mj_low_variation",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_modal",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_pan",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_reroll",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_shorten",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_upscale",
+    "type": "times",
+    "channel_type": 34,
+    "input": 25,
+    "output": 25
+  },
+  {
+    "model": "mj_variation",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "mj_zoom",
+    "type": "times",
+    "channel_type": 34,
+    "input": 50,
+    "output": 50
+  },
+  {
+    "model": "swap_face",
+    "type": "times",
+    "channel_type": 34,
+    "input": 25,
+    "output": 25
   }
 ]
