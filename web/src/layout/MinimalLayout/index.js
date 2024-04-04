@@ -21,9 +21,10 @@ const MinimalLayout = () => {
           bgcolor: theme.palette.background.default,
           flex: 'none'
         }}
+        padding="false"
       >
-        <Container>
-          <Toolbar>
+        <Container  maxWidth={false} >
+          <Toolbar >
             <Header />
           </Toolbar>
         </Container>

@@ -46,7 +46,7 @@ export function generateLineChartOptions(data, unit) {
       dataLabels: {
         enabled: false
       },
-      colors: ['#fff'],
+      colors: ['#cdd5df'],
       fill: {
         type: 'solid',
         opacity: 1

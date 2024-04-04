@@ -13,7 +13,7 @@ import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   ...theme.typography.CardWrapper,
-  color: '#fff',
+  color: '#cdd5df',
   overflow: 'hidden',
   position: 'relative',
   '&>div': {
