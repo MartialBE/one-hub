@@ -20,7 +20,7 @@ import {
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import User1 from 'assets/images/users/user-round.svg';
+// import User1 from 'assets/images/users/user-round.svg';
 import useLogin from 'hooks/useLogin';
 
 // assets
@@ -71,8 +71,8 @@ const ProfileSection = () => {
           alignItems: 'center',
           borderRadius: '27px',
           transition: 'all .2s ease-in-out',
-          borderColor: theme.palette.primary.light,
-          backgroundColor: theme.palette.primary.light,
+          borderColor: theme.typography.menuChip.background,
+          backgroundColor: theme.typography.menuChip.background,
           '&[aria-controls="menu-list-grow"], &:hover': {
             borderColor: theme.palette.primary.main,
             background: `${theme.palette.primary.main}!important`,
@@ -87,7 +87,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src={User1}
+            src="https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp"
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',

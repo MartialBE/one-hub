@@ -34,7 +34,7 @@ import { alpha } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import shapeAvatar from 'assets/images/icons/shape-avatar.svg';
 import coverAvatar from 'assets/images/invite/cover.webp';
-import userAvatar from 'assets/images/users/user-round.svg';
+// import userAvatar from 'assets/images/users/user-round.svg';
 import SvgColor from 'ui-component/SvgColor';
 
 import React from 'react';
@@ -57,7 +57,7 @@ export default function UserCard({ children }) {
 
   const renderAvatar = (
     <Avatar
-      src={userAvatar}
+      src='https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp'
       sx={{
         zIndex: 11,
         width: 64,
