@@ -17,7 +17,7 @@ import {
   ListItemIcon
   // linearProgressClasses
 } from '@mui/material';
-import User1 from 'assets/images/users/user-round.svg';
+// import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
 
@@ -99,7 +99,7 @@ const MenuCard = () => {
             <ListItemAvatar sx={{ mt: 0 }}>
               <Avatar
                 variant="rounded"
-                src={User1}
+                src="https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp"
                 sx={{
                   ...theme.typography.commonAvatar,
                   ...theme.typography.largeAvatar,

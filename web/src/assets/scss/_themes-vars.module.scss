@@ -1,19 +1,19 @@
 // paper & background
-$paper: #252422;
+$paper: #ffffff;
 
 // primary
-$primaryLight: #31302D;
+$primaryLight: #f1f9fe;
 $primaryMain: #2ea7e0;
 $primaryDark: #1e88e5;
 $primary200: #bfe3f8;
 $primary800: #144766;
 
 // secondary
-$secondaryLight: #315261; //50
-$secondaryMain: #2ea7e0; //500
-$secondaryDark: #127db7; //600
-$secondary200: #bfe3f8; //200
-$secondary800: #11557b; //800
+$secondaryLight: #eceff1; //50
+$secondaryMain: #607d8b; //500
+$secondaryDark: #546e7a; //600
+$secondary200: #b0bec5; //200
+$secondary800: #37474f; //800
 
 // success Colors
 $successLight: #b9f6ca;
@@ -63,14 +63,14 @@ $tableBorderBottom: #f1f3f4;
 // ==============================|| DARK THEME VARIANTS ||============================== //
 
 // paper & background
-$darkBackground: #1a223f; // level 3
-$darkPaper: #111936; // level 4
+$darkBackground: #31302D; // level 3
+$darkPaper: #252422; // level 4
 $darkDivider: rgba(227, 232, 239, 0.2);
-$darkSelectedBack : rgba(124, 77, 255, 0.15);
+$darkSelectedBack : rgba(77, 104, 255, 0.15);
 
 // dark 800 & 900
-$darkLevel1: #29314f; // level 1
-$darkLevel2: #212946; // level 2
+$darkLevel1: #11557b; // level 1
+$darkLevel2: #252422; // level 2
 
 // primary dark
 $darkPrimaryLight: #eef2f6;
@@ -80,16 +80,16 @@ $darkPrimary200: #90caf9;
 $darkPrimary800: #1565c0;
 
 // secondary dark
-$darkSecondaryLight: #d1c4e9;
-$darkSecondaryMain: #7c4dff;
-$darkSecondaryDark: #651fff;
-$darkSecondary200: #b39ddb;
-$darkSecondary800: #6200ea;
+$darkSecondaryLight: #f1f9fe;
+$darkSecondaryMain: #2ea7e0;
+$darkSecondaryDark: #127db7;
+$darkSecondary200: #bfe3f8;
+$darkSecondary800: #11557b;
 
 // text variants
-$darkTextTitle: #d7dcec;
-$darkTextPrimary: #bdc8f0;
-$darkTextSecondary: #8492c4;
+$darkTextTitle: #F5F5F7;
+$darkTextPrimary: #f1f9fe;
+$darkTextSecondary: #e2f2fc;
 
 // ==============================|| JAVASCRIPT ||============================== //
 
