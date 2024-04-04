@@ -234,7 +234,7 @@ export default function componentStyleOverrides(theme) {
         },
         head: {
           color: theme.darkTextSecondary,
-          backgroundColor: '#144766'
+          backgroundColor: '#282725'
         }
       }
     },
@@ -242,7 +242,7 @@ export default function componentStyleOverrides(theme) {
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: '#144766'
+            backgroundColor: '#0d2d44'
           }
         }
       }
