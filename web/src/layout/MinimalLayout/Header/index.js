@@ -53,7 +53,7 @@ const Header = () => {
           }
         }}
       >
-        <Box component="span" sx={{ flexGrow: 1 }}>
+        <Box component="span" sx={{ flexGrow: 1, }}>
           <LogoSection />
         </Box>
       </Box>
@@ -190,104 +190,5 @@ const Header = () => {
     </>
   );
 };
-{/* <Stack spacing={2} direction="row">
-        <Button component={Link} variant="text" to="/" color={pathname === '/' ? 'primary' : 'inherit'}>
-          首页
-        </Button>
-        <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
-          接口
-        </Button>
-        <Button
-          variant="text"
-          href="https://work.weixin.qq.com/kfid/kfce787ac8bbad50026" // 使用href而不是to
-          target="_blank" // 在新标签页中打开链接
-          rel="noopener noreferrer" // 出于安全考虑，防止链接到不安全的地方
-          color={pathname === 'https://work.weixin.qq.com/kfid/kfce787ac8bbad50026' ? 'primary' : 'inherit'}
-        >
-          客服
-        </Button>
-        <Button
-          variant="text"
-          href="https://chat.czl.net" // 使用href而不是to
-          target="_blank" // 在新标签页中打开链接
-          rel="noopener noreferrer" // 出于安全考虑，防止链接到不安全的地方
-          color={pathname === 'https://chat.czl.net' ? 'primary' : 'inherit'}
-        >
-          对话
-        </Button>
-        {account.user ? (
-          <Button component={Link} variant="contained" to="/panel" color="primary">
-            控制台
-          </Button>
-        ) : (
-          <Button component={Link} variant="contained" to="/login" color="primary">
-            登录
-          </Button>
-        )}
-      </Stack>
-
-      <Popper
-        open={!!open}
-        anchorEl={open}
-        transition
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 14]
-              }
-            }
-          ]
-        }}
-        style={{ width: '100vw' }}
-      >
-        {({ TransitionProps }) => (
-          <Transitions in={open} {...TransitionProps}>
-            <ClickAwayListener onClickAway={handleCloseMenu}>
-              <Paper style={{ width: '100%' }}>
-                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                  <List
-                    component="nav"
-                    sx={{
-                      width: '100%',
-                      maxWidth: '100%',
-                      minWidth: '100%',
-                      backgroundColor: theme.palette.background.paper,
-
-                      '& .MuiListItemButton-root': {
-                        mt: 0.5
-                      }
-                    }}
-                    onClick={handleCloseMenu}
-                  >
-                    <ListItemButton component={Link} variant="text" to="/">
-                      <ListItemText primary={<Typography variant="body2">首页</Typography>} />
-                    </ListItemButton>
-
-                    <ListItemButton component={Link} variant="text" to="/about">
-                      <ListItemText primary={<Typography variant="body2">关于</Typography>} />
-                    </ListItemButton>
-                    <Divider />
-                    {account.user ? (
-                      <ListItemButton component={Link} variant="contained" to="/panel" color="primary">
-                        控制台
-                      </ListItemButton>
-                    ) : (
-                      <ListItemButton component={Link} variant="contained" to="/login" color="primary">
-                        登录
-                      </ListItemButton>
-                    )}
-                  </List>
-                </MainCard>
-              </Paper>
-            </ClickAwayListener>
-          </Transitions>
-        )}
-      </Popper>
-    </>
-  );
-}; */}
 
 export default Header;

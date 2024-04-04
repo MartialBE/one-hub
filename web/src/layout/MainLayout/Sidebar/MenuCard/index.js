@@ -106,7 +106,7 @@ const MenuCard = () => {
                   color: theme.palette.primary.main,
                   border: 'none',
                   borderColor: theme.palette.primary.main,
-                  background: '#fff',
+                  background: '#cdd5df',
                   marginRight: '12px'
                 }}
                 onClick={() => navigate('/panel/profile')}
@@ -115,7 +115,7 @@ const MenuCard = () => {
             <ListItemText
               sx={{ mt: 0 }}
               primary={
-                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[800] }}>
+                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[200] }}>
                   {account.user?.username}
                 </Typography>
               }

@@ -65,7 +65,7 @@ const Home = () => {
               <iframe title="home_page_content" src={homePageContent} style={{ width: '100%', height: '100vh', border: 'none' }} />
             ) : (
               <>
-                <Container>
+                <Container >
                   <div style={{ fontSize: 'larger' }} dangerouslySetInnerHTML={{ __html: homePageContent }}></div>
                 </Container>
               </>
