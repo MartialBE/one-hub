@@ -1,4 +1,4 @@
-name: 构建和推送Docker镜像
+name: Docker
 
 on:
   push:
@@ -12,7 +12,7 @@ env:
   DOCKER_HUB_REPO: czloapi
 
 jobs:
-  构建和推送:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       packages: write
