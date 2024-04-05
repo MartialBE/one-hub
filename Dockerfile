@@ -2,13 +2,13 @@
 FROM node:18 as frontend-builder
 
 WORKDIR /web
-COPY web/package.json ./
+COPY web/package.json web/yarn.lock ./
 
-RUN npm install
+RUN yarn install
 
 COPY web/ ./
 
-RUN npm run build
+RUN DISABLE_ESLINT_PLUGIN='true' yarn run build
 
 
 # 阶段二：构建后端
