@@ -1,96 +1,42 @@
-name: docker
+name: Docker
 
 on:
   push:
     branches:
       - main
     tags:
-      - "v*"
+      - v*
 
 env:
-  DOCKER_HUB_USERNAME: woodchen
-  DOCKER_HUB_REPO: czloapi
+  IMAGE_NAME: czloapi
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Save dev version info
-        run: |
-          HASH=$(git rev-parse --short=7 HEAD)
-          echo "dev-$HASH" > VERSION
-      - name: Save Tag version info
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          git describe --tags > VERSION
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Build Frontend
-        env:
-          CI: ""
-        run: |
-          export VERSION=$(cat VERSION)
-          cd web
-          yarn install
-          REACT_APP_VERSION=$VERSION yarn run build
-          cd ..
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.18.0"
-      - name: Build Backend (amd64)
-        run: |
-          go mod download
-          go build -ldflags "-s -w -X 'one-api/common.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-amd64
 
-      - name: Build Backend (arm64)
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-aarch64-linux-gnu
-          CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X 'one-api/common.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-arm64
-      - name: Set up QEMU
+    steps:
+      - name: 检出代码库
+        uses: actions/checkout@v3
+
+      - name: 设置 QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Set up Docker Buildx
+      - name: 设置 Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to Docker Hub
+      - name: 登录 Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: docker.io
-          username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.ACCESS_TOKEN }} # Replace with your Docker Hub password secret
+          username: woodchen
+          password: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          # list of Docker images to use as base name for tags
-          images: |
-            docker.io/${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_HUB_REPO }}
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
-
-      - name: Build and push
+      - name: 构建和推送镜像
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            COMMIT_SHA=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+          file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          file: Dockerfile-action
+          tags: |
+            woodchen/${{ env.IMAGE_NAME }}:latest
+            woodchen/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
