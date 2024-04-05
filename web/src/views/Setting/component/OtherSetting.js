@@ -7,12 +7,6 @@ import {
   OutlinedInput,
   Button,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  Divider,
-  Typography
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
@@ -28,11 +22,6 @@ const OtherSetting = () => {
     HomePageContent: ''
   });
   let [loading, setLoading] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateData, setUpdateData] = useState({
-    tag_name: '',
-    content: ''
-  });
 
   const getOptions = async () => {
     try {
@@ -240,27 +229,6 @@ const OtherSetting = () => {
           </Grid>
         </SubCard>
       </Stack>
-      <Dialog open={showUpdateModal} onClose={() => setShowUpdateModal(false)} fullWidth maxWidth={'md'}>
-        <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-          新版本：{updateData.tag_name}
-        </DialogTitle>
-        <Divider />
-        <DialogContent>
-          {' '}
-          <div dangerouslySetInnerHTML={{ __html: updateData.content }}></div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowUpdateModal(false)}>关闭</Button>
-          <Button
-            onClick={async () => {
-              setShowUpdateModal(false);
-              openGitHubRelease();
-            }}
-          >
-            去GitHub查看
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };
