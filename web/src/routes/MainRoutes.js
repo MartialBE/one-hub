@@ -16,6 +16,8 @@ const NotFoundView = Loadable(lazy(() => import('views/Error')));
 const Analytics = Loadable(lazy(() => import('views/Analytics')));
 const Telegram = Loadable(lazy(() => import('views/Telegram')));
 const Pricing = Loadable(lazy(() => import('views/Pricing')));
+const Midjourney = Loadable(lazy(() => import('views/Midjourney')));
+const ModelPrice = Loadable(lazy(() => import('views/ModelPrice')));
 
 // dashboard routing
 const Dashboard = Loadable(lazy(() => import('views/Dashboard')));
@@ -81,6 +83,14 @@ const MainRoutes = {
     {
       path: 'pricing',
       element: <Pricing />
+    },
+    {
+      path: 'midjourney',
+      element: <Midjourney />
+    },
+    {
+      path: 'model_price',
+      element: <ModelPrice />
     }
   ]
 };

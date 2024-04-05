@@ -37,6 +37,9 @@ var WeChatAuthEnabled = false
 var TurnstileCheckEnabled = false
 var RegisterEnabled = true
 
+// mj
+var MjNotifyEnabled = false
+
 var EmailDomainRestrictionEnabled = false
 var EmailDomainWhitelist = []string{
 	"gmail.com",
@@ -150,6 +153,7 @@ const (
 	ChannelTypeGroq        = 31
 	ChannelTypeBedrock     = 32
 	ChannelTypeLingyi      = 33
+	ChannelTypeMidjourney  = 34
 )
 
 var ChannelBaseURLs = []string{
@@ -187,6 +191,7 @@ var ChannelBaseURLs = []string{
 	"https://api.groq.com/openai",       //31
 	"",                                  //32
 	"https://api.lingyiwanwu.com",       //33
+	"",                                  //34
 }
 
 const (
