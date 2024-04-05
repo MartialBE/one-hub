@@ -30,6 +30,21 @@ jobs:
           username: woodchen
           password: ${{ secrets.ACCESS_TOKEN }}
 
+      - name: Build Frontend
+        env:
+          CI: ""
+        run: |
+          export VERSION=$(cat VERSION)
+          cd web
+          yarn install
+          REACT_APP_VERSION=$VERSION yarn run build
+          cd ..
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.18.0"
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
