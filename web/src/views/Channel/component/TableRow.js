@@ -37,7 +37,7 @@ import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@
 import { styled, alpha } from '@mui/material/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { copy } from 'utils/common';
+import { copy, renderQuota  } from 'utils/common';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -245,8 +245,10 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             handle_action={handleResponseTime}
           />
         </TableCell>
+        
         {/*  总已用额度 */}
-        <TableCell>{usedQuotaValue}</TableCell>
+        <TableCell>{renderQuota(item.used_quota)}</TableCell>
+
         <TableCell>
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
