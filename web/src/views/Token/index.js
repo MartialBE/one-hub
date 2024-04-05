@@ -200,7 +200,7 @@ export default function Token() {
                 headLabel={[
                   { id: 'name', label: '名称', disableSort: false },
                   { id: 'status', label: '状态', disableSort: false },
-                  { id: 'used_quota', label: '已用额度', disableSort: false },
+                  { id: 'used_quota', label: '总已用', disableSort: false },
                   { id: 'remain_quota', label: '剩余额度', disableSort: false },
                   { id: 'created_time', label: '创建时间', disableSort: false },
                   { id: 'expired_time', label: '过期时间', disableSort: false },

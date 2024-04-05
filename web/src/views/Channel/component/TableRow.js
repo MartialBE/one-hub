@@ -37,7 +37,7 @@ import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@
 import { styled, alpha } from '@mui/material/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { copy, renderQuota } from 'utils/common';
+import { copy } from 'utils/common';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -191,10 +191,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     await manageChannel(item.id, 'delete', '');
   };
 
-  // 获取localStorage中存储的quotaPerUnit，如果不存在则默认为500000
-  const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
-  // 总已用额度
-  const usedQuotaValue = (item.used_quota / quotaPerUnit || 0).toFixed(2);
   // 改变用户组的显示方式
   function renderCheckbox(checked, color) {
     return (
@@ -256,7 +252,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             {renderBalance(item.type, itemBalance)}
           </Tooltip>
         </TableCell>
-        <TableCell>{renderQuota(item.used_quota)}</TableCell>
+        
         <TableCell>
           <TextField
             id={`priority-${item.id}`}
