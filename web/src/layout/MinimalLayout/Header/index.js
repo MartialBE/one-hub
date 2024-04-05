@@ -73,7 +73,7 @@ const Header = () => {
               首页
             </Button>
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
-              关于
+              接口
             </Button>
             <Button
               variant="text"
@@ -150,7 +150,7 @@ const Header = () => {
                     </ListItemButton>
 
                     <ListItemButton component={Link} variant="text" to="/about">
-                      <ListItemText primary={<Typography variant="body2">关于</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">接口</Typography>} />
                     </ListItemButton>
                     <ListItemButton
                       variant="text"

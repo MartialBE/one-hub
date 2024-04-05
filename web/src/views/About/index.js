@@ -23,10 +23,10 @@ const About = () => {
         localStorage.setItem('about', aboutContent);
       } else {
         showError(message);
-        setAbout('加载关于内容失败...');
+        setAbout('加载接口内容失败...');
       }
     } catch (error) {
-      setAbout('加载关于内容失败...');
+      setAbout('加载接口内容失败...');
     }
 
     setAboutLoaded(true);
@@ -42,7 +42,7 @@ const About = () => {
         <>
           <Box>
             <Container sx={{ paddingTop: '40px' }}>
-              <MainCard title="关于">
+              <MainCard title="接口">
                 <Typography variant="body2">
                 </Typography>
               </MainCard>
