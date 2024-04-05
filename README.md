@@ -45,4 +45,3 @@ ghcr.io/martialbe/one-api
 请查看[文档](https://github.com/MartialBE/one-api/wiki)
 
 尽量不要使用我的镜像,因为我的镜像加了很多自己的东西. 
-

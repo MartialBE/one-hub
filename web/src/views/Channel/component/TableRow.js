@@ -37,7 +37,7 @@ import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@
 import { styled, alpha } from '@mui/material/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { copy } from 'utils/common';
+import { copy, renderQuota } from 'utils/common';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -256,6 +256,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             {renderBalance(item.type, itemBalance)}
           </Tooltip>
         </TableCell>
+        <TableCell>{renderQuota(item.used_quota)}</TableCell>
         <TableCell>
           <TextField
             id={`priority-${item.id}`}
@@ -280,7 +281,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </TableCell>
 
         <TableCell>
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
             <Button
               id="test-model-button"
               aria-controls={openTest ? 'test-model-menu' : undefined}
@@ -290,6 +291,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
               disableElevation
               onClick={handleTestModel}
               endIcon={<KeyboardArrowDownIcon />}
+              size="small"
             >
               测试
             </Button>
@@ -372,7 +374,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         ))}
       </StyledMenu>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={11}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={12}>
           <Collapse in={openRow} timeout="auto" unmountOnExit>
             <Grid container spacing={1}>
               <Grid item xs={12}>
