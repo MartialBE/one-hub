@@ -4,11 +4,11 @@ FROM node:18 as frontend-builder
 WORKDIR /web
 COPY web/package.json ./
 
-RUN npm install
+RUN npm install --fetch-timeout=120000
 
 COPY web/ ./
 
-RUN npm run build
+RUN npm config set registry https://registry.npm.taobao.org && npm run build
 
 
 # 阶段二：构建后端
