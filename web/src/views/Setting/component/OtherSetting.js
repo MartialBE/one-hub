@@ -17,7 +17,6 @@ import {
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
 import { API } from 'utils/api';
-import { marked } from 'marked';
 
 const OtherSetting = () => {
   let [inputs, setInputs] = useState({
@@ -109,41 +108,11 @@ const OtherSetting = () => {
     await updateOption(key, inputs[key]);
   };
 
-  const openGitHubRelease = () => {
-    window.location = 'https://github.com/woodchen-ink/one-api/releases/latest';
-  };
-
-  const checkUpdate = async () => {
-    try {
-      const res = await API.get('https://api.github.com/repos/woodchen-ink/one-api/releases/latest');
-      const { tag_name, body } = res.data;
-      if (tag_name === process.env.REACT_APP_VERSION) {
-        showSuccess(`已是最新版本：${tag_name}`);
-      } else {
-        setUpdateData({
-          tag_name: tag_name,
-          content: marked.parse(body)
-        });
-        setShowUpdateModal(true);
-      }
-    } catch (error) {
-      return;
-    }
-  };
-
   return (
     <>
       <Stack spacing={2}>
         <SubCard title="通用设置">
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
-            <Grid xs={12}>
-              <Typography variant="h6" gutterBottom>
-                当前版本：{process.env.REACT_APP_VERSION}
-              </Typography>
-              <Button variant="contained" onClick={checkUpdate}>
-                检查更新
-              </Button>
-            </Grid>
             <Grid xs={12}>
               <FormControl fullWidth>
                 <TextField
