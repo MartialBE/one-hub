@@ -1,15 +1,17 @@
-# 前端构建阶段
+# 阶段一：构建前端
 FROM node:18 as frontend-builder
 
 WORKDIR /web
 COPY web/package.json web/yarn.lock ./
 
+# 使用yarn代替npm进行依赖安装
 RUN yarn install
 
 COPY web/ ./
+COPY ./VERSION ./
 
-RUN DISABLE_ESLINT_PLUGIN='true' yarn run build
-
+# 直接使用文件中的VERSION信息进行构建
+RUN DISABLE_ESLINT_PLUGIN='true' REACT_APP_VERSION=$(cat VERSION) yarn run build
 
 # 阶段二：构建后端
 FROM golang AS backend-builder
@@ -25,8 +27,8 @@ RUN go mod download
 COPY . .
 COPY --from=frontend-builder /web/build ./web/build
 
-# 修改构建命令，移除关于VERSION的引用
-RUN go build -ldflags "-s -w -extldflags '-static'" -o one-api
+# 直接在构建命令中使用文件中的VERSION信息
+RUN go build -ldflags "-s -w -X 'one-api/common.Version=$(cat VERSION)' -extldflags '-static'" -o one-api
 
 # 阶段三：准备最终镜像
 FROM alpine
