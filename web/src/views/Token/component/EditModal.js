@@ -23,7 +23,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import {  showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
+import { showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
 import { API } from 'utils/api';
 require('dayjs/locale/zh-cn');
 
@@ -41,9 +41,9 @@ const validationSchema = Yup.object().shape({
 const originInputs = {
   is_edit: false,
   name: '默认key',
-  remain_quota: 100,
+  remain_quota: 0,
   expired_time: -1,
-  unlimited_quota: false
+  unlimited_quota: true
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk }) => {
@@ -54,7 +54,8 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
     setSubmitting(true);
 
     // values.remain_quota = parseInt(values.remain_quota);
-    values.remain_quota = parseInt(values.remain_quota)* quotaPerUnit;
+    // 确保使用parseFloat确保处理小数
+    values.remain_quota = parseFloat(values.remain_quota) * quotaPerUnit;
     let res;
 
     try {
@@ -88,6 +89,10 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
       const { success, message, data } = res.data;
       if (success) {
         data.is_edit = true;
+        // 如果data.remain_quota是数字，则转换为美金单位
+        if (typeof data.remain_quota === 'number') {
+          data.remain_quota = data.remain_quota / quotaPerUnit;
+        }
         setInputs(data);
       } else {
         showError(message);
@@ -151,7 +156,11 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                         }
                       }}
                       onChange={(newValue) => {
-                        setFieldValue('expired_time', newValue.unix());
+                        //在 Formik 中处理 expired_time 时，应该避免在值未更改的情况下更新状态，这可以通过比较新旧值来实现
+                        const newUnix = newValue.unix();
+                        if (values.expired_time !== newUnix) {
+                          setFieldValue('expired_time', newUnix);
+                        }
                       }}
                       slotProps={{
                         actionBar: {
@@ -183,7 +192,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                 <OutlinedInput
                   id="channel-remain_quota-label"
                   label="额度"
-                  type="number"
+                  type="text" // 支持输入小数
                   value={values.remain_quota}
                   name="remain_quota"
                   // endAdornment={<InputAdornment position="end">{renderQuotaWithPrompt(values.remain_quota)}</InputAdornment>}

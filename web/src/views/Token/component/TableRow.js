@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import {
   Popover,
@@ -35,6 +35,21 @@ function createMenu(menuItems) {
       ))}
     </>
   );
+}
+
+function statusInfo(status) {
+  switch (status) {
+    case 1:
+      return '已启用';
+    case 2:
+      return '已禁用';
+    case 3:
+      return '已过期';
+    case 4:
+      return '已耗尽';
+    default:
+      return '未知';
+  }
 }
 
 export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId }) {
@@ -96,6 +111,10 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     }
   ]);
 
+  useEffect(() => {
+    setStatusSwitch(item.status);
+  }, [item.status]);
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -104,18 +123,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
         <TableCell>
           <Tooltip
             title={(() => {
-              switch (statusSwitch) {
-                case 1:
-                  return '已启用';
-                case 2:
-                  return '已禁用';
-                case 3:
-                  return '已过期';
-                case 4:
-                  return '已耗尽';
-                default:
-                  return '未知';
-              }
+              return statusInfo(statusSwitch);
             })()}
             placement="top"
           >
@@ -137,7 +145,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
         <TableCell>{item.expired_time === -1 ? '永不过期' : timestamp2string(item.expired_time)}</TableCell>
 
         <TableCell>
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
+          <Stack direction="row" justifyContent="left" alignItems="center" spacing={1}>
             <ButtonGroup size="small" aria-label="split button">
               <Button
                 color="primary"
