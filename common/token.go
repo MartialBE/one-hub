@@ -100,7 +100,8 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 						}
 						imageTokens, err := countImageTokens(url, detail)
 						if err != nil {
-							SysError("error counting image tokens: " + err.Error())
+							//Due to the excessive length of the error information, only extract and record the most critical part.
+							SysError("error counting image tokens: " + err.Error()) 
 						} else {
 							tokenNum += imageTokens
 						}
@@ -127,6 +128,9 @@ const (
 // https://platform.openai.com/docs/guides/vision/calculating-costs
 // https://github.com/openai/openai-cookbook/blob/05e3f9be4c7a2ae7ecf029a7c32065b024730ebe/examples/How_to_count_tokens_with_tiktoken.ipynb
 func countImageTokens(url string, detail string) (_ int, err error) {
+	if !strings.HasPrefix(url, "data:image") {
+        return 1000, errors.New("invalid file type")
+    } 
 	var fetchSize = true
 	var width, height int
 	// Reference: https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
