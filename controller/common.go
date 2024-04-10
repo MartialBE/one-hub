@@ -79,8 +79,8 @@ func DisableChannel(channelId int, channelName string, reason string, sendNotify
 		return
 	}
 
-	subject := fmt.Sprintf("通道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("通道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
+	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
 	notify.Send(subject, content)
 }
 
@@ -91,8 +91,8 @@ func EnableChannel(channelId int, channelName string, sendNotify bool) {
 		return
 	}
 
-	subject := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
-	content := fmt.Sprintf("通道「%s」（#%d）已被启用", channelName, channelId)
+	subject := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
+	content := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
 	notify.Send(subject, content)
 }
 

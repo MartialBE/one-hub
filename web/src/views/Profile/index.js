@@ -134,7 +134,7 @@ export default function Profile() {
                 <IconBrandTelegram /> {inputs.telegram_id || '未绑定'}
               </Label>
             </Stack>
-            <SubCard title="个人信息">
+            <SubCard title="个人信息" >
               <Grid container spacing={2}>
                 <Grid xs={12}>
                   <FormControl fullWidth variant="outlined">
