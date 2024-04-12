@@ -153,7 +153,7 @@ func testAllChannels(isNotify bool) error {
 			time.Sleep(common.RequestInterval)
 
 			isChannelEnabled := channel.Status == common.ChannelStatusEnabled
-			sendMessage += fmt.Sprintf("**通道 %s - #%d - %s** : \n\n", common.EscapeMarkdownText(channel.Name), channel.Id, channel.StatusToStr())
+			sendMessage += fmt.Sprintf("**渠道 %s - #%d - %s** : \n\n", common.EscapeMarkdownText(channel.Name), channel.Id, channel.StatusToStr())
 			tik := time.Now()
 			err, openaiErr := testChannel(channel, "")
 			tok := time.Now()
