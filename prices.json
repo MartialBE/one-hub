@@ -880,5 +880,68 @@
     "channel_type": 34,
     "input": 25,
     "output": 25
+  },
+  {
+    "model": "@cf/bytedance/stable-diffusion-xl-lightning",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@cf/lykon/dreamshaper-8-lcm",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@cf/openai/whisper",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@cf/qwen/qwen1.5-14b-chat-awq",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@cf/qwen/qwen1.5-7b-chat-awq",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@hf/google/gemma-7b-it",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@hf/thebloke/deepseek-coder-6.7b-base-awq",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "@hf/thebloke/llama-2-13b-chat-awq",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
   }
 ]
