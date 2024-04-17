@@ -104,6 +104,10 @@ func InitDB() (err error) {
 			return nil
 		}
 		common.SysLog("database migration started")
+		// err = MigrateDB(DB)
+		// if err != nil {
+		// 	return err
+		// }
 		err = db.AutoMigrate(&Channel{})
 		if err != nil {
 			return err
@@ -144,6 +148,10 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
+		err = db.AutoMigrate(&ChatCache{})
+		if err != nil {
+			return err
+		}
 		common.SysLog("database migrated")
 		err = createRootAccountIfNeed()
 		return err
@@ -152,6 +160,24 @@ func InitDB() (err error) {
 	}
 	return err
 }
+
+// func MigrateDB(db *gorm.DB) error {
+// 	if DB.Migrator().HasConstraint(&Price{}, "model") {
+// 		fmt.Println("----Price model has constraint----")
+// 		// 如果是主键，移除主键约束
+// 		err := db.Migrator().DropConstraint(&Price{}, "model")
+// 		if err != nil {
+// 			return err
+// 		}
+// 		// 修改字段长度
+// 		err = db.Migrator().AlterColumn(&Price{}, "model")
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+
+// 	return nil
+// }
 
 func CloseDB() error {
 	sqlDB, err := DB.DB()

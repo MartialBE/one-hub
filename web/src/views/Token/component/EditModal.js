@@ -17,6 +17,7 @@ import {
   OutlinedInput,
   // InputAdornment,
   Switch,
+  FormControlLabel,
   FormHelperText
 } from '@mui/material';
 
@@ -25,6 +26,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
 import { API } from 'utils/api';
+import { useSelector } from 'react-redux';
 require('dayjs/locale/zh-cn');
 
 
@@ -43,12 +45,14 @@ const originInputs = {
   name: '默认key',
   remain_quota: 0,
   expired_time: -1,
-  unlimited_quota: true
+  unlimited_quota: true,
+  chat_cache: false
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk }) => {
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
+  const siteInfo = useSelector((state) => state.siteInfo);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -176,17 +180,22 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                   )}
                 </FormControl>
               )}
-              <Switch
-                checked={values.expired_time === -1}
-                onClick={() => {
-                  if (values.expired_time === -1) {
-                    setFieldValue('expired_time', Math.floor(Date.now() / 1000));
-                  } else {
-                    setFieldValue('expired_time', -1);
-                  }
-                }}
-              />{' '}
-              永不过期
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={values.expired_time === -1}
+                    onClick={() => {
+                      if (values.expired_time === -1) {
+                        setFieldValue('expired_time', Math.floor(Date.now() / 1000));
+                      } else {
+                        setFieldValue('expired_time', -1);
+                      }
+                    }}
+                  />
+                }
+                label="永不过期"
+              />
+
               <FormControl fullWidth error={Boolean(touched.remain_quota && errors.remain_quota)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-remain_quota-label">额度</InputLabel>
                 <OutlinedInput
@@ -208,13 +217,32 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                   </FormHelperText>
                 )}
               </FormControl>
-              <Switch
-                checked={values.unlimited_quota === true}
-                onClick={() => {
-                  setFieldValue('unlimited_quota', !values.unlimited_quota);
-                }}
-              />{' '}
-              无限额度
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values.unlimited_quota === true}
+                      onClick={() => {
+                        setFieldValue('unlimited_quota', !values.unlimited_quota);
+                      }}
+                    />
+                  }
+                  label="无限额度"
+                />
+                {siteInfo.chat_cache_enabled && (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={values.chat_cache}
+                        onClick={() => {
+                          setFieldValue('chat_cache', !values.chat_cache);
+                        }}
+                      />
+                    }
+                    label="是否开启缓存(开启后，将会缓存聊天记录，以减少消费)"
+                  />
+                )}
+              </FormControl>
               <DialogActions>
                 <Button onClick={onCancel}>取消</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
