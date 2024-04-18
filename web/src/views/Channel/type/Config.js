@@ -163,7 +163,8 @@ const typeConfig = {
       models: ['tts-1', 'tts-1-hd']
     },
     prompt: {
-      test_model: ''
+      test_model: '',
+      base_url: '请输入请求地址，例如：https://eastasia.tts.speech.microsoft.com'
     }
   },
   27: {
@@ -283,6 +284,22 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'Cloudflare AI'
+  },
+  36: {
+    input: {
+      models: ['command-r', 'command-r-plus'],
+      test_model: 'command-r'
+    },
+    modelGroup: 'Cohere'
+  },
+  37: {
+    input: {
+      models: ['sd3', 'sd3-turbo', 'stable-image-core']
+    },
+    prompt: {
+      test_model: ''
+    },
+    modelGroup: 'Stability AI'
   }
 };
 
