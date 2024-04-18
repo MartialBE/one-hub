@@ -26,5 +26,7 @@ func init() {
 		common.ChannelTypeLingyi:       "Lingyiwanwu",
 		common.ChannelTypeMidjourney:   "Midjourney",
 		common.ChannelTypeCloudflareAI: "Cloudflare AI",
+		common.ChannelTypeCohere:       "Cohere",
+		common.ChannelTypeStabilityAI:  "Stability AI",
 	}
 }

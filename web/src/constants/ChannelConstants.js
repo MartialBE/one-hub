@@ -146,6 +146,20 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: ''
   },
+  36: {
+    key: 36,
+    text: 'Cohere',
+    value: 36,
+    color: 'default',
+    url: ''
+  },
+  37: {
+    key: 37,
+    text: 'Stability AI',
+    value: 37,
+    color: 'default',
+    url: ''
+  },
   24: {
     key: 24,
     text: 'Azure Speech',

@@ -12,6 +12,7 @@ import (
 	"one-api/providers/bedrock"
 	"one-api/providers/claude"
 	"one-api/providers/cloudflareAI"
+	"one-api/providers/cohere"
 	"one-api/providers/deepseek"
 	"one-api/providers/gemini"
 	"one-api/providers/groq"
@@ -20,6 +21,7 @@ import (
 	"one-api/providers/mistral"
 	"one-api/providers/openai"
 	"one-api/providers/palm"
+	"one-api/providers/stabilityAI"
 	"one-api/providers/tencent"
 	"one-api/providers/xunfei"
 	"one-api/providers/zhipu"
@@ -56,6 +58,8 @@ func init() {
 	providerFactories[common.ChannelTypeBedrock] = bedrock.BedrockProviderFactory{}
 	providerFactories[common.ChannelTypeMidjourney] = midjourney.MidjourneyProviderFactory{}
 	providerFactories[common.ChannelTypeCloudflareAI] = cloudflareAI.CloudflareAIProviderFactory{}
+	providerFactories[common.ChannelTypeCohere] = cohere.CohereProviderFactory{}
+	providerFactories[common.ChannelTypeStabilityAI] = stabilityAI.StabilityAIProviderFactory{}
 
 }
 
