@@ -943,5 +943,40 @@
     "channel_type": 35,
     "input": 0,
     "output": 0
+  },
+  {
+    "model": "command-r",
+    "type": "tokens",
+    "channel_type": 36,
+    "input": 0.25,
+    "output": 0.75
+  },
+  {
+    "model": "command-r-plus",
+    "type": "tokens",
+    "channel_type": 36,
+    "input": 1.5,
+    "output": 7.5
+  },
+  {
+    "model": "sd3",
+    "type": "tokens",
+    "channel_type": 37,
+    "input": 32.5,
+    "output": 32.5
+  },
+  {
+    "model": "sd3-turbo",
+    "type": "tokens",
+    "channel_type": 37,
+    "input": 20,
+    "output": 20
+  },
+  {
+    "model": "stable-image-core",
+    "type": "tokens",
+    "channel_type": 37,
+    "input": 15,
+    "output": 15
   }
 ]
