@@ -728,39 +728,39 @@
     "output": 0.35
   },
   {
-    "model": "open-mixtral-8x22b",
-    "type": "tokens",
-    "channel_type": 30,
-    "input": 4,
-    "output": 12
-  },
-  {
     "model": "gemma-7b-it",
-    "type": "tokens",
+    "type": "times",
     "channel_type": 31,
-    "input": 0.05,
-    "output": 0.05
+    "input": 0,
+    "output": 0
   },
   {
     "model": "llama2-70b-4096",
-    "type": "tokens",
+    "type": "times",
     "channel_type": 31,
-    "input": 0.35,
-    "output": 0.4
-  },
-  {
-    "model": "llama2-7b-2048",
-    "type": "tokens",
-    "channel_type": 31,
-    "input": 0.05,
-    "output": 0.05
+    "input": 0,
+    "output": 0
   },
   {
     "model": "mixtral-8x7b-32768",
-    "type": "tokens",
+    "type": "times",
     "channel_type": 31,
-    "input": 0.135,
-    "output": 0.135
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "llama3-8b-8192",
+    "type": "times",
+    "channel_type": 31,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "llama3-70b-8192",
+    "type": "times",
+    "channel_type": 31,
+    "input": 0,
+    "output": 0
   },
   {
     "model": "yi-34b-chat-0205",
