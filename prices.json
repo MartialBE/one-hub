@@ -728,6 +728,13 @@
     "output": 0.35
   },
   {
+    "model": "open-mixtral-8x22b",
+    "type": "tokens",
+    "channel_type": 30,
+    "input": 4,
+    "output": 12
+  },
+  {
     "model": "gemma-7b-it",
     "type": "tokens",
     "channel_type": 31,
