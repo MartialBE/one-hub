@@ -945,6 +945,13 @@
     "output": 0
   },
   {
+    "model": "@cf/meta/llama-3-8b-instruct",
+    "type": "tokens",
+    "channel_type": 35,
+    "input": 0,
+    "output": 0
+  },
+  {
     "model": "command-r",
     "type": "tokens",
     "channel_type": 36,
