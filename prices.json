@@ -999,5 +999,12 @@
     "channel_type": 37,
     "input": 15,
     "output": 15
+  },
+  {
+    "model": "coze-*",
+    "type": "times",
+    "channel_type": 38,
+    "input": 0,
+    "output": 0
   }
 ]
