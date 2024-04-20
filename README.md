@@ -72,6 +72,7 @@ ghcr.io/martialbe/one-api
 | [Midjourney](https://www.midjourney.com/)                             | -                        | -          | -      | -           | [midjourney-proxy](https://github.com/novicezk/midjourney-proxy) |
 | [Cohere](https://cohere.com/)                                         | ✅                       | -          | -      | -           | -                                                                |
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                        | -          | -      | ⚠️ 图片生成 | -                                                                |
+| [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                       | -          | -      | -           | -                                                                |
 
 ## 感谢
 

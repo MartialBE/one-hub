@@ -137,33 +137,45 @@ const (
 )
 
 const (
-	ChannelTypeUnknown      = 0
-	ChannelTypeOpenAI       = 1
-	ChannelTypeAzure        = 3
-	ChannelTypeCustom       = 8
-	ChannelTypeAILS         = 9
-	ChannelTypePaLM         = 11
-	ChannelTypeAnthropic    = 14
-	ChannelTypeBaidu        = 15
-	ChannelTypeZhipu        = 16
-	ChannelTypeAli          = 17
-	ChannelTypeXunfei       = 18
-	ChannelType360          = 19
-	ChannelTypeTencent      = 23
-	ChannelTypeAzureSpeech  = 24
-	ChannelTypeGemini       = 25
-	ChannelTypeBaichuan     = 26
-	ChannelTypeMiniMax      = 27
-	ChannelTypeDeepseek     = 28
-	ChannelTypeMoonshot     = 29
-	ChannelTypeMistral      = 30
-	ChannelTypeGroq         = 31
-	ChannelTypeBedrock      = 32
-	ChannelTypeLingyi       = 33
-	ChannelTypeMidjourney   = 34
-	ChannelTypeCloudflareAI = 35
-	ChannelTypeCohere       = 36
-	ChannelTypeStabilityAI  = 37
+	ChannelTypeUnknown        = 0
+	ChannelTypeOpenAI         = 1
+	ChannelTypeAPI2D          = 2
+	ChannelTypeAzure          = 3
+	ChannelTypeCloseAI        = 4
+	ChannelTypeOpenAISB       = 5
+	ChannelTypeOpenAIMax      = 6
+	ChannelTypeOhMyGPT        = 7
+	ChannelTypeCustom         = 8
+	ChannelTypeAILS           = 9
+	ChannelTypeAIProxy        = 10
+	ChannelTypePaLM           = 11
+	ChannelTypeAPI2GPT        = 12
+	ChannelTypeAIGC2D         = 13
+	ChannelTypeAnthropic      = 14
+	ChannelTypeBaidu          = 15
+	ChannelTypeZhipu          = 16
+	ChannelTypeAli            = 17
+	ChannelTypeXunfei         = 18
+	ChannelType360            = 19
+	ChannelTypeOpenRouter     = 20
+	ChannelTypeAIProxyLibrary = 21
+	ChannelTypeFastGPT        = 22
+	ChannelTypeTencent        = 23
+	ChannelTypeAzureSpeech    = 24
+	ChannelTypeGemini         = 25
+	ChannelTypeBaichuan       = 26
+	ChannelTypeMiniMax        = 27
+	ChannelTypeDeepseek       = 28
+	ChannelTypeMoonshot       = 29
+	ChannelTypeMistral        = 30
+	ChannelTypeGroq           = 31
+	ChannelTypeBedrock        = 32
+	ChannelTypeLingyi         = 33
+	ChannelTypeMidjourney     = 34
+	ChannelTypeCloudflareAI   = 35
+	ChannelTypeCohere         = 36
+	ChannelTypeStabilityAI    = 37
+	ChannelTypeCoze           = 38
 )
 
 var ChannelBaseURLs = []string{
@@ -205,6 +217,7 @@ var ChannelBaseURLs = []string{
 	"",                                  //35
 	"https://api.cohere.ai/v1",          //36
 	"https://api.stability.ai/v2beta",   //37
+	"https://api.coze.com/open_api",     //38
 }
 
 const (
