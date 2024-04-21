@@ -37,6 +37,7 @@ import Github from 'assets/images/icons/github.svg';
 import Wechat from 'assets/images/icons/wechat.svg';
 import Lark from 'assets/images/icons/lark.svg';
 import { onGitHubOAuthClicked, onLarkOAuthClicked } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
@@ -47,7 +48,7 @@ const LoginForm = ({ ...others }) => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
   const customization = useSelector((state) => state.customization);
   const siteInfo = useSelector((state) => state.siteInfo);
-  // const [checked, setChecked] = useState(true);
+  const { t } = useTranslation('login');
 
   let tripartiteLogin = false;
   if (siteInfo.github_oauth || siteInfo.wechat_login || siteInfo.lark_client_id) {
@@ -91,7 +92,7 @@ const LoginForm = ({ ...others }) => {
                   <Box sx={{ mr: { xs: 1, sm: 2, width: 20 }, display: 'flex', alignItems: 'center' }}>
                     <img src={Github} alt="github" width={25} height={25} style={{ marginRight: matchDownSM ? 8 : 16 }} />
                   </Box>
-                  使用 Github 登录
+                  {t('login_with_github')}
                 </Button>
               </AnimateButton>
             </Grid>
@@ -112,7 +113,7 @@ const LoginForm = ({ ...others }) => {
                   <Box sx={{ mr: { xs: 1, sm: 2, width: 20 }, display: 'flex', alignItems: 'center' }}>
                     <img src={Wechat} alt="Wechat" width={25} height={25} style={{ marginRight: matchDownSM ? 8 : 16 }} />
                   </Box>
-                  使用 Wechat 登录
+                  {t('login_with_wechat')}
                 </Button>
               </AnimateButton>
               <WechatModal open={openWechat} handleClose={handleWechatClose} wechatLogin={wechatLogin} qrCode={siteInfo.wechat_qrcode} />
@@ -179,8 +180,8 @@ const LoginForm = ({ ...others }) => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('用户名/邮箱是必填项'),
-          password: Yup.string().max(255).required('密码是必填项')
+          username: Yup.string().max(255).required(t('user_email_require')),
+          password: Yup.string().max(255).required(t('password_require'))
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           const { success, message } = await login(values.username, values.password);
@@ -198,7 +199,7 @@ const LoginForm = ({ ...others }) => {
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-username-login">用户名/邮箱</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-username-login">{t('username_or_email')}</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-username-login"
                 type="text"
@@ -206,7 +207,7 @@ const LoginForm = ({ ...others }) => {
                 name="username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                label="用户名/邮箱"
+                label={t('username_or_email')}
                 inputProps={{ autoComplete: 'username' }}
               />
               {touched.username && errors.username && (
@@ -217,7 +218,7 @@ const LoginForm = ({ ...others }) => {
             </FormControl>
 
             <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-password-login">密码</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-password-login">{t('password')}</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-login"
                 type={showPassword ? 'text' : 'password'}
@@ -238,7 +239,7 @@ const LoginForm = ({ ...others }) => {
                     </IconButton>
                   </InputAdornment>
                 }
-                label="Password"
+                label={t('password')}
               />
               {touched.password && errors.password && (
                 <FormHelperText error id="standard-weight-helper-text-password-login">
@@ -260,7 +261,7 @@ const LoginForm = ({ ...others }) => {
                 color="primary"
                 sx={{ textDecoration: 'none', cursor: 'pointer' }}
               >
-                忘记密码?
+                {t('forgot_password')}
               </Typography>
             </Stack>
             {errors.submit && (
@@ -272,7 +273,7 @@ const LoginForm = ({ ...others }) => {
             <Box sx={{ mt: 2 }}>
               <AnimateButton>
                 <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                  登录
+                  {t('login')}
                 </Button>
               </AnimateButton>
             </Box>

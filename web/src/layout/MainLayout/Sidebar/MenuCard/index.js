@@ -3,37 +3,11 @@ import { useSelector } from 'react-redux';
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
-import {
-  Avatar,
-  Card,
-  CardContent,
-  // Grid,
-  // LinearProgress,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Typography
-  // linearProgressClasses
-} from '@mui/material';
+import { Avatar, Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 
-// assets
-// import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
-
-// styles
-// const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-//   height: 10,
-//   borderRadius: 30,
-//   [`&.${linearProgressClasses.colorPrimary}`]: {
-//     backgroundColor: '#fff'
-//   },
-//   [`& .${linearProgressClasses.bar}`]: {
-//     borderRadius: 5,
-//     backgroundColor: theme.palette.primary.main
-//   }
-// }));
+import { useTranslation } from 'react-i18next';
 
 const CardStyle = styled(Card)(({ theme }) => ({
   background: theme.typography.menuChip.background,
@@ -88,6 +62,7 @@ const MenuCard = () => {
   const theme = useTheme();
   const account = useSelector((state) => state.account);
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   return (
     <CardStyle>
@@ -117,7 +92,7 @@ const MenuCard = () => {
                   {account.user?.username}
                 </Typography>
               }
-              secondary={<Typography variant="caption"> 欢迎回来 </Typography>}
+              secondary={<Typography variant="caption"> {t('welcome')} </Typography>}
             />
           </ListItem>
         </List>

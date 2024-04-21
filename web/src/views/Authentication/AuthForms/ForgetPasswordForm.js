@@ -16,12 +16,14 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 
 // assets
 import { showError, showInfo, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
 const ForgetPasswordForm = ({ ...others }) => {
   const theme = useTheme();
   const siteInfo = useSelector((state) => state.siteInfo);
+  const { t } = useTranslation('login');
 
   const [sendEmail, setSendEmail] = useState(false);
   const [turnstileEnabled, setTurnstileEnabled] = useState(false);
@@ -40,7 +42,7 @@ const ForgetPasswordForm = ({ ...others }) => {
     setDisableButton(true);
     setSubmitting(true);
     if (turnstileEnabled && turnstileToken === '') {
-      showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+      showInfo(t('check_turnstile'));
       setSubmitting(false);
       return;
     }
@@ -48,13 +50,13 @@ const ForgetPasswordForm = ({ ...others }) => {
       const res = await API.get(`/api/reset_password?email=${values.email}&turnstile=${turnstileToken}`);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('重置邮件发送成功，请检查邮箱！');
+        showSuccess(t('reset_email_sent'));
         setSendEmail(true);
       } else {
         handleFailure(message);
       }
     } catch (error) {
-      handleFailure('服务器错误');
+      handleFailure(t('error.server_error'));
     }
     setSubmitting(false);
   };
@@ -83,7 +85,7 @@ const ForgetPasswordForm = ({ ...others }) => {
     <>
       {sendEmail ? (
         <Typography variant="h3" padding={'20px'}>
-          重置邮件发送成功，请检查邮箱！
+          {t('reset_email_sent')}
         </Typography>
       ) : (
         <Formik
@@ -91,14 +93,14 @@ const ForgetPasswordForm = ({ ...others }) => {
             email: ''
           }}
           validationSchema={Yup.object().shape({
-            email: Yup.string().email('必须是有效的Email地址').max(255).required('Email是必填项')
+            email: Yup.string().email(t('email_not_valid')).max(255).required(t('email_require'))
           })}
           onSubmit={submit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
             <form noValidate onSubmit={handleSubmit} {...others}>
               <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                <InputLabel htmlFor="outlined-adornment-email-register">Email</InputLabel>
+                <InputLabel htmlFor="outlined-adornment-email-register">{t('email')}</InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-email-register"
                   type="text"
@@ -137,7 +139,7 @@ const ForgetPasswordForm = ({ ...others }) => {
                     variant="contained"
                     color="primary"
                   >
-                    {disableButton ? `重试 (${countdown})` : '提交'}
+                    {disableButton ? t('forgot_password_retry', { count: countdown }) : t('submit')}
                   </Button>
                 </AnimateButton>
               </Box>

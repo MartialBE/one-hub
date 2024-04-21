@@ -19,6 +19,10 @@ import StatusProvider from 'contexts/StatusContext';
 import { SnackbarProvider } from 'notistack';
 import CopySnackbar from 'ui-component/Snackbar';
 
+// i18n
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
+
 // ==============================|| APP ||============================== //
 
 const App = () => {
@@ -34,23 +38,25 @@ const App = () => {
 
   return (
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={themes(customization)}>
-        <CssBaseline />
-        <NavigationScroll>
-          <SnackbarProvider
-            autoHideDuration={5000}
-            maxSnack={3}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            Components={{ copy: CopySnackbar }}
-          >
-            <UserProvider>
-              <StatusProvider>
-                <Routes />
-              </StatusProvider>
-            </UserProvider>
-          </SnackbarProvider>
-        </NavigationScroll>
-      </ThemeProvider>
+      <I18nextProvider i18n={i18n} defaultNS={'common'}>
+        <ThemeProvider theme={themes(customization)}>
+          <CssBaseline />
+          <NavigationScroll>
+            <SnackbarProvider
+              autoHideDuration={5000}
+              maxSnack={3}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              Components={{ copy: CopySnackbar }}
+            >
+              <UserProvider>
+                <StatusProvider>
+                  <Routes />
+                </StatusProvider>
+              </UserProvider>
+            </SnackbarProvider>
+          </NavigationScroll>
+        </ThemeProvider>
+      </I18nextProvider>
     </StyledEngineProvider>
   );
 };

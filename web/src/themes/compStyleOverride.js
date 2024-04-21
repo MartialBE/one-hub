@@ -16,13 +16,11 @@ export default function componentStyleOverrides(theme) {
     MuiAutocomplete: {
       styleOverrides: {
         popper: {
-          // 继承 MuiPopover-root
           boxShadow: '0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)',
           borderRadius: '12px',
           color: '#364152'
         },
         listbox: {
-          // 继承 MuiPopover-root
           padding: '0px',
           paddingTop: '8px',
           paddingBottom: '8px'

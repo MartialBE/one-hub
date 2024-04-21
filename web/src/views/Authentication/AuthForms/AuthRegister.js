@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import useRegister from 'hooks/useRegister';
 import Turnstile from 'react-turnstile';
 import { useSearchParams } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -32,6 +31,7 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { showError, showInfo } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
@@ -49,6 +49,7 @@ const RegisterForm = ({ ...others }) => {
 
   const [strength, setStrength] = useState(0);
   const [level, setLevel] = useState();
+  const { t } = useTranslation('login');
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -66,11 +67,11 @@ const RegisterForm = ({ ...others }) => {
 
   const handleSendCode = async (email) => {
     if (email === '') {
-      showError('请输入邮箱');
+      showError(t('input_email'));
       return;
     }
     if (turnstileEnabled && turnstileToken === '') {
-      showError('请稍后几秒重试，Turnstile 正在检查用户环境！');
+      showError(t('check_turnstile'));
       return;
     }
 
@@ -106,17 +107,17 @@ const RegisterForm = ({ ...others }) => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('用户名是必填项'),
-          password: Yup.string().max(255).required('密码是必填项'),
+          username: Yup.string().max(255).required(t('username_require')),
+          password: Yup.string().max(255).required(t('password_require')),
           confirmPassword: Yup.string()
-            .required('确认密码是必填项')
-            .oneOf([Yup.ref('password'), null], '两次输入的密码不一致'),
-          email: showEmailVerification ? Yup.string().email('必须是有效的Email地址').max(255).required('Email是必填项') : Yup.mixed(),
-          verification_code: showEmailVerification ? Yup.string().max(255).required('验证码是必填项') : Yup.mixed()
+            .required(t('confirm_password_require'))
+            .oneOf([Yup.ref('password'), null], t('password_not_match')),
+          email: showEmailVerification ? Yup.string().email(t('email_not_valid')).max(255).required(t('email_require')) : Yup.mixed(),
+          verification_code: showEmailVerification ? Yup.string().max(255).required(t('verification_code_require')) : Yup.mixed()
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           if (turnstileEnabled && turnstileToken === '') {
-            showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+            showInfo(t('check_turnstile'));
             setSubmitting(false);
             return;
           }
@@ -135,7 +136,7 @@ const RegisterForm = ({ ...others }) => {
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-username-register">用户名</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-username-register">{t('username')}</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-username-register"
                 type="text"
@@ -153,13 +154,13 @@ const RegisterForm = ({ ...others }) => {
             </FormControl>
 
             <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-password-register">密码</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-password-register">{t('password')}</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-register"
                 type={showPassword ? 'text' : 'password'}
                 value={values.password}
                 name="password"
-                label="Password"
+                label={t('password')}
                 onBlur={handleBlur}
                 onChange={(e) => {
                   handleChange(e);
@@ -192,13 +193,13 @@ const RegisterForm = ({ ...others }) => {
               error={Boolean(touched.confirmPassword && errors.confirmPassword)}
               sx={{ ...theme.typography.customInput }}
             >
-              <InputLabel htmlFor="outlined-adornment-confirm-password-register">确认密码</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-confirm-password-register">{t('confirm_password')}</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-confirm-password-register"
                 type={showPassword ? 'text' : 'password'}
                 value={values.confirmPassword}
                 name="confirmPassword"
-                label="Confirm Password"
+                label={t('confirm_password')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 inputProps={{}}
@@ -241,7 +242,7 @@ const RegisterForm = ({ ...others }) => {
                     endAdornment={
                       <InputAdornment position="end">
                         <Button variant="contained" color="primary" onClick={() => handleSendCode(values.email)}>
-                          发送验证码
+                          {t('send_verification_code')}
                         </Button>
                       </InputAdornment>
                     }
@@ -258,7 +259,7 @@ const RegisterForm = ({ ...others }) => {
                   error={Boolean(touched.verification_code && errors.verification_code)}
                   sx={{ ...theme.typography.customInput }}
                 >
-                  <InputLabel htmlFor="outlined-adornment-verification_code-register">验证码</InputLabel>
+                  <InputLabel htmlFor="outlined-adornment-verification_code-register">{t('verification_code')}</InputLabel>
                   <OutlinedInput
                     id="outlined-adornment-verification_code-register"
                     type="text"
@@ -296,7 +297,7 @@ const RegisterForm = ({ ...others }) => {
             <Box sx={{ mt: 2 }}>
               <AnimateButton>
                 <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                  注册
+                  {t('register')}
                 </Button>
               </AnimateButton>
             </Box>

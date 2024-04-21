@@ -1,0 +1,16 @@
+{
+  "home": "首页",
+  "about": "关于",
+  "panel": "控制台",
+  "login": "登录",
+  "loginout": "注销",
+  "welcome": "欢迎回来",
+  "settings": "设置",
+  "login_success": "登录成功！",
+  "bind_success": "绑定成功！",
+  "new_version": "新版本可用：{{vison}}，请使用快捷键 Shift + F5 刷新页面",
+
+  "error": {
+    "server_error": "无法正常连接至服务器！"
+  }
+}

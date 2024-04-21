@@ -25,6 +25,7 @@ import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from 'ui-component/extended/Transitions';
 import MainCard from 'ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -42,6 +43,7 @@ const Header = () => {
   const handleCloseMenu = () => {
     setOpen(null);
   };
+  const { t } = useTranslation('common');
 
   return (
     <>
@@ -72,22 +74,22 @@ const Header = () => {
         ) : (
           <>
             <Button component={Link} variant="text" to="/" color={pathname === '/' ? 'primary' : 'inherit'}>
-              首页
+              {t('home')}
             </Button>
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
-              关于
+              {t('about')}
             </Button>
             <ThemeButton />
             {account.user ? (
               <>
                 <Button component={Link} variant="contained" to="/panel" color="primary">
-                  控制台
+                  {t('panel')}
                 </Button>
                 <ProfileSection />
               </>
             ) : (
               <Button component={Link} variant="contained" to="/login" color="primary">
-                登录
+                {t('login')}
               </Button>
             )}
           </>
@@ -131,20 +133,20 @@ const Header = () => {
                     onClick={handleCloseMenu}
                   >
                     <ListItemButton component={Link} variant="text" to="/">
-                      <ListItemText primary={<Typography variant="body2">首页</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('home')}</Typography>} />
                     </ListItemButton>
 
                     <ListItemButton component={Link} variant="text" to="/about">
-                      <ListItemText primary={<Typography variant="body2">关于</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('about')}</Typography>} />
                     </ListItemButton>
                     <Divider />
                     {account.user ? (
                       <ListItemButton component={Link} variant="contained" to="/panel" color="primary">
-                        控制台
+                        {t('panel')}
                       </ListItemButton>
                     ) : (
                       <ListItemButton component={Link} variant="contained" to="/login" color="primary">
-                        登录
+                        {t('login')}
                       </ListItemButton>
                     )}
                   </List>

@@ -9,6 +9,7 @@ import AuthWrapper from '../AuthWrapper';
 import AuthCardWrapper from '../AuthCardWrapper';
 import ForgetPasswordForm from '../AuthForms/ForgetPasswordForm';
 import Logo from 'ui-component/Logo';
+import { useTranslation } from 'react-i18next';
 
 // assets
 
@@ -17,6 +18,7 @@ import Logo from 'ui-component/Logo';
 const ForgetPassword = () => {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
+  const { t } = useTranslation('login');
 
   return (
     <AuthWrapper>
@@ -36,7 +38,7 @@ const ForgetPassword = () => {
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
                           <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                            密码重置
+                            {t('reset_password')}
                           </Typography>
                         </Stack>
                       </Grid>
@@ -51,7 +53,7 @@ const ForgetPassword = () => {
                   <Grid item xs={12}>
                     <Grid item container direction="column" alignItems="center" xs={12}>
                       <Typography component={Link} to="/login" variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                        登录
+                        {t('login')}
                       </Typography>
                     </Grid>
                   </Grid>

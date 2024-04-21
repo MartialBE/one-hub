@@ -1,0 +1,11 @@
+{
+  "index": {
+    "subtitle1": "All in one 的 OpenAI 接口",
+    "subtitle2": "整合各种 API 访问方式",
+    "subtitle3": "一键部署，开箱即用"
+  },
+
+  "error": {
+    "content": "加载首页内容失败..."
+  }
+}

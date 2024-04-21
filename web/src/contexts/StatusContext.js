@@ -2,6 +2,7 @@ import { useEffect, useCallback, createContext } from 'react';
 import { API } from 'utils/api';
 import { showNotice, showError } from 'utils/common';
 import { SET_SITE_INFO } from 'store/actions';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export const LoadStatusContext = createContext();
@@ -9,6 +10,7 @@ export const LoadStatusContext = createContext();
 // eslint-disable-next-line
 const StatusProvider = ({ children }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation('common');
 
   const loadStatus = useCallback(async () => {
     let system_name = '';
@@ -29,7 +31,7 @@ const StatusProvider = ({ children }) => {
           data.version !== '' &&
           process.env.REACT_APP_VERSION !== ''
         ) {
-          showNotice(`新版本可用：${data.version}，请使用快捷键 Shift + F5 刷新页面`);
+          showNotice(t('new_version', { version: data.version }));
         }
         if (data.system_name) {
           system_name = data.system_name;
@@ -48,13 +50,13 @@ const StatusProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      showError('无法正常连接至服务器！');
+      showError(t('error.server_error'));
     }
 
     if (system_name) {
       document.title = system_name;
     }
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   useEffect(() => {
     loadStatus().then();

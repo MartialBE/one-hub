@@ -3,10 +3,12 @@ import { useDispatch } from 'react-redux';
 import { LOGIN } from 'store/actions';
 import { useNavigate } from 'react-router';
 import { showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const useLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const login = async (username, password) => {
     try {
       const res = await API.post(`/api/user/login`, {
@@ -21,7 +23,6 @@ const useLogin = () => {
       }
       return { success, message };
     } catch (err) {
-      // 请求失败，设置错误信息
       return { success: false, message: '' };
     }
   };
@@ -32,18 +33,17 @@ const useLogin = () => {
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
-          showSuccess('绑定成功！');
+          showSuccess(t('bind_success'));
           navigate('/panel');
         } else {
           dispatch({ type: LOGIN, payload: data });
           localStorage.setItem('user', JSON.stringify(data));
-          showSuccess('登录成功！');
+          showSuccess(t('login_success'));
           navigate('/panel');
         }
       }
       return { success, message };
     } catch (err) {
-      // 请求失败，设置错误信息
       return { success: false, message: '' };
     }
   };
@@ -77,12 +77,11 @@ const useLogin = () => {
       if (success) {
         dispatch({ type: LOGIN, payload: data });
         localStorage.setItem('user', JSON.stringify(data));
-        showSuccess('登录成功！');
+        showSuccess(t('login_success'));
         navigate('/panel');
       }
       return { success, message };
     } catch (err) {
-      // 请求失败，设置错误信息
       return { success: false, message: '' };
     }
   };

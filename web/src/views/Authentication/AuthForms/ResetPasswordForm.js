@@ -7,6 +7,7 @@ import { Button, Stack, Typography, Alert } from '@mui/material';
 // assets
 import { showError, copy } from 'utils/common';
 import { API } from 'utils/api';
+import { useTranslation } from 'react-i18next';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
@@ -17,6 +18,7 @@ const ResetPasswordForm = () => {
     token: ''
   });
   const [newPassword, setNewPassword] = useState('');
+  const { t } = useTranslation('login');
 
   const submit = async () => {
     try {
@@ -25,7 +27,7 @@ const ResetPasswordForm = () => {
       if (success) {
         let password = res.data.data;
         setNewPassword(password);
-        copy(password, '新密码');
+        copy(password, t('new_password'));
       } else {
         showError(message);
       }
@@ -48,16 +50,16 @@ const ResetPasswordForm = () => {
     <Stack spacing={3} padding={'24px'} justifyContent={'center'} alignItems={'center'}>
       {!inputs.email || !inputs.token ? (
         <Typography variant="h3" sx={{ textDecoration: 'none' }}>
-          无效的链接
+          {t('invalid_link')}
         </Typography>
       ) : newPassword ? (
         <Alert severity="error">
-          你的新密码是: <b>{newPassword}</b> <br />
-          请登录后及时修改密码
+          {t('your_new_password')}: <b>{newPassword}</b> <br />
+          {t('password_reset_tip')}
         </Alert>
       ) : (
         <Button fullWidth onClick={submit} size="large" type="submit" variant="contained" color="primary">
-          点击重置密码
+          {t('click_reset_password')}
         </Button>
       )}
     </Stack>

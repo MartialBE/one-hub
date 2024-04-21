@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
 import { marked } from 'marked';
 import { Box, Container, Typography } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
   const [about, setAbout] = useState('');
   const [aboutLoaded, setAboutLoaded] = useState(false);
+  const { t } = useTranslation('about');
 
-  const displayAbout = async () => {
+  const displayAbout = useCallback(async () => {
     setAbout(localStorage.getItem('about') || '');
     try {
       const res = await API.get('/api/about');
@@ -23,18 +25,18 @@ const About = () => {
         localStorage.setItem('about', aboutContent);
       } else {
         showError(message);
-        setAbout('加载关于内容失败...');
+        setAbout(t('error.content'));
       }
     } catch (error) {
-      setAbout('加载关于内容失败...');
+      setAbout(t('error.content'));
     }
 
     setAboutLoaded(true);
-  };
+  }, [t]);
 
   useEffect(() => {
     displayAbout().then();
-  }, []);
+  }, [displayAbout]);
 
   return (
     <>
@@ -44,8 +46,8 @@ const About = () => {
             <Container sx={{ paddingTop: '40px' }}>
               <MainCard title="关于">
                 <Typography variant="body2">
-                  可在设置页面设置关于内容，支持 HTML & Markdown <br />
-                  项目仓库地址：
+                  {t('body1')} <br />
+                  {t('body2')}
                   <a href="https://github.com/MartialBE/one-api">https://github.com/MartialBE/one-api</a>
                 </Typography>
               </MainCard>

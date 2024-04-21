@@ -9,12 +9,14 @@ import AuthWrapper from '../AuthWrapper';
 import AuthCardWrapper from '../AuthCardWrapper';
 import AuthLogin from '../AuthForms/AuthLogin';
 import Logo from 'ui-component/Logo';
+import { useTranslation } from 'react-i18next';
 
 // ================================|| AUTH3 - LOGIN ||================================ //
 
 const Login = () => {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
+  const { t } = useTranslation('login');
 
   return (
     <AuthWrapper>
@@ -34,7 +36,7 @@ const Login = () => {
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
                           <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                            登录
+                            {t('login')}
                           </Typography>
                         </Stack>
                       </Grid>
@@ -49,7 +51,7 @@ const Login = () => {
                   <Grid item xs={12}>
                     <Grid item container direction="column" alignItems="center" xs={12}>
                       <Typography component={Link} to="/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                        注册
+                        {t('register')}
                       </Typography>
                     </Grid>
                   </Grid>
