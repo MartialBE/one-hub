@@ -169,7 +169,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
-          sx: { width: 140 }
+          sx: { minWidth: 140 }
         }}
       >
         {menuItems}

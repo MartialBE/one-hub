@@ -78,7 +78,8 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 
 func fetchChannel(c *gin.Context, modelName string) (channel *model.Channel, fail error) {
 	channelId := c.GetInt("specific_channel_id")
-	if channelId > 0 {
+	ignore := c.GetBool("specific_channel_id_ignore")
+	if channelId > 0 && !ignore {
 		return fetchChannelById(channelId)
 	}
 
@@ -145,6 +146,8 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 			if !errors.Is(err, io.EOF) {
 				fmt.Fprint(w, "data: "+err.Error()+"\n\n")
 				errWithOP = common.ErrorWrapper(err, "stream_error", http.StatusInternalServerError)
+				// 报错不应该缓存
+				cache.NoCache()
 			}
 
 			streamData := "data: [DONE]\n"
@@ -206,7 +209,8 @@ func responseCache(c *gin.Context, response string) {
 
 func shouldRetry(c *gin.Context, statusCode int) bool {
 	channelId := c.GetInt("specific_channel_id")
-	if channelId > 0 {
+	ignore := c.GetBool("specific_channel_id_ignore")
+	if channelId > 0 && !ignore {
 		return false
 	}
 	if statusCode == http.StatusTooManyRequests {
@@ -229,4 +233,12 @@ func processChannelRelayError(ctx context.Context, channelId int, channelName st
 	if controller.ShouldDisableChannel(&err.OpenAIError, err.StatusCode) {
 		controller.DisableChannel(channelId, channelName, err.Message, true)
 	}
+}
+
+func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
+	requestId := c.GetString(common.RequestIdKey)
+	err.OpenAIError.Message = common.MessageWithRequestId(err.OpenAIError.Message, requestId)
+	c.JSON(err.StatusCode, gin.H{
+		"error": err.OpenAIError,
+	})
 }

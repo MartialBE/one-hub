@@ -1,3 +1,4 @@
+
 # dangdangdang
 
 ## 请star原作者
@@ -73,6 +74,7 @@ ghcr.io/martialbe/one-api
 | [Cohere](https://cohere.com/)                                         | ✅                       | -          | -      | -           | -                                                                |
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                        | -          | -      | ⚠️ 图片生成 | -                                                                |
 | [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                       | -          | -      | -           | -                                                                |
+| [Ollama](https://github.com/ollama/ollama)                            | ✅                       | ✅         | -      | -           | -                                                                |
 
 ## 感谢
 
