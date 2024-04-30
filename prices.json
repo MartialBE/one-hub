@@ -640,8 +640,22 @@
     "model": "abab6-chat",
     "type": "tokens",
     "channel_type": 27,
-    "input": 14.2857,
-    "output": 14.2857
+    "input": 7.1429,
+    "output": 7.1429
+  },
+  {
+    "model": "abab6.5-chat",
+    "type": "tokens",
+    "channel_type": 27,
+    "input": 0.7143,
+    "output": 0.7143
+  },
+  {
+    "model": "abab6.5s-chat",
+    "type": "tokens",
+    "channel_type": 27,
+    "input": 2.1429,
+    "output": 2.1429
   },
   {
     "model": "embo-01",
