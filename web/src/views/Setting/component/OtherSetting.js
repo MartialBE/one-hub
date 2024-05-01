@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
 import {
   Stack,
@@ -57,8 +57,9 @@ const OtherSetting = () => {
       });
       const { success, message } = res.data;
       if (success) {
-        setInputs((inputs) => ({ ...inputs, [key]: value }));
         showSuccess('保存成功');
+        getOptions();
+        await loadStatus();
       } else {
         showError(message);
       }
