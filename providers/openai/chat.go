@@ -108,6 +108,11 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 		return
 	}
 
+	if len(openaiResponse.Choices) == 0 {
+		*rawLine = nil
+		return
+	}
+
 	dataChan <- string(*rawLine)
 
 	// if h.isAzure {

@@ -23,7 +23,6 @@ import { renderQuota, timestamp2string, copy } from 'utils/common';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 
-
 function createMenu(menuItems) {
   return (
     <>
