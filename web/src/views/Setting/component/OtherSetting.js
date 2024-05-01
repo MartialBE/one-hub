@@ -11,6 +11,7 @@ import {
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
 import { API } from 'utils/api';
+import { LoadStatusContext } from 'contexts/StatusContext';
 
 const OtherSetting = () => {
   let [inputs, setInputs] = useState({
@@ -22,6 +23,7 @@ const OtherSetting = () => {
     HomePageContent: ''
   });
   let [loading, setLoading] = useState(false);
+  const loadStatus = useContext(LoadStatusContext);
 
   const getOptions = async () => {
     try {
@@ -97,6 +99,8 @@ const OtherSetting = () => {
   const submitOption = async (key) => {
     await updateOption(key, inputs[key]);
   };
+
+
 
   return (
     <>
@@ -196,7 +200,7 @@ const OtherSetting = () => {
                   name="About"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入新的接口内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为接口页面。"
+                  placeholder="在此输入新的接口内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。"
                 />
               </FormControl>
             </Grid>
@@ -206,14 +210,12 @@ const OtherSetting = () => {
               </Button>
             </Grid>
             <Grid xs={12}>
-            </Grid>
-            <Grid xs={12}>
               <FormControl fullWidth>
                 <TextField
                   multiline
                   maxRows={15}
                   id="Footer"
-                  label="页脚"
+                  label="公告"
                   value={inputs.Footer}
                   name="Footer"
                   onChange={handleInputChange}
