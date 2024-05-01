@@ -6,7 +6,6 @@ import { API } from 'utils/api';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
 import { LoadStatusContext } from 'contexts/StatusContext';
 require('dayjs/locale/zh-cn');
@@ -533,39 +532,6 @@ const OperationSetting = () => {
           >
             保存倍率设置
           </Button>
-        </Stack>
-      </SubCard>
-
-      <SubCard title="聊天链接设置">
-        <Stack spacing={2}>
-          <Alert severity="info">
-            配置聊天链接，该配置在令牌中的聊天生效以及首页的Playground中的聊天生效. <br />
-            链接中可以使{'{key}'}替换用户的令牌，{'{server}'}替换服务器地址。例如：
-            {'https://chat.oneapi.pro/#/?settings={"key":"sk-{key}","url":"{server}"}'}
-            <br />
-            如果未配置，会默认配置以下4个链接：
-            <br />
-            ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={"key":"{key}","url":"{server}"}'}
-            <br />
-            chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={"key":"{key}","url":"{server}"}'}
-            <br />
-            AMA 问天 ： {'ama://set-api-key?server={server}&key={key}'}
-            <br />
-            opencat ： {'opencat://team/join?domain={server}&token={key}'}
-            <br />
-          </Alert>
-          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
-            <ChatLinksDataGrid links={inputs.ChatLinks || '[]'} onChange={handleInputChange} />
-
-            <Button
-              variant="contained"
-              onClick={() => {
-                submitConfig('chatlinks').then();
-              }}
-            >
-              保存聊天链接设置
-            </Button>
-          </Stack>
         </Stack>
       </SubCard>
     </Stack>

@@ -93,7 +93,6 @@ func SetApiRouter(router *gin.Engine) {
 		tokenRoute := apiRouter.Group("/token")
 		tokenRoute.Use(middleware.UserAuth())
 		{
-			tokenRoute.GET("/playground", controller.GetPlaygroundToken)
 			tokenRoute.GET("/", controller.GetUserTokensList)
 			tokenRoute.GET("/:id", controller.GetToken)
 			tokenRoute.POST("/", controller.AddToken)

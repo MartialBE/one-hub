@@ -144,16 +144,6 @@ const ChatLinksDataGrid = ({ links, onChange }) => {
         hideable: false
       },
       {
-        field: 'show',
-        sortable: false,
-        headerName: '是否显示在playground',
-        flex: 1,
-        minWidth: 200,
-        type: 'boolean',
-        editable: true,
-        hideable: false
-      },
-      {
         field: 'actions',
         type: 'actions',
         headerName: '操作',

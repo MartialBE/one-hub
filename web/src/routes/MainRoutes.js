@@ -18,7 +18,6 @@ const Telegram = Loadable(lazy(() => import('views/Telegram')));
 const Pricing = Loadable(lazy(() => import('views/Pricing')));
 const Midjourney = Loadable(lazy(() => import('views/Midjourney')));
 const ModelPrice = Loadable(lazy(() => import('views/ModelPrice')));
-const Playground = Loadable(lazy(() => import('views/Playground')));
 
 // dashboard routing
 const Dashboard = Loadable(lazy(() => import('views/Dashboard')));
@@ -92,10 +91,6 @@ const MainRoutes = {
     {
       path: 'model_price',
       element: <ModelPrice />
-    },
-    {
-      path: 'playground',
-      element: <Playground />
     }
   ]
 };
