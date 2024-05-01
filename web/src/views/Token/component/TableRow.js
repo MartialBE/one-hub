@@ -19,9 +19,9 @@ import {
 } from '@mui/material';
 
 import TableSwitch from 'ui-component/Switch';
-import { renderQuota, timestamp2string, copy, getChatLinks, replaceChatPlaceholders } from 'utils/common';
+import { renderQuota, timestamp2string, copy } from 'utils/common';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 
 function createMenu(menuItems) {
   return (
