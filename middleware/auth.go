@@ -105,14 +105,23 @@ func tokenAuth(c *gin.Context, key string) {
 	c.Set("id", token.UserId)
 	c.Set("token_id", token.Id)
 	c.Set("token_name", token.Name)
+	c.Set("chat_cache", token.ChatCache)
 	if len(parts) > 1 {
 		if model.IsAdmin(token.UserId) {
-			channelId := common.String2Int(parts[1])
-			if channelId == 0 {
-				abortWithMessage(c, http.StatusForbidden, "无效的渠道 Id")
-				return
+			if strings.HasPrefix(parts[1], "!") {
+				channelId := common.String2Int(parts[1][1:])
+				c.Set("skip_channel_id", channelId)
+			} else {
+				channelId := common.String2Int(parts[1])
+				if channelId == 0 {
+					abortWithMessage(c, http.StatusForbidden, "无效的渠道 Id")
+					return
+				}
+				c.Set("specific_channel_id", channelId)
+				if len(parts) == 3 && parts[2] == "ignore" {
+					c.Set("specific_channel_id_ignore", true)
+				}
 			}
-			c.Set("specific_channel_id", channelId)
 		} else {
 			abortWithMessage(c, http.StatusForbidden, "普通用户不支持指定渠道")
 			return
@@ -132,5 +141,18 @@ func MjAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		key := c.Request.Header.Get("mj-api-secret")
 		tokenAuth(c, key)
+	}
+}
+
+func SpecifiedChannel() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		channelId := c.GetInt("specific_channel_id")
+		c.Set("specific_channel_id_ignore", false)
+
+		if channelId <= 0 {
+			abortWithMessage(c, http.StatusForbidden, "必须指定渠道")
+			return
+		}
+		c.Next()
 	}
 }

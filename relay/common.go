@@ -13,6 +13,7 @@ import (
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
+	"one-api/relay/util"
 	"one-api/types"
 	"strings"
 
@@ -20,29 +21,37 @@ import (
 )
 
 func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
+	allowCache := false
+	var relay RelayBaseInterface
 	if strings.HasPrefix(path, "/v1/chat/completions") {
-		return NewRelayChat(c)
+		allowCache = true
+		relay = NewRelayChat(c)
 	} else if strings.HasPrefix(path, "/v1/completions") {
-		return NewRelayCompletions(c)
+		allowCache = true
+		relay = NewRelayCompletions(c)
 	} else if strings.HasPrefix(path, "/v1/embeddings") {
-		return NewRelayEmbeddings(c)
+		relay = NewRelayEmbeddings(c)
 	} else if strings.HasPrefix(path, "/v1/moderations") {
-		return NewRelayModerations(c)
+		relay = NewRelayModerations(c)
 	} else if strings.HasPrefix(path, "/v1/images/generations") {
-		return NewRelayImageGenerations(c)
+		relay = NewRelayImageGenerations(c)
 	} else if strings.HasPrefix(path, "/v1/images/edits") {
-		return NewRelayImageEdits(c)
+		relay = NewRelayImageEdits(c)
 	} else if strings.HasPrefix(path, "/v1/images/variations") {
-		return NewRelayImageVariations(c)
+		relay = NewRelayImageVariations(c)
 	} else if strings.HasPrefix(path, "/v1/audio/speech") {
-		return NewRelaySpeech(c)
+		relay = NewRelaySpeech(c)
 	} else if strings.HasPrefix(path, "/v1/audio/transcriptions") {
-		return NewRelayTranscriptions(c)
+		relay = NewRelayTranscriptions(c)
 	} else if strings.HasPrefix(path, "/v1/audio/translations") {
-		return NewRelayTranslations(c)
+		relay = NewRelayTranslations(c)
 	}
 
-	return nil
+	if relay != nil {
+		relay.SetChatCache(allowCache)
+	}
+
+	return relay
 }
 
 func GetProvider(c *gin.Context, modeName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
@@ -69,7 +78,8 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 
 func fetchChannel(c *gin.Context, modelName string) (channel *model.Channel, fail error) {
 	channelId := c.GetInt("specific_channel_id")
-	if channelId > 0 {
+	ignore := c.GetBool("specific_channel_id_ignore")
+	if channelId > 0 && !ignore {
 		return fetchChannelById(channelId)
 	}
 
@@ -90,7 +100,8 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("group")
-	channel, err := model.ChannelGroup.Next(group, modelName)
+	skip_channel_id := c.GetInt("skip_channel_id")
+	channel, err := model.ChannelGroup.Next(group, modelName, skip_channel_id)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 		if channel != nil {
@@ -120,7 +131,7 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 	return nil
 }
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string]) *types.OpenAIErrorWithStatusCode {
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *util.ChatCacheProps) (errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -128,19 +139,26 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 	c.Stream(func(w io.Writer) bool {
 		select {
 		case data := <-dataChan:
-			fmt.Fprintln(w, "data: "+data+"\n")
+			streamData := "data: " + data + "\n\n"
+			fmt.Fprint(w, streamData)
+			cache.SetResponse(streamData)
 			return true
 		case err := <-errChan:
 			if !errors.Is(err, io.EOF) {
-				fmt.Fprintln(w, "data: "+err.Error()+"\n")
+				fmt.Fprint(w, "data: "+err.Error()+"\n\n")
+				errWithOP = common.ErrorWrapper(err, "stream_error", http.StatusInternalServerError)
+				// 报错不应该缓存
+				cache.NoCache()
 			}
 
-			fmt.Fprintln(w, "data: [DONE]")
+			streamData := "data: [DONE]\n"
+			fmt.Fprint(w, streamData)
+			cache.SetResponse(streamData)
 			return false
 		}
 	})
 
-	return nil
+	return errWithOP
 }
 
 func responseMultipart(c *gin.Context, resp *http.Response) *types.OpenAIErrorWithStatusCode {
@@ -174,9 +192,26 @@ func responseCustom(c *gin.Context, response *types.AudioResponseWrapper) *types
 	return nil
 }
 
+func responseCache(c *gin.Context, response string) {
+	// 检查是否是 data: 开头的流式数据
+	isStream := strings.HasPrefix(response, "data: ")
+
+	if isStream {
+		requester.SetEventStreamHeaders(c)
+		c.Stream(func(w io.Writer) bool {
+			fmt.Fprint(w, response)
+			return false
+		})
+	} else {
+		c.Data(http.StatusOK, "application/json", []byte(response))
+	}
+
+}
+
 func shouldRetry(c *gin.Context, statusCode int) bool {
 	channelId := c.GetInt("specific_channel_id")
-	if channelId > 0 {
+	ignore := c.GetBool("specific_channel_id_ignore")
+	if channelId > 0 && !ignore {
 		return false
 	}
 	if statusCode == http.StatusTooManyRequests {
@@ -199,4 +234,12 @@ func processChannelRelayError(ctx context.Context, channelId int, channelName st
 	if controller.ShouldDisableChannel(&err.OpenAIError, err.StatusCode) {
 		controller.DisableChannel(channelId, channelName, err.Message, true)
 	}
+}
+
+func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
+	requestId := c.GetString(common.RequestIdKey)
+	err.OpenAIError.Message = common.MessageWithRequestId(err.OpenAIError.Message, requestId)
+	c.JSON(err.StatusCode, gin.H{
+		"error": err.OpenAIError,
+	})
 }

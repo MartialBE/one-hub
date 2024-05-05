@@ -15,6 +15,7 @@ var Footer = ""
 var Logo = ""
 var TopUpLink = ""
 var ChatLink = ""
+var ChatLinks = ""
 var QuotaPerUnit = 500 * 1000.0 // $0.002 / 1K tokens
 var DisplayInCurrencyEnabled = true
 var DisplayTokenStatEnabled = true
@@ -36,6 +37,10 @@ var GitHubOAuthEnabled = false
 var WeChatAuthEnabled = false
 var TurnstileCheckEnabled = false
 var RegisterEnabled = true
+
+// chat cache
+var ChatCacheEnabled = false
+var ChatCacheExpireMinute = 5 // 5 Minute
 
 // mj
 var MjNotifyEnabled = false
@@ -65,6 +70,9 @@ var SMTPToken = ""
 
 var GitHubClientId = ""
 var GitHubClientSecret = ""
+
+var LarkClientId = ""
+var LarkClientSecret = ""
 
 var WeChatServerAddress = ""
 var WeChatServerToken = ""
@@ -165,6 +173,11 @@ const (
 	ChannelTypeBedrock        = 32
 	ChannelTypeLingyi         = 33
 	ChannelTypeMidjourney     = 34
+	ChannelTypeCloudflareAI   = 35
+	ChannelTypeCohere         = 36
+	ChannelTypeStabilityAI    = 37
+	ChannelTypeCoze           = 38
+	ChannelTypeOllama         = 39
 )
 
 var ChannelBaseURLs = []string{
@@ -203,6 +216,11 @@ var ChannelBaseURLs = []string{
 	"",                                  //32
 	"https://api.lingyiwanwu.com",       //33
 	"",                                  //34
+	"",                                  //35
+	"https://api.cohere.ai/v1",          //36
+	"https://api.stability.ai/v2beta",   //37
+	"https://api.coze.com/open_api",     //38
+	"",                                  //39
 }
 
 const (

@@ -28,6 +28,7 @@ func GetStatus(c *gin.Context) {
 			"email_verification":  common.EmailVerificationEnabled,
 			"github_oauth":        common.GitHubOAuthEnabled,
 			"github_client_id":    common.GitHubClientId,
+			"lark_client_id":      common.LarkClientId,
 			"system_name":         common.SystemName,
 			"logo":                common.Logo,
 			"footer_html":         common.Footer,
@@ -42,6 +43,8 @@ func GetStatus(c *gin.Context) {
 			"display_in_currency": common.DisplayInCurrencyEnabled,
 			"telegram_bot":        telegram_bot,
 			"mj_notify_enabled":   common.MjNotifyEnabled,
+			"chat_cache_enabled":  common.ChatCacheEnabled,
+			"chat_links":          common.ChatLinks,
 		},
 	})
 }

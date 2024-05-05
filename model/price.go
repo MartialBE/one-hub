@@ -3,6 +3,7 @@ package model
 import (
 	"one-api/common"
 
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +16,7 @@ const (
 )
 
 type Price struct {
-	Model       string  `json:"model" gorm:"type:varchar(30);primaryKey" binding:"required"`
+	Model       string  `json:"model" gorm:"type:varchar(100)" binding:"required"`
 	Type        string  `json:"type"  gorm:"default:'tokens'" binding:"required"`
 	ChannelType int     `json:"channel_type" gorm:"default:0" binding:"gte=0"`
 	Input       float64 `json:"input" gorm:"default:0" binding:"gte=0"`
@@ -62,11 +63,17 @@ func (price *Price) GetOutput() float64 {
 }
 
 func (price *Price) FetchInputCurrencyPrice(rate float64) float64 {
-	return price.GetInput() * rate
+	r := decimal.NewFromFloat(price.GetInput()).Mul(decimal.NewFromFloat(rate))
+	v, _ := r.Float64()
+
+	return v
 }
 
 func (price *Price) FetchOutputCurrencyPrice(rate float64) float64 {
-	return price.GetOutput() * rate
+	r := decimal.NewFromFloat(price.GetOutput()).Mul(decimal.NewFromFloat(rate))
+	v, _ := r.Float64()
+
+	return v
 }
 
 func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
@@ -98,11 +105,7 @@ func DeleteAllPrices(tx *gorm.DB) error {
 }
 
 func (price *Price) Delete() error {
-	err := DB.Delete(price).Error
-	if err != nil {
-		return err
-	}
-	return err
+	return DB.Where("model = ?", price.Model).Delete(&Price{}).Error
 }
 
 type ModelType struct {
@@ -123,11 +126,13 @@ func GetDefaultPrice() []*Price {
 		"gpt-4-32k-0314": {[]float64{30, 60}, common.ChannelTypeOpenAI},
 		"gpt-4-32k-0613": {[]float64{30, 60}, common.ChannelTypeOpenAI},
 		// 	$0.01 / 1K tokens	$0.03 / 1K tokens
-		"gpt-4-preview":        {[]float64{5, 15}, common.ChannelTypeOpenAI},
-		"gpt-4-1106-preview":   {[]float64{5, 15}, common.ChannelTypeOpenAI},
-		"gpt-4-0125-preview":   {[]float64{5, 15}, common.ChannelTypeOpenAI},
-		"gpt-4-turbo-preview":  {[]float64{5, 15}, common.ChannelTypeOpenAI},
-		"gpt-4-vision-preview": {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-preview":          {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-turbo":            {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-turbo-2024-04-09": {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-1106-preview":     {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-0125-preview":     {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-turbo-preview":    {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		"gpt-4-vision-preview":   {[]float64{5, 15}, common.ChannelTypeOpenAI},
 		// 	$0.0005 / 1K tokens	$0.0015 / 1K tokens
 		"gpt-3.5-turbo":      {[]float64{0.25, 0.75}, common.ChannelTypeOpenAI},
 		"gpt-3.5-turbo-0125": {[]float64{0.25, 0.75}, common.ChannelTypeOpenAI},
@@ -287,6 +292,27 @@ func GetDefaultPrice() []*Price {
 		"yi-34b-chat-200k": {[]float64{0.8571, 0.8571}, common.ChannelTypeLingyi},
 		// 	6 元 / 1M tokens 0.006 / 1k tokens
 		"yi-vl-plus": {[]float64{0.4286, 0.4286}, common.ChannelTypeLingyi},
+
+		"@cf/stabilityai/stable-diffusion-xl-base-1.0": {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@cf/lykon/dreamshaper-8-lcm":                  {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@cf/bytedance/stable-diffusion-xl-lightning":  {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@cf/qwen/qwen1.5-7b-chat-awq":                 {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@cf/qwen/qwen1.5-14b-chat-awq":                {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@hf/thebloke/deepseek-coder-6.7b-base-awq":    {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@hf/google/gemma-7b-it":                       {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@hf/thebloke/llama-2-13b-chat-awq":            {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		"@cf/openai/whisper":                           {[]float64{0, 0}, common.ChannelTypeCloudflareAI},
+		//$0.50 /1M TOKENS   $1.50/1M TOKENS
+		"command-r": {[]float64{0.25, 0.75}, common.ChannelTypeCohere},
+		//$3 /1M TOKENS   $15/1M TOKENS
+		"command-r-plus": {[]float64{1.5, 7.5}, common.ChannelTypeCohere},
+
+		// 0.065
+		"sd3": {[]float64{32.5, 32.5}, common.ChannelTypeStabilityAI},
+		// 0.04
+		"sd3-turbo": {[]float64{20, 20}, common.ChannelTypeStabilityAI},
+		// 0.03
+		"stable-image-core": {[]float64{15, 15}, common.ChannelTypeStabilityAI},
 	}
 
 	var prices []*Price

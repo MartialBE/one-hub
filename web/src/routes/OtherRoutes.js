@@ -8,12 +8,14 @@ import MinimalLayout from 'layout/MinimalLayout';
 const AuthLogin = Loadable(lazy(() => import('views/Authentication/Auth/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/Authentication/Auth/Register')));
 const GitHubOAuth = Loadable(lazy(() => import('views/Authentication/Auth/GitHubOAuth')));
+const LarkOAuth = Loadable(lazy(() => import('views/Authentication/Auth/LarkOAuth')));
 const ForgetPassword = Loadable(lazy(() => import('views/Authentication/Auth/ForgetPassword')));
 const ResetPassword = Loadable(lazy(() => import('views/Authentication/Auth/ResetPassword')));
 const Home = Loadable(lazy(() => import('views/Home')));
 const About = Loadable(lazy(() => import('views/About')));
 const NotFoundView = Loadable(lazy(() => import('views/Error')));
 const Jump = Loadable(lazy(() => import('views/Jump')));
+const Playground = Loadable(lazy(() => import('views/Playground')));
 
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 
@@ -50,12 +52,20 @@ const OtherRoutes = {
       element: <GitHubOAuth />
     },
     {
+      path: '/oauth/lark',
+      element: <LarkOAuth />
+    },
+    {
       path: '/404',
       element: <NotFoundView />
     },
     {
       path: '/jump',
       element: <Jump />
+    },
+    {
+      path: '/playground',
+      element: <Playground />
     }
   ]
 };

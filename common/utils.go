@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -239,4 +240,25 @@ func GetModelsWithMatch(modelList *[]string, modelName string) string {
 		}
 	}
 	return ""
+}
+
+func EscapeMarkdownText(text string) string {
+	chars := []string{"_", "*", "[", "]", "(", ")", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "`"}
+	for _, char := range chars {
+		text = strings.ReplaceAll(text, char, "\\"+char)
+	}
+	return text
+}
+
+func UnmarshalString[T interface{}](data string) (form T, err error) {
+	err = json.Unmarshal([]byte(data), &form)
+	return form, err
+}
+
+func Marshal[T interface{}](data T) string {
+	res, err := json.Marshal(data)
+	if err != nil {
+		return ""
+	}
+	return string(res)
 }

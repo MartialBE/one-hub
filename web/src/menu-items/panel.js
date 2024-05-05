@@ -4,16 +4,17 @@ import {
   IconSitemap,
   IconArticle,
   IconCoin,
-  IconAdjustments,
+  IconSettingsCog,
   IconKey,
-  IconGardenCart,
+  IconCreditCard,
   IconUser,
   IconUserScan,
-  IconActivity,
+  IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
   IconBrush,
-  IconBrandGithubCopilot
+  IconBrandGithubCopilot,
+  IconBallFootball
 } from '@tabler/icons-react';
 
 // constant
@@ -22,16 +23,17 @@ const icons = {
   IconSitemap,
   IconArticle,
   IconCoin,
-  IconAdjustments,
+  IconSettingsCog,
   IconKey,
-  IconGardenCart,
+  IconCreditCard,
   IconUser,
   IconUserScan,
-  IconActivity,
+  IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
   IconBrush,
-  IconBrandGithubCopilot
+  IconBrandGithubCopilot,
+  IconBallFootball
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -54,7 +56,7 @@ const panel = {
       title: '分析',
       type: 'item',
       url: '/panel/analytics',
-      icon: icons.IconActivity,
+      icon: icons.IconChartHistogram,
       breadcrumbs: false,
       isAdmin: true
     },
@@ -73,6 +75,14 @@ const panel = {
       type: 'item',
       url: '/panel/token',
       icon: icons.IconKey,
+      breadcrumbs: false
+    },
+    {
+      id: 'playground',
+      title: 'Playground',
+      type: 'item',
+      url: '/panel/playground',
+      icon: icons.IconBallFootball,
       breadcrumbs: false
     },
     {
@@ -97,7 +107,7 @@ const panel = {
       title: '充值',
       type: 'item',
       url: '/panel/topup',
-      icon: icons.IconGardenCart,
+      icon: icons.IconCreditCard,
       breadcrumbs: false
     },
     {
@@ -124,7 +134,7 @@ const panel = {
       url: '/panel/profile',
       icon: icons.IconUserScan,
       breadcrumbs: false,
-      isAdmin: true
+      isAdmin: false
     },
     {
       id: 'pricing',
@@ -142,14 +152,14 @@ const panel = {
       url: '/panel/model_price',
       icon: icons.IconBrandGithubCopilot,
       breadcrumbs: false,
-      isAdmin: true
+      isAdmin: false
     },
     {
       id: 'setting',
       title: '设置',
       type: 'item',
       url: '/panel/setting',
-      icon: icons.IconAdjustments,
+      icon: icons.IconSettingsCog,
       breadcrumbs: false,
       isAdmin: true
     },

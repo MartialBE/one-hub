@@ -7,8 +7,10 @@ import (
 	"one-api/common/config"
 	"one-api/common/notify"
 	"one-api/common/requester"
+	"one-api/common/storage"
 	"one-api/common/telegram"
 	"one-api/controller"
+	"one-api/cron"
 	"one-api/middleware"
 	"one-api/model"
 	"one-api/relay/util"
@@ -48,12 +50,14 @@ func main() {
 
 	controller.InitMidjourneyTask()
 	notify.InitNotifier()
+	cron.InitCron()
+	storage.InitStorage()
 
 	initHttpServer()
 }
 
 func initMemoryCache() {
-	if viper.GetBool("MEMORY_CACHE_ENABLED") {
+	if viper.GetBool("memory_cache_enabled") {
 		common.MemoryCacheEnabled = true
 	}
 
@@ -61,7 +65,7 @@ func initMemoryCache() {
 		return
 	}
 
-	syncFrequency := viper.GetInt("SYNC_FREQUENCY")
+	syncFrequency := viper.GetInt("sync_frequency")
 	model.TokenCacheSeconds = syncFrequency
 
 	common.SysLog("memory cache enabled")
@@ -70,8 +74,8 @@ func initMemoryCache() {
 }
 
 func initSync() {
-	go controller.AutomaticallyUpdateChannels(viper.GetInt("CHANNEL_UPDATE_FREQUENCY"))
-	go controller.AutomaticallyTestChannels(viper.GetInt("CHANNEL_TEST_FREQUENCY"))
+	go controller.AutomaticallyUpdateChannels(viper.GetInt("channel.update_frequency"))
+	go controller.AutomaticallyTestChannels(viper.GetInt("channel.test_frequency"))
 }
 
 func initHttpServer() {
@@ -88,7 +92,7 @@ func initHttpServer() {
 	server.Use(sessions.Sessions("session", store))
 
 	router.SetRouter(server, buildFS, indexPage)
-	port := viper.GetString("PORT")
+	port := viper.GetString("port")
 
 	err := server.Run(":" + port)
 	if err != nil {

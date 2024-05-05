@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
-import { Stack, FormControl, InputLabel, OutlinedInput, Checkbox, Button, FormControlLabel, TextField } from '@mui/material';
+import { Stack, FormControl, InputLabel, OutlinedInput, Checkbox, Button, FormControlLabel, TextField, Alert } from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
+import { LoadStatusContext } from 'contexts/StatusContext';
 require('dayjs/locale/zh-cn');
 
 const OperationSetting = () => {
@@ -20,6 +22,7 @@ const OperationSetting = () => {
     GroupRatio: '',
     TopUpLink: '',
     ChatLink: '',
+    ChatLinks: '',
     QuotaPerUnit: 0,
     AutomaticDisableChannelEnabled: '',
     AutomaticEnableChannelEnabled: '',
@@ -30,11 +33,14 @@ const OperationSetting = () => {
     ApproximateTokenEnabled: '',
     RetryTimes: 0,
     RetryCooldownSeconds: 0,
-    MjNotifyEnabled: ''
+    MjNotifyEnabled: '',
+    ChatCacheEnabled: '',
+    ChatCacheExpireMinute: 5
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
   let [historyTimestamp, setHistoryTimestamp] = useState(now.getTime() / 1000 - 30 * 24 * 3600); // a month ago new Date().getTime() / 1000 + 3600
+  const loadStatus = useContext(LoadStatusContext);
 
   const getOptions = async () => {
     try {
@@ -76,6 +82,8 @@ const OperationSetting = () => {
       const { success, message } = res.data;
       if (success) {
         setInputs((inputs) => ({ ...inputs, [key]: value }));
+        getOptions();
+        await loadStatus();
       } else {
         showError(message);
       }
@@ -116,6 +124,15 @@ const OperationSetting = () => {
           await updateOption('GroupRatio', inputs.GroupRatio);
         }
         break;
+      case 'chatlinks':
+        if (originInputs['ChatLinks'] !== inputs.ChatLinks) {
+          if (!verifyJSON(inputs.ChatLinks)) {
+            showError('links不是合法的 JSON 字符串');
+            return;
+          }
+          await updateOption('ChatLinks', inputs.ChatLinks);
+        }
+        break;
       case 'quota':
         if (originInputs['QuotaForNewUser'] !== inputs.QuotaForNewUser) {
           await updateOption('QuotaForNewUser', inputs.QuotaForNewUser);
@@ -150,6 +167,11 @@ const OperationSetting = () => {
         }
         if (originInputs['RetryCooldownSeconds'] !== inputs.RetryCooldownSeconds) {
           await updateOption('RetryCooldownSeconds', inputs.RetryCooldownSeconds);
+        }
+        break;
+      case 'other':
+        if (originInputs['ChatCacheExpireMinute'] !== inputs.ChatCacheExpireMinute) {
+          await updateOption('ChatCacheExpireMinute', inputs.ChatCacheExpireMinute);
         }
         break;
     }
@@ -292,7 +314,34 @@ const OperationSetting = () => {
               label="Midjourney 允许回调（会泄露服务器ip地址）"
               control={<Checkbox checked={inputs.MjNotifyEnabled === 'true'} onChange={handleInputChange} name="MjNotifyEnabled" />}
             />
+            <FormControlLabel
+              sx={{ marginLeft: '0px' }}
+              label="是否开启聊天缓存(如果没有启用Redis，将会存储在数据库中)"
+              control={<Checkbox checked={inputs.ChatCacheEnabled === 'true'} onChange={handleInputChange} name="ChatCacheEnabled" />}
+            />
           </Stack>
+          <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
+            <FormControl>
+              <InputLabel htmlFor="ChatCacheExpireMinute">缓存时间(分钟)</InputLabel>
+              <OutlinedInput
+                id="ChatCacheExpireMinute"
+                name="ChatCacheExpireMinute"
+                value={inputs.ChatCacheExpireMinute}
+                onChange={handleInputChange}
+                label="缓存时间(分钟)"
+                placeholder="开启缓存时，数据缓存的时间"
+                disabled={loading}
+              />
+            </FormControl>
+          </Stack>
+          <Button
+            variant="contained"
+            onClick={() => {
+              submitConfig('other').then();
+            }}
+          >
+            保存其他设置
+          </Button>
         </Stack>
       </SubCard>
       <SubCard title="日志设置">
@@ -484,6 +533,39 @@ const OperationSetting = () => {
           >
             保存倍率设置
           </Button>
+        </Stack>
+      </SubCard>
+
+      <SubCard title="聊天链接设置">
+        <Stack spacing={2}>
+          <Alert severity="info">
+            配置聊天链接，该配置在令牌中的聊天生效以及首页的Playground中的聊天生效. <br />
+            链接中可以使{'{key}'}替换用户的令牌，{'{server}'}替换服务器地址。例如：
+            {'https://chat.oneapi.pro/#/?settings={"key":"sk-{key}","url":"{server}"}'}
+            <br />
+            如果未配置，会默认配置以下4个链接：
+            <br />
+            ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={"key":"{key}","url":"{server}"}'}
+            <br />
+            chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={"key":"{key}","url":"{server}"}'}
+            <br />
+            AMA 问天 ： {'ama://set-api-key?server={server}&key={key}'}
+            <br />
+            opencat ： {'opencat://team/join?domain={server}&token={key}'}
+            <br />
+          </Alert>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <ChatLinksDataGrid links={inputs.ChatLinks || '[]'} onChange={handleInputChange} />
+
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('chatlinks').then();
+              }}
+            >
+              保存聊天链接设置
+            </Button>
+          </Stack>
         </Stack>
       </SubCard>
     </Stack>

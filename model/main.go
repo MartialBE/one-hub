@@ -24,9 +24,9 @@ func SetupDB() {
 	ChannelGroup.Load()
 	common.RootUserEmail = GetRootUserEmail()
 
-	if viper.GetBool("BATCH_UPDATE_ENABLED") {
+	if viper.GetBool("batch_update_enabled") {
 		common.BatchUpdateEnabled = true
-		common.BatchUpdateInterval = common.GetOrDefault("BATCH_UPDATE_INTERVAL", 5)
+		common.BatchUpdateInterval = common.GetOrDefault("batch_update_interval", 5)
 		common.SysLog("batch update enabled with interval " + strconv.Itoa(common.BatchUpdateInterval) + "s")
 		InitBatchUpdater()
 	}
@@ -56,8 +56,8 @@ func createRootAccountIfNeed() error {
 }
 
 func chooseDB() (*gorm.DB, error) {
-	if viper.IsSet("SQL_DSN") {
-		dsn := viper.GetString("SQL_DSN")
+	if viper.IsSet("sql_dsn") {
+		dsn := viper.GetString("sql_dsn")
 		if strings.HasPrefix(dsn, "postgres://") {
 			// Use PostgreSQL
 			common.SysLog("using PostgreSQL as database")
@@ -78,7 +78,7 @@ func chooseDB() (*gorm.DB, error) {
 	// Use SQLite
 	common.SysLog("SQL_DSN not set, using SQLite as database")
 	common.UsingSQLite = true
-	config := fmt.Sprintf("?_busy_timeout=%d", common.GetOrDefault("SQLITE_BUSY_TIMEOUT", 3000))
+	config := fmt.Sprintf("?_busy_timeout=%d", common.GetOrDefault("sqlite_busy_timeout", 3000))
 	return gorm.Open(sqlite.Open(viper.GetString("sqlite_path")+config), &gorm.Config{
 		PrepareStmt: true, // precompile SQL
 	})
@@ -104,6 +104,10 @@ func InitDB() (err error) {
 			return nil
 		}
 		common.SysLog("database migration started")
+		// err = MigrateDB(DB)
+		// if err != nil {
+		// 	return err
+		// }
 		err = db.AutoMigrate(&Channel{})
 		if err != nil {
 			return err
@@ -144,6 +148,10 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
+		err = db.AutoMigrate(&ChatCache{})
+		if err != nil {
+			return err
+		}
 		common.SysLog("database migrated")
 		err = createRootAccountIfNeed()
 		return err
@@ -152,6 +160,24 @@ func InitDB() (err error) {
 	}
 	return err
 }
+
+// func MigrateDB(db *gorm.DB) error {
+// 	if DB.Migrator().HasConstraint(&Price{}, "model") {
+// 		fmt.Println("----Price model has constraint----")
+// 		// 如果是主键，移除主键约束
+// 		err := db.Migrator().DropConstraint(&Price{}, "model")
+// 		if err != nil {
+// 			return err
+// 		}
+// 		// 修改字段长度
+// 		err = db.Migrator().AlterColumn(&Price{}, "model")
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+
+// 	return nil
+// }
 
 func CloseDB() error {
 	sqlDB, err := DB.DB()

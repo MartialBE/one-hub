@@ -159,11 +159,16 @@ const typeConfig = {
     modelGroup: 'Baichuan'
   },
   24: {
+    inputLabel: {
+      other: '位置/区域'
+    },
     input: {
       models: ['tts-1', 'tts-1-hd']
     },
     prompt: {
-      test_model: ''
+      test_model: '',
+      base_url: '',
+      other: '请输入你 Speech Studio 的位置/区域，例如：eastasia'
     }
   },
   27: {
@@ -262,6 +267,63 @@ const typeConfig = {
       model_mapping: ''
     },
     modelGroup: 'Midjourney'
+  },
+  35: {
+    input: {
+      models: [
+        '@cf/stabilityai/stable-diffusion-xl-base-1.0',
+        '@cf/lykon/dreamshaper-8-lcm',
+        '@cf/bytedance/stable-diffusion-xl-lightning',
+        '@cf/qwen/qwen1.5-7b-chat-awq',
+        '@cf/qwen/qwen1.5-14b-chat-awq',
+        '@hf/google/gemma-7b-it',
+        '@hf/thebloke/deepseek-coder-6.7b-base-awq',
+        '@hf/thebloke/llama-2-13b-chat-awq',
+        '@cf/openai/whisper'
+      ],
+      test_model: '@hf/google/gemma-7b-it'
+    },
+    prompt: {
+      key: '按照如下格式输入：CLOUDFLARE_ACCOUNT_ID|CLOUDFLARE_API_TOKEN',
+      base_url: ''
+    },
+    modelGroup: 'Cloudflare AI'
+  },
+  36: {
+    input: {
+      models: ['command-r', 'command-r-plus'],
+      test_model: 'command-r'
+    },
+    modelGroup: 'Cohere'
+  },
+  37: {
+    input: {
+      models: ['sd3', 'sd3-turbo', 'stable-image-core']
+    },
+    prompt: {
+      test_model: ''
+    },
+    modelGroup: 'Stability AI'
+  },
+  38: {
+    input: {
+      models: ['coze-*']
+    },
+    prompt: {
+      models: '模型名称为coze-{bot_id}，你也可以直接使用 coze-* 通配符来匹配所有coze开头的模型',
+      model_mapping:
+        '模型名称映射， 你可以取一个容易记忆的名字来代替coze-{bot_id}，例如：{"coze-translate": "coze-xxxxx"},注意：如果使用了模型映射，那么上面的模型名称必须使用映射前的名称，上述例子中，你应该在模型中填入coze-translate(如果已经使用了coze-*，可以忽略)。'
+    },
+    modelGroup: 'Coze'
+  },
+  39: {
+    input: {
+      models: ['phi3', 'llama3']
+    },
+    prompt: {
+      base_url: '请输入你部署的Ollama地址，例如：http://127.0.0.1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息',
+      key: '请随意填写'
+    }
   }
 };
 
