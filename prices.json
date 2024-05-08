@@ -668,15 +668,15 @@
     "model": "deepseek-chat",
     "type": "tokens",
     "channel_type": 28,
-    "input": 0.75,
-    "output": 0.75
+    "input": 0.0714,
+    "output": 0.1429
   },
   {
     "model": "deepseek-coder",
     "type": "tokens",
     "channel_type": 28,
-    "input": 0.75,
-    "output": 0.75
+    "input": 0.0714,
+    "output": 0.1429
   },
   {
     "model": "moonshot-v1-128k",
