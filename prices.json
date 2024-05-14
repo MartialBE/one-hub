@@ -570,15 +570,22 @@
     "model": "gemini-1.5-pro",
     "type": "tokens",
     "channel_type": 25,
-    "input": 3.5,
-    "output": 10.5
+    "input": 1.75,
+    "output": 5.25
   },
   {
     "model": "gemini-1.5-pro-latest",
     "type": "tokens",
     "channel_type": 25,
-    "input": 3.5,
-    "output": 10.5
+    "input": 1.75,
+    "output": 5.25
+  },
+  {
+    "model": "gemini-1.5-flash-latest",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 0.175,
+    "output": 0.265
   },
   {
     "model": "gemini-ultra",
