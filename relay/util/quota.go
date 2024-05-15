@@ -129,15 +129,13 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	}
 	var modelRatioStr string
 	if q.price.Type == model.TimesPriceType {
-		modelRatioStr = fmt.Sprintf("$%.4f/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
+		modelRatioStr = fmt.Sprintf("$%s/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
 	} else {
 		// 如果输入费率和输出费率一样，则只显示一个费率
 		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("单价: $%.4f/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
+			modelRatioStr = fmt.Sprintf("$%s/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
 		} else {
-			modelRatioStr = fmt.Sprintf(" 提示: $%.4f/1k, 补全: $%.4f/1k",
-				q.price.FetchInputCurrencyPrice(model.DollarRate),
-				q.price.FetchOutputCurrencyPrice(model.DollarRate))
+			modelRatioStr = fmt.Sprintf("$%s/1k (输入) | $%s/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
 		}
 	}
 
