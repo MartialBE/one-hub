@@ -144,21 +144,21 @@ export default function Profile() {
               spacing={2}
               sx={{ paddingBottom: '20px' }}
             >
-              <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
+              {status.wechat_login && !inputs.wechat_id && (<Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
                 <IconBrandWechat /> {inputs.wechat_id || '未绑定'}
-              </Label>
-              <Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
+              </Label>)}
+              {status.github_oauth && !inputs.github_id && (<Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
                 <IconBrandGithub /> {inputs.github_id || '未绑定'}
-              </Label>
+              </Label>)}
               <Label variant="ghost" color={inputs.email ? 'primary' : 'default'}>
                 <IconMail /> {inputs.email || '未绑定'}
               </Label>
-              <Label variant="ghost" color={inputs.telegram_id ? 'primary' : 'default'}>
+              {status.telegram_bot && (<Label variant="ghost" color={inputs.telegram_id ? 'primary' : 'default'}>
                 <IconBrandTelegram /> {inputs.telegram_id || '未绑定'}
-              </Label>
-              <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
+              </Label>)}
+              {status.lark_client_id && !inputs.lark_id && (<Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
                 <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || '未绑定'}
-              </Label>
+              </Label>)}
             </Stack>
             <SubCard title="个人信息">
               <Grid container spacing={2}>
