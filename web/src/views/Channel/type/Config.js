@@ -52,6 +52,11 @@ const typeConfig = {
       provider_models_list: '从OpenAI获取模型列表'
     }
   },
+  8: {
+    inputLabel: {
+      provider_models_list: '从渠道获取模型列表'
+    }
+  },
   3: {
     inputLabel: {
       base_url: 'AZURE_OPENAI_ENDPOINT',
