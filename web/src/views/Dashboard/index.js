@@ -3,7 +3,7 @@ import { Grid, Typography } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
-import SupportModels from './component/SupportModels';
+// import SupportModels from './component/SupportModels';
 import { generateLineChartOptions, getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
@@ -70,9 +70,9 @@ const Dashboard = () => {
 
   return (
     <Grid container spacing={gridSpacing}>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <SupportModels />
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={4} xs={12}>

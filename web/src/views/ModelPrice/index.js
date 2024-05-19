@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-
-import { Card, Stack, Typography } from '@mui/material';
+import { Card, Stack, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import {
   DataGrid,
   GridToolbarContainer,
@@ -20,6 +19,7 @@ export default function ModelPrice() {
   const [userModelList, setUserModelList] = useState([]);
   const [prices, setPrices] = useState({});
   const [ownedby, setOwnedby] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState('');
 
   const fetchOwnedby = useCallback(async () => {
     try {
@@ -80,8 +80,6 @@ export default function ModelPrice() {
     let newRows = [];
     userModelList.forEach((model, index) => {
       const price = prices[model.id];
-      // const type_label = priceType.find((pt) => pt.value === price?.type);
-      // const channel_label = ownedby.find((ob) => ob.value === price?.channel_type);
       newRows.push({
         id: index + 1,
         model: model.id,
@@ -91,7 +89,6 @@ export default function ModelPrice() {
         output: price?.output !== undefined && price?.output !== null ? price.output : 30
       });
     });
-    console.log(newRows);
     setRows(newRows);
   }, [userModelList, ownedby, prices]);
 
@@ -107,6 +104,15 @@ export default function ModelPrice() {
 
     fetchData();
   }, [fetchOwnedby, fetchUserModelList, fetchPrices]);
+
+  const handleSupplierChange = (event) => {
+    setSelectedSupplier(event.target.value);
+  };
+
+  const filteredRows = useMemo(() => {
+    if (!selectedSupplier) return rows;
+    return rows.filter(row => row.channel_type === parseInt(selectedSupplier));
+  }, [rows, selectedSupplier]);
 
   const modelRatioColumns = useMemo(
     () => [
@@ -159,11 +165,32 @@ export default function ModelPrice() {
 
   function EditToolbar() {
     return (
-      <GridToolbarContainer>
+      <GridToolbarContainer style={{paddingTop: 16}}>
         <GridToolbarColumnsButton />
         <GridToolbarFilterButton />
         <GridToolbarDensitySelector />
         <GridToolbarQuickFilter />
+        <FormControl variant="outlined" size="small" style={{ marginLeft: 16, width: 200 }}>
+          <InputLabel id="supplier-select-label">供应商</InputLabel>
+          <Select
+            labelId="supplier-select-label"
+            id="supplier-select"
+            value={selectedSupplier}
+            onChange={handleSupplierChange}
+            label="供应商"
+            style={{ height: '40px' }}  // 设置 Select 的高度
+          >
+            <MenuItem value="">
+              <em>全部</em>
+            </MenuItem>
+            {ownedby.map((supplier) => (
+              <MenuItem key={supplier.value} value={supplier.value}>
+                {supplier.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
       </GridToolbarContainer>
     );
   }
@@ -175,7 +202,7 @@ export default function ModelPrice() {
       </Stack>
       <Card>
         <DataGrid
-          rows={rows}
+          rows={filteredRows}
           columns={modelRatioColumns}
           initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
           pageSizeOptions={[20, 30, 50, 100]}
