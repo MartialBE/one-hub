@@ -343,21 +343,42 @@
     "output": 8.572
   },
   {
-    "model": "ERNIE-Bot-8k",
-    "type": "tokens",
-    "channel_type": 15,
-    "input": 1.7143,
-    "output": 3.4286
-  },
-  {
     "model": "ERNIE-Bot-turbo",
     "type": "tokens",
     "channel_type": 15,
-    "input": 0.5715,
-    "output": 0.5715
+    "input": 0,
+    "output": 0
   },
   {
     "model": "ERNIE-Speed",
+    "type": "tokens",
+    "channel_type": 15,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "ERNIE-Speed-128K",
+    "type": "tokens",
+    "channel_type": 15,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "ERNIE-Lite-8K",
+    "type": "tokens",
+    "channel_type": 15,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "ERNIE-Tiny-8K",
+    "type": "tokens",
+    "channel_type": 15,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "ERNIE-Functions-8K",
     "type": "tokens",
     "channel_type": 15,
     "input": 0.2857,
@@ -388,8 +409,8 @@
     "model": "glm-3-turbo",
     "type": "tokens",
     "channel_type": 16,
-    "input": 0.3572,
-    "output": 0.3572
+    "input": 0.0714,
+    "output": 0.0714
   },
   {
     "model": "glm-4",
@@ -409,29 +430,36 @@
     "model": "qwen-max",
     "type": "tokens",
     "channel_type": 17,
-    "input": 8.5714,
+    "input": 2.8571,
     "output": 8.5714
   },
   {
     "model": "qwen-max-longcontext",
     "type": "tokens",
     "channel_type": 17,
-    "input": 8.5714,
+    "input": 2.8571,
     "output": 8.5714
   },
   {
     "model": "qwen-plus",
     "type": "tokens",
     "channel_type": 17,
-    "input": 1.4286,
-    "output": 1.4286
+    "input": 0.2857,
+    "output": 0.8571
   },
   {
     "model": "qwen-turbo",
     "type": "tokens",
     "channel_type": 17,
-    "input": 0.5715,
-    "output": 0.5715
+    "input": 0.1429,
+    "output": 0.4286
+  },
+  {
+    "model": "qwen-long",
+    "type": "tokens",
+    "channel_type": 17,
+    "input": 0.0357,
+    "output": 0.1429
   },
   {
     "model": "qwen-vl-max",
