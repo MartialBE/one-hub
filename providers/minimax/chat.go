@@ -132,6 +132,7 @@ func (p *MiniMaxProvider) convertToChatOpenai(response *MiniMaxChatResponse, req
 func convertFromChatOpenai(request *types.ChatCompletionRequest) *MiniMaxChatRequest {
 	var botSettings []MiniMaxBotSetting
 	var messges []MiniMaxChatMessage
+	request.ClearEmptyMessages()
 	for _, message := range request.Messages {
 		if message.Role == types.ChatMessageRoleSystem {
 			botSettings = append(botSettings, MiniMaxBotSetting{
@@ -145,7 +146,12 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *MiniMaxChatReq
 		}
 
 		// 如果role为function， 则需要在前面一条记录添加function_call，如果没有消息，则添加一个message
-		if message.Role == types.ChatMessageRoleFunction {
+		if message.ToolCalls != nil {
+			miniMessage.FunctionCall = &types.ChatCompletionToolCallsFunction{
+				Name:      message.ToolCalls[0].Function.Name,
+				Arguments: message.ToolCalls[0].Function.Arguments,
+			}
+		} else if message.Role == types.ChatMessageRoleFunction {
 			if len(messges) == 0 {
 				messges = append(messges, MiniMaxChatMessage{
 					SenderType: "USER",
@@ -187,7 +193,6 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *MiniMaxChatReq
 			miniRequest.Functions = append(miniRequest.Functions, &tool.Function)
 		}
 	}
-
 	return miniRequest
 }
 

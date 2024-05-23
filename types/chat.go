@@ -111,6 +111,37 @@ func (m ChatCompletionMessage) ParseContent() []ChatMessagePart {
 	return nil
 }
 
+// 将FunctionCall转换为ToolCalls
+func (m *ChatCompletionMessage) FuncToToolCalls() {
+	if m.ToolCalls != nil {
+		return
+	}
+	if m.FunctionCall != nil {
+		m.ToolCalls = []*ChatCompletionToolCalls{
+			{
+				Type:     ChatMessageRoleFunction,
+				Function: m.FunctionCall,
+			},
+		}
+		m.FunctionCall = nil
+	}
+}
+
+// 将ToolCalls转换为FunctionCall
+func (m *ChatCompletionMessage) ToolToFuncCalls() {
+
+	if m.FunctionCall != nil {
+		return
+	}
+	if m.ToolCalls != nil {
+		m.FunctionCall = &ChatCompletionToolCallsFunction{
+			Name:      m.ToolCalls[0].Function.Name,
+			Arguments: m.ToolCalls[0].Function.Arguments,
+		}
+		m.ToolCalls = nil
+	}
+}
+
 type ChatMessageImageURL struct {
 	URL    string `json:"url,omitempty"`
 	Detail string `json:"detail,omitempty"`
@@ -158,6 +189,32 @@ func (r ChatCompletionRequest) GetFunctionCate() string {
 	return ""
 }
 
+func (r *ChatCompletionRequest) GetFunctions() []*ChatCompletionFunction {
+	if r.Tools == nil && r.Functions == nil {
+		return nil
+	}
+
+	if r.Tools != nil {
+		var functions []*ChatCompletionFunction
+		for _, tool := range r.Tools {
+			functions = append(functions, &tool.Function)
+		}
+		return functions
+	}
+
+	return r.Functions
+}
+
+func (r *ChatCompletionRequest) ClearEmptyMessages() {
+	var messages []ChatCompletionMessage
+	for _, message := range r.Messages {
+		if message.StringContent() != "" || message.ToolCalls != nil || message.FunctionCall != nil {
+			messages = append(messages, message)
+		}
+	}
+	r.Messages = messages
+}
+
 type ChatCompletionFunction struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -178,10 +235,17 @@ type ChatCompletionChoice struct {
 	FinishDetails        any                   `json:"finish_details,omitempty"`
 }
 
+func (c *ChatCompletionChoice) CheckChoice(request *ChatCompletionRequest) {
+	if request.Functions != nil && c.Message.ToolCalls != nil {
+		c.Message.ToolToFuncCalls()
+		c.FinishReason = FinishReasonFunctionCall
+	}
+}
+
 type ChatCompletionResponse struct {
 	ID                  string                 `json:"id"`
 	Object              string                 `json:"object"`
-	Created             int64                  `json:"created"`
+	Created             any                    `json:"created"`
 	Model               string                 `json:"model"`
 	Choices             []ChatCompletionChoice `json:"choices"`
 	Usage               *Usage                 `json:"usage,omitempty"`
@@ -198,61 +262,16 @@ func (cc *ChatCompletionResponse) GetContent() string {
 }
 
 func (c ChatCompletionStreamChoice) ConvertOpenaiStream() []ChatCompletionStreamChoice {
-	var function *ChatCompletionToolCallsFunction
-	var functions []*ChatCompletionToolCallsFunction
 	var choices []ChatCompletionStreamChoice
 	var stopFinish string
 	if c.Delta.FunctionCall != nil {
-		function = c.Delta.FunctionCall
 		stopFinish = FinishReasonFunctionCall
+		choices = c.Delta.FunctionCall.Split(&c, stopFinish, 0)
 	} else {
-		function = c.Delta.ToolCalls[0].Function
 		stopFinish = FinishReasonToolCalls
-	}
-
-	if function.Name == "" {
-		c.FinishReason = stopFinish
-		choices = append(choices, c)
-		return choices
-	}
-
-	functions = append(functions, &ChatCompletionToolCallsFunction{
-		Name:      function.Name,
-		Arguments: "",
-	})
-
-	if function.Arguments == "" || function.Arguments == "{}" {
-		functions = append(functions, &ChatCompletionToolCallsFunction{
-			Arguments: "{}",
-		})
-	} else {
-		functions = append(functions, &ChatCompletionToolCallsFunction{
-			Arguments: function.Arguments,
-		})
-	}
-
-	// 循环functions, 生成choices
-	for _, function := range functions {
-		choice := ChatCompletionStreamChoice{
-			Index: 0,
-			Delta: ChatCompletionStreamChoiceDelta{
-				Role: c.Delta.Role,
-			},
+		for index, tool := range c.Delta.ToolCalls {
+			choices = append(choices, tool.Function.Split(&c, stopFinish, index)...)
 		}
-		if stopFinish == FinishReasonFunctionCall {
-			choice.Delta.FunctionCall = function
-		} else {
-			choice.Delta.ToolCalls = []*ChatCompletionToolCalls{
-				{
-					Id:       c.Delta.ToolCalls[0].Id,
-					Index:    0,
-					Type:     "function",
-					Function: function,
-				},
-			}
-		}
-
-		choices = append(choices, choice)
 	}
 
 	choices = append(choices, ChatCompletionStreamChoice{
@@ -264,11 +283,72 @@ func (c ChatCompletionStreamChoice) ConvertOpenaiStream() []ChatCompletionStream
 	return choices
 }
 
+func (f *ChatCompletionToolCallsFunction) Split(c *ChatCompletionStreamChoice, stopFinish string, index int) []ChatCompletionStreamChoice {
+	var functions []*ChatCompletionToolCallsFunction
+	var choices []ChatCompletionStreamChoice
+	functions = append(functions, &ChatCompletionToolCallsFunction{
+		Name:      f.Name,
+		Arguments: "",
+	})
+
+	if f.Arguments == "" || f.Arguments == "{}" {
+		functions = append(functions, &ChatCompletionToolCallsFunction{
+			Arguments: "{}",
+		})
+	} else {
+		functions = append(functions, &ChatCompletionToolCallsFunction{
+			Arguments: f.Arguments,
+		})
+	}
+
+	for fIndex, function := range functions {
+		choice := ChatCompletionStreamChoice{
+			Index: c.Index,
+			Delta: ChatCompletionStreamChoiceDelta{
+				Role: c.Delta.Role,
+			},
+		}
+		if stopFinish == FinishReasonFunctionCall {
+			choice.Delta.FunctionCall = function
+		} else {
+			toolCalls := &ChatCompletionToolCalls{
+				// Id:       c.Delta.ToolCalls[0].Id,
+				Index:    index,
+				Type:     ChatMessageRoleFunction,
+				Function: function,
+			}
+
+			if fIndex == 0 {
+				toolCalls.Id = c.Delta.ToolCalls[0].Id
+			}
+			choice.Delta.ToolCalls = []*ChatCompletionToolCalls{toolCalls}
+		}
+
+		choices = append(choices, choice)
+	}
+
+	return choices
+}
+
 type ChatCompletionStreamChoiceDelta struct {
 	Content      string                           `json:"content,omitempty"`
 	Role         string                           `json:"role,omitempty"`
 	FunctionCall *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls    []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
+}
+
+func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {
+
+	if m.FunctionCall != nil {
+		return
+	}
+	if m.ToolCalls != nil {
+		m.FunctionCall = &ChatCompletionToolCallsFunction{
+			Name:      m.ToolCalls[0].Function.Name,
+			Arguments: m.ToolCalls[0].Function.Arguments,
+		}
+		m.ToolCalls = nil
+	}
 }
 
 type ChatCompletionStreamChoice struct {
@@ -278,10 +358,17 @@ type ChatCompletionStreamChoice struct {
 	ContentFilterResults any                             `json:"content_filter_results,omitempty"`
 }
 
+func (c *ChatCompletionStreamChoice) CheckChoice(request *ChatCompletionRequest) {
+	if request.Functions != nil && c.Delta.ToolCalls != nil {
+		c.Delta.ToolToFuncCalls()
+		c.FinishReason = FinishReasonToolCalls
+	}
+}
+
 type ChatCompletionStreamResponse struct {
 	ID                string                       `json:"id"`
 	Object            string                       `json:"object"`
-	Created           int64                        `json:"created"`
+	Created           any                          `json:"created"`
 	Model             string                       `json:"model"`
 	Choices           []ChatCompletionStreamChoice `json:"choices"`
 	PromptAnnotations any                          `json:"prompt_annotations,omitempty"`
