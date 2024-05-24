@@ -11,7 +11,7 @@ on:
 
 env:
   # github.repository as <account>/<repo>
-  DOCKER_HUB_USERNAME: martialbe
+  DOCKER_HUB_USERNAME: zerodeng
   DOCKER_HUB_REPO: one-api
 
 jobs:
