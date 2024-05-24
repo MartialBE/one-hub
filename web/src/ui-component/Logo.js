@@ -1,6 +1,6 @@
 // material-ui
-import logoLight from 'assets/images/logo.svg';
-import logoDark from 'assets/images/logo-white.svg';
+import logoLight from 'assets/images/logo.png';
+import logoDark from 'assets/images/logo-white.png';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 
