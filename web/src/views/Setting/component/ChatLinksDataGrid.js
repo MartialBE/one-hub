@@ -158,7 +158,7 @@ const ChatLinksDataGrid = ({ links, onChange }) => {
         sortable: false,
         headerName: '排序',
         flex: 1,
-        minWidth: 50,
+        minWidth: 100,
         editable: true,
         hideable: false
       },
