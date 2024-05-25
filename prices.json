@@ -483,39 +483,25 @@
     "output": 0.05
   },
   {
-    "model": "SparkDesk",
-    "type": "tokens",
-    "channel_type": 18,
-    "input": 1.2858,
-    "output": 1.2858
-  },
-  {
     "model": "SparkDesk-v1.1",
     "type": "tokens",
     "channel_type": 18,
-    "input": 1.2858,
-    "output": 1.2858
-  },
-  {
-    "model": "SparkDesk-v2.1",
-    "type": "tokens",
-    "channel_type": 18,
-    "input": 1.2858,
-    "output": 1.2858
+    "input": 0,
+    "output": 0
   },
   {
     "model": "SparkDesk-v3.1",
     "type": "tokens",
     "channel_type": 18,
-    "input": 1.2858,
-    "output": 1.2858
+    "input": 2.1429,
+    "output": 2.1429
   },
   {
     "model": "SparkDesk-v3.5",
     "type": "tokens",
     "channel_type": 18,
-    "input": 1.2858,
-    "output": 1.2858
+    "input": 2.1429,
+    "output": 2.1429
   },
   {
     "model": "360GPT_S2_V9",
@@ -1062,6 +1048,34 @@
     "channel_type": 37,
     "input": 15,
     "output": 15
+  },
+  {
+    "model": "hunyuan-lite",
+    "type": "tokens",
+    "channel_type": 40,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "hunyuan-standard",
+    "type": "tokens",
+    "channel_type": 40,
+    "input": 0.3214,
+    "output": 0.3571
+  },
+  {
+    "model": "hunyuan-standard-256k",
+    "type": "tokens",
+    "channel_type": 40,
+    "input": 1.0714,
+    "output": 4.2857
+  },
+  {
+    "model": "hunyuan-pro",
+    "type": "tokens",
+    "channel_type": 37,
+    "input": 2.1429,
+    "output": 7.1429
   },
   {
     "model": "coze-*",
