@@ -103,7 +103,7 @@ const ChatLinksDataGrid = ({ links, onChange }) => {
   );
 
   const processRowUpdate = (newRow, oldRows) => {
-    if (!newRow.isNew && newRow.name === oldRows.name && newRow.url === oldRows.url && newRow.show === oldRows.show) {
+    if (!newRow.isNew && newRow.name === oldRows.name && newRow.url === oldRows.url && newRow.serial===oldRows.serial && newRow.show === oldRows.show) {
       return oldRows;
     }
     const updatedRow = { ...newRow, isNew: false };
@@ -150,6 +150,15 @@ const ChatLinksDataGrid = ({ links, onChange }) => {
         flex: 1,
         minWidth: 200,
         type: 'boolean',
+        editable: true,
+        hideable: false
+      },
+      {
+        field: 'serial',
+        sortable: false,
+        headerName: '排序',
+        flex: 1,
+        minWidth: 100,
         editable: true,
         hideable: false
       },
