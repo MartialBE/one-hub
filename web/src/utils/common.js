@@ -254,11 +254,11 @@ export function getChatLinks(filterShow = false) {
   if (filterShow) {
     links = links.filter((link) => link.show);
   }
-  // 对links进行排序，serial为空的项排在最后
+  // 对links进行排序，sort为空的项排在最后
   links.sort((a, b) => {
-    if (a.serial === undefined || a.serial === null) return 1;
-    if (b.serial === undefined || b.serial === null) return -1;
-    return a.serial - b.serial;
+    if (!a?.sort) return 1;
+    if (!b?.sort) return -1;
+    return b.sort - a.sort;
   });
   return links;
 }
