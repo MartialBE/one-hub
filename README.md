@@ -86,6 +86,10 @@ ghcr.io/martialbe/one-api
 
 感谢以上项目的作者和贡献者
 
+## 交流群
+
+<img src="https://github.com/MartialBE/one-api/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
+
 ## 其他
 
 <a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=689214770" target="_blank" style="display: block" align="center">
