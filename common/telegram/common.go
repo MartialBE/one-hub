@@ -235,13 +235,8 @@ func getHttpClient() (httpClient *http.Client) {
 		common.SysLog("failed to parse TG proxy URL: " + err.Error())
 		return
 	}
-	proxyUsername := viper.GetString("tg.proxy_username") // 代理用户名
-	proxyPassword := viper.GetString("tg.proxy_password") // 代理密码
 	switch proxyURL.Scheme {
 	case "http", "https":
-		if proxyUsername != "" && proxyPassword != "" {
-			proxyURL.User = url.UserPassword(proxyUsername, proxyPassword)
-		}
 		httpClient = &http.Client{
 			Transport: &http.Transport{
 				Proxy: http.ProxyURL(proxyURL),
@@ -249,10 +244,11 @@ func getHttpClient() (httpClient *http.Client) {
 		}
 	case "socks5":
 		var auth *proxy.Auth = nil
-		if proxyUsername != "" && proxyPassword != "" {
+		password, isSetPassword := proxyURL.User.Password()
+		if isSetPassword {
 			auth = &proxy.Auth{
-				User:     proxyUsername,
-				Password: proxyPassword,
+				User:     proxyURL.User.Username(),
+				Password: password,
 			}
 		}
 		dialer, err := proxy.SOCKS5("tcp", proxyURL.Host, auth, proxy.Direct)

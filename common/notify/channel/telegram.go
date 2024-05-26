@@ -30,13 +30,11 @@ type telegramResponse struct {
 	Description string `json:"description"`
 }
 
-func NewTelegram(secret, chatID, httpProxy string, proxyUsername string, proxyPassword string) *Telegram {
+func NewTelegram(secret, chatID, httpProxy string) *Telegram {
 	return &Telegram{
-		secret:        secret,
-		chatID:        chatID,
-		httpProxy:     httpProxy,
-		proxyUsername: proxyUsername,
-		proxyPassword: proxyPassword,
+		secret:    secret,
+		chatID:    chatID,
+		httpProxy: httpProxy,
 	}
 }
 

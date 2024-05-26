@@ -88,13 +88,11 @@ func InitTelegramNotifier() {
 	bot_token := viper.GetString("notify.telegram.bot_api_key")
 	chat_id := viper.GetString("notify.telegram.chat_id")
 	httpProxy := viper.GetString("notify.telegram.http_proxy")
-	proxyUsername := viper.GetString("notify.telegram.proxy_username") // 代理用户名
-	proxyPassword := viper.GetString("notify.telegram.proxy_password") // 代理密码
 	if bot_token == "" || chat_id == "" {
 		return
 	}
 
-	telegramNotifier := channel.NewTelegram(bot_token, chat_id, httpProxy, proxyUsername, proxyPassword)
+	telegramNotifier := channel.NewTelegram(bot_token, chat_id, httpProxy)
 
 	AddNotifiers(telegramNotifier)
 	common.SysLog("telegram notifier enable")
