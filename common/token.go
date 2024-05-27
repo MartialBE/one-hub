@@ -128,7 +128,7 @@ const (
 // https://platform.openai.com/docs/guides/vision/calculating-costs
 // https://github.com/openai/openai-cookbook/blob/05e3f9be4c7a2ae7ecf029a7c32065b024730ebe/examples/How_to_count_tokens_with_tiktoken.ipynb
 func countImageTokens(url string, detail string) (_ int, err error) {
-	if !strings.HasPrefix(url, "data:image") {
+	if !strings.HasPrefix(url, "data:image") && !strings.HasPrefix(url, "http") {
         return 1000, errors.New("invalid file type")
     } 
 	var fetchSize = true
