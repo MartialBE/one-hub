@@ -62,18 +62,14 @@ func (price *Price) GetOutput() float64 {
 	return price.Output
 }
 
-func (price *Price) FetchInputCurrencyPrice(rate float64) float64 {
+func (price *Price) FetchInputCurrencyPrice(rate float64) string {
 	r := decimal.NewFromFloat(price.GetInput()).Mul(decimal.NewFromFloat(rate))
-	v, _ := r.Float64()
-
-	return v
+	return r.String()
 }
 
-func (price *Price) FetchOutputCurrencyPrice(rate float64) float64 {
+func (price *Price) FetchOutputCurrencyPrice(rate float64) string {
 	r := decimal.NewFromFloat(price.GetOutput()).Mul(decimal.NewFromFloat(rate))
-	v, _ := r.Float64()
-
-	return v
+	return r.String()
 }
 
 func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
@@ -133,6 +129,8 @@ func GetDefaultPrice() []*Price {
 		"gpt-4-0125-preview":     {[]float64{5, 15}, common.ChannelTypeOpenAI},
 		"gpt-4-turbo-preview":    {[]float64{5, 15}, common.ChannelTypeOpenAI},
 		"gpt-4-vision-preview":   {[]float64{5, 15}, common.ChannelTypeOpenAI},
+		// $0.005 / 1K tokens	$0.015 / 1K tokens
+		"gpt-4o": {[]float64{2.5, 7.5}, common.ChannelTypeOpenAI},
 		// 	$0.0005 / 1K tokens	$0.0015 / 1K tokens
 		"gpt-3.5-turbo":      {[]float64{0.25, 0.75}, common.ChannelTypeOpenAI},
 		"gpt-3.5-turbo-0125": {[]float64{0.25, 0.75}, common.ChannelTypeOpenAI},
@@ -205,9 +203,11 @@ func GetDefaultPrice() []*Price {
 		"gemini-pro-vision": {[]float64{0.25, 0.75}, common.ChannelTypeGemini},
 		"gemini-1.0-pro":    {[]float64{0.25, 0.75}, common.ChannelTypeGemini},
 		// $7 / 1 million tokens  $21 / 1 million tokens
-		// 0.007$ / 1k tokens 0.021$ / 1k tokens
-		"gemini-1.5-pro": {[]float64{3.5, 10.5}, common.ChannelTypeGemini},
-		"gemini-ultra":   {[]float64{1, 1}, common.ChannelTypeGemini},
+		"gemini-1.5-pro":          {[]float64{1.75, 5.25}, common.ChannelTypeGemini},
+		"gemini-1.5-pro-latest":   {[]float64{1.75, 5.25}, common.ChannelTypeGemini},
+		"gemini-1.5-flash":        {[]float64{0.175, 0.265}, common.ChannelTypeGemini},
+		"gemini-1.5-flash-latest": {[]float64{0.175, 0.265}, common.ChannelTypeGemini},
+		"gemini-ultra":            {[]float64{1, 1}, common.ChannelTypeGemini},
 
 		// ￥0.005 / 1k tokens
 		"glm-3-turbo": {[]float64{0.3572, 0.3572}, common.ChannelTypeZhipu},
@@ -313,6 +313,12 @@ func GetDefaultPrice() []*Price {
 		"sd3-turbo": {[]float64{20, 20}, common.ChannelTypeStabilityAI},
 		// 0.03
 		"stable-image-core": {[]float64{15, 15}, common.ChannelTypeStabilityAI},
+
+		// hunyuan
+		"hunyuan-lite":          {[]float64{0, 0}, common.ChannelTypeHunyuan},
+		"hunyuan-standard":      {[]float64{0.3214, 0.3571}, common.ChannelTypeHunyuan},
+		"hunyuan-standard-256k": {[]float64{1.0714, 4.2857}, common.ChannelTypeHunyuan},
+		"hunyuan-pro":           {[]float64{2.1429, 7.1429}, common.ChannelTypeHunyuan},
 	}
 
 	var prices []*Price

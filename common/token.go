@@ -9,14 +9,21 @@ import (
 	"one-api/common/image"
 	"one-api/types"
 
-	"github.com/pkoukk/tiktoken-go"
+	"github.com/MartialBE/tiktoken-go"
+	"github.com/spf13/viper"
 )
 
 var tokenEncoderMap = map[string]*tiktoken.Tiktoken{}
 var gpt35TokenEncoder *tiktoken.Tiktoken
 var gpt4TokenEncoder *tiktoken.Tiktoken
+var gpt4oTokenEncoder *tiktoken.Tiktoken
 
 func InitTokenEncoders() {
+	if viper.GetBool("disable_token_encoders") {
+		DISABLE_TOKEN_ENCODERS = true
+		SysLog("token encoders disabled")
+		return
+	}
 	SysLog("initializing token encoders")
 	var err error
 	gpt35TokenEncoder, err = tiktoken.EncodingForModel("gpt-3.5-turbo")
@@ -29,10 +36,19 @@ func InitTokenEncoders() {
 		FatalLog(fmt.Sprintf("failed to get gpt-4 token encoder: %s", err.Error()))
 	}
 
+	gpt4oTokenEncoder, err = tiktoken.EncodingForModel("gpt-4o")
+	if err != nil {
+		FatalLog(fmt.Sprintf("failed to get gpt-4o token encoder: %s", err.Error()))
+	}
+
 	SysLog("token encoders initialized")
 }
 
 func getTokenEncoder(model string) *tiktoken.Tiktoken {
+	if DISABLE_TOKEN_ENCODERS {
+		return nil
+	}
+
 	tokenEncoder, ok := tokenEncoderMap[model]
 	if ok {
 		return tokenEncoder
@@ -40,6 +56,8 @@ func getTokenEncoder(model string) *tiktoken.Tiktoken {
 
 	if strings.HasPrefix(model, "gpt-3.5") {
 		tokenEncoder = gpt35TokenEncoder
+	} else if strings.HasPrefix(model, "gpt-4o") {
+		tokenEncoder = gpt4oTokenEncoder
 	} else if strings.HasPrefix(model, "gpt-4") {
 		tokenEncoder = gpt4TokenEncoder
 	} else {
@@ -56,7 +74,7 @@ func getTokenEncoder(model string) *tiktoken.Tiktoken {
 }
 
 func getTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
-	if ApproximateTokenEnabled {
+	if DISABLE_TOKEN_ENCODERS || ApproximateTokenEnabled {
 		return int(float64(len(text)) * 0.38)
 	}
 	return len(tokenEncoder.Encode(text, nil, nil))

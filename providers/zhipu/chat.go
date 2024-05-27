@@ -8,7 +8,6 @@ import (
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
-	"time"
 )
 
 type zhipuStreamHandler struct {
@@ -99,14 +98,24 @@ func (p *ZhipuProvider) convertToChatOpenai(response *ZhipuResponse, request *ty
 		Usage:   response.Usage,
 	}
 
+	if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Message.ToolCalls != nil && request.Functions != nil {
+		for i, _ := range openaiResponse.Choices {
+			openaiResponse.Choices[i].CheckChoice(request)
+		}
+	}
+
 	*p.Usage = *response.Usage
 
 	return
 }
 
 func (p *ZhipuProvider) convertFromChatOpenai(request *types.ChatCompletionRequest) *ZhipuRequest {
-	for i := range request.Messages {
+	request.ClearEmptyMessages()
+	for i, _ := range request.Messages {
 		request.Messages[i].Role = convertRole(request.Messages[i].Role)
+		if request.Messages[i].FunctionCall != nil {
+			request.Messages[i].FuncToToolCalls()
+		}
 	}
 
 	zhipuRequest := &ZhipuRequest{
@@ -167,7 +176,6 @@ func (p *ZhipuProvider) convertFromChatOpenai(request *types.ChatCompletionReque
 	}
 
 	p.pluginHandle(zhipuRequest)
-
 	return zhipuRequest
 }
 
@@ -252,9 +260,9 @@ func (h *zhipuStreamHandler) convertToOpenaiStream(zhipuResponse *ZhipuStreamRes
 		Model:   h.Request.Model,
 	}
 
-	choice := zhipuResponse.Choices[0]
-
-	if choice.Delta.ToolCalls != nil {
+	if zhipuResponse.Choices[0].Delta.ToolCalls != nil {
+		choice := zhipuResponse.Choices[0]
+		choice.CheckChoice(h.Request)
 		choices := choice.ConvertOpenaiStream()
 		for _, choice := range choices {
 			chatCompletionCopy := streamResponse
@@ -263,10 +271,9 @@ func (h *zhipuStreamHandler) convertToOpenaiStream(zhipuResponse *ZhipuStreamRes
 			dataChan <- string(responseBody)
 		}
 	} else {
-		streamResponse.Choices = []types.ChatCompletionStreamChoice{choice}
+		streamResponse.Choices = zhipuResponse.Choices
 		responseBody, _ := json.Marshal(streamResponse)
 		dataChan <- string(responseBody)
-		time.Sleep(20 * time.Millisecond)
 	}
 
 	if zhipuResponse.Usage != nil {

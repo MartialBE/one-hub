@@ -17,8 +17,9 @@ type OpenAIProviderFactory struct{}
 
 type OpenAIProvider struct {
 	base.BaseProvider
-	IsAzure       bool
-	BalanceAction bool
+	IsAzure              bool
+	BalanceAction        bool
+	SupportStreamOptions bool
 }
 
 // 创建 OpenAIProvider
@@ -33,7 +34,7 @@ func (f OpenAIProviderFactory) Create(channel *model.Channel) base.ProviderInter
 func CreateOpenAIProvider(channel *model.Channel, baseURL string) *OpenAIProvider {
 	config := getOpenAIConfig(baseURL)
 
-	return &OpenAIProvider{
+	OpenAIProvider := &OpenAIProvider{
 		BaseProvider: base.BaseProvider{
 			Config:    config,
 			Channel:   channel,
@@ -42,6 +43,12 @@ func CreateOpenAIProvider(channel *model.Channel, baseURL string) *OpenAIProvide
 		IsAzure:       false,
 		BalanceAction: true,
 	}
+
+	if channel.Type == common.ChannelTypeOpenAI {
+		OpenAIProvider.SupportStreamOptions = true
+	}
+
+	return OpenAIProvider
 }
 
 func getOpenAIConfig(baseURL string) base.ProviderConfig {
@@ -57,6 +64,7 @@ func getOpenAIConfig(baseURL string) base.ProviderConfig {
 		ImagesGenerations:   "/v1/images/generations",
 		ImagesEdit:          "/v1/images/edits",
 		ImagesVariations:    "/v1/images/variations",
+		ModelList:           "/v1/models",
 	}
 }
 
@@ -101,6 +109,8 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 			requestURL = fmt.Sprintf("/openai%s?api-version=%s", requestURL, apiVersion)
 		}
 
+	} else if p.Channel.Type == common.ChannelTypeCustom && p.Channel.Other != "" {
+		requestURL = strings.Replace(requestURL, "v1", p.Channel.Other, 1)
 	}
 
 	if strings.HasPrefix(baseURL, "https://gateway.ai.cloudflare.com") {

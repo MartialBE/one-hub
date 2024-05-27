@@ -107,7 +107,7 @@ export default function Profile() {
   const submit = async () => {
     try {
       let inputValue = inputs;
-      inputValue.username = trims(inputValue.username);
+      // inputValue.username = trims(inputValue.username);
       inputValue.display_name = trims(inputValue.display_name);
       await validationSchema.validate(inputValue);
       const res = await API.put(`/api/user/self`, inputValue);
@@ -144,21 +144,29 @@ export default function Profile() {
               spacing={2}
               sx={{ paddingBottom: '20px' }}
             >
-              <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
-                <IconBrandWechat /> {inputs.wechat_id || '未绑定'}
-              </Label>
-              <Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
-                <IconBrandGithub /> {inputs.github_id || '未绑定'}
-              </Label>
+              {status.wechat_login && (
+                <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
+                  <IconBrandWechat /> {inputs.wechat_id || '未绑定'}
+                </Label>
+              )}
+              {status.github_oauth && (
+                <Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
+                  <IconBrandGithub /> {inputs.github_id || '未绑定'}
+                </Label>
+              )}
               <Label variant="ghost" color={inputs.email ? 'primary' : 'default'}>
                 <IconMail /> {inputs.email || '未绑定'}
               </Label>
-              <Label variant="ghost" color={inputs.telegram_id ? 'primary' : 'default'}>
-                <IconBrandTelegram /> {inputs.telegram_id || '未绑定'}
-              </Label>
-              <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
-                <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || '未绑定'}
-              </Label>
+              {status.telegram_bot && (
+                <Label variant="ghost" color={inputs.telegram_id ? 'primary' : 'default'}>
+                  <IconBrandTelegram /> {inputs.telegram_id || '未绑定'}
+                </Label>
+              )}
+              {status.lark_login && (
+                <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
+                  <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || '未绑定'}
+                </Label>
+              )}
             </Stack>
             <SubCard title="个人信息">
               <Grid container spacing={2}>
@@ -170,7 +178,8 @@ export default function Profile() {
                       label="用户名"
                       type="text"
                       value={inputs.username || ''}
-                      onChange={handleInputChange}
+                      // onChange={handleInputChange}
+                      disabled
                       name="username"
                       placeholder="请输入用户名"
                     />

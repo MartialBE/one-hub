@@ -4,6 +4,7 @@ module one-api
 go 1.18
 
 require (
+	github.com/MartialBE/tiktoken-go v0.1.7
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1
 	github.com/aws/smithy-go v1.20.1
 	github.com/gin-contrib/cors v1.7.0
@@ -18,7 +19,6 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/pkoukk/tiktoken-go v0.1.6
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
@@ -35,6 +35,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-gormigrate/gormigrate/v2 v2.1.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect

@@ -101,7 +101,16 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("group")
 	skip_channel_id := c.GetInt("skip_channel_id")
-	channel, err := model.ChannelGroup.Next(group, modelName, skip_channel_id)
+	skip_only_chat := c.GetBool("skip_only_chat")
+	var filters []model.ChannelsFilterFunc
+	if skip_only_chat {
+		filters = append(filters, model.FilterOnlyChat())
+	}
+	if skip_channel_id > 0 {
+		filters = append(filters, model.FilterChannelId(skip_channel_id))
+	}
+
+	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 		if channel != nil {
@@ -131,7 +140,9 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 	return nil
 }
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *util.ChatCacheProps) (errWithOP *types.OpenAIErrorWithStatusCode) {
+type StreamEndHandler func() string
+
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *util.ChatCacheProps, endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -151,6 +162,14 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 				cache.NoCache()
 			}
 
+			if errWithOP == nil && endHandler != nil {
+				streamData := endHandler()
+				if streamData != "" {
+					fmt.Fprint(w, "data: "+streamData+"\n\n")
+					cache.SetResponse(streamData)
+				}
+			}
+
 			streamData := "data: [DONE]\n"
 			fmt.Fprint(w, streamData)
 			cache.SetResponse(streamData)
@@ -158,7 +177,7 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 		}
 	})
 
-	return errWithOP
+	return nil
 }
 
 func responseMultipart(c *gin.Context, resp *http.Response) *types.OpenAIErrorWithStatusCode {

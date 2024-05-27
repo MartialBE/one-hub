@@ -86,6 +86,7 @@ func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 }
 
 func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
+	request.ClearEmptyMessages()
 	geminiRequest := GeminiChatRequest{
 		Contents: make([]GeminiChatContent, 0, len(request.Messages)),
 		SafetySettings: []GeminiChatSafetySettings{
@@ -112,10 +113,13 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			MaxOutputTokens: request.MaxTokens,
 		},
 	}
-	if request.Tools != nil {
+
+	functions := request.GetFunctions()
+
+	if functions != nil {
 		var geminiChatTools GeminiChatTools
-		for _, tool := range request.Tools {
-			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, tool.Function)
+		for _, function := range functions {
+			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, *function)
 		}
 		geminiRequest.Tools = append(geminiRequest.Tools, geminiChatTools)
 	}
@@ -147,36 +151,11 @@ func (p *GeminiProvider) convertToChatOpenai(response *GeminiChatResponse, reque
 		Model:   request.Model,
 		Choices: make([]types.ChatCompletionChoice, 0, len(response.Candidates)),
 	}
-	for i, candidate := range response.Candidates {
-		choice := types.ChatCompletionChoice{
-			Index: i,
-			Message: types.ChatCompletionMessage{
-				Role: "assistant",
-				// Content: "",
-			},
-			FinishReason: types.FinishReasonStop,
-		}
-		if len(candidate.Content.Parts) == 0 {
-			choice.Message.Content = ""
-			openaiResponse.Choices = append(openaiResponse.Choices, choice)
-			continue
-			// choice.Message.Content = candidate.Content.Parts[0].Text
-		}
-		// 开始判断
-		geminiParts := candidate.Content.Parts[0]
-
-		if geminiParts.FunctionCall != nil {
-			choice.Message.ToolCalls = geminiParts.FunctionCall.ToOpenAITool()
-		} else {
-			choice.Message.Content = geminiParts.Text
-		}
-		openaiResponse.Choices = append(openaiResponse.Choices, choice)
+	for _, candidate := range response.Candidates {
+		openaiResponse.Choices = append(openaiResponse.Choices, candidate.ToOpenAIChoice(request))
 	}
 
-	completionTokens := common.CountTokenText(response.GetResponseText(), response.Model)
-
-	p.Usage.CompletionTokens = completionTokens
-	p.Usage.TotalTokens = p.Usage.PromptTokens + completionTokens
+	*p.Usage = convertOpenAIUsage(request.Model, response.UsageMetadata)
 	openaiResponse.Usage = p.Usage
 
 	return
@@ -221,42 +200,11 @@ func (h *geminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 
 	choices := make([]types.ChatCompletionStreamChoice, 0, len(geminiResponse.Candidates))
 
-	for i, candidate := range geminiResponse.Candidates {
-		parts := candidate.Content.Parts[0]
-
-		choice := types.ChatCompletionStreamChoice{
-			Index: i,
-			Delta: types.ChatCompletionStreamChoiceDelta{
-				Role: types.ChatMessageRoleAssistant,
-			},
-			FinishReason: types.FinishReasonStop,
-		}
-
-		if parts.FunctionCall != nil {
-			if parts.FunctionCall.Args == nil {
-				parts.FunctionCall.Args = map[string]interface{}{}
-			}
-			args, _ := json.Marshal(parts.FunctionCall.Args)
-
-			choice.Delta.ToolCalls = []*types.ChatCompletionToolCalls{
-				{
-					Id:    "call_" + common.GetRandomString(24),
-					Type:  types.ChatMessageRoleFunction,
-					Index: 0,
-					Function: &types.ChatCompletionToolCallsFunction{
-						Name:      parts.FunctionCall.Name,
-						Arguments: string(args),
-					},
-				},
-			}
-		} else {
-			choice.Delta.Content = parts.Text
-		}
-
-		choices = append(choices, choice)
+	for _, candidate := range geminiResponse.Candidates {
+		choices = append(choices, candidate.ToOpenAIStreamChoice(h.Request))
 	}
 
-	if len(choices) > 0 && choices[0].Delta.ToolCalls != nil {
+	if len(choices) > 0 && (choices[0].Delta.ToolCalls != nil || choices[0].Delta.FunctionCall != nil) {
 		choices := choices[0].ConvertOpenaiStream()
 		for _, choice := range choices {
 			chatCompletionCopy := streamResponse
@@ -270,6 +218,60 @@ func (h *geminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		dataChan <- string(responseBody)
 	}
 
-	h.Usage.CompletionTokens += common.CountTokenText(geminiResponse.GetResponseText(), h.Request.Model)
-	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+	if geminiResponse.UsageMetadata != nil {
+		*h.Usage = convertOpenAIUsage(h.Request.Model, geminiResponse.UsageMetadata)
+
+	}
+}
+
+const tokenThreshold = 1000000
+
+var modelAdjustRatios = map[string]int{
+	"gemini-1.5-pro":   2,
+	"gemini-1.5-flash": 2,
+}
+
+func adjustTokenCounts(modelName string, usage *GeminiUsageMetadata) {
+	if usage.PromptTokenCount <= tokenThreshold && usage.CandidatesTokenCount <= tokenThreshold {
+		return
+	}
+
+	currentRatio := 1
+	for model, r := range modelAdjustRatios {
+		if strings.HasPrefix(modelName, model) {
+			currentRatio = r
+			break
+		}
+	}
+
+	if currentRatio == 1 {
+		return
+	}
+
+	adjustTokenCount := func(count int) int {
+		if count > tokenThreshold {
+			return tokenThreshold + (count-tokenThreshold)*currentRatio
+		}
+		return count
+	}
+
+	if usage.PromptTokenCount > tokenThreshold {
+		usage.PromptTokenCount = adjustTokenCount(usage.PromptTokenCount)
+	}
+
+	if usage.CandidatesTokenCount > tokenThreshold {
+		usage.CandidatesTokenCount = adjustTokenCount(usage.CandidatesTokenCount)
+	}
+
+	usage.TotalTokenCount = usage.PromptTokenCount + usage.CandidatesTokenCount
+}
+
+func convertOpenAIUsage(modelName string, geminiUsage *GeminiUsageMetadata) types.Usage {
+	adjustTokenCounts(modelName, geminiUsage)
+
+	return types.Usage{
+		PromptTokens:     geminiUsage.PromptTokenCount,
+		CompletionTokens: geminiUsage.CandidatesTokenCount,
+		TotalTokens:      geminiUsage.TotalTokenCount,
+	}
 }

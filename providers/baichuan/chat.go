@@ -40,11 +40,25 @@ func (p *BaichuanProvider) CreateChatCompletion(request *types.ChatCompletionReq
 }
 
 func (p *BaichuanProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	streamOptions := request.StreamOptions
+	// 如果支持流式返回Usage 则需要更改配置：
+	if p.SupportStreamOptions {
+		request.StreamOptions = &types.StreamOptions{
+			IncludeUsage: true,
+		}
+	} else {
+		// 避免误传导致报错
+		request.StreamOptions = nil
+	}
+
 	req, errWithCode := p.GetRequestTextBody(common.RelayModeChatCompletions, request.Model, request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 	defer req.Body.Close()
+
+	// 恢复原来的配置
+	request.StreamOptions = streamOptions
 
 	// 发送请求
 	resp, errWithCode := p.Requester.SendRequestRaw(req)
@@ -62,6 +76,7 @@ func (p *BaichuanProvider) CreateChatCompletionStream(request *types.ChatComplet
 
 // 获取聊天请求体
 func (p *BaichuanProvider) getChatRequestBody(request *types.ChatCompletionRequest) *BaichuanChatRequest {
+	request.ClearEmptyMessages()
 	messages := make([]BaichuanMessage, 0, len(request.Messages))
 	for i := 0; i < len(request.Messages); i++ {
 		message := request.Messages[i]

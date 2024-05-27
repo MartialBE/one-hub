@@ -131,6 +131,7 @@ func (p *BaiduProvider) convertToChatOpenai(response *BaiduChatResponse, request
 }
 
 func convertFromChatOpenai(request *types.ChatCompletionRequest) *BaiduChatRequest {
+	request.ClearEmptyMessages()
 	baiduChatRequest := &BaiduChatRequest{
 		Messages:        make([]BaiduMessage, 0, len(request.Messages)),
 		Temperature:     request.Temperature,
@@ -150,7 +151,7 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *BaiduChatReque
 		if message.Role == types.ChatMessageRoleSystem {
 			baiduChatRequest.System = message.StringContent()
 			continue
-		} else if message.Role == types.ChatMessageRoleFunction {
+		} else if message.ToolCalls != nil {
 			baiduChatRequest.Messages = append(baiduChatRequest.Messages, BaiduMessage{
 				Role: types.ChatMessageRoleAssistant,
 				FunctionCall: &types.ChatCompletionToolCallsFunction{
@@ -158,6 +159,7 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *BaiduChatReque
 					Arguments: "{}",
 				},
 			})
+		} else if message.Role == types.ChatMessageRoleFunction || message.Role == types.ChatMessageRoleTool {
 			baiduChatRequest.Messages = append(baiduChatRequest.Messages, BaiduMessage{
 				Role:    types.ChatMessageRoleUser,
 				Content: "这是函数调用返回的内容，请回答之前的问题：\n" + message.StringContent(),
