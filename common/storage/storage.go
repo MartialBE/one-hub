@@ -13,6 +13,29 @@ type Storage struct {
 func InitStorage() {
 	InitImgurStorage()
 	InitSMStorage()
+	InitAliOSSStorage()
+}
+
+func InitAliOSSStorage() {
+	endpoint := viper.GetString("storage.alioss.endpoint")
+	if endpoint == "" {
+		return
+	}
+	accessKeyId := viper.GetString("storage.alioss.accessKeyId")
+	if accessKeyId == "" {
+		return
+	}
+	accessKeySecret := viper.GetString("storage.alioss.accessKeySecret")
+	if accessKeySecret == "" {
+		return
+	}
+	bucketName := viper.GetString("storage.alioss.bucketName")
+	if bucketName == "" {
+		return
+	}
+
+	aliOssUpload := drives.NewAliOSSUpload(endpoint, accessKeyId, accessKeySecret, bucketName)
+	AddStorageDrive(aliOssUpload)
 }
 
 func InitSMStorage() {
