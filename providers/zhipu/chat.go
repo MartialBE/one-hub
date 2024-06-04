@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -54,13 +55,13 @@ func (p *ZhipuProvider) CreateChatCompletionStream(request *types.ChatCompletion
 }
 
 func (p *ZhipuProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(nil, "invalid_zhipu_config", http.StatusInternalServerError)
 	}
@@ -80,10 +81,10 @@ func (p *ZhipuProvider) getChatRequest(request *types.ChatCompletionRequest) (*h
 }
 
 func (p *ZhipuProvider) convertToChatOpenai(response *ZhipuResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.Error)
-	if error != nil {
+	aiError := errorHandle(&response.Error)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -99,7 +100,7 @@ func (p *ZhipuProvider) convertToChatOpenai(response *ZhipuResponse, request *ty
 	}
 
 	if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Message.ToolCalls != nil && request.Functions != nil {
-		for i, _ := range openaiResponse.Choices {
+		for i := range openaiResponse.Choices {
 			openaiResponse.Choices[i].CheckChoice(request)
 		}
 	}
@@ -111,7 +112,7 @@ func (p *ZhipuProvider) convertToChatOpenai(response *ZhipuResponse, request *ty
 
 func (p *ZhipuProvider) convertFromChatOpenai(request *types.ChatCompletionRequest) *ZhipuRequest {
 	request.ClearEmptyMessages()
-	for i, _ := range request.Messages {
+	for i := range request.Messages {
 		request.Messages[i].Role = convertRole(request.Messages[i].Role)
 		if request.Messages[i].FunctionCall != nil {
 			request.Messages[i].FuncToToolCalls()
@@ -188,16 +189,16 @@ func (p *ZhipuProvider) pluginHandle(request *ZhipuRequest) {
 
 	// 检测是否开启了 retrieval 插件
 	if pRetrieval, ok := plugin["retrieval"]; ok {
-		if knowledge_id, ok := pRetrieval["knowledge_id"].(string); ok && knowledge_id != "" {
+		if knowledgeId, ok := pRetrieval["knowledge_id"].(string); ok && knowledgeId != "" {
 			retrieval := ZhipuTool{
 				Type: "retrieval",
 				Retrieval: &ZhipuRetrieval{
-					KnowledgeId: knowledge_id,
+					KnowledgeId: knowledgeId,
 				},
 			}
 
-			if prompt_template, ok := pRetrieval["prompt_template"].(string); ok && prompt_template != "" {
-				retrieval.Retrieval.PromptTemplate = prompt_template
+			if promptTemplate, ok := pRetrieval["prompt_template"].(string); ok && promptTemplate != "" {
+				retrieval.Retrieval.PromptTemplate = promptTemplate
 			}
 
 			request.Tools = append(request.Tools, retrieval)
@@ -243,9 +244,9 @@ func (h *zhipuStreamHandler) handlerStream(rawLine *[]byte, dataChan chan string
 		return
 	}
 
-	error := errorHandle(&zhipuResponse.Error)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&zhipuResponse.Error)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -278,5 +279,8 @@ func (h *zhipuStreamHandler) convertToOpenaiStream(zhipuResponse *ZhipuStreamRes
 
 	if zhipuResponse.Usage != nil {
 		*h.Usage = *zhipuResponse.Usage
+	} else {
+		h.Usage.CompletionTokens += common.CountTokenText(zhipuResponse.GetResponseText(), h.Request.Model)
+		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 }

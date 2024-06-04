@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -135,19 +136,19 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 }
 
 func (p *GeminiProvider) convertToChatOpenai(response *GeminiChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.GeminiErrorResponse)
-	if error != nil {
+	aiError := errorHandle(&response.GeminiErrorResponse)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
 	}
 
 	openaiResponse = &types.ChatCompletionResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   request.Model,
 		Choices: make([]types.ChatCompletionChoice, 0, len(response.Candidates)),
 	}
@@ -179,9 +180,9 @@ func (h *geminiStreamHandler) handlerStream(rawLine *[]byte, dataChan chan strin
 		return
 	}
 
-	error := errorHandle(&geminiResponse.GeminiErrorResponse)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&geminiResponse.GeminiErrorResponse)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -191,9 +192,9 @@ func (h *geminiStreamHandler) handlerStream(rawLine *[]byte, dataChan chan strin
 
 func (h *geminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatResponse, dataChan chan string) {
 	streamResponse := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 		// Choices: choices,
 	}

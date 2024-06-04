@@ -3,11 +3,12 @@ package ali
 import (
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/types"
 )
 
 func (p *AliProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*types.EmbeddingResponse, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeEmbeddings)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -48,10 +49,10 @@ func convertFromEmbeddingOpenai(request *types.EmbeddingRequest) *AliEmbeddingRe
 }
 
 func (p *AliProvider) convertToEmbeddingOpenai(response *AliEmbeddingResponse, request *types.EmbeddingRequest) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.AliError)
-	if error != nil {
+	aiError := errorHandle(&response.AliError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return

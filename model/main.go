@@ -3,6 +3,9 @@ package model
 import (
 	"fmt"
 	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
+	"one-api/common/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -19,15 +22,15 @@ var DB *gorm.DB
 func SetupDB() {
 	err := InitDB()
 	if err != nil {
-		common.FatalLog("failed to initialize database: " + err.Error())
+		logger.FatalLog("failed to initialize database: " + err.Error())
 	}
 	ChannelGroup.Load()
-	common.RootUserEmail = GetRootUserEmail()
+	config.RootUserEmail = GetRootUserEmail()
 
 	if viper.GetBool("batch_update_enabled") {
-		common.BatchUpdateEnabled = true
-		common.BatchUpdateInterval = common.GetOrDefault("batch_update_interval", 5)
-		common.SysLog("batch update enabled with interval " + strconv.Itoa(common.BatchUpdateInterval) + "s")
+		config.BatchUpdateEnabled = true
+		config.BatchUpdateInterval = utils.GetOrDefault("batch_update_interval", 5)
+		logger.SysLog("batch update enabled with interval " + strconv.Itoa(config.BatchUpdateInterval) + "s")
 		InitBatchUpdater()
 	}
 }
@@ -36,7 +39,7 @@ func createRootAccountIfNeed() error {
 	var user User
 	//if user.Status != common.UserStatusEnabled {
 	if err := DB.First(&user).Error; err != nil {
-		common.SysLog("no user exists, create a root user for you: username is root, password is 123456")
+		logger.SysLog("no user exists, create a root user for you: username is root, password is 123456")
 		hashedPassword, err := common.Password2Hash("123456")
 		if err != nil {
 			return err
@@ -44,10 +47,10 @@ func createRootAccountIfNeed() error {
 		rootUser := User{
 			Username:    "root",
 			Password:    hashedPassword,
-			Role:        common.RoleRootUser,
-			Status:      common.UserStatusEnabled,
+			Role:        config.RoleRootUser,
+			Status:      config.UserStatusEnabled,
 			DisplayName: "Root User",
-			AccessToken: common.GetUUID(),
+			AccessToken: utils.GetUUID(),
 			Quota:       100000000,
 		}
 		DB.Create(&rootUser)
@@ -60,7 +63,7 @@ func chooseDB() (*gorm.DB, error) {
 		dsn := viper.GetString("sql_dsn")
 		if strings.HasPrefix(dsn, "postgres://") {
 			// Use PostgreSQL
-			common.SysLog("using PostgreSQL as database")
+			logger.SysLog("using PostgreSQL as database")
 			common.UsingPostgreSQL = true
 			return gorm.Open(postgres.New(postgres.Config{
 				DSN:                  dsn,
@@ -70,15 +73,15 @@ func chooseDB() (*gorm.DB, error) {
 			})
 		}
 		// Use MySQL
-		common.SysLog("using MySQL as database")
+		logger.SysLog("using MySQL as database")
 		return gorm.Open(mysql.Open(dsn), &gorm.Config{
 			PrepareStmt: true, // precompile SQL
 		})
 	}
 	// Use SQLite
-	common.SysLog("SQL_DSN not set, using SQLite as database")
+	logger.SysLog("SQL_DSN not set, using SQLite as database")
 	common.UsingSQLite = true
-	config := fmt.Sprintf("?_busy_timeout=%d", common.GetOrDefault("sqlite_busy_timeout", 3000))
+	config := fmt.Sprintf("?_busy_timeout=%d", utils.GetOrDefault("sqlite_busy_timeout", 3000))
 	return gorm.Open(sqlite.Open(viper.GetString("sqlite_path")+config), &gorm.Config{
 		PrepareStmt: true, // precompile SQL
 	})
@@ -96,14 +99,14 @@ func InitDB() (err error) {
 			return err
 		}
 
-		sqlDB.SetMaxIdleConns(common.GetOrDefault("SQL_MAX_IDLE_CONNS", 100))
-		sqlDB.SetMaxOpenConns(common.GetOrDefault("SQL_MAX_OPEN_CONNS", 1000))
-		sqlDB.SetConnMaxLifetime(time.Second * time.Duration(common.GetOrDefault("SQL_MAX_LIFETIME", 60)))
+		sqlDB.SetMaxIdleConns(utils.GetOrDefault("SQL_MAX_IDLE_CONNS", 100))
+		sqlDB.SetMaxOpenConns(utils.GetOrDefault("SQL_MAX_OPEN_CONNS", 1000))
+		sqlDB.SetConnMaxLifetime(time.Second * time.Duration(utils.GetOrDefault("SQL_MAX_LIFETIME", 60)))
 
-		if !common.IsMasterNode {
+		if !config.IsMasterNode {
 			return nil
 		}
-		common.SysLog("database migration started")
+		logger.SysLog("database migration started")
 
 		migration(DB)
 
@@ -151,11 +154,11 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
-		common.SysLog("database migrated")
+		logger.SysLog("database migrated")
 		err = createRootAccountIfNeed()
 		return err
 	} else {
-		common.FatalLog(err)
+		logger.FatalLog(err)
 	}
 	return err
 }

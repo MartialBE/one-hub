@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -53,7 +54,7 @@ func (p *HunyuanProvider) CreateChatCompletionStream(request *types.ChatCompleti
 }
 
 func (p *HunyuanProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	action, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	action, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -68,10 +69,10 @@ func (p *HunyuanProvider) getChatRequest(request *types.ChatCompletionRequest) (
 }
 
 func (p *HunyuanProvider) convertToChatOpenai(response *ChatCompletionsResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.Response.HunyuanResponseError)
-	if error != nil {
+	aiError := errorHandle(&response.Response.HunyuanResponseError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -142,9 +143,9 @@ func (h *tunyuanStreamHandler) handlerStream(rawLine *[]byte, dataChan chan stri
 		return
 	}
 
-	error := errorHandle(&tunyuanChatResponse.HunyuanResponseError)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&tunyuanChatResponse.HunyuanResponseError)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 

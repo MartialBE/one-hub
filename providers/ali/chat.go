@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -54,7 +56,7 @@ func (p *AliProvider) CreateChatCompletionStream(request *types.ChatCompletionRe
 }
 
 func (p *AliProvider) getAliChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -80,10 +82,10 @@ func (p *AliProvider) getAliChatRequest(request *types.ChatCompletionRequest) (*
 
 // 转换为OpenAI聊天请求体
 func (p *AliProvider) convertToChatOpenai(response *AliChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.AliError)
-	if error != nil {
+	aiError := errorHandle(&response.AliError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -92,7 +94,7 @@ func (p *AliProvider) convertToChatOpenai(response *AliChatResponse, request *ty
 	openaiResponse = &types.ChatCompletionResponse{
 		ID:      response.RequestId,
 		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   request.Model,
 		Choices: response.Output.ToChatCompletionChoices(),
 		Usage: &types.Usage{
@@ -189,9 +191,9 @@ func (h *aliStreamHandler) handlerStream(rawLine *[]byte, dataChan chan string, 
 		return
 	}
 
-	error := errorHandle(&aliResponse.AliError)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&aliResponse.AliError)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -223,7 +225,7 @@ func (h *aliStreamHandler) convertToOpenaiStream(aliResponse *AliChatResponse, d
 	streamResponse := types.ChatCompletionStreamResponse{
 		ID:      aliResponse.RequestId,
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 		Choices: []types.ChatCompletionStreamChoice{choice},
 	}

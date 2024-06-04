@@ -8,12 +8,15 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/controller"
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
-	"one-api/relay/util"
+	"one-api/relay/relay_util"
 	"one-api/types"
 	"strings"
 
@@ -87,11 +90,11 @@ func fetchChannel(c *gin.Context, modelName string) (channel *model.Channel, fai
 }
 
 func fetchChannelById(channelId int) (*model.Channel, error) {
-	channel, err := model.GetChannelById(channelId, true)
+	channel, err := model.GetChannelById(channelId)
 	if err != nil {
 		return nil, errors.New("无效的渠道 Id")
 	}
-	if channel.Status != common.ChannelStatusEnabled {
+	if channel.Status != config.ChannelStatusEnabled {
 		return nil, errors.New("该渠道已被禁用")
 	}
 
@@ -100,21 +103,21 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("group")
-	skip_channel_id := c.GetInt("skip_channel_id")
-	skip_only_chat := c.GetBool("skip_only_chat")
+	skipChannelId := c.GetInt("skip_channel_id")
+	skipOnlyChat := c.GetBool("skip_only_chat")
 	var filters []model.ChannelsFilterFunc
-	if skip_only_chat {
+	if skipOnlyChat {
 		filters = append(filters, model.FilterOnlyChat())
 	}
-	if skip_channel_id > 0 {
-		filters = append(filters, model.FilterChannelId(skip_channel_id))
+	if skipChannelId > 0 {
+		filters = append(filters, model.FilterChannelId(skipChannelId))
 	}
 
 	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 		if channel != nil {
-			common.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
+			logger.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
 			message = "数据库一致性已被破坏，请联系管理员"
 		}
 		return nil, errors.New(message)
@@ -142,7 +145,7 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 
 type StreamEndHandler func() string
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *util.ChatCacheProps, endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -249,15 +252,15 @@ func shouldRetry(c *gin.Context, statusCode int) bool {
 }
 
 func processChannelRelayError(ctx context.Context, channelId int, channelName string, err *types.OpenAIErrorWithStatusCode) {
-	common.LogError(ctx, fmt.Sprintf("relay error (channel #%d(%s)): %s", channelId, channelName, err.Message))
+	logger.LogError(ctx, fmt.Sprintf("relay error (channel #%d(%s)): %s", channelId, channelName, err.Message))
 	if controller.ShouldDisableChannel(&err.OpenAIError, err.StatusCode) {
 		controller.DisableChannel(channelId, channelName, err.Message, true)
 	}
 }
 
 func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
-	requestId := c.GetString(common.RequestIdKey)
-	err.OpenAIError.Message = common.MessageWithRequestId(err.OpenAIError.Message, requestId)
+	requestId := c.GetString(logger.RequestIdKey)
+	err.OpenAIError.Message = utils.MessageWithRequestId(err.OpenAIError.Message, requestId)
 	c.JSON(err.StatusCode, gin.H{
 		"error": err.OpenAIError,
 	})

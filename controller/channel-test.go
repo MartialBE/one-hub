@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/common/notify"
+	"one-api/common/utils"
 	"one-api/model"
 	"one-api/providers"
 	providers_base "one-api/providers/base"
@@ -69,7 +71,7 @@ func testChannel(channel *model.Channel, testModel string) (err error, openaiErr
 
 	// 转换为JSON字符串
 	jsonBytes, _ := json.Marshal(response)
-	common.SysLog(fmt.Sprintf("测试渠道 %s : %s 返回内容为：%s", channel.Name, request.Model, string(jsonBytes)))
+	logger.SysLog(fmt.Sprintf("测试渠道 %s : %s 返回内容为：%s", channel.Name, request.Model, string(jsonBytes)))
 
 	return nil, nil
 }
@@ -98,7 +100,7 @@ func TestChannel(c *gin.Context) {
 		})
 		return
 	}
-	channel, err := model.GetChannelById(id, true)
+	channel, err := model.GetChannelById(id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -143,17 +145,17 @@ func testAllChannels(isNotify bool) error {
 	if err != nil {
 		return err
 	}
-	var disableThreshold = int64(common.ChannelDisableThreshold * 1000)
+	var disableThreshold = int64(config.ChannelDisableThreshold * 1000)
 	if disableThreshold == 0 {
 		disableThreshold = 10000000 // a impossible value
 	}
 	go func() {
 		var sendMessage string
 		for _, channel := range channels {
-			time.Sleep(common.RequestInterval)
+			time.Sleep(config.RequestInterval)
 
-			isChannelEnabled := channel.Status == common.ChannelStatusEnabled
-			sendMessage += fmt.Sprintf("**渠道 %s - #%d - %s** : \n\n", common.EscapeMarkdownText(channel.Name), channel.Id, channel.StatusToStr())
+			isChannelEnabled := channel.Status == config.ChannelStatusEnabled
+			sendMessage += fmt.Sprintf("**渠道 %s - #%d - %s** : \n\n", utils.EscapeMarkdownText(channel.Name), channel.Id, channel.StatusToStr())
 			tik := time.Now()
 			err, openaiErr := testChannel(channel, "")
 			tok := time.Now()
@@ -161,7 +163,7 @@ func testAllChannels(isNotify bool) error {
 			// 渠道为禁用状态，并且还是请求错误 或者 响应时间超过阈值 直接跳过，也不需要更新响应时间。
 			if !isChannelEnabled {
 				if err != nil {
-					sendMessage += fmt.Sprintf("- 测试报错: %s \n\n- 无需改变状态，跳过\n\n", common.EscapeMarkdownText(err.Error()))
+					sendMessage += fmt.Sprintf("- 测试报错: %s \n\n- 无需改变状态，跳过\n\n", utils.EscapeMarkdownText(err.Error()))
 					continue
 				}
 				if milliseconds > disableThreshold {
@@ -171,7 +173,7 @@ func testAllChannels(isNotify bool) error {
 				// 如果已被禁用，但是请求成功，需要判断是否需要恢复
 				// 手动禁用的渠道，不会自动恢复
 				if shouldEnableChannel(err, openaiErr) {
-					if channel.Status == common.ChannelStatusAutoDisabled {
+					if channel.Status == config.ChannelStatusAutoDisabled {
 						EnableChannel(channel.Id, channel.Name, false)
 						sendMessage += "- 已被启用 \n\n"
 					} else {
@@ -181,19 +183,20 @@ func testAllChannels(isNotify bool) error {
 			} else {
 				// 如果渠道启用状态，但是返回了错误 或者 响应时间超过阈值，需要判断是否需要禁用
 				if milliseconds > disableThreshold {
-					sendMessage += fmt.Sprintf("- 响应时间 %.2fs 超过阈值 %.2fs \n\n- 禁用\n\n", float64(milliseconds)/1000.0, float64(disableThreshold)/1000.0)
-					DisableChannel(channel.Id, channel.Name, err.Error(), false)
+					errMsg := fmt.Sprintf("响应时间 %.2fs 超过阈值 %.2fs ", float64(milliseconds)/1000.0, float64(disableThreshold)/1000.0)
+					sendMessage += fmt.Sprintf("- %s \n\n- 禁用\n\n", errMsg)
+					DisableChannel(channel.Id, channel.Name, errMsg, false)
 					continue
 				}
 
 				if ShouldDisableChannel(openaiErr, -1) {
-					sendMessage += fmt.Sprintf("- 已被禁用，原因：%s\n\n", common.EscapeMarkdownText(err.Error()))
+					sendMessage += fmt.Sprintf("- 已被禁用，原因：%s\n\n", utils.EscapeMarkdownText(err.Error()))
 					DisableChannel(channel.Id, channel.Name, err.Error(), false)
 					continue
 				}
 
 				if err != nil {
-					sendMessage += fmt.Sprintf("- 测试报错: %s \n\n", common.EscapeMarkdownText(err.Error()))
+					sendMessage += fmt.Sprintf("- 测试报错: %s \n\n", utils.EscapeMarkdownText(err.Error()))
 					continue
 				}
 			}
@@ -232,8 +235,8 @@ func AutomaticallyTestChannels(frequency int) {
 
 	for {
 		time.Sleep(time.Duration(frequency) * time.Minute)
-		common.SysLog("testing all channels")
+		logger.SysLog("testing all channels")
 		_ = testAllChannels(false)
-		common.SysLog("channel test finished")
+		logger.SysLog("channel test finished")
 	}
 }

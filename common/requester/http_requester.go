@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/utils"
 	"one-api/types"
 	"strconv"
 	"strings"
@@ -19,7 +20,7 @@ import (
 type HttpErrorHandler func(*http.Response) *types.OpenAIError
 
 type HTTPRequester struct {
-	requestBuilder    RequestBuilder
+	// requestBuilder    utils.RequestBuilder
 	CreateFormBuilder func(io.Writer) FormBuilder
 	ErrorHandler      HttpErrorHandler
 	proxyAddr         string
@@ -33,7 +34,6 @@ type HTTPRequester struct {
 // 如果 errorHandler 为 nil，那么会使用一个默认的错误处理函数。
 func NewHTTPRequester(proxyAddr string, errorHandler HttpErrorHandler) *HTTPRequester {
 	return &HTTPRequester{
-		requestBuilder: NewRequestBuilder(),
 		CreateFormBuilder: func(body io.Writer) FormBuilder {
 			return NewFormBuilder(body)
 		},
@@ -52,18 +52,7 @@ type requestOptions struct {
 type requestOption func(*requestOptions)
 
 func (r *HTTPRequester) setProxy() context.Context {
-	if r.proxyAddr == "" {
-		return r.Context
-	}
-
-	// 如果是以 socks5:// 开头的地址，那么使用 socks5 代理
-	if strings.HasPrefix(r.proxyAddr, "socks5://") {
-		return context.WithValue(r.Context, ProxySock5AddrKey, r.proxyAddr)
-	}
-
-	// 否则使用 http 代理
-	return context.WithValue(r.Context, ProxyHTTPAddrKey, r.proxyAddr)
-
+	return utils.SetProxy(r.proxyAddr, r.Context)
 }
 
 // 创建请求
@@ -75,7 +64,7 @@ func (r *HTTPRequester) NewRequest(method, url string, setters ...requestOption)
 	for _, setter := range setters {
 		setter(args)
 	}
-	req, err := r.requestBuilder.Build(r.setProxy(), method, url, args.body, args.header)
+	req, err := utils.RequestBuilder(r.setProxy(), method, url, args.body, args.header)
 	if err != nil {
 		return nil, err
 	}

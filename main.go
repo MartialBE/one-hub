@@ -3,8 +3,10 @@ package main
 import (
 	"embed"
 	"fmt"
+	"one-api/cli"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/common/notify"
 	"one-api/common/requester"
 	"one-api/common/storage"
@@ -13,7 +15,7 @@ import (
 	"one-api/cron"
 	"one-api/middleware"
 	"one-api/model"
-	"one-api/relay/util"
+	"one-api/relay/relay_util"
 	"one-api/router"
 	"time"
 
@@ -30,9 +32,10 @@ var buildFS embed.FS
 var indexPage []byte
 
 func main() {
+	cli.InitCli()
 	config.InitConf()
-	common.SetupLogger()
-	common.SysLog("CZLOapi " + common.Version + " started")
+	logger.SetupLogger()
+	logger.SysLog("CZLOapi " + config.Version + " started")
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
@@ -40,7 +43,7 @@ func main() {
 	common.InitRedisClient()
 	// Initialize options
 	model.InitOptionMap()
-	util.NewPricing()
+	relay_util.NewPricing()
 	initMemoryCache()
 	initSync()
 
@@ -59,18 +62,18 @@ func main() {
 
 func initMemoryCache() {
 	if viper.GetBool("memory_cache_enabled") {
-		common.MemoryCacheEnabled = true
+		config.MemoryCacheEnabled = true
 	}
 
-	if !common.MemoryCacheEnabled {
+	if !config.MemoryCacheEnabled {
 		return
 	}
 
 	syncFrequency := viper.GetInt("sync_frequency")
 	model.TokenCacheSeconds = syncFrequency
 
-	common.SysLog("memory cache enabled")
-	common.SysError(fmt.Sprintf("sync frequency: %d seconds", syncFrequency))
+	logger.SysLog("memory cache enabled")
+	logger.SysError(fmt.Sprintf("sync frequency: %d seconds", syncFrequency))
 	go model.SyncOptions(syncFrequency)
 	go SyncChannelCache(syncFrequency)
 }
@@ -90,7 +93,7 @@ func initHttpServer() {
 	server.Use(middleware.RequestId())
 	middleware.SetUpLogger(server)
 
-	store := cookie.NewStore([]byte(common.SessionSecret))
+	store := cookie.NewStore([]byte(config.SessionSecret))
 	server.Use(sessions.Sessions("session", store))
 
 	router.SetRouter(server, buildFS, indexPage)
@@ -98,20 +101,20 @@ func initHttpServer() {
 
 	err := server.Run(":" + port)
 	if err != nil {
-		common.FatalLog("failed to start HTTP server: " + err.Error())
+		logger.FatalLog("failed to start HTTP server: " + err.Error())
 	}
 }
 
 func SyncChannelCache(frequency int) {
 	// 只有 从 服务器端获取数据的时候才会用到
-	if common.IsMasterNode {
-		common.SysLog("master node does't synchronize the channel")
+	if config.IsMasterNode {
+		logger.SysLog("master node does't synchronize the channel")
 		return
 	}
 	for {
 		time.Sleep(time.Duration(frequency) * time.Second)
-		common.SysLog("syncing channels from database")
+		logger.SysLog("syncing channels from database")
 		model.ChannelGroup.Load()
-		util.PricingInstance.Init()
+		relay_util.PricingInstance.Init()
 	}
 }

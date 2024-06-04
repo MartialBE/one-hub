@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -54,12 +56,12 @@ func (p *PalmProvider) CreateChatCompletionStream(request *types.ChatCompletionR
 }
 
 func (p *PalmProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(nil, "invalid_palm_config", http.StatusInternalServerError)
 	}
@@ -81,10 +83,10 @@ func (p *PalmProvider) getChatRequest(request *types.ChatCompletionRequest) (*ht
 }
 
 func (p *PalmProvider) convertToChatOpenai(response *PaLMChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.PaLMErrorResponse)
-	if error != nil {
+	aiError := errorHandle(&response.PaLMErrorResponse)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -159,9 +161,9 @@ func (h *palmStreamHandler) handlerStream(rawLine *[]byte, dataChan chan string,
 		return
 	}
 
-	error := errorHandle(&palmChatResponse.PaLMErrorResponse)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&palmChatResponse.PaLMErrorResponse)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -177,11 +179,11 @@ func (h *palmStreamHandler) convertToOpenaiStream(palmChatResponse *PaLMChatResp
 	choice.FinishReason = types.FinishReasonStop
 
 	streamResponse := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",
 		Model:   h.Request.Model,
 		Choices: []types.ChatCompletionStreamChoice{choice},
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 	}
 
 	responseBody, _ := json.Marshal(streamResponse)

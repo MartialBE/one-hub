@@ -1,4 +1,4 @@
-package common
+package logger
 
 import (
 	"context"
@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"one-api/common/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -62,13 +64,13 @@ func getLogDir() string {
 	}
 
 	var err error
-	logDir, err = filepath.Abs(viper.GetString("log_dir"))
+	logDir, err = filepath.Abs(logDir)
 	if err != nil {
 		log.Fatal(err)
 		return ""
 	}
 
-	if !IsFileExist(logDir) {
+	if !utils.IsFileExist(logDir) {
 		err = os.Mkdir(logDir, 0777)
 		if err != nil {
 			log.Fatal(err)
@@ -126,12 +128,4 @@ func FatalLog(v ...any) {
 	t := time.Now()
 	_, _ = fmt.Fprintf(gin.DefaultErrorWriter, "[FATAL] %v | %v \n", t.Format("2006/01/02 - 15:04:05"), v)
 	os.Exit(1)
-}
-
-func LogQuota(quota int) string {
-	if DisplayInCurrencyEnabled {
-		return fmt.Sprintf("＄%.6f 额度", float64(quota)/QuotaPerUnit)
-	} else {
-		return fmt.Sprintf("%d 点额度", quota)
-	}
 }

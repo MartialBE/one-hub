@@ -7,7 +7,9 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 
@@ -58,12 +60,12 @@ func (p *XunfeiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 }
 
 func (p *XunfeiProvider) getChatRequest(request *types.ChatCompletionRequest) (*websocket.Conn, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	_, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
-	authUrl := p.GetFullRequestURL(url, request.Model)
+	authUrl := p.GetFullRequestURL(request.Model)
 
 	wsConn, err := p.wsRequester.NewRequest(authUrl, nil)
 	if err != nil {
@@ -194,7 +196,7 @@ func (h *xunfeiHandler) convertToChatOpenai(stream requester.StreamReaderInterfa
 		ID:      xunfeiResponse.Header.Sid,
 		Object:  "chat.completion",
 		Model:   h.Request.Model,
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Choices: []types.ChatCompletionChoice{choice},
 		Usage:   &xunfeiResponse.Payload.Usage.Text,
 	}
@@ -215,9 +217,9 @@ func (h *xunfeiHandler) handlerData(rawLine *[]byte, isFinished *bool) (*XunfeiC
 		return nil, common.ErrorToOpenAIError(err)
 	}
 
-	error := errorHandle(&xunfeiChatResponse)
-	if error != nil {
-		return nil, error
+	aiError := errorHandle(&xunfeiChatResponse)
+	if aiError != nil {
+		return nil, aiError
 	}
 
 	if xunfeiChatResponse.Payload.Choices.Status == 2 {
@@ -310,7 +312,7 @@ func (h *xunfeiHandler) convertToOpenaiStream(xunfeiChatResponse *XunfeiChatResp
 	chatCompletion := types.ChatCompletionStreamResponse{
 		ID:      xunfeiChatResponse.Header.Sid,
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 	}
 

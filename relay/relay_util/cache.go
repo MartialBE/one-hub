@@ -1,13 +1,13 @@
-package util
+package relay_util
 
 import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"one-api/common"
-	"one-api/model"
-
 	"github.com/gin-gonic/gin"
+	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/utils"
 )
 
 type ChatCacheProps struct {
@@ -29,24 +29,6 @@ type CacheDriver interface {
 	Set(hash string, props *ChatCacheProps, expire int64) error
 }
 
-func GetDebugList(userId int) ([]*ChatCacheProps, error) {
-	caches, err := model.GetChatCacheListByUserId(userId)
-	if err != nil {
-		return nil, err
-	}
-
-	var props []*ChatCacheProps
-	for _, cache := range caches {
-		prop, err := common.UnmarshalString[ChatCacheProps](cache.Data)
-		if err != nil {
-			continue
-		}
-		props = append(props, &prop)
-	}
-
-	return props, nil
-}
-
 func NewChatCacheProps(c *gin.Context, allow bool) *ChatCacheProps {
 	props := &ChatCacheProps{
 		Cache: false,
@@ -56,7 +38,7 @@ func NewChatCacheProps(c *gin.Context, allow bool) *ChatCacheProps {
 		return props
 	}
 
-	if common.ChatCacheEnabled && c.GetBool("chat_cache") {
+	if config.ChatCacheEnabled && c.GetBool("chat_cache") {
 		props.Cache = true
 	}
 
@@ -77,7 +59,7 @@ func (p *ChatCacheProps) SetHash(request any) {
 		return
 	}
 
-	p.hash(common.Marshal(request))
+	p.hash(utils.Marshal(request))
 }
 
 func (p *ChatCacheProps) SetResponse(response any) {
@@ -90,7 +72,7 @@ func (p *ChatCacheProps) SetResponse(response any) {
 		return
 	}
 
-	responseStr := common.Marshal(response)
+	responseStr := utils.Marshal(response)
 	if responseStr == "" {
 		return
 	}
@@ -112,7 +94,7 @@ func (p *ChatCacheProps) StoreCache(channelId, promptTokens, completionTokens in
 	p.CompletionTokens = completionTokens
 	p.ModelName = modelName
 
-	return p.Driver.Set(p.getHash(), p, int64(common.ChatCacheExpireMinute))
+	return p.Driver.Set(p.getHash(), p, int64(config.ChatCacheExpireMinute))
 }
 
 func (p *ChatCacheProps) GetCache() *ChatCacheProps {
@@ -124,7 +106,7 @@ func (p *ChatCacheProps) GetCache() *ChatCacheProps {
 }
 
 func (p *ChatCacheProps) needCache() bool {
-	return common.ChatCacheEnabled && p.Cache
+	return config.ChatCacheEnabled && p.Cache
 }
 
 func (p *ChatCacheProps) getHash() string {

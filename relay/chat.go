@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	providersBase "one-api/providers/base"
 	"one-api/types"
 
@@ -39,7 +40,7 @@ func (r *relayChat) setRequest() error {
 	}
 
 	if !r.chatRequest.Stream && r.chatRequest.StreamOptions != nil {
-		return errors.New("The 'stream_options' parameter is only allowed when 'stream' is enabled.")
+		return errors.New("the 'stream_options' parameter is only allowed when 'stream' is enabled")
 	}
 
 	r.originalModel = r.chatRequest.Model
@@ -100,9 +101,9 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 func (r *relayChat) getUsageResponse() string {
 	if r.chatRequest.StreamOptions != nil && r.chatRequest.StreamOptions.IncludeUsage {
 		usageResponse := types.ChatCompletionStreamResponse{
-			ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+			ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 			Object:  "chat.completion.chunk",
-			Created: common.GetTimestamp(),
+			Created: utils.GetTimestamp(),
 			Model:   r.chatRequest.Model,
 			Choices: []types.ChatCompletionStreamChoice{},
 			Usage:   r.provider.GetUsage(),

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -17,7 +18,7 @@ type OpenAIStreamHandler struct {
 }
 
 func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.GetRequestTextBody(common.RelayModeChatCompletions, request.Model, request)
+	req, errWithCode := p.GetRequestTextBody(config.RelayModeChatCompletions, request.Model, request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -67,7 +68,7 @@ func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		// 避免误传导致报错
 		request.StreamOptions = nil
 	}
-	req, errWithCode := p.GetRequestTextBody(common.RelayModeChatCompletions, request.Model, request)
+	req, errWithCode := p.GetRequestTextBody(config.RelayModeChatCompletions, request.Model, request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -115,9 +116,9 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 		return
 	}
 
-	error := ErrorHandle(&openaiResponse.OpenAIErrorResponse)
-	if error != nil {
-		errChan <- error
+	aiError := ErrorHandle(&openaiResponse.OpenAIErrorResponse)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -137,7 +138,7 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 		if h.Usage.TotalTokens == 0 {
 			h.Usage.TotalTokens = h.Usage.PromptTokens
 		}
-		countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.ModelName)
+		countTokenText := common.CountTokenText(openaiResponse.GetResponseText(), h.ModelName)
 		h.Usage.CompletionTokens += countTokenText
 		h.Usage.TotalTokens += countTokenText
 	}

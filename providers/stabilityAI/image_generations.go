@@ -5,7 +5,9 @@ import (
 	"encoding/base64"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/storage"
+	"one-api/common/utils"
 	"one-api/types"
 	"time"
 )
@@ -19,7 +21,7 @@ func convertModelName(modelName string) string {
 }
 
 func (p *StabilityAIProvider) CreateImageGenerations(request *types.ImageRequest) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeImagesGenerations)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeImagesGenerations)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -71,7 +73,7 @@ func (p *StabilityAIProvider) CreateImageGenerations(request *types.ImageRequest
 	if request.ResponseFormat == "" || request.ResponseFormat == "url" {
 		body, err := base64.StdEncoding.DecodeString(stabilityAIResponse.Image)
 		if err == nil {
-			imgUrl = storage.Upload(body, common.GetUUID()+".png")
+			imgUrl = storage.Upload(body, utils.GetUUID()+".png")
 		}
 	}
 

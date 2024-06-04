@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/model"
-	"one-api/relay/util"
+	"one-api/relay/relay_util"
 	"one-api/types"
 	"time"
 
@@ -49,9 +51,9 @@ func Relay(c *gin.Context) {
 	channel := relay.getProvider().GetChannel()
 	go processChannelRelayError(c.Request.Context(), channel.Id, channel.Name, apiErr)
 
-	retryTimes := common.RetryTimes
+	retryTimes := config.RetryTimes
 	if done || !shouldRetry(c, apiErr.StatusCode) {
-		common.LogError(c.Request.Context(), fmt.Sprintf("relay error happen, status code is %d, won't retry in this case", apiErr.StatusCode))
+		logger.LogError(c.Request.Context(), fmt.Sprintf("relay error happen, status code is %d, won't retry in this case", apiErr.StatusCode))
 		retryTimes = 0
 	}
 
@@ -63,7 +65,7 @@ func Relay(c *gin.Context) {
 		}
 
 		channel = relay.getProvider().GetChannel()
-		common.LogError(c.Request.Context(), fmt.Sprintf("using channel #%d(%s) to retry (remain times %d)", channel.Id, channel.Name, i))
+		logger.LogError(c.Request.Context(), fmt.Sprintf("using channel #%d(%s) to retry (remain times %d)", channel.Id, channel.Name, i))
 		apiErr, done = RelayHandler(relay)
 		if apiErr == nil {
 			return
@@ -96,8 +98,8 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 
 	relay.getProvider().SetUsage(usage)
 
-	var quota *util.Quota
-	quota, err = util.NewQuota(relay.getContext(), relay.getModelName(), promptTokens)
+	var quota *relay_util.Quota
+	quota, err = relay_util.NewQuota(relay.getContext(), relay.getModelName(), promptTokens)
 	if err != nil {
 		done = true
 		return
@@ -119,7 +121,7 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 	return
 }
 
-func cacheProcessing(c *gin.Context, cacheProps *util.ChatCacheProps) {
+func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps) {
 	responseCache(c, cacheProps.Response)
 
 	// 写入日志

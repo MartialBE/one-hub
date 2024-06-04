@@ -6,8 +6,10 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/image"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/providers/base"
 	"one-api/types"
 	"strings"
@@ -63,13 +65,13 @@ func (p *ClaudeProvider) CreateChatCompletionStream(request *types.ChatCompletio
 }
 
 func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(nil, "invalid_claude_config", http.StatusInternalServerError)
 	}
@@ -151,10 +153,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 }
 
 func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.Error)
-	if error != nil {
+	aiError := errorHandle(&response.Error)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -172,7 +174,7 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 	openaiResponse = &types.ChatCompletionResponse{
 		ID:      response.Id,
 		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Choices: []types.ChatCompletionChoice{choice},
 		Model:   request.Model,
 		Usage: &types.Usage{
@@ -216,9 +218,9 @@ func (h *ClaudeStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 		return
 	}
 
-	error := errorHandle(&claudeResponse.Error)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&claudeResponse.Error)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -240,6 +242,8 @@ func (h *ClaudeStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 
 	case "content_block_delta":
 		h.convertToOpenaiStream(&claudeResponse, dataChan)
+		h.Usage.CompletionTokens += common.CountTokenText(claudeResponse.Delta.Text, h.Request.Model)
+		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 
 	default:
 		return
@@ -264,9 +268,9 @@ func (h *ClaudeStreamHandler) convertToOpenaiStream(claudeResponse *ClaudeStream
 		choice.FinishReason = &finishReason
 	}
 	chatCompletion := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 		Choices: []types.ChatCompletionStreamChoice{choice},
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/providers/openai"
 	"one-api/types"
 	"time"
@@ -14,7 +15,7 @@ func (p *AzureProvider) CreateImageGenerations(request *types.ImageRequest) (*ty
 		return nil, common.StringErrorWrapper("n_not_within_range", "n_not_within_range", http.StatusBadRequest)
 	}
 
-	req, errWithCode := p.GetRequestTextBody(common.RelayModeImagesGenerations, request.Model, request)
+	req, errWithCode := p.GetRequestTextBody(config.RelayModeImagesGenerations, request.Model, request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -69,12 +70,12 @@ func (p *AzureProvider) ResponseAzureImageHandler(resp *http.Response, azure *Im
 		return
 	}
 
-	operation_location := resp.Header.Get("operation-location")
-	if operation_location == "" {
+	operationLocation := resp.Header.Get("operation-location")
+	if operationLocation == "" {
 		return nil, common.ErrorWrapper(errors.New("image url is empty"), "get_images_url_failed", http.StatusInternalServerError)
 	}
 
-	req, err := p.Requester.NewRequest("GET", operation_location, p.Requester.WithHeader(p.GetRequestHeaders()))
+	req, err := p.Requester.NewRequest("GET", operationLocation, p.Requester.WithHeader(p.GetRequestHeaders()))
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "get_images_request_failed", http.StatusInternalServerError)
 	}

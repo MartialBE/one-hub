@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -55,13 +56,13 @@ func (p *MiniMaxProvider) CreateChatCompletionStream(request *types.ChatCompleti
 }
 
 func (p *MiniMaxProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(errors.New("API KEY is filled in incorrectly"), "invalid_minimax_config", http.StatusInternalServerError)
 	}
@@ -81,10 +82,10 @@ func (p *MiniMaxProvider) getChatRequest(request *types.ChatCompletionRequest) (
 }
 
 func (p *MiniMaxProvider) convertToChatOpenai(response *MiniMaxChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.MiniMaxBaseResp.BaseResp)
-	if error != nil {
+	aiError := errorHandle(&response.MiniMaxBaseResp.BaseResp)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -213,9 +214,9 @@ func (h *minimaxStreamHandler) handlerStream(rawLine *[]byte, dataChan chan stri
 		return
 	}
 
-	error := errorHandle(&miniResponse.BaseResp)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&miniResponse.BaseResp)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -269,6 +270,9 @@ func (h *minimaxStreamHandler) convertToOpenaiStream(miniResponse *MiniMaxChatRe
 
 	if miniResponse.Usage != nil {
 		h.handleUsage(miniResponse)
+	} else {
+		h.Usage.CompletionTokens += common.CountTokenText(miniChoice.Messages[0].Text, h.Request.Model)
+		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 }
 

@@ -1,4 +1,4 @@
-package util
+package relay_util
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"math"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/model"
 	"one-api/types"
 	"time"
@@ -44,7 +46,7 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *type
 	if quota.price.Type == model.TimesPriceType {
 		quota.preConsumedQuota = int(1000 * quota.inputRatio)
 	} else {
-		quota.preConsumedQuota = int(float64(quota.promptTokens+common.PreConsumedQuota) * quota.inputRatio)
+		quota.preConsumedQuota = int(float64(quota.promptTokens)*quota.inputRatio) + config.PreConsumedQuota
 	}
 
 	errWithCode := quota.preQuotaConsumption()
@@ -97,7 +99,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		quota = int(1000 * q.inputRatio)
 	} else {
 		completionRatio := q.price.GetOutput() * q.groupRatio
-		quota = int(math.Ceil(((float64(promptTokens) * q.inputRatio) + (float64(completionTokens) * completionRatio))))
+		quota = int(math.Ceil((float64(promptTokens) * q.inputRatio) + (float64(completionTokens) * completionRatio)))
 	}
 
 	if q.inputRatio != 0 && quota <= 0 {
@@ -154,7 +156,7 @@ func (q *Quota) Undo(c *gin.Context) {
 			// return pre-consumed quota
 			err := model.PostConsumeTokenQuota(tokenId, -q.preConsumedQuota)
 			if err != nil {
-				common.LogError(ctx, "error return pre-consumed quota: "+err.Error())
+				logger.LogError(ctx, "error return pre-consumed quota: "+err.Error())
 			}
 		}(c.Request.Context())
 	}
@@ -166,7 +168,7 @@ func (q *Quota) Consume(c *gin.Context, usage *types.Usage) {
 	go func(ctx context.Context) {
 		err := q.completedQuotaConsumption(usage, tokenName, ctx)
 		if err != nil {
-			common.LogError(ctx, err.Error())
+			logger.LogError(ctx, err.Error())
 		}
 	}(c.Request.Context())
 }

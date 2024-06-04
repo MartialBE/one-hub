@@ -6,7 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/model"
 	"strconv"
 	"time"
@@ -40,8 +41,8 @@ type LarkUser struct {
 
 func getLarkAppAccessToken() (string, error) {
 	values := map[string]string{
-		"app_id":     common.LarkClientId,
-		"app_secret": common.LarkClientSecret,
+		"app_id":     config.LarkClientId,
+		"app_secret": config.LarkClientSecret,
 	}
 	jsonData, err := json.Marshal(values)
 	if err != nil {
@@ -58,7 +59,7 @@ func getLarkAppAccessToken() (string, error) {
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		common.SysLog(err.Error())
+		logger.SysLog(err.Error())
 		return "", errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	defer res.Body.Close()
@@ -100,7 +101,7 @@ func getLarkUserAccessToken(code string) (string, error) {
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		common.SysLog(err.Error())
+		logger.SysLog(err.Error())
 		return "", errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	defer res.Body.Close()
@@ -135,7 +136,7 @@ func getLarkUserInfoByCode(code string) (*LarkUser, error) {
 	}
 	res2, err := client.Do(req)
 	if err != nil {
-		common.SysLog(err.Error())
+		logger.SysLog(err.Error())
 		return nil, errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	var larkUser LarkUser
@@ -147,7 +148,7 @@ func getLarkUserInfoByCode(code string) (*LarkUser, error) {
 }
 
 func LarkOAuth(c *gin.Context) {
-	if !common.LarkAuthEnabled {
+	if !config.LarkAuthEnabled {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "管理员未开启通过飞书登录以及注册",
 			"success": false,
@@ -190,15 +191,15 @@ func LarkOAuth(c *gin.Context) {
 			return
 		}
 	} else {
-		if common.RegisterEnabled {
+		if config.RegisterEnabled {
 			user.Username = "lark_" + strconv.Itoa(model.GetMaxUserId()+1)
 			if larkUser.Data.Name != "" {
 				user.DisplayName = larkUser.Data.Name
 			} else {
 				user.DisplayName = "Lark User"
 			}
-			user.Role = common.RoleCommonUser
-			user.Status = common.UserStatusEnabled
+			user.Role = config.RoleCommonUser
+			user.Status = config.UserStatusEnabled
 
 			if err := user.Insert(0); err != nil {
 				c.JSON(http.StatusOK, gin.H{
@@ -216,7 +217,7 @@ func LarkOAuth(c *gin.Context) {
 		}
 	}
 
-	if user.Status != common.UserStatusEnabled {
+	if user.Status != config.UserStatusEnabled {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "用户已被封禁",
 			"success": false,
@@ -227,7 +228,7 @@ func LarkOAuth(c *gin.Context) {
 }
 
 func LarkBind(c *gin.Context) {
-	if !common.LarkAuthEnabled {
+	if !config.LarkAuthEnabled {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "管理员未开启通过飞书登录以及注册",
 			"success": false,
