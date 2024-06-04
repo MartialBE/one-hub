@@ -3,16 +3,17 @@ package minimax
 import (
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/types"
 )
 
 func (p *MiniMaxProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*types.EmbeddingResponse, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeEmbeddings)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
 		return nil, common.ErrorWrapper(nil, "invalid_minimax_config", http.StatusInternalServerError)
 	}
@@ -60,10 +61,10 @@ func convertFromEmbeddingOpenai(request *types.EmbeddingRequest) *MiniMaxEmbeddi
 }
 
 func (p *MiniMaxProvider) convertToEmbeddingOpenai(response *MiniMaxEmbeddingResponse, request *types.EmbeddingRequest) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.BaseResp)
-	if error != nil {
+	aiError := errorHandle(&response.BaseResp)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return

@@ -3,11 +3,12 @@ package baidu
 import (
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/types"
 )
 
 func (p *BaiduProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*types.EmbeddingResponse, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeEmbeddings)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeEmbeddings)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -46,10 +47,10 @@ func convertFromEmbeddingOpenai(request *types.EmbeddingRequest) *BaiduEmbedding
 }
 
 func (p *BaiduProvider) convertToEmbeddingOpenai(response *BaiduEmbeddingResponse, request *types.EmbeddingRequest) (openaiResponse *types.EmbeddingResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.BaiduError)
-	if error != nil {
+	aiError := errorHandle(&response.BaiduError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return

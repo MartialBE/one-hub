@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -56,7 +57,7 @@ func (p *MistralProvider) CreateChatCompletionStream(request *types.ChatCompleti
 }
 
 func (p *MistralProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -130,6 +131,9 @@ func (h *mistralStreamHandler) handlerStream(rawLine *[]byte, dataChan chan stri
 
 	if mistralResponse.Usage != nil {
 		*h.Usage = *mistralResponse.Usage
+	} else {
+		h.Usage.CompletionTokens += common.CountTokenText(mistralResponse.GetResponseText(), h.Request.Model)
+		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 
 	stop := false

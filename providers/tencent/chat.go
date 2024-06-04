@@ -5,7 +5,9 @@ import (
 	"errors"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -54,7 +56,7 @@ func (p *TencentProvider) CreateChatCompletionStream(request *types.ChatCompleti
 }
 
 func (p *TencentProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -90,10 +92,10 @@ func (p *TencentProvider) getChatRequest(request *types.ChatCompletionRequest) (
 }
 
 func (p *TencentProvider) convertToChatOpenai(response *TencentChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.TencentResponseError)
-	if error != nil {
+	aiError := errorHandle(&response.TencentResponseError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -101,7 +103,7 @@ func (p *TencentProvider) convertToChatOpenai(response *TencentChatResponse, req
 
 	openaiResponse = &types.ChatCompletionResponse{
 		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Usage:   response.Usage,
 		Model:   request.Model,
 	}
@@ -137,9 +139,9 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *TencentChatReq
 		stream = 1
 	}
 	return &TencentChatRequest{
-		Timestamp:   common.GetTimestamp(),
-		Expired:     common.GetTimestamp() + 24*60*60,
-		QueryID:     common.GetUUID(),
+		Timestamp:   utils.GetTimestamp(),
+		Expired:     utils.GetTimestamp() + 24*60*60,
+		QueryID:     utils.GetUUID(),
 		Temperature: request.Temperature,
 		TopP:        request.TopP,
 		Stream:      stream,
@@ -165,9 +167,9 @@ func (h *tencentStreamHandler) handlerStream(rawLine *[]byte, dataChan chan stri
 		return
 	}
 
-	error := errorHandle(&tencentChatResponse.TencentResponseError)
-	if error != nil {
-		errChan <- error
+	aiError := errorHandle(&tencentChatResponse.TencentResponseError)
+	if aiError != nil {
+		errChan <- aiError
 		return
 	}
 
@@ -178,7 +180,7 @@ func (h *tencentStreamHandler) handlerStream(rawLine *[]byte, dataChan chan stri
 func (h *tencentStreamHandler) convertToOpenaiStream(tencentChatResponse *TencentChatResponse, dataChan chan string) {
 	streamResponse := types.ChatCompletionStreamResponse{
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 	}
 	if len(tencentChatResponse.Choices) > 0 {

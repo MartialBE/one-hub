@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/providers/base"
 	"one-api/types"
 	"strings"
@@ -55,7 +57,7 @@ func (p *CohereProvider) CreateChatCompletionStream(request *types.ChatCompletio
 }
 
 func (p *CohereProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
-	url, errWithCode := p.GetSupportedAPIUri(common.RelayModeChatCompletions)
+	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -118,10 +120,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*CohereRequest
 }
 
 func ConvertToChatOpenai(provider base.ProviderInterface, response *CohereResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	error := errorHandle(&response.CohereError)
-	if error != nil {
+	aiError := errorHandle(&response.CohereError)
+	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *error,
+			OpenAIError: *aiError,
 			StatusCode:  http.StatusBadRequest,
 		}
 		return
@@ -138,7 +140,7 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *CohereRespon
 	openaiResponse = &types.ChatCompletionResponse{
 		ID:      response.GenerationID,
 		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Choices: []types.ChatCompletionChoice{choice},
 		Model:   request.Model,
 		Usage:   &types.Usage{},
@@ -187,12 +189,15 @@ func (h *CohereStreamHandler) convertToOpenaiStream(cohereResponse *CohereStream
 			Role:    types.ChatMessageRoleAssistant,
 			Content: cohereResponse.Text,
 		}
+
+		h.Usage.CompletionTokens += common.CountTokenText(cohereResponse.Text, h.Request.Model)
+		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 
 	chatCompletion := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", common.GetUUID()),
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
+		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 		Choices: []types.ChatCompletionStreamChoice{choice},
 	}

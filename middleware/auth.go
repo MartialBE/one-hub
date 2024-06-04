@@ -2,7 +2,8 @@ package middleware
 
 import (
 	"net/http"
-	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/utils"
 	"one-api/model"
 	"strings"
 
@@ -43,7 +44,7 @@ func authHelper(c *gin.Context, minRole int) {
 			return
 		}
 	}
-	if status.(int) == common.UserStatusDisabled {
+	if status.(int) == config.UserStatusDisabled {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": "用户已被封禁",
@@ -67,19 +68,19 @@ func authHelper(c *gin.Context, minRole int) {
 
 func UserAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		authHelper(c, common.RoleCommonUser)
+		authHelper(c, config.RoleCommonUser)
 	}
 }
 
 func AdminAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		authHelper(c, common.RoleAdminUser)
+		authHelper(c, config.RoleAdminUser)
 	}
 }
 
 func RootAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		authHelper(c, common.RoleRootUser)
+		authHelper(c, config.RoleRootUser)
 	}
 }
 
@@ -109,10 +110,10 @@ func tokenAuth(c *gin.Context, key string) {
 	if len(parts) > 1 {
 		if model.IsAdmin(token.UserId) {
 			if strings.HasPrefix(parts[1], "!") {
-				channelId := common.String2Int(parts[1][1:])
+				channelId := utils.String2Int(parts[1][1:])
 				c.Set("skip_channel_id", channelId)
 			} else {
-				channelId := common.String2Int(parts[1])
+				channelId := utils.String2Int(parts[1])
 				if channelId == 0 {
 					abortWithMessage(c, http.StatusForbidden, "无效的渠道 Id")
 					return

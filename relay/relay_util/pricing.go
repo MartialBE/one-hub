@@ -1,9 +1,11 @@
-package util
+package relay_util
 
 import (
 	"encoding/json"
 	"errors"
-	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
+	"one-api/common/utils"
 	"one-api/model"
 	"sort"
 	"strings"
@@ -29,7 +31,7 @@ type BatchPrices struct {
 
 // NewPricing creates a new Pricing instance
 func NewPricing() {
-	common.SysLog("Initializing Pricing")
+	logger.SysLog("Initializing Pricing")
 
 	PricingInstance = &Pricing{
 		Prices: make(map[string]*model.Price),
@@ -39,16 +41,16 @@ func NewPricing() {
 	err := PricingInstance.Init()
 
 	if err != nil {
-		common.SysError("Failed to initialize Pricing:" + err.Error())
+		logger.SysError("Failed to initialize Pricing:" + err.Error())
 		return
 	}
 
 	// 初始化时，需要检测是否有更新
 	if viper.GetBool("auto_price_updates") || len(PricingInstance.Prices) == 0 {
-		common.SysLog("Checking for pricing updates")
+		logger.SysLog("Checking for pricing updates")
 		prices := model.GetDefaultPrice()
 		PricingInstance.SyncPricing(prices, false)
-		common.SysLog("Pricing initialized")
+		logger.SysLog("Pricing initialized")
 	}
 }
 
@@ -98,14 +100,14 @@ func (p *Pricing) GetPrice(modelName string) *model.Price {
 		return price
 	}
 
-	matchModel := common.GetModelsWithMatch(&p.Match, modelName)
+	matchModel := utils.GetModelsWithMatch(&p.Match, modelName)
 	if price, ok := p.Prices[matchModel]; ok {
 		return price
 	}
 
 	return &model.Price{
 		Type:        model.TokensPriceType,
-		ChannelType: common.ChannelTypeUnknown,
+		ChannelType: config.ChannelTypeUnknown,
 		Input:       model.DefaultPrice,
 		Output:      model.DefaultPrice,
 	}
@@ -281,7 +283,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	var updatePrices []string
 
 	for _, model := range originalModels {
-		if !common.Contains(model, batchPrices.Models) {
+		if !utils.Contains(model, batchPrices.Models) {
 			deletePrices = append(deletePrices, model)
 		} else {
 			updatePrices = append(updatePrices, model)
@@ -289,7 +291,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	for _, model := range batchPrices.Models {
-		if !common.Contains(model, originalModels) {
+		if !utils.Contains(model, originalModels) {
 			addPrice := batchPrices.Price
 			addPrice.Model = model
 			addPrices = append(addPrices, &addPrice)

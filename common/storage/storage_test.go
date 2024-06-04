@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"one-api/common"
+	"one-api/common/utils"
+
 	"one-api/common/requester"
 	"one-api/common/storage/drives"
 
@@ -21,7 +22,24 @@ func InitConfig() {
 	viper.ReadInConfig()
 	requester.InitHttpClient()
 }
+func TestALIOSSUpload(t *testing.T) {
+	InitConfig()
+	endpoint := viper.GetString("storage.alioss.endpoint")
+	accessKeyId := viper.GetString("storage.alioss.accessKeyId")
+	accessKeySecret := viper.GetString("storage.alioss.accessKeySecret")
+	bucketName := viper.GetString("storage.alioss.bucketName")
+	aliUpload := drives.NewAliOSSUpload(endpoint, accessKeyId, accessKeySecret, bucketName)
 
+	image, err := base64.StdEncoding.DecodeString(testImageB64)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	url, err := aliUpload.Upload(image, utils.GetUUID()+".png")
+	fmt.Println(url)
+	fmt.Println(err)
+	assert.Nil(t, err)
+}
 func TestSMMSUpload(t *testing.T) {
 	InitConfig()
 	smSecret := viper.GetString("storage.smms.secret")
@@ -32,7 +50,7 @@ func TestSMMSUpload(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	url, err := smUpload.Upload(image, common.GetUUID()+".png")
+	url, err := smUpload.Upload(image, utils.GetUUID()+".png")
 	fmt.Println(url)
 	fmt.Println(err)
 	assert.Nil(t, err)
@@ -48,7 +66,7 @@ func TestImgurUpload(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	url, err := imgurUpload.Upload(image, common.GetUUID()+".png")
+	url, err := imgurUpload.Upload(image, utils.GetUUID()+".png")
 	fmt.Println(url)
 	fmt.Println(err)
 	assert.Nil(t, err)

@@ -1,7 +1,8 @@
 package telegram
 
 import (
-	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/utils"
 	"strings"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
@@ -15,7 +16,7 @@ func commandAffStart(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	if user.AffCode == "" {
-		user.AffCode = common.GetRandomString(4)
+		user.AffCode = utils.GetRandomString(4)
 		if err := user.Update(false); err != nil {
 			ctx.EffectiveMessage.Reply(b, "系统错误，请稍后再试", nil)
 			return nil
@@ -23,8 +24,8 @@ func commandAffStart(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	messae := "您可以通过分享您的邀请码来邀请朋友，每次成功邀请将获得奖励。\n\n您的邀请码是: " + user.AffCode
-	if common.ServerAddress != "" {
-		serverAddress := strings.TrimSuffix(common.ServerAddress, "/")
+	if config.ServerAddress != "" {
+		serverAddress := strings.TrimSuffix(config.ServerAddress, "/")
 		messae += "\n\n页面地址：" + serverAddress + "/register?aff=" + user.AffCode
 	}
 
