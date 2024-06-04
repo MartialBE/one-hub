@@ -4,8 +4,6 @@ import (
 	"one-api/common/logger"
 	"one-api/common/utils"
 
-	"one-api/common"
-
 	"github.com/gin-gonic/gin"
 )
 
