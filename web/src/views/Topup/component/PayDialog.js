@@ -72,8 +72,6 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
           setMessage('支付成功');
           setLoading(false);
           setSuccess(true);
-          //支付成功清空旧的二维码
-          setQrCodeUrl('');
           clearInterval(id);
           setIntervalId(null);
         }
