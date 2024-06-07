@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import { QRCode } from 'react-qrcode-logo';
@@ -26,7 +26,6 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
     if (!open) {
       return;
     }
-
     setMessage('正在拉起支付中...');
     setLoading(true);
 
@@ -80,7 +79,12 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
     }, 3000);
     setIntervalId(id);
   };
-
+  //打开支付宝
+  const handleOpenAlipay = (alipayUrl) => {
+    if (alipayUrl && alipayUrl.startsWith('https://qr.alipay.com')) {
+      window.open(alipayUrl, '_blank');
+    }
+  };
   return (
     <Dialog open={open} fullWidth maxWidth={'sm'} disableEscapeKeyDown>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>支付</DialogTitle>
@@ -118,6 +122,11 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
             )}
             {success && <img src={successSvg} alt="success" height="100" />}
             <Typography variant="h3">{message}</Typography>
+            {qrCodeUrl && qrCodeUrl.startsWith('https://qr.alipay.com') && !success && (
+              <Button variant="contained" color="primary" onClick={() => handleOpenAlipay(qrCodeUrl)}>
+                打开支付宝
+              </Button>
+            )}
           </Stack>
         </DialogContent>
       </DialogContent>
