@@ -33,6 +33,8 @@ const TopupCard = () => {
   const [payment, setPayment] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [amount, setAmount] = useState(0);
+  const [amounts, setAmounts] = useState(0);
+  const [selectedButton, setSelectedButton] = useState(null);
   const [open, setOpen] = useState(false);
 
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -135,6 +137,11 @@ const TopupCard = () => {
   const handleAmountChange = (event) => {
     const value = event.target.value;
     setAmount(value);
+    setAmounts(value);
+  };
+  const handleSetAmount = (newAmount, buttonId) => {
+    setAmount(newAmount);
+    setSelectedButton(buttonId);
   };
   const calculateFee = () => {
     if (!selectedPayment) return 0;
@@ -197,7 +204,64 @@ const TopupCard = () => {
                 </Button>
               </AnimateButton>
             ))}
-            <TextField label="金额" type="number" onChange={handleAmountChange} value={amount} />
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => handleSetAmount(5,1)}
+                      sx={{
+                        border: selectedButton === 1 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      $5
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => handleSetAmount(10,2)}
+                      sx={{
+                        border: selectedButton === 2 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      $10
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => handleSetAmount(20,3)}
+                      sx={{
+                        border: selectedButton === 3 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      $20
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => handleSetAmount(30,4)}
+                      sx={{
+                        border: selectedButton === 4 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      $30
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => handleSetAmount(50,5)}
+                      sx={{
+                        border: selectedButton === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      $50
+                    </Button>
+                  </Grid>
+                </Grid>
+            <TextField label="金额" type="number" onChange={handleAmountChange} value={amounts} />
             <Divider />
             <Grid container direction="row" justifyContent="flex-end" spacing={2}>
               <Grid item xs={9}>
