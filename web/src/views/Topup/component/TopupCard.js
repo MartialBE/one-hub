@@ -265,17 +265,17 @@ const TopupCard = () => {
             <TextField label="金额" type="number" onChange={handleAmountChange} value={amount} />
             <Divider />
             <Grid container direction="row" justifyContent="flex-end" spacing={2}>
-              <Grid item xs={9}>
+              <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
                   充值金额:{' '}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
               {selectedPayment && (selectedPayment.percent_fee > 0 || selectedPayment.fixed_fee > 0) && (
                 <>
-                  <Grid item xs={9}>
+                  <Grid item xs={6} md={9}>
                     <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
                       手续费:
                       {selectedPayment &&
@@ -286,18 +286,18 @@ const TopupCard = () => {
                             : '')}{' '}
                     </Typography>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={6} md={3}>
                     ${calculateFee()}
                   </Grid>
                 </>
               )}
 
-              <Grid item xs={9}>
+              <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
                   实际支付金额:{' '}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={6} md={3}>
                 {calculateTotal()}{' '}
                 {selectedPayment &&
                   (selectedPayment.currency === 'CNY' ? `CNY (汇率：${siteInfo.PaymentUSDRate})` : selectedPayment.currency)}
