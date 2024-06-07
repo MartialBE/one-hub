@@ -4,7 +4,8 @@ type PayType string
 
 var (
 	FacePay PayType = "facepay" // 当面付
-	PagePay PayType = "pagepay" // 跳转支付
+	PagePay PayType = "pagepay" // PC网页支付
+	WapPay  PayType = "wappay"  // Wap网页支付
 
 )
 

@@ -101,6 +101,10 @@ const PaymentConfig = {
         {
           name: '电脑网站支付',
           value: 'pagepay'
+        },
+        {
+          name: '手机网站支付',
+          value: 'wappay'
         }
       ]
     }
