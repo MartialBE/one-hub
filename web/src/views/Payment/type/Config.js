@@ -99,7 +99,7 @@ const PaymentConfig = {
           value: 'facepay'
         },
         {
-          name: '跳转支付',
+          name: '电脑网站支付',
           value: 'pagepay'
         }
       ]

@@ -86,6 +86,7 @@ func (a *Alipay) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 		p.Subject = sysconfig.SystemName + "-Token充值:" + p.TotalAmount
 		p.NotifyURL = config.NotifyURL
 		p.ReturnURL = config.ReturnURL
+		p.ProductCode = "FAST_INSTANT_TRADE_PAY"
 		alipayRes, err := client.TradePagePay(p)
 		if err != nil {
 			return nil, fmt.Errorf("alipay trade precreate failed: %s", err.Error())
