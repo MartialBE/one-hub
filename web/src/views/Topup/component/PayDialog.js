@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
@@ -22,6 +22,31 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
     siteInfo = JSON.parse(siteInfoStorage);
   }
   const useLogo = siteInfo.logo ? siteInfo.logo : defaultLogo;
+
+  const clearValue = () => {
+    setMessage('正在拉起支付中...');
+    setLoading(false);
+    setQrCodeUrl(null);
+    setSuccess(false);
+  };
+
+  const pollOrderStatus = useCallback((tradeNo) => {
+    const id = setInterval(() => {
+      API.get(`/api/user/order/status?trade_no=${tradeNo}`).then((response) => {
+        if (response.data.success) {
+          clearInterval(id);
+          setMessage('支付成功');
+          setLoading(false);
+          setSuccess(true);
+          setQrCodeUrl(null);
+          clearInterval(id);
+          setIntervalId(null);
+        }
+      });
+    }, 3000);
+    setIntervalId(id);
+  }, []);
+
   useEffect(() => {
     if (!open) {
       return;
@@ -63,22 +88,8 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
       }
       pollOrderStatus(response.data.data.trade_no);
     });
-  }, [open, onClose, amount, uuid]);
+  }, [open, onClose, amount, uuid, pollOrderStatus]);
 
-  const pollOrderStatus = (tradeNo) => {
-    const id = setInterval(() => {
-      API.get(`/api/user/order/status?trade_no=${tradeNo}`).then((response) => {
-        if (response.data.success) {
-          setMessage('支付成功');
-          setLoading(false);
-          setSuccess(true);
-          clearInterval(id);
-          setIntervalId(null);
-        }
-      });
-    }, 3000);
-    setIntervalId(id);
-  };
   //打开支付宝
   const handleOpenAlipay = (alipayUrl) => {
     if (alipayUrl && alipayUrl.startsWith('https://qr.alipay.com')) {
@@ -95,6 +106,7 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
             clearInterval(intervalId);
             setIntervalId(null);
           }
+          clearValue();
           onClose();
         }}
         sx={{

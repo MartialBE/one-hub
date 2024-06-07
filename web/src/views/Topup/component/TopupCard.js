@@ -33,9 +33,8 @@ const TopupCard = () => {
   const [payment, setPayment] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [amount, setAmount] = useState(0);
-  const [amounts, setAmounts] = useState(0);
-  const [selectedButton, setSelectedButton] = useState(null);
   const [open, setOpen] = useState(false);
+  const [disabledPay, setDisabledPay] = useState(false);
 
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
   const siteInfo = useSelector((state) => state.siteInfo);
@@ -89,7 +88,13 @@ const TopupCard = () => {
       return;
     }
 
+    setDisabledPay(true);
     setOpen(true);
+  };
+
+  const onClosePayDialog = () => {
+    setOpen(false);
+    setDisabledPay(false);
   };
 
   const getPayment = async () => {
@@ -135,14 +140,10 @@ const TopupCard = () => {
   };
 
   const handleAmountChange = (event) => {
-    const value = event.target.value;
+    const value = Number(event.target.value);
     setAmount(value);
-    setAmounts(value);
   };
-  const handleSetAmount = (newAmount, buttonId) => {
-    setAmount(newAmount);
-    setSelectedButton(buttonId);
-  };
+
   const calculateFee = () => {
     if (!selectedPayment) return 0;
 
@@ -204,64 +205,64 @@ const TopupCard = () => {
                 </Button>
               </AnimateButton>
             ))}
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(5,1)}
-                      sx={{
-                        border: selectedButton === 1 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $5
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(10,2)}
-                      sx={{
-                        border: selectedButton === 2 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $10
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(20,3)}
-                      sx={{
-                        border: selectedButton === 3 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $20
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(30,4)}
-                      sx={{
-                        border: selectedButton === 4 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $30
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(50,5)}
-                      sx={{
-                        border: selectedButton === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $50
-                    </Button>
-                  </Grid>
-                </Grid>
-            <TextField label="金额" type="number" onChange={handleAmountChange} value={amounts} />
+            <Grid container spacing={2}>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAmount(5)}
+                  sx={{
+                    border: amount === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $5
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAmount(10)}
+                  sx={{
+                    border: amount === 10 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $10
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAmount(20)}
+                  sx={{
+                    border: amount === 20 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $20
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAmount(30)}
+                  sx={{
+                    border: amount === 30 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $30
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAmount(50)}
+                  sx={{
+                    border: amount === 50 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $50
+                </Button>
+              </Grid>
+            </Grid>
+            <TextField label="金额" type="number" onChange={handleAmountChange} value={amount} />
             <Divider />
             <Grid container direction="row" justifyContent="flex-end" spacing={2}>
               <Grid item xs={9}>
@@ -303,11 +304,11 @@ const TopupCard = () => {
               </Grid>
             </Grid>
             <Divider />
-            <Button variant="contained" onClick={handlePay}>
+            <Button variant="contained" onClick={handlePay} disabled={disabledPay}>
               充值
             </Button>
           </Stack>
-          <PayDialog open={open} onClose={() => setOpen(false)} amount={amount} uuid={selectedPayment.uuid} />
+          <PayDialog open={open} onClose={onClosePayDialog} amount={amount} uuid={selectedPayment.uuid} />
         </SubCard>
       )}
 
