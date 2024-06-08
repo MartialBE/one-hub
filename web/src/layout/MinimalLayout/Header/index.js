@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ThemeButton from 'ui-component/ThemeButton';
+import TutorialButton from 'ui-component/tutorialButton';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from 'ui-component/extended/Transitions';
@@ -64,6 +65,7 @@ const Header = () => {
       <Stack spacing={2} direction="row" justifyContent="center" alignItems="center">
         {isMobile ? (
           <>
+            <TutorialButton />
             <ThemeButton />
             <IconButton onClick={handleOpenMenu}>
               <IconMenu2 />
@@ -82,6 +84,7 @@ const Header = () => {
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
               关于
             </Button>
+            <TutorialButton />
             <ThemeButton />
             {account.user ? (
               <>
