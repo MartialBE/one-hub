@@ -64,21 +64,21 @@ func (q *Quota) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 
 	userQuota, err := model.CacheGetUserQuota(q.userId)
 	if err != nil {
-		return common.ErrorWrapper(err, "get_user_quota_failed", http.StatusInternalServerError)
+		return common.ErrorWrapper(err, "获取用户配额失败", http.StatusInternalServerError)
 	}
 
 	if userQuota < q.preConsumedQuota {
-		return common.ErrorWrapper(errors.New("user quota is not enough"), "insufficient_user_quota", http.StatusForbidden)
+		return common.ErrorWrapper(errors.New("用户配额不足"), "用户配额不足", http.StatusForbidden)
 	}
 
 	err = model.CacheDecreaseUserQuota(q.userId, q.preConsumedQuota)
 	if err != nil {
-		return common.ErrorWrapper(err, "decrease_user_quota_failed", http.StatusInternalServerError)
+		return common.ErrorWrapper(err, "减少用户配额失败", http.StatusInternalServerError)
 	}
 
 	if userQuota > 100*q.preConsumedQuota {
-		// in this case, we do not pre-consume quota
-		// because the user has enough quota
+		// 在这种情况下，我们不预先消耗配额
+		// 因为用户有足够的配额
 		q.preConsumedQuota = 0
 		// common.LogInfo(c.Request.Context(), fmt.Sprintf("user %d has enough quota %d, trusted and no need to pre-consume", userId, userQuota))
 	}
@@ -86,7 +86,7 @@ func (q *Quota) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 	if q.preConsumedQuota > 0 {
 		err := model.PreConsumeTokenQuota(q.tokenId, q.preConsumedQuota)
 		if err != nil {
-			return common.ErrorWrapper(err, "pre_consume_token_quota_failed", http.StatusForbidden)
+			return common.ErrorWrapper(err, "预消耗令牌配额失败", http.StatusForbidden)
 		}
 		q.HandelStatus = true
 	}
@@ -111,18 +111,18 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	}
 	totalTokens := promptTokens + completionTokens
 	if totalTokens == 0 {
-		// in this case, must be some error happened
-		// we cannot just return, because we may have to return the pre-consumed quota
+		// 在这种情况下，必须发生了一些错误
+		// 我们不能直接返回，因为我们可能需要返还预消耗的配额
 		quota = 0
 	}
 	quotaDelta := quota - q.preConsumedQuota
 	err := model.PostConsumeTokenQuota(q.tokenId, quotaDelta)
 	if err != nil {
-		return errors.New("error consuming token remain quota: " + err.Error())
+		return errors.New("消耗令牌剩余配额出错: " + err.Error())
 	}
 	err = model.CacheUpdateUserQuota(q.userId)
 	if err != nil {
-		return errors.New("error consuming token remain quota: " + err.Error())
+		return errors.New("消耗令牌剩余配额出错: " + err.Error())
 	}
 
 	requestTime := 0
@@ -157,10 +157,10 @@ func (q *Quota) Undo(c *gin.Context) {
 	tokenId := c.GetInt("token_id")
 	if q.HandelStatus {
 		go func(ctx context.Context) {
-			// return pre-consumed quota
+			// 返还预消耗的配额
 			err := model.PostConsumeTokenQuota(tokenId, -q.preConsumedQuota)
 			if err != nil {
-				logger.LogError(ctx, "error return pre-consumed quota: "+err.Error())
+				logger.LogError(ctx, "返还预消耗配额出错: "+err.Error())
 			}
 		}(c.Request.Context())
 	}
