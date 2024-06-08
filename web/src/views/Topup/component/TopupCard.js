@@ -36,6 +36,7 @@ const TopupCard = () => {
   const [amounts, setAmounts] = useState(0);
   const [selectedButton, setSelectedButton] = useState(null);
   const [open, setOpen] = useState(false);
+  const [isManualInput, setIsManualInput] = useState(false);
 
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
   const siteInfo = useSelector((state) => state.siteInfo);
@@ -138,13 +139,17 @@ const TopupCard = () => {
     const value = event.target.value;
     setAmount(value);
     setAmounts(value);
+    setIsManualInput(true);
   };
+
   const handleSetAmount = (newAmount, buttonId) => {
     setAmount(newAmount);
     setSelectedButton(buttonId);
+    setIsManualInput(false);
   };
+
   const calculateFee = () => {
-    if (!selectedPayment) return 0;
+    if (!selectedPayment || !isManualInput) return 0;
 
     if (selectedPayment.fixed_fee > 0) {
       return Number(selectedPayment.fixed_fee);
@@ -156,7 +161,7 @@ const TopupCard = () => {
   const calculateTotal = () => {
     if (amount === 0) return 0;
 
-    let total = Number(amount) + Number(calculateFee());
+    let total = Number(amount) + (isManualInput ? Number(calculateFee()) : 0);
     if (selectedPayment && selectedPayment.currency === 'CNY') {
       total = parseFloat((total * siteInfo.PaymentUSDRate).toFixed(2));
     }
@@ -204,63 +209,63 @@ const TopupCard = () => {
                 </Button>
               </AnimateButton>
             ))}
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(5,1)}
-                      sx={{
-                        border: selectedButton === 1 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $5
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(10,2)}
-                      sx={{
-                        border: selectedButton === 2 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $10
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(20,3)}
-                      sx={{
-                        border: selectedButton === 3 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $20
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(30,4)}
-                      sx={{
-                        border: selectedButton === 4 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $30
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button 
-                      variant="outlined"
-                      onClick={() => handleSetAmount(50,5)}
-                      sx={{
-                        border: selectedButton === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                      }}
-                    >
-                      $50
-                    </Button>
-                  </Grid>
-                </Grid>
+            <Grid container spacing={2}>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSetAmount(5, 1)}
+                  sx={{
+                    border: selectedButton === 1 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $5
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSetAmount(10, 2)}
+                  sx={{
+                    border: selectedButton === 2 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $10
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSetAmount(20, 3)}
+                  sx={{
+                    border: selectedButton === 3 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $20
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSetAmount(30, 4)}
+                  sx={{
+                    border: selectedButton === 4 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $30
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSetAmount(50, 5)}
+                  sx={{
+                    border: selectedButton === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                  }}
+                >
+                  $50
+                </Button>
+              </Grid>
+            </Grid>
             <TextField label="金额" type="number" onChange={handleAmountChange} value={amounts} />
             <Divider />
             <Grid container direction="row" justifyContent="flex-end" spacing={2}>
@@ -272,7 +277,7 @@ const TopupCard = () => {
               <Grid item xs={3}>
                 ${Number(amount)}
               </Grid>
-              {selectedPayment && (selectedPayment.percent_fee > 0 || selectedPayment.fixed_fee > 0) && (
+              {selectedPayment && (selectedPayment.percent_fee > 0 || selectedPayment.fixed_fee > 0) && isManualInput && (
                 <>
                   <Grid item xs={9}>
                     <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
@@ -281,8 +286,8 @@ const TopupCard = () => {
                         (selectedPayment.fixed_fee > 0
                           ? '(固定)'
                           : selectedPayment.percent_fee > 0
-                            ? `(${selectedPayment.percent_fee * 100}%)`
-                            : '')}{' '}
+                          ? `(${selectedPayment.percent_fee * 100}%)`
+                          : '')}{' '}
                     </Typography>
                   </Grid>
                   <Grid item xs={3}>
