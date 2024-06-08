@@ -1,17 +1,12 @@
 package alipay
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay/v3"
-	"net/http"
-	"net/url"
-	sysconfig "one-api/common/config"
 	"one-api/payment/types"
-	"strconv"
 )
 
 type Alipay struct{}
@@ -28,7 +23,7 @@ var client *alipay.Client
 const isProduction bool = true
 
 func (a *Alipay) Name() string {
-	return "支付宝当面付"
+	return "支付宝"
 }
 
 func (a *Alipay) InitClient(config *AlipayConfig) error {
@@ -53,59 +48,14 @@ func (a *Alipay) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 		}
 	}
 
-	if alipayConfig.PayType != PagePay {
-		var p = alipay.TradePreCreate{}
-		p.OutTradeNo = config.TradeNo
-		p.TotalAmount = strconv.FormatFloat(config.Money, 'f', 2, 64)
-		p.Subject = sysconfig.SystemName + "-Token充值:" + p.TotalAmount
-		p.NotifyURL = config.NotifyURL
-		p.ReturnURL = config.ReturnURL
-		ctx := context.Background()
-		alipayRes, err := client.TradePreCreate(ctx, p)
-		if err != nil {
-			return nil, fmt.Errorf("alipay trade precreate failed: %s", alipayRes.Msg)
-		}
-		if !alipayRes.IsSuccess() {
-			return nil, fmt.Errorf("alipay trade precreate failed: %s", alipayRes.Msg)
-		}
-		if alipayRes.Code != "10000" {
-			return nil, fmt.Errorf("alipay trade precreate failed: %s", alipayRes.Msg)
-		}
-		payRequest := &types.PayRequest{
-			Type: 2,
-			Data: types.PayRequestData{
-				URL:    alipayRes.QRCode,
-				Method: http.MethodGet,
-			},
-		}
-		return payRequest, nil
-	} else {
-		var p = alipay.TradePagePay{}
-		p.OutTradeNo = config.TradeNo
-		p.TotalAmount = strconv.FormatFloat(config.Money, 'f', 2, 64)
-		p.Subject = sysconfig.SystemName + "-Token充值:" + p.TotalAmount
-		p.NotifyURL = config.NotifyURL
-		p.ReturnURL = config.ReturnURL
-		p.ProductCode = "FAST_INSTANT_TRADE_PAY"
-		alipayRes, err := client.TradePagePay(p)
-		if err != nil {
-			return nil, fmt.Errorf("alipay trade precreate failed: %s", err.Error())
-		}
-		payUrl, parms, err := extractURLAndParams(alipayRes.String())
-		if err != nil {
-			return nil, fmt.Errorf("alipay trade precreate failed: %s", err.Error())
-		}
-		payRequest := &types.PayRequest{
-			Type: 1,
-			Data: types.PayRequestData{
-				URL:    payUrl,
-				Params: parms,
-				Method: http.MethodGet,
-			},
-		}
-		return payRequest, nil
+	switch alipayConfig.PayType {
+	case PagePay:
+		return a.handlePagePay(config, alipayConfig)
+	case WapPay:
+		return a.handleWapPay(config, alipayConfig)
+	default:
+		return a.handleTradePreCreate(config, alipayConfig)
 	}
-
 }
 
 func (a *Alipay) HandleCallback(c *gin.Context, gatewayConfig string) (*types.PayNotify, error) {
@@ -149,26 +99,4 @@ func getAlipayConfig(gatewayConfig string) (*AlipayConfig, error) {
 	}
 
 	return &alipayConfig, nil
-}
-
-// extractURLAndParams 从给定的原始 URL 中提取网址和参数，并将参数转换为 map[string]string
-func extractURLAndParams(rawURL string) (string, map[string]string, error) {
-	// 解析 URL
-	parsedURL, err := url.Parse(rawURL)
-	if err != nil {
-		return "", nil, err
-	}
-
-	// 提取网址
-	baseURL := fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
-
-	// 提取参数并转换成 map[string]string
-	params := parsedURL.Query()
-	paramMap := make(map[string]string)
-	for key, values := range params {
-		// 由于 URL 参数可能有多个值，这里只取第一个值
-		paramMap[key] = values[0]
-	}
-
-	return baseURL, paramMap, nil
 }

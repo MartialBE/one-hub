@@ -140,8 +140,13 @@ const TopupCard = () => {
   };
 
   const handleAmountChange = (event) => {
-    const value = Number(event.target.value);
-    setAmount(value);
+    const value = event.target.value;
+    if (value == '') {
+      setAmount('');
+      return;
+    }
+
+    setAmount(Number(value));
   };
 
   const calculateFee = () => {

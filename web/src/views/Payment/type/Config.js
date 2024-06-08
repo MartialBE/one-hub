@@ -1,6 +1,7 @@
 const PaymentType = {
   epay: '易支付',
-  alipay: '支付宝'
+  alipay: '支付宝',
+  wxpay: '微信支付'
 };
 
 const CurrencyType = {
@@ -101,6 +102,54 @@ const PaymentConfig = {
         {
           name: '电脑网站支付',
           value: 'pagepay'
+        },
+        {
+          name: '手机网站支付',
+          value: 'wappay'
+        }
+      ]
+    }
+  },
+  wxpay: {
+    app_id: {
+      name: 'AppID',
+      description: '应用ID 详见https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_7_1.shtml',
+      type: 'text',
+      value: ''
+    },
+    mch_id: {
+      name: '商户号',
+      description: '微信商户号 详见https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_7_1.shtml',
+      type: 'text',
+      value: ''
+    },
+    mch_certificate_serial_number: {
+      name: '商户证书序列号',
+      description: '商户证书序列号 详见https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_7_1.shtml',
+      type: 'text',
+      value: ''
+    },
+    mch_apiv3_key: {
+      name: '商户APIv3密钥',
+      description: '商户APIv3密钥 详见https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_7_1.shtml',
+      type: 'text',
+      value: ''
+    },
+    mch_private_key: {
+      name: '商户私钥',
+      description: '商户私钥 详见https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_7_1.shtml',
+      type: 'text',
+      value: ''
+    },
+    pay_type: {
+      name: '支付类型',
+      description: '支付类型',
+      type: 'select',
+      value: '',
+      options: [
+        {
+          name: 'Native支付',
+          value: 'Native'
         }
       ]
     }

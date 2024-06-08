@@ -7,24 +7,24 @@ import { QRCode } from 'react-qrcode-logo';
 import successSvg from 'assets/images/success.svg';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
+import { useSelector } from 'react-redux';
 
 const PayDialog = ({ open, onClose, amount, uuid }) => {
   const theme = useTheme();
+  const siteInfo = useSelector((state) => state.siteInfo);
   const defaultLogo = theme.palette.mode === 'light' ? '/logo-loading.svg' : '/logo-loading-white.svg';
   const [message, setMessage] = useState('正在拉起支付中...');
+  const [subMessage, setSubMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
   const [success, setSuccess] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
-  const siteInfoStorage = localStorage.getItem('siteInfo');
-  let siteInfo;
-  if (siteInfoStorage) {
-    siteInfo = JSON.parse(siteInfoStorage);
-  }
-  const useLogo = siteInfo.logo ? siteInfo.logo : defaultLogo;
+
+  let useLogo = siteInfo.logo ? siteInfo.logo : defaultLogo;
 
   const clearValue = () => {
     setMessage('正在拉起支付中...');
+    setSubMessage(null);
     setLoading(false);
     setQrCodeUrl(null);
     setSuccess(false);
@@ -47,6 +47,22 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
     setIntervalId(id);
   }, []);
 
+  function openPayUrl(method, url, params) {
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = url;
+    form.target = '_blank';
+    for (const key in params) {
+      const input = document.createElement('input');
+      input.name = key;
+      input.value = params[key];
+      form.appendChild(input);
+    }
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  }
+
   useEffect(() => {
     if (!open) {
       return;
@@ -68,19 +84,15 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
       const { type, data } = response.data.data;
       if (type === 1) {
         setMessage('等待支付中...');
-        const form = document.createElement('form');
-        form.method = data.method;
-        form.action = data.url;
-        form.target = '_blank';
-        for (const key in data.params) {
-          const input = document.createElement('input');
-          input.name = key;
-          input.value = data.params[key];
-          form.appendChild(input);
-        }
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        setSubMessage(
+          <>
+            如果没有自动跳转，请点击
+            <a href="#" onClick={() => openPayUrl(data.method, data.url, data.params)}>
+              这里跳转
+            </a>
+          </>
+        );
+        openPayUrl(data.method, data.url, data.params);
       } else if (type === 2) {
         setQrCodeUrl(data.url);
         setLoading(false);
@@ -134,6 +146,7 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
             )}
             {success && <img src={successSvg} alt="success" height="100" />}
             <Typography variant="h3">{message}</Typography>
+            {subMessage && <Typography variant="body">{subMessage}</Typography>}
             {qrCodeUrl && qrCodeUrl.startsWith('https://qr.alipay.com') && !success && (
               <Button variant="contained" color="primary" onClick={() => handleOpenAlipay(qrCodeUrl)}>
                 打开支付宝
