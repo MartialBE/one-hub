@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"one-api/common"
@@ -51,7 +52,6 @@ func CreateOrder(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
-
 	// 获取手续费和支付金额
 	fee, payMoney := calculateOrderAmount(paymentService.Payment, orderReq.Amount)
 
@@ -185,15 +185,20 @@ func CheckOrderStatus(c *gin.Context) {
 	})
 }
 
+// fee手续费，payMoney实付金额
 func calculateOrderAmount(payment *model.Payment, amount int) (fee, payMoney float64) {
+	discount := common.GetRechargeDiscount(strconv.Itoa(amount))
+	newMoney := float64(amount) * discount //折后价
 	if payment.PercentFee > 0 {
-		fee = utils.Decimal(float64(amount)*payment.PercentFee, 2)
+		//手续费=（原始价值*折扣*手续费率）
+		fee = utils.Decimal(newMoney*payment.PercentFee, 2) //折后手续费
 	} else if payment.FixedFee > 0 {
+		//固定费率不计算折扣
 		fee = payment.FixedFee
 	}
 
-	total := utils.Decimal(float64(amount)+fee, 2)
-
+	//实际费用=（折后价+折后手续费）*汇率
+	total := utils.Decimal(newMoney+fee, 2)
 	if payment.Currency == model.CurrencyTypeUSD {
 		payMoney = total
 	} else {
