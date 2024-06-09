@@ -282,7 +282,7 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="Footer"
-                  label="公告"
+                  label="页脚设置"
                   value={inputs.Footer}
                   name="Footer"
                   onChange={handleInputChange}

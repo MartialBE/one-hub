@@ -12,6 +12,20 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
     <>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
         <FormControl>
+          <InputLabel htmlFor="channel-gateway_id-label">网关ID</InputLabel>
+          <OutlinedInput
+            id="gateway_id"
+            name="gateway_id"
+            sx={{
+              minWidth: '100%'
+            }}
+            label="网关ID"
+            value={filterName.gateway_id}
+            onChange={handleFilterName}
+            placeholder="网关ID"
+          />
+        </FormControl>
+        <FormControl>
           <InputLabel htmlFor="channel-user_id-label">用户ID</InputLabel>
           <OutlinedInput
             id="user_id"

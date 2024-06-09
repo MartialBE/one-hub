@@ -154,6 +154,11 @@ export default function Order() {
                     disableSort: false
                   },
                   {
+                    id: 'gateway_id',
+                    label: '支付网关',
+                    disableSort: false
+                  },
+                  {
                     id: 'user_id',
                     label: '用户',
                     disableSort: false
@@ -179,6 +184,11 @@ export default function Order() {
                     disableSort: true
                   },
                   {
+                    id: 'discount',
+                    label: '优惠金额',
+                    disableSort: true
+                  },
+                  {
                     id: 'order_amount',
                     label: '实际支付金额',
                     disableSort: true
@@ -191,7 +201,7 @@ export default function Order() {
                   {
                     id: 'status',
                     label: '状态',
-                    disableSort: true
+                    disableSort: false
                   }
                 ]}
               />

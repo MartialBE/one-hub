@@ -53,7 +53,7 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 	// 获取手续费和支付金额
-	fee, payMoney := calculateOrderAmount(paymentService.Payment, orderReq.Amount)
+	discount, fee, payMoney := calculateOrderAmount(paymentService.Payment, orderReq.Amount)
 
 	// 开始支付
 	tradeNo := utils.GenerateTradeNo()
@@ -66,11 +66,13 @@ func CreateOrder(c *gin.Context) {
 	// 创建订单
 	order := &model.Order{
 		UserId:        userId,
+		GatewayId:     paymentService.Payment.ID,
 		TradeNo:       tradeNo,
 		Amount:        orderReq.Amount,
 		OrderAmount:   payMoney,
 		OrderCurrency: paymentService.Payment.Currency,
 		Fee:           fee,
+		Discount:      discount,
 		Status:        model.OrderStatusPending,
 		Quota:         orderReq.Amount * int(config.QuotaPerUnit),
 	}
@@ -185,13 +187,16 @@ func CheckOrderStatus(c *gin.Context) {
 	})
 }
 
-// fee手续费，payMoney实付金额
-func calculateOrderAmount(payment *model.Payment, amount int) (fee, payMoney float64) {
+// discountMoney优惠金额 fee手续费，payMoney实付金额
+func calculateOrderAmount(payment *model.Payment, amount int) (discountMoney, fee, payMoney float64) {
+	// 获取折扣
 	discount := common.GetRechargeDiscount(strconv.Itoa(amount))
-	newMoney := float64(amount) * discount //折后价
+	newMoney := float64(amount) * discount // 折后价值
+	oldTotal := float64(amount)            //原价值
 	if payment.PercentFee > 0 {
 		//手续费=（原始价值*折扣*手续费率）
-		fee = utils.Decimal(newMoney*payment.PercentFee, 2) //折后手续费
+		fee = utils.Decimal(newMoney*payment.PercentFee, 2) //折后手续
+		oldTotal = utils.Decimal(oldTotal*(1+payment.PercentFee), 2)
 	} else if payment.FixedFee > 0 {
 		//固定费率不计算折扣
 		fee = payment.FixedFee
@@ -202,9 +207,10 @@ func calculateOrderAmount(payment *model.Payment, amount int) (fee, payMoney flo
 	if payment.Currency == model.CurrencyTypeUSD {
 		payMoney = total
 	} else {
+		oldTotal = utils.Decimal(oldTotal*config.PaymentUSDRate, 2)
 		payMoney = utils.Decimal(total*config.PaymentUSDRate, 2)
 	}
-
+	discountMoney = oldTotal - payMoney //折扣金额 = 原价值-实际支付价值
 	return
 }
 
