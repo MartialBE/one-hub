@@ -34,6 +34,7 @@ const TopupCard = () => {
   const [payment, setPayment] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [amount, setAmount] = useState(0);
+  const [discountTotal, setDiscountTotal] = useState(0);
   const [open, setOpen] = useState(false);
   const [disabledPay, setDisabledPay] = useState(false);
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -146,13 +147,17 @@ const TopupCard = () => {
 
   const handleAmountChange = (event) => {
     const value = event.target.value;
-    //const discount = RechargeDiscount[amount] || 1;
-    //setDiscount(Number(discount));
     if (value === '') {
-      setAmount(0);
+      setAmount('');
       return;
     }
-    setAmount(Number(value));
+    handleSetAmount(value);
+  };
+
+  const handleSetAmount = (amount) => {
+    amount = Number(amount);
+    setAmount(amount);
+    handleDiscountTotal(amount);
   };
 
   const calculateFee = () => {
@@ -177,24 +182,19 @@ const TopupCard = () => {
     return total;
   };
 
-  const discountTotal = () => {
-    if (amount === 0) return 1;
+  const handleDiscountTotal = (amount) => {
+    if (amount === 0) return 0;
     // 如果金额在RechargeDiscount中，则应用折扣,手续费和货币换算汇率不算在折扣内
     const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
-    return amount * discount;
+    console.log(amount, discount);
+    setDiscountTotal(amount * discount);
   };
 
   useEffect(() => {
     getPayment().then();
     getUserQuota().then();
   }, []);
-  // useEffect(() => {
-  //   if (!open) {
-  //     // 仅当对话框未打开时更新折扣
-  //     const discount = RechargeDiscount[amount] || 1;
-  //     setDiscount(Number(discount));
-  //   }
-  // }, [amount, RechargeDiscount, open]);
+
   return (
     <UserCard>
       <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
@@ -237,7 +237,7 @@ const TopupCard = () => {
                   <Badge badgeContent={value !== 1 ? `${value * 10}折` : null} color="error">
                     <Button
                       variant="outlined"
-                      onClick={() => setAmount(Number(key))}
+                      onClick={() => handleSetAmount(key)}
                       sx={{
                         border: amount === Number(key) ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
                       }}
@@ -259,7 +259,7 @@ const TopupCard = () => {
               <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
-              {discountTotal() && discountTotal() !== 1 && (
+              {discountTotal != amount && (
                 <>
                   <Grid item xs={6} md={9}>
                     <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
@@ -267,7 +267,7 @@ const TopupCard = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    ${discountTotal()}
+                    ${discountTotal}
                   </Grid>
                 </>
               )}
