@@ -10,7 +10,8 @@ import {
   TextField,
   Box,
   Grid,
-  Divider
+  Divider,
+  Badge
 } from '@mui/material';
 import { IconBuildingBank } from '@tabler/icons-react';
 import { useTheme } from '@mui/material/styles';
@@ -35,10 +36,14 @@ const TopupCard = () => {
   const [amount, setAmount] = useState(0);
   const [open, setOpen] = useState(false);
   const [disabledPay, setDisabledPay] = useState(false);
-
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
   const siteInfo = useSelector((state) => state.siteInfo);
-
+  const RechargeDiscount = useSelector((state) => {
+    if (state.siteInfo.RechargeDiscount === '') {
+      return {};
+    }
+    return JSON.parse(state.siteInfo.RechargeDiscount);
+  });
   const topUp = async () => {
     if (redemptionCode === '') {
       showInfo('请输入充值码！');
@@ -141,11 +146,12 @@ const TopupCard = () => {
 
   const handleAmountChange = (event) => {
     const value = event.target.value;
-    if (value == '') {
-      setAmount('');
+    //const discount = RechargeDiscount[amount] || 1;
+    //setDiscount(Number(discount));
+    if (value === '') {
+      setAmount(0);
       return;
     }
-
     setAmount(Number(value));
   };
 
@@ -153,27 +159,42 @@ const TopupCard = () => {
     if (!selectedPayment) return 0;
 
     if (selectedPayment.fixed_fee > 0) {
-      return Number(selectedPayment.fixed_fee);
+      return Number(selectedPayment.fixed_fee); //固定费率不计算折扣
     }
-
-    return parseFloat(selectedPayment.percent_fee * Number(amount)).toFixed(2);
+    const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
+    let newAmount = amount * discount; //折后价格
+    return parseFloat(selectedPayment.percent_fee * Number(newAmount)).toFixed(2);
   };
 
   const calculateTotal = () => {
     if (amount === 0) return 0;
-
-    let total = Number(amount) + Number(calculateFee());
+    const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
+    let newAmount = amount * discount; //折后价格
+    let total = Number(newAmount) + Number(calculateFee());
     if (selectedPayment && selectedPayment.currency === 'CNY') {
       total = parseFloat((total * siteInfo.PaymentUSDRate).toFixed(2));
     }
     return total;
   };
 
+  const discountTotal = () => {
+    if (amount === 0) return 1;
+    // 如果金额在RechargeDiscount中，则应用折扣,手续费和货币换算汇率不算在折扣内
+    const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
+    return amount * discount;
+  };
+
   useEffect(() => {
     getPayment().then();
     getUserQuota().then();
   }, []);
-
+  // useEffect(() => {
+  //   if (!open) {
+  //     // 仅当对话框未打开时更新折扣
+  //     const discount = RechargeDiscount[amount] || 1;
+  //     setDiscount(Number(discount));
+  //   }
+  // }, [amount, RechargeDiscount, open]);
   return (
     <UserCard>
       <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
@@ -211,61 +232,21 @@ const TopupCard = () => {
               </AnimateButton>
             ))}
             <Grid container spacing={2}>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAmount(5)}
-                  sx={{
-                    border: amount === 5 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                  }}
-                >
-                  $5
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAmount(10)}
-                  sx={{
-                    border: amount === 10 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                  }}
-                >
-                  $10
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAmount(20)}
-                  sx={{
-                    border: amount === 20 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                  }}
-                >
-                  $20
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAmount(30)}
-                  sx={{
-                    border: amount === 30 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                  }}
-                >
-                  $30
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAmount(50)}
-                  sx={{
-                    border: amount === 50 ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
-                  }}
-                >
-                  $50
-                </Button>
-              </Grid>
+              {Object.entries(RechargeDiscount).map(([key, value]) => (
+                <Grid item key={key}>
+                  <Badge badgeContent={value !== 1 ? `${value * 10}折` : null} color="error">
+                    <Button
+                      variant="outlined"
+                      onClick={() => setAmount(Number(key))}
+                      sx={{
+                        border: amount === Number(key) ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent'
+                      }}
+                    >
+                      ${key}
+                    </Button>
+                  </Badge>
+                </Grid>
+              ))}
             </Grid>
             <TextField label="金额" type="number" onChange={handleAmountChange} value={amount} />
             <Divider />
@@ -278,6 +259,18 @@ const TopupCard = () => {
               <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
+              {discountTotal() && discountTotal() !== 1 && (
+                <>
+                  <Grid item xs={6} md={9}>
+                    <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
+                      折后价:{' '}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    ${discountTotal()}
+                  </Grid>
+                </>
+              )}
               {selectedPayment && (selectedPayment.percent_fee > 0 || selectedPayment.fixed_fee > 0) && (
                 <>
                   <Grid item xs={6} md={9}>

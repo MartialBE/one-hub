@@ -38,7 +38,8 @@ const OperationSetting = () => {
     ChatCacheExpireMinute: 5,
     ChatImageRequestProxy: '',
     PaymentUSDRate: 0,
-    PaymentMinAmount: 1
+    PaymentMinAmount: 1,
+    RechargeDiscount: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -53,6 +54,9 @@ const OperationSetting = () => {
         let newInputs = {};
         data.forEach((item) => {
           if (item.key === 'GroupRatio') {
+            item.value = JSON.stringify(JSON.parse(item.value), null, 2);
+          }
+          if (item.key === 'RechargeDiscount') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);
           }
           newInputs[item.key] = item.value;
@@ -186,6 +190,13 @@ const OperationSetting = () => {
         }
         if (originInputs['PaymentMinAmount'] !== inputs.PaymentMinAmount) {
           await updateOption('PaymentMinAmount', inputs.PaymentMinAmount);
+        }
+        if (originInputs['RechargeDiscount'] !== inputs.RechargeDiscount) {
+          if (!verifyJSON(inputs.RechargeDiscount)) {
+            showError('固定金额充值折扣不是合法的 JSON 字符串');
+            return;
+          }
+          await updateOption('RechargeDiscount', inputs.RechargeDiscount);
         }
         break;
     }
@@ -544,40 +555,64 @@ const OperationSetting = () => {
       </SubCard>
       <SubCard title="支付设置">
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
-          <FormControl fullWidth>
-            <Alert severity="info">
-              支付设置： <br />
-              1. 美元汇率：用于计算充值金额的美元金额 <br />
-              2. 最低充值金额（美元）：最低充值金额，单位为美元，填写整数 <br />
-              3. 页面都以美元为单位计算，实际用户支付的货币，按照支付网关设置的货币进行转换 <br />
-              例如： A 网关设置货币为 CNY，用户支付 100 美元，那么实际支付金额为 100 * 美元汇率 <br />B 网关设置货币为 USD，用户支付 100
-              美元，那么实际支付金额为 100 美元
-            </Alert>
-          </FormControl>
-          <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <FormControl fullWidth>
-              <InputLabel htmlFor="PaymentUSDRate">美元汇率</InputLabel>
-              <OutlinedInput
-                id="PaymentUSDRate"
-                name="PaymentUSDRate"
-                type="number"
-                value={inputs.PaymentUSDRate}
-                onChange={handleInputChange}
-                label="美元汇率"
-                placeholder="例如：7.3"
-                disabled={loading}
-              />
+              <Alert severity="info">
+                支付设置： <br />
+                1. 美元汇率：用于计算充值金额的美元金额 <br />
+                2. 最低充值金额（美元）：最低充值金额，单位为美元，填写整数 <br />
+                3. 页面都以美元为单位计算，实际用户支付的货币，按照支付网关设置的货币进行转换 <br />
+                例如： A 网关设置货币为 CNY，用户支付 100 美元，那么实际支付金额为 100 * 美元汇率 <br />B 网关设置货币为 USD，用户支付 100
+                美元，那么实际支付金额为 100 美元
+              </Alert>
             </FormControl>
+            <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="PaymentUSDRate">美元汇率</InputLabel>
+                <OutlinedInput
+                  id="PaymentUSDRate"
+                  name="PaymentUSDRate"
+                  type="number"
+                  value={inputs.PaymentUSDRate}
+                  onChange={handleInputChange}
+                  label="美元汇率"
+                  placeholder="例如：7.3"
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="PaymentMinAmount">最低充值金额（美元）</InputLabel>
+                <OutlinedInput
+                  id="PaymentMinAmount"
+                  name="PaymentMinAmount"
+                  type="number"
+                  value={inputs.PaymentMinAmount}
+                  onChange={handleInputChange}
+                  label="最低充值金额（美元）"
+                  placeholder="例如：1，那么最低充值金额为1美元，请填写整数"
+                  disabled={loading}
+                />
+              </FormControl>
+            </Stack>
+          </Stack>
+          <Stack spacing={2}>
+            <Alert severity="info">
+              固定金额充值折扣设置示例： <br />
+              为一个 JSON文本，键为充值金额，值为折扣，比如 &#123;&quot;10&quot;:0.9&#125; 表示充值10美元按照9折计算 <br />
+              计算公式：实际费用=（原始价值*折扣+原始价值*折扣*手续费率）*汇率
+            </Alert>
             <FormControl fullWidth>
-              <InputLabel htmlFor="PaymentMinAmount">最低充值金额（美元）</InputLabel>
-              <OutlinedInput
-                id="PaymentMinAmount"
-                name="PaymentMinAmount"
-                type="number"
-                value={inputs.PaymentMinAmount}
+              <TextField
+                multiline
+                maxRows={15}
+                id="channel-RechargeDiscount-label"
+                label="固定金额充值折扣"
+                value={inputs.RechargeDiscount}
+                name="RechargeDiscount"
                 onChange={handleInputChange}
-                label="最低充值金额（美元）"
-                placeholder="例如：1，那么最低充值金额为1美元，请填写整数"
+                aria-describedby="helper-text-channel-RechargeDiscount-label"
+                minRows={5}
+                placeholder="为一个 JSON 文本，键为充值金额，值为折扣"
                 disabled={loading}
               />
             </FormControl>
