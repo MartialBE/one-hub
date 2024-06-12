@@ -237,6 +237,9 @@ const TopupCard = () => {
         <Typography variant="h4">当前额度:</Typography>
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
+        <Typography variant="h5">充值$5即可升级VIP</Typography>
+      </Stack>
 
       {payment.length > 0 && (
         <SubCard
