@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 const PayDialog = ({ open, onClose, amount, uuid }) => {
   const theme = useTheme();
   const siteInfo = useSelector((state) => state.siteInfo);
-  const defaultLogo = theme.palette.mode === 'light' ? '/logo-loading.svg' : '/logo-loading-white.svg';
+  const defaultLogo = theme.palette.mode === 'light' ? '/logo.svg' : '/logo.svg';
   const [message, setMessage] = useState('正在拉起支付中...');
   const [subMessage, setSubMessage] = useState(null);
   const [loading, setLoading] = useState(false);
