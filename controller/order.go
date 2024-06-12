@@ -162,8 +162,10 @@ func PaymentCallback(c *gin.Context) {
 		logger.SysError(fmt.Sprintf("gateway callback failed to increase user quota, trade_no: %s,", payNotify.TradeNo))
 		return
 	}
+	//改为美金显示
+	UsdQuota := order.Quota / 500000
 
-	model.RecordLog(order.UserId, model.LogTypeTopup, fmt.Sprintf("在线充值成功，充值quota: %d，支付金额：%.2f %s", order.Quota, order.OrderAmount, order.OrderCurrency))
+	model.RecordLog(order.UserId, model.LogTypeTopup, fmt.Sprintf("在线充值成功，充值: %d，支付金额：%.2f %s", UsdQuota, order.OrderAmount, order.OrderCurrency))
 
 }
 
