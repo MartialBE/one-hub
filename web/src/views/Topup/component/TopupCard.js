@@ -214,6 +214,9 @@ const TopupCard = () => {
         <Typography variant="h4">当前额度:</Typography>
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
+        <Typography variant="h6">充值$5即可自动升级VIP，当前在线支付自动升级功能有误，请先联系客服人工调整会员等级。</Typography>
+      </Stack>
 
       {payment.length > 0 && (
         <SubCard
@@ -297,7 +300,7 @@ const TopupCard = () => {
               </Grid>
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  实际支付金额:{' '}
+                  支付金额:{' '}
                 </Typography>
               </Grid>
               <Grid item xs={6} md={3}>
