@@ -324,7 +324,7 @@ const TopupCard = () => {
               </Grid>
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  实际支付金额:{' '}
+                  支付金额:{' '}
                 </Typography>
               </Grid>
               <Grid item xs={6} md={3}>
