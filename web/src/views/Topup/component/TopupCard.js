@@ -74,7 +74,7 @@ const TopupCard = () => {
     }
   };
 
-  const handlePay = async () => {
+  const handlePay = () => {
     if (!selectedPayment) {
       showError('请选择支付方式');
       return;
@@ -97,31 +97,8 @@ const TopupCard = () => {
     }
 
     setDisabledPay(true);
-
-    try {
-      const response = await API.post('/api/user/payment', {
-        paymentId: selectedPayment.id,
-        amount: amount
-      });
-
-      const { success, data, message, upgradedToVIP } = response.data;
-
-      if (success) {
-        if (upgradedToVIP) {
-          showSuccess('支付成功，升级为 VIP 会员！');
-        } else {
-          showSuccess('支付成功，谢谢。');
-        }
-        setUserQuota((quota) => quota + data.quota);
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      showError('支付失败, 请右下角联系客服');
-    } finally {
-      setDisabledPay(false);
-      setOpen(false);
-    }
+    setOpen(true);
+    
   };
 
   const onClosePayDialog = () => {
@@ -237,9 +214,6 @@ const TopupCard = () => {
         <Typography variant="h4">当前额度:</Typography>
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
-        <Typography variant="h5">充值$5即可升级VIP</Typography>
-      </Stack>
 
       {payment.length > 0 && (
         <SubCard
@@ -313,7 +287,6 @@ const TopupCard = () => {
               <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
-
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
                   交易汇率:{' '}
@@ -324,7 +297,7 @@ const TopupCard = () => {
               </Grid>
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  支付金额:{' '}
+                  实际支付金额:{' '}
                 </Typography>
               </Grid>
               <Grid item xs={6} md={3}>
@@ -333,6 +306,7 @@ const TopupCard = () => {
                   (selectedPayment.currency === 'CNY' ? `CNY ` : selectedPayment.currency)}
               </Grid>
             </Grid>
+
             <Button variant="contained" onClick={handlePay} disabled={disabledPay}>
               充值
             </Button>
@@ -371,6 +345,7 @@ const TopupCard = () => {
             aria-describedby="helper-text-channel-quota-label"
           />
         </FormControl>
+
       </SubCard>
     </UserCard>
   );
