@@ -33,7 +33,6 @@ const TopupCard = () => {
   const [payment, setPayment] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [amount, setAmount] = useState(0);
-  // const [discountTotal, setDiscountTotal] = useState(0);
   const [open, setOpen] = useState(false);
   const [disabledPay, setDisabledPay] = useState(false);
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -75,7 +74,7 @@ const TopupCard = () => {
     }
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (!selectedPayment) {
       showError('请选择支付方式');
       return;
@@ -98,7 +97,31 @@ const TopupCard = () => {
     }
 
     setDisabledPay(true);
-    setOpen(true);
+
+    try {
+      const response = await API.post('/api/user/payment', {
+        paymentId: selectedPayment.id,
+        amount: amount
+      });
+
+      const { success, data, message, upgradedToVIP } = response.data;
+
+      if (success) {
+        if (upgradedToVIP) {
+          showSuccess('支付成功，升级为 VIP 会员！');
+        } else {
+          showSuccess('支付成功，谢谢。');
+        }
+        setUserQuota((quota) => quota + data.quota);
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      showError('支付失败, 请右下角联系客服');
+    } finally {
+      setDisabledPay(false);
+      setOpen(false);
+    }
   };
 
   const onClosePayDialog = () => {
@@ -122,13 +145,6 @@ const TopupCard = () => {
     }
   };
 
-  // const openTopUpLink = () => {
-  //   if (!siteInfo.top_up_link) {
-  //     showError('超级管理员未设置充值链接！');
-  //     return;
-  //   }
-  //   window.open(siteInfo.top_up_link, '_blank');
-  // };
 
   const getUserQuota = async () => {
     try {
@@ -190,7 +206,6 @@ const TopupCard = () => {
     // 如果金额在RechargeDiscount中，则应用折扣,手续费和货币换算汇率不算在折扣内
     const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
     console.log(amount, discount);
-    // setDiscountTotal(amount * discount);
   };
 
   //交易汇率计算
@@ -295,36 +310,7 @@ const TopupCard = () => {
               <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
-              {/* {discountTotal !== amount && (
-              <>
-                <Grid item xs={6} md={9}>
-                  <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                    折后价:{' '}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  ${discountTotal}
-                </Grid>
-              </>
-            )} */}
-              {/* {selectedPayment && (selectedPayment.percent_fee > 0 || selectedPayment.fixed_fee > 0) && (
-                <>
-                  <Grid item xs={6} md={9}>
-                    <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                      手续费:
-                      {selectedPayment &&
-                        (selectedPayment.fixed_fee > 0
-                          ? '(固定)'
-                          : selectedPayment.percent_fee > 0
-                            ? `(${selectedPayment.percent_fee * 100}%)`
-                            : '')}{' '}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    ${calculateFee()}
-                  </Grid>
-                </>
-              )} */}
+
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
                   交易汇率:{' '}
@@ -342,19 +328,8 @@ const TopupCard = () => {
                 {calculateTotal()}{' '}
                 {selectedPayment &&
                   (selectedPayment.currency === 'CNY' ? `CNY ` : selectedPayment.currency)}
-                {/* (汇率：${siteInfo.PaymentUSDRate}) */}
               </Grid>
             </Grid>
-            {/* <Divider /> */}
-            {/* {selectedPayment && selectedPayment.currency === 'CNY' && (
-            <Grid container direction="row" justifyContent="flex-end" spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  汇率: {calculateExchangeRate()}
-                </Typography>
-              </Grid>
-            </Grid>
-          )} */}
             <Button variant="contained" onClick={handlePay} disabled={disabledPay}>
               充值
             </Button>
@@ -393,14 +368,6 @@ const TopupCard = () => {
             aria-describedby="helper-text-channel-quota-label"
           />
         </FormControl>
-        {/* <Stack justifyContent="center" alignItems={'center'} spacing={3} paddingTop={'20px'}>
-          <Typography variant={'h4'} color={theme.palette.grey[700]}>
-            还没有兑换码？ 点击获取兑换码：
-          </Typography>
-          <Button variant="contained" onClick={openTopUpLink}>
-            获取兑换码
-          </Button>
-        </Stack> */}
       </SubCard>
     </UserCard>
   );
