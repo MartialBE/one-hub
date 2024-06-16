@@ -35,7 +35,11 @@ func UnmarshalBodyReusable(c *gin.Context, v any) error {
 }
 
 func ErrorWrapper(err error, code string, statusCode int) *types.OpenAIErrorWithStatusCode {
-	return StringErrorWrapper(err.Error(), code, statusCode)
+	errString := "error"
+	if err != nil {
+		errString = err.Error()
+	}
+	return StringErrorWrapper(errString, code, statusCode)
 }
 
 func ErrorToOpenAIError(err error) *types.OpenAIError {
