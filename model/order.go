@@ -18,6 +18,7 @@ const (
 type Order struct {
 	ID            int            `json:"id"`
 	UserId        int            `json:"user_id"`
+	GatewayId     int            `json:"gateway_id"`
 	TradeNo       string         `json:"trade_no" gorm:"type:varchar(50);uniqueIndex"`
 	GatewayNo     string         `json:"gateway_no" gorm:"type:varchar(100)"`
 	Amount        int            `json:"amount" gorm:"default:0"`
@@ -25,6 +26,7 @@ type Order struct {
 	OrderCurrency CurrencyType   `json:"order_currency" gorm:"type:varchar(16)"`
 	Quota         int            `json:"quota" gorm:"type:int;default:0"`
 	Fee           float64        `json:"fee" gorm:"type:decimal(10,2);default:0"`
+	Discount      float64        `json:"discount" gorm:"type:decimal(10,2);default:0"`
 	Status        OrderStatus    `json:"status" gorm:"type:varchar(32)"`
 	CreatedAt     int            `json:"created_at"`
 	UpdatedAt     int            `json:"-"`
@@ -60,6 +62,7 @@ func (o *Order) Update() error {
 
 var allowedOrderFields = map[string]bool{
 	"id":         true,
+	"gateway_id": true,
 	"user_id":    true,
 	"status":     true,
 	"created_at": true,
@@ -67,6 +70,7 @@ var allowedOrderFields = map[string]bool{
 
 type SearchOrderParams struct {
 	UserId         int    `form:"user_id"`
+	GatewayId      int    `form:"gateway_id"`
 	TradeNo        string `form:"trade_no"`
 	GatewayNo      string `form:"gateway_no"`
 	Status         string `form:"status"`
@@ -79,7 +83,9 @@ func GetOrderList(params *SearchOrderParams) (*DataResult[Order], error) {
 	var orders []*Order
 
 	db := DB.Omit("key")
-
+	if params.GatewayId != 0 {
+		db = db.Where("gateway_id = ?", params.GatewayId)
+	}
 	if params.UserId != 0 {
 		db = db.Where("user_id = ?", params.UserId)
 	}

@@ -137,7 +137,7 @@ func GetUserLogsList(userId int, params *LogsListParams) (*DataResult[Log], erro
 	tx := DB.Where("user_id = ?", userId).Omit("id")
 
 	if params.LogType != LogTypeUnknown {
-		tx = DB.Where("type = ?", params.LogType)
+		tx = tx.Where("type = ?", params.LogType)
 	}
 	if params.ModelName != "" {
 		tx = tx.Where("model_name = ?", params.ModelName)

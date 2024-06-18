@@ -19,7 +19,6 @@ func GetStatus(c *gin.Context) {
 	if telegram.TGEnabled {
 		telegramBot = telegram.TGBot.User.Username
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -49,6 +48,7 @@ func GetStatus(c *gin.Context) {
 			"chat_links":          config.ChatLinks,
 			"PaymentUSDRate":      config.PaymentUSDRate,
 			"PaymentMinAmount":    config.PaymentMinAmount,
+			"RechargeDiscount":    config.RechargeDiscount,
 		},
 	})
 }

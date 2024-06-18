@@ -70,7 +70,14 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const container = window !== undefined ? () => window.document.body : undefined;
 
   return (
-    <Box component="nav" sx={{ flexShrink: { md: 0 }, width: matchUpMd ? drawerWidth : 'auto' }} aria-label="mailbox folders">
+    <Box
+      component="nav"
+      sx={{
+        flexShrink: { md: 0 },
+        width: matchUpMd ? drawerWidth : 'auto'
+      }}
+      aria-label="mailbox folders"
+    >
       <Drawer
         container={container}
         variant={matchUpMd ? 'persistent' : 'temporary'}
@@ -82,7 +89,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             width: drawerWidth,
             background: theme.palette.background.default,
             color: theme.palette.text.primary,
-            borderRight: 'none',
+            borderRight: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.12)' : 'none',
             [theme.breakpoints.up('md')]: {
               top: '88px'
             }

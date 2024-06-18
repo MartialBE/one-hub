@@ -25,11 +25,15 @@ export default function OrderTableRow({ item }) {
     <>
       <TableRow tabIndex={item.id}>
         <TableCell>{timestamp2string(item.created_at)}</TableCell>
+        <TableCell>{item.gateway_id}</TableCell>
         <TableCell>{item.user_id}</TableCell>
         <TableCell>{item.trade_no}</TableCell>
         <TableCell>{item.gateway_no}</TableCell>
         <TableCell>${item.amount}</TableCell>
         <TableCell>${item.fee}</TableCell>
+        <TableCell>
+          {item.discount} {item.order_currency}
+        </TableCell>
         <TableCell>
           {item.order_amount} {item.order_currency}
         </TableCell>
