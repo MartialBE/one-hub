@@ -41,8 +41,8 @@ const Header = ({ handleLeftDrawerToggle }) => {
               ...theme.typography.menuButton,
               transition: 'all .2s ease-in-out',
               '&:hover': {
-                background: theme.palette.secondary.dark,
-                color: theme.palette.secondary.light
+                background: `${theme.palette.primary.main}!important`,
+                color: theme.palette.primary.light
               }
             }}
             onClick={handleLeftDrawerToggle}

@@ -1,5 +1,5 @@
 export default function componentStyleOverrides(theme) {
-  const bgColor = theme.mode === 'dark' ? theme.backgroundDefault : theme.colors?.grey50;
+  const bgColor = theme.mode === 'dark' ? theme.paper : theme.colors?.grey50;
   return {
     MuiButton: {
       styleOverrides: {
@@ -218,6 +218,7 @@ export default function componentStyleOverrides(theme) {
     MuiTableCell: {
       styleOverrides: {
         root: {
+          // color: theme.darkTextSecondary,
           borderBottom: '1px solid ' + theme.tableBorderBottom,
           textAlign: 'left',
           borderRight: "1px solid rgba(34,36,38,.05)", // 添加列的分割线
@@ -234,7 +235,7 @@ export default function componentStyleOverrides(theme) {
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: theme.headBackgroundColor
+            backgroundColor: theme.headBackgroundColorHover
           }
         }
       }
