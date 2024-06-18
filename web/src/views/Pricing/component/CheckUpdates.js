@@ -31,11 +31,12 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
     setLoading(true);
     try {
       const res = await API.get(url);
+      let responseData = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
       // 检测是否是一个列表
-      if (!Array.isArray(res.data)) {
+      if (!Array.isArray(responseData)) {
         showError('数据格式不正确');
       } else {
-        setNewPricing(res.data);
+        setNewPricing(responseData);
       }
     } catch (err) {
       console.error(err);
