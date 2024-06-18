@@ -7,6 +7,8 @@ $primaryMain: #2ea7e0;
 $primaryDark: #1e88e5;
 $primary200: #bfe3f8;
 $primary800: #144766;
+$primaryDark2: #68CDF9;
+// $main: #078DEE;
 
 // secondary
 $secondaryLight: #eceff1; //50
@@ -156,6 +158,8 @@ $darkTextSecondary: #e2f2fc;
   darkTextTitle: $darkTextTitle;
   darkTextPrimary: $darkTextPrimary;
   darkTextSecondary: $darkTextSecondary;
+  darkTextDark: $darkTextDark;
+  darkTableHeader: $darkTableHeader;
 
   // primary dark
   darkPrimaryLight: $darkPrimaryLight;
