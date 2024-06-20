@@ -377,21 +377,49 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   <FormHelperText id="helper-tex-channel-name-label"> {inputPrompt.name} </FormHelperText>
                 )}
               </FormControl>
+              {channelId === 0 && (
+                <Container
+                  sx={{
+                    textAlign: 'right'
+                  }}
+                >
+                  <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
+                  批量添加
+                </Container>
+              )}
 
               {inputPrompt.base_url && (
                 <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-base_url-label">{inputLabel.base_url}</InputLabel>
-                  <OutlinedInput
-                    id="channel-base_url-label"
-                    label={inputLabel.base_url}
-                    type="text"
-                    value={values.base_url}
-                    name="base_url"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                    aria-describedby="helper-text-channel-base_url-label"
-                  />
+                  {!batchAdd ? (
+                    <>
+                      <InputLabel htmlFor="channel-base_url-label">{inputLabel.base_url}</InputLabel>
+                      <OutlinedInput
+                        id="channel-base_url-label"
+                        label={inputLabel.base_url}
+                        type="text"
+                        value={values.base_url}
+                        name="base_url"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        inputProps={{}}
+                        aria-describedby="helper-text-channel-base_url-label"
+                      />
+                    </>
+                  ) : (
+                    <TextField
+                      multiline
+                      id="channel-base_url-label"
+                      label={inputLabel.base_url}
+                      value={values.base_url}
+                      name="base_url"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      aria-describedby="helper-text-channel-base_url-label"
+                      minRows={5}
+                      placeholder={inputPrompt.base_url + '，一行一个,顺序对应下面的key，如果对应不上则默认使用第一个'}
+                    />
+                  )}
+
                   {touched.base_url && errors.base_url ? (
                     <FormHelperText error id="helper-tex-channel-base_url-label">
                       {errors.base_url}
@@ -452,6 +480,28 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   </FormHelperText>
                 ) : (
                   <FormHelperText id="helper-tex-channel-groups-label"> {inputPrompt.groups} </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.tag && errors.tag)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-tag-label">{inputLabel.tag}</InputLabel>
+                <OutlinedInput
+                  id="channel-tag-label"
+                  label={inputLabel.tag}
+                  type="text"
+                  value={values.tag}
+                  name="tag"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  inputProps={{}}
+                  aria-describedby="helper-text-channel-tag-label"
+                />
+                {touched.tag && errors.tag ? (
+                  <FormHelperText error id="helper-tex-channel-tag-label">
+                    {errors.tag}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText id="helper-tex-channel-tag-label"> {inputPrompt.tag} </FormHelperText>
                 )}
               </FormControl>
 
@@ -585,16 +635,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   <FormHelperText id="helper-tex-channel-key-label"> {inputPrompt.key} </FormHelperText>
                 )}
               </FormControl>
-              {channelId === 0 && (
-                <Container
-                  sx={{
-                    textAlign: 'right'
-                  }}
-                >
-                  <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
-                  批量添加
-                </Container>
-              )}
 
               {inputPrompt.model_mapping && (
                 <FormControl

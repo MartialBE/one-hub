@@ -26,6 +26,7 @@ type Channel struct {
 	BalanceUpdatedTime int64   `json:"balance_updated_time" gorm:"bigint"`
 	Models             string  `json:"models" form:"models"`
 	Group              string  `json:"group" form:"group" gorm:"type:varchar(32);default:'default'"`
+	Tag                string  `json:"tag" form:"tag" gorm:"type:varchar(32);default:''"`
 	UsedQuota          int64   `json:"used_quota" gorm:"bigint;default:0"`
 	ModelMapping       *string `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
 	Priority           *int64  `json:"priority" gorm:"bigint;default:0"`
