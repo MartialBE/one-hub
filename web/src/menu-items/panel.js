@@ -12,7 +12,7 @@ import {
   IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
-  IconBrush,
+  // IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal
@@ -32,7 +32,7 @@ const icons = {
   IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
-  IconBrush,
+  // IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal
@@ -104,14 +104,14 @@ const panel = {
       icon: icons.IconCreditCard,
       breadcrumbs: false
     },
-    {
-      id: 'midjourney',
-      title: 'Midjourney',
-      type: 'item',
-      url: '/panel/midjourney',
-      icon: icons.IconBrush,
-      breadcrumbs: false
-    },
+    // {
+    //   id: 'midjourney',
+    //   title: 'Midjourney',
+    //   type: 'item',
+    //   url: '/panel/midjourney',
+    //   icon: icons.IconBrush,
+    //   breadcrumbs: false
+    // },
     {
       id: 'user',
       title: '用户',
