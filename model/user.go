@@ -58,7 +58,7 @@ func GetUsersList(params *GenericParams) (*DataResult[User], error) {
 	var users []*User
 	db := DB.Omit("password")
 	if params.Keyword != "" {
-		db = db.Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ?", utils.String2Int(params.Keyword), params.Keyword+"%", params.Keyword+"%", params.Keyword+"%")
+		db = db.Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ? or `group` LIKE ?", utils.String2Int(params.Keyword), params.Keyword+"%", params.Keyword+"%", params.Keyword+"%", params.Keyword+"%")
 	}
 
 	return PaginateAndOrder[User](db, &params.PaginationParams, &users, allowedUserOrderFields)
