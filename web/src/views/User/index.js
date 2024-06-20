@@ -157,7 +157,7 @@ export default function Users() {
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchUsers} noValidate>
-          <TableToolBar placeholder={'搜索用户的ID，用户名，显示名称，以及邮箱地址...'} />
+          <TableToolBar placeholder={'搜索用户的ID，用户名，分组，显示名称，以及邮箱地址...'} />
         </Box>
         <Toolbar
           sx={{
