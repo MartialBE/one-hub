@@ -11,6 +11,7 @@ const defaultConfig = {
     models: [],
     groups: ['default'],
     plugin: {},
+    tag: '',
     only_chat: false
   },
   inputLabel: {
@@ -25,6 +26,7 @@ const defaultConfig = {
     model_mapping: '模型映射关系',
     groups: '用户组',
     only_chat: '仅支持聊天',
+    tag: '标签',
     provider_models_list: ''
   },
   prompt: {
@@ -41,7 +43,8 @@ const defaultConfig = {
       '请输入要修改的模型映射关系，格式为：api请求模型ID:实际转发给渠道的模型ID，使用JSON数组表示，例如：{"gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k-0613"}',
     groups: '请选择该渠道所支持的用户组',
     only_chat: '如果选择了仅支持聊天，那么遇到有函数调用的请求会跳过该渠道',
-    provider_models_list: '必须填写所有数据后才能获取模型列表'
+    provider_models_list: '必须填写所有数据后才能获取模型列表',
+    tag: '你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道'
   },
   modelGroup: 'OpenAI'
 };

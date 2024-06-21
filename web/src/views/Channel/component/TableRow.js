@@ -91,7 +91,7 @@ function statusInfo(status) {
 import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
+export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
   const [open, setOpen] = useState(null);
   const [openTest, setOpenTest] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -183,6 +183,11 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
   };
 
+  const handleDeleteTag = async () => {
+    handleCloseMenu();
+    await manageChannel(item.id, 'delete_tag', '');
+  };
+
   const updateChannelBalance = async () => {
     try {
       const res = await API.get(`/api/channel/update_balance/${item.id}`);
@@ -235,7 +240,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </TableCell>
 
         <TableCell>{item.id}</TableCell>
-
         <TableCell>{item.name}</TableCell>
 
         <TableCell>
@@ -243,6 +247,8 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           {renderCheckbox(item.group.split(',').includes('vip'), red[500])}
           {renderCheckbox(item.group.split(',').includes('svip'), purple[500])}
         </TableCell>
+
+        <TableCell>{item.tag && <Label key={item.tag}>{item.tag}</Label>}</TableCell>
 
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
@@ -272,6 +278,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         <TableCell>{renderQuota(item.used_quota)}</TableCell>
 
         <TableCell>
+          {renderQuota(item.used_quota)}
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
           </Tooltip>
@@ -334,16 +341,18 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           sx: { minWidth: 140 }
         }}
       >
-        <MenuItem
-          onClick={() => {
-            handleCloseMenu();
-            handleOpenModal();
-            setModalChannelId(item.id);
-          }}
-        >
-          <IconEdit style={{ marginRight: '16px' }} />
-          编辑
-        </MenuItem>
+        {!hideEdit && (
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              handleOpenModal();
+              setModalChannelId(item.id);
+            }}
+          >
+            <IconEdit style={{ marginRight: '16px' }} />
+            编辑
+          </MenuItem>
+        )}
 
         <MenuItem
           onClick={() => {
@@ -366,6 +375,12 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           </MenuItem>
         )}
 
+        {item.tag && (
+          <MenuItem onClick={handleDeleteTag} sx={{ color: 'error.main' }}>
+            <IconTrash style={{ marginRight: '16px' }} />
+            删除标签
+          </MenuItem>
+        )}
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
           删除
@@ -395,7 +410,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         ))}
       </StyledMenu>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={12}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={20}>
           <Collapse in={openRow} timeout="auto" unmountOnExit>
             <Grid container spacing={1}>
               <Grid item xs={12}>
@@ -489,7 +504,8 @@ ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalChannelId: PropTypes.func
+  setModalChannelId: PropTypes.func,
+  hideEdit: PropTypes.bool
 };
 
 function renderBalance(type, balance) {
@@ -499,6 +515,6 @@ function renderBalance(type, balance) {
     case 8: // 自定义
       return <span>${balance.toFixed(2)}</span>;
     default:
-      return <span>不支持</span>;
+      return <span></span>;
   }
 }

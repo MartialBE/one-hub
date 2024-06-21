@@ -236,6 +236,33 @@ func Contains[T comparable](value T, slice []T) bool {
 	return false
 }
 
+func SliceToMap[T comparable](slice []T) map[T]bool {
+	res := make(map[T]bool)
+	for _, item := range slice {
+		res[item] = true
+	}
+	return res
+}
+
+func DifferenceSets[T comparable](set1, set2 map[T]bool) (diff1, diff2 []T) {
+	diff1 = make([]T, 0)
+	diff2 = make([]T, 0)
+
+	for key := range set1 {
+		if !set2[key] {
+			diff1 = append(diff1, key)
+		}
+	}
+
+	for key := range set2 {
+		if !set1[key] {
+			diff2 = append(diff2, key)
+		}
+	}
+
+	return diff1, diff2
+}
+
 func Filter[T any](arr []T, f func(T) bool) []T {
 	var res []T
 	for _, v := range arr {
