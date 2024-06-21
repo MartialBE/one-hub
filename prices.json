@@ -297,8 +297,15 @@
     "model": "claude-3-sonnet-20240229",
     "type": "tokens",
     "channel_type": 14,
-    "input": 1.3,
-    "output": 3.9
+    "input": 1.5,
+    "output": 7.5
+  },
+  {
+    "model": "claude-3-5-sonnet-20240620",
+    "type": "tokens",
+    "channel_type": 14,
+    "input": 1.5,
+    "output": 7.5
   },
   {
     "model": "claude-instant-1.2",
