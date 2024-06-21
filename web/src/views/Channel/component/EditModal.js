@@ -43,6 +43,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const filter = createFilterOptions();
 const validationSchema = Yup.object().shape({
   is_edit: Yup.boolean(),
+  // is_tag: Yup.boolean(),
   name: Yup.string().required('名称 不能为空'),
   type: Yup.number().required('渠道 不能为空'),
   key: Yup.string().when('is_edit', { is: false, then: Yup.string().required('密钥 不能为空') }),
@@ -72,7 +73,7 @@ const validationSchema = Yup.object().shape({
   })
 });
 
-const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
+const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {
   const theme = useTheme();
   // const [loading, setLoading] = useState(false);
   const [initialInput, setInitialInput] = useState(defaultConfig.input);
@@ -81,6 +82,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
   const [modelOptions, setModelOptions] = useState([]);
   const [batchAdd, setBatchAdd] = useState(false);
   const [providerModelsLoad, setProviderModelsLoad] = useState(false);
+  const [hasTag, setHasTag] = useState(false);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -211,18 +213,25 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
     let res;
     const modelsStr = values.models.map((model) => model.id).join(',');
     values.group = values.groups.join(',');
+
+    let baseApiUrl = '/api/channel/';
+
+    if (isTag) {
+      baseApiUrl = '/api/channel_tag/' + encodeURIComponent(channelId);
+    }
+
     try {
       if (channelId) {
-        res = await API.put(`/api/channel/`, { ...values, id: parseInt(channelId), models: modelsStr });
+        res = await API.put(baseApiUrl, { ...values, id: parseInt(channelId), models: modelsStr });
       } else {
-        res = await API.post(`/api/channel/`, { ...values, models: modelsStr });
+        res = await API.post(baseApiUrl, { ...values, models: modelsStr });
       }
       const { success, message } = res.data;
       if (success) {
         if (channelId) {
-          showSuccess('渠道更新成功！');
+          showSuccess('更新成功！');
         } else {
-          showSuccess('渠道创建成功！');
+          showSuccess('创建成功！');
         }
         setSubmitting(false);
         setStatus({ success: true });
@@ -262,7 +271,13 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
 
   const loadChannel = async () => {
     try {
-      let res = await API.get(`/api/channel/${channelId}`);
+      let baseApiUrl = `/api/channel/${channelId}`;
+
+      if (isTag) {
+        baseApiUrl = '/api/channel_tag/' + encodeURIComponent(channelId);
+      }
+
+      let res = await API.get(baseApiUrl);
       const { success, message, data } = res.data;
       if (success) {
         if (data.models === '') {
@@ -286,6 +301,10 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
         }
         initChannel(data.type);
         setInitialInput(data);
+
+        if (!isTag && data.tag) {
+          setHasTag(true);
+        }
       } else {
         showError(message);
       }
@@ -303,6 +322,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
     if (channelId) {
       loadChannel().then();
     } else {
+      setHasTag(false);
       initChannel(1);
       setInitialInput({ ...defaultConfig.input, is_edit: false });
     }
@@ -312,86 +332,141 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {channelId ? '编辑渠道' : '新建渠道'}
+        {channelId ? '编辑' : '新建'}
       </DialogTitle>
       <Divider />
       <DialogContent>
         <Formik initialValues={initialInput} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => (
             <form noValidate onSubmit={handleSubmit}>
-              <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-type-label">{inputLabel.type}</InputLabel>
-                <Select
-                  id="channel-type-label"
-                  label={inputLabel.type}
-                  value={values.type}
-                  name="type"
-                  onBlur={handleBlur}
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleTypeChange(setFieldValue, e.target.value, values);
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 200
+              {!isTag && (
+                <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-type-label">{inputLabel.type}</InputLabel>
+                  <Select
+                    id="channel-type-label"
+                    label={inputLabel.type}
+                    value={values.type}
+                    name="type"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleTypeChange(setFieldValue, e.target.value, values);
+                    }}
+                    disabled={hasTag}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200
+                        }
                       }
-                    }
-                  }}
-                >
-                  {Object.values(CHANNEL_OPTIONS).map((option) => {
-                    return (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.text}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-                {touched.type && errors.type ? (
-                  <FormHelperText error id="helper-tex-channel-type-label">
-                    {errors.type}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-type-label"> {inputPrompt.type} </FormHelperText>
-                )}
-              </FormControl>
+                    }}
+                  >
+                    {Object.values(CHANNEL_OPTIONS).map((option) => {
+                      return (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.text}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  {touched.type && errors.type ? (
+                    <FormHelperText error id="helper-tex-channel-type-label">
+                      {errors.type}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-type-label"> {inputPrompt.type} </FormHelperText>
+                  )}
+                </FormControl>
+              )}
 
-              <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-name-label">{inputLabel.name}</InputLabel>
+              <FormControl fullWidth error={Boolean(touched.tag && errors.tag)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-tag-label">{inputLabel.tag}</InputLabel>
                 <OutlinedInput
-                  id="channel-name-label"
-                  label={inputLabel.name}
+                  id="channel-tag-label"
+                  label={inputLabel.tag}
                   type="text"
-                  value={values.name}
-                  name="name"
+                  value={values.tag}
+                  name="tag"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  inputProps={{ autoComplete: 'name' }}
-                  aria-describedby="helper-text-channel-name-label"
+                  inputProps={{}}
+                  aria-describedby="helper-text-channel-tag-label"
                 />
-                {touched.name && errors.name ? (
-                  <FormHelperText error id="helper-tex-channel-name-label">
-                    {errors.name}
+                {touched.tag && errors.tag ? (
+                  <FormHelperText error id="helper-tex-channel-tag-label">
+                    {errors.tag}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-channel-name-label"> {inputPrompt.name} </FormHelperText>
+                  <FormHelperText id="helper-tex-channel-tag-label"> {inputPrompt.tag} </FormHelperText>
                 )}
               </FormControl>
 
-              {inputPrompt.base_url && (
-                <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-base_url-label">{inputLabel.base_url}</InputLabel>
+              {!isTag && (
+                <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-name-label">{inputLabel.name}</InputLabel>
                   <OutlinedInput
-                    id="channel-base_url-label"
-                    label={inputLabel.base_url}
+                    id="channel-name-label"
+                    label={inputLabel.name}
                     type="text"
-                    value={values.base_url}
-                    name="base_url"
+                    value={values.name}
+                    name="name"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    inputProps={{}}
-                    aria-describedby="helper-text-channel-base_url-label"
+                    inputProps={{ autoComplete: 'name' }}
+                    aria-describedby="helper-text-channel-name-label"
                   />
+                  {touched.name && errors.name ? (
+                    <FormHelperText error id="helper-tex-channel-name-label">
+                      {errors.name}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-name-label"> {inputPrompt.name} </FormHelperText>
+                  )}
+                </FormControl>
+              )}
+              {channelId === 0 && (
+                <Container
+                  sx={{
+                    textAlign: 'right'
+                  }}
+                >
+                  <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
+                  批量添加
+                </Container>
+              )}
+
+              {!isTag && inputPrompt.base_url && (
+                <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
+                  {!batchAdd ? (
+                    <>
+                      <InputLabel htmlFor="channel-base_url-label">{inputLabel.base_url}</InputLabel>
+                      <OutlinedInput
+                        id="channel-base_url-label"
+                        label={inputLabel.base_url}
+                        type="text"
+                        value={values.base_url}
+                        name="base_url"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        inputProps={{}}
+                        aria-describedby="helper-text-channel-base_url-label"
+                      />
+                    </>
+                  ) : (
+                    <TextField
+                      multiline
+                      id="channel-base_url-label"
+                      label={inputLabel.base_url}
+                      value={values.base_url}
+                      name="base_url"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      aria-describedby="helper-text-channel-base_url-label"
+                      minRows={5}
+                      placeholder={inputPrompt.base_url + '，一行一个,顺序对应下面的key，如果对应不上则默认使用第一个'}
+                    />
+                  )}
+
                   {touched.base_url && errors.base_url ? (
                     <FormHelperText error id="helper-tex-channel-base_url-label">
                       {errors.base_url}
@@ -411,6 +486,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                     type="text"
                     value={values.other}
                     name="other"
+                    disabled={hasTag}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     inputProps={{}}
@@ -432,6 +508,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   id="channel-groups-label"
                   options={groupOptions}
                   value={values.groups}
+                  disabled={hasTag}
                   onChange={(e, value) => {
                     const event = {
                       target: {
@@ -460,6 +537,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   multiple
                   freeSolo
                   id="channel-models-label"
+                  disabled={hasTag}
                   options={modelOptions}
                   value={values.models}
                   onChange={(e, value) => {
@@ -519,6 +597,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
                   <Button
+                    disabled={hasTag}
                     onClick={() => {
                       setFieldValue('models', basicModels(values.type));
                     }}
@@ -526,6 +605,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                     填入渠道支持模型
                   </Button>
                   <Button
+                    disabled={hasTag}
                     onClick={() => {
                       setFieldValue('models', modelOptions);
                     }}
@@ -536,6 +616,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                     <Tooltip title={inputPrompt.provider_models_list} placement="top">
                       <LoadingButton
                         loading={providerModelsLoad}
+                        disabled={hasTag}
                         onClick={() => {
                           getProviderModels(values, setFieldValue);
                         }}
@@ -546,54 +627,46 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   )}
                 </ButtonGroup>
               </Container>
-              <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
-                {!batchAdd ? (
-                  <>
-                    <InputLabel htmlFor="channel-key-label">{inputLabel.key}</InputLabel>
-                    <OutlinedInput
+              {!isTag && (
+                <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
+                  {!batchAdd ? (
+                    <>
+                      <InputLabel htmlFor="channel-key-label">{inputLabel.key}</InputLabel>
+                      <OutlinedInput
+                        id="channel-key-label"
+                        label={inputLabel.key}
+                        type="text"
+                        value={values.key}
+                        name="key"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        inputProps={{}}
+                        aria-describedby="helper-text-channel-key-label"
+                      />
+                    </>
+                  ) : (
+                    <TextField
+                      multiline
                       id="channel-key-label"
                       label={inputLabel.key}
-                      type="text"
                       value={values.key}
                       name="key"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      inputProps={{}}
                       aria-describedby="helper-text-channel-key-label"
+                      minRows={5}
+                      placeholder={inputPrompt.key + '，一行一个密钥'}
                     />
-                  </>
-                ) : (
-                  <TextField
-                    multiline
-                    id="channel-key-label"
-                    label={inputLabel.key}
-                    value={values.key}
-                    name="key"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    aria-describedby="helper-text-channel-key-label"
-                    minRows={5}
-                    placeholder={inputPrompt.key + '，一行一个密钥'}
-                  />
-                )}
+                  )}
 
-                {touched.key && errors.key ? (
-                  <FormHelperText error id="helper-tex-channel-key-label">
-                    {errors.key}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-key-label"> {inputPrompt.key} </FormHelperText>
-                )}
-              </FormControl>
-              {channelId === 0 && (
-                <Container
-                  sx={{
-                    textAlign: 'right'
-                  }}
-                >
-                  <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
-                  批量添加
-                </Container>
+                  {touched.key && errors.key ? (
+                    <FormHelperText error id="helper-tex-channel-key-label">
+                      {errors.key}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-key-label"> {inputPrompt.key} </FormHelperText>
+                  )}
+                </FormControl>
               )}
 
               {inputPrompt.model_mapping && (
@@ -610,6 +683,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                     value={values.model_mapping}
                     name="model_mapping"
                     onBlur={handleBlur}
+                    disabled={hasTag}
                     onChange={handleChange}
                     aria-describedby="helper-text-channel-model_mapping-label"
                     minRows={5}
@@ -629,6 +703,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                 <OutlinedInput
                   id="channel-proxy-label"
                   label={inputLabel.proxy}
+                  disabled={hasTag}
                   type="text"
                   value={values.proxy}
                   name="proxy"
@@ -652,6 +727,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                     id="channel-test_model-label"
                     label={inputLabel.test_model}
                     type="text"
+                    disabled={hasTag}
                     value={values.test_model}
                     name="test_model"
                     onBlur={handleBlur}
@@ -673,6 +749,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                   <FormControlLabel
                     control={
                       <Switch
+                        disabled={hasTag}
                         checked={values.only_chat === true}
                         onClick={() => {
                           setFieldValue('only_chat', !values.only_chat);
@@ -704,6 +781,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                                 <Switch
                                   key={name}
                                   name={name}
+                                  disabled={hasTag}
                                   checked={values.plugin?.[pluginId]?.[paramId] || false}
                                   onChange={(event) => {
                                     setFieldValue(name, event.target.checked);
@@ -720,6 +798,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions }) => {
                               multiline
                               key={name}
                               name={name}
+                              disabled={hasTag}
                               value={values.plugin?.[pluginId]?.[paramId] || ''}
                               label={param.name}
                               placeholder={param.description}
@@ -750,8 +829,9 @@ export default EditModal;
 
 EditModal.propTypes = {
   open: PropTypes.bool,
-  channelId: PropTypes.number,
+  channelId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
-  groupOptions: PropTypes.array
+  groupOptions: PropTypes.array,
+  isTag: PropTypes.bool
 };

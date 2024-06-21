@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Grid, TextField, InputAdornment, Checkbox, Button, FormControlLabel, IconButton } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import { IconSearch, IconSend } from '@tabler/icons-react';
-import { fetchChannelData } from '../index';
+import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
 

@@ -5,7 +5,7 @@ import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel, Select, 
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 // ----------------------------------------------------------------------
 
-export default function TableToolBar({ filterName, handleFilterName, groupOptions }) {
+export default function TableToolBar({ filterName, handleFilterName, groupOptions, tags }) {
   const theme = useTheme();
   const grey500 = theme.palette.grey[500];
 
@@ -110,7 +110,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
-        <FormControl sx={{ minWidth: '22%' }}>
+        <FormControl sx={{ minWidth: '17.5%' }}>
           <InputLabel htmlFor="channel-type-label">渠道类型</InputLabel>
           <Select
             id="channel-type-label"
@@ -142,7 +142,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             })}
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: '22%' }}>
+        <FormControl sx={{ minWidth: '17.5%' }}>
           <InputLabel htmlFor="channel-status-label">状态</InputLabel>
           <Select
             id="channel-status-label"
@@ -176,7 +176,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
           </Select>
         </FormControl>
 
-        <FormControl sx={{ minWidth: '22%' }}>
+        <FormControl sx={{ minWidth: '17.5%' }}>
           <InputLabel htmlFor="channel-group-label">分组</InputLabel>
           <Select
             id="channel-group-label"
@@ -204,6 +204,61 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             })}
           </Select>
         </FormControl>
+        <FormControl sx={{ minWidth: '17.5%' }}>
+          <InputLabel htmlFor="channel-filter_tag-label">过滤标签</InputLabel>
+          <Select
+            id="channel-filter_tag-label"
+            label="过滤标签"
+            value={filterName.filter_tag}
+            name="filter_tag"
+            onChange={handleFilterName}
+            sx={{
+              minWidth: '100%'
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200
+                }
+              }
+            }}
+          >
+            <MenuItem key={1} value={false}>
+              显示全部
+            </MenuItem>
+            <MenuItem key={2} value={true}>
+              过滤标签
+            </MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: '17.5%' }}>
+          <InputLabel htmlFor="channel-tag-label">标签</InputLabel>
+          <Select
+            id="channel-tag-label"
+            label="标签"
+            value={filterName.tag}
+            name="tag"
+            onChange={handleFilterName}
+            sx={{
+              minWidth: '100%'
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200
+                }
+              }
+            }}
+          >
+            {tags.map((option) => {
+              return (
+                <MenuItem key={option.tag} value={option.tag}>
+                  {option.tag}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
       </Stack>
     </>
   );
@@ -212,5 +267,6 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
 TableToolBar.propTypes = {
   filterName: PropTypes.object,
   handleFilterName: PropTypes.func,
-  groupOptions: PropTypes.array
+  groupOptions: PropTypes.array,
+  tags: PropTypes.array
 };
