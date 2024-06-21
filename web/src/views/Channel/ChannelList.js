@@ -31,7 +31,9 @@ const originalKeyword = {
   models: '',
   key: '',
   test_model: '',
-  other: ''
+  other: '',
+  filter_tag: false,
+  tag: ''
 };
 
 export async function fetchChannelData(page, rowsPerPage, keyword, order, orderBy) {
@@ -71,6 +73,7 @@ export default function ChannelList() {
   const [searching, setSearching] = useState(false);
   const [channels, setChannels] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const [groupOptions, setGroupOptions] = useState([]);
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
@@ -133,6 +136,9 @@ export default function ChannelList() {
         case 'delete':
           res = await API.delete(url + id);
           break;
+        case 'delete_tag':
+          res = await API.delete(url + id + '/tag');
+          break;
         case 'status':
           res = await API.put(url, {
             ...data,
@@ -166,7 +172,7 @@ export default function ChannelList() {
       const { success, message } = res.data;
       if (success) {
         showSuccess('操作成功完成！');
-        if (action === 'delete' || action === 'copy') {
+        if (action === 'delete' || action === 'copy' || action == 'delete_tag') {
           await handleRefresh();
         }
       } else {
@@ -275,12 +281,25 @@ export default function ChannelList() {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      let res = await API.get(`/api/channel_tag/_all`);
+      const { success, data } = res.data;
+      if (success) {
+        setTags(data);
+      }
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
 
   useEffect(() => {
     fetchGroups().then();
+    fetchTags().then();
   }, []);
 
   return (
@@ -313,7 +332,7 @@ export default function ChannelList() {
       </Stack>
       <Card>
         <Box component="form" noValidate>
-          <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} groupOptions={groupOptions} />
+          <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} groupOptions={groupOptions} tags={tags} />
         </Box>
 
         <Toolbar

@@ -89,7 +89,7 @@ function statusInfo(status) {
   }
 }
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
+export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
   const [open, setOpen] = useState(null);
   const [openTest, setOpenTest] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -179,6 +179,11 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
       setResponseTimeData({ test_time: Date.now() / 1000, response_time: time * 1000 });
       showInfo(`通道 ${item.name}: ${modelName} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
     }
+  };
+
+  const handleDeleteTag = async () => {
+    handleCloseMenu();
+    await manageChannel(item.id, 'delete_tag', '');
   };
 
   const updateChannelBalance = async () => {
@@ -317,16 +322,18 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           sx: { minWidth: 140 }
         }}
       >
-        <MenuItem
-          onClick={() => {
-            handleCloseMenu();
-            handleOpenModal();
-            setModalChannelId(item.id);
-          }}
-        >
-          <IconEdit style={{ marginRight: '16px' }} />
-          编辑
-        </MenuItem>
+        {!hideEdit && (
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              handleOpenModal();
+              setModalChannelId(item.id);
+            }}
+          >
+            <IconEdit style={{ marginRight: '16px' }} />
+            编辑
+          </MenuItem>
+        )}
 
         <MenuItem
           onClick={() => {
@@ -349,6 +356,12 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           </MenuItem>
         )}
 
+        {item.tag && (
+          <MenuItem onClick={handleDeleteTag} sx={{ color: 'error.main' }}>
+            <IconTrash style={{ marginRight: '16px' }} />
+            删除标签
+          </MenuItem>
+        )}
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
           删除
@@ -472,7 +485,8 @@ ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalChannelId: PropTypes.func
+  setModalChannelId: PropTypes.func,
+  hideEdit: PropTypes.bool
 };
 
 function renderBalance(type, balance) {

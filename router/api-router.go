@@ -94,8 +94,20 @@ func SetApiRouter(router *gin.Engine) {
 			channelRoute.PUT("/batch/azure_api", controller.BatchUpdateChannelsAzureApi)
 			channelRoute.PUT("/batch/del_model", controller.BatchDelModelChannels)
 			channelRoute.DELETE("/disabled", controller.DeleteDisabledChannel)
+			channelRoute.DELETE("/:id/tag", controller.DeleteChannelTag)
 			channelRoute.DELETE("/:id", controller.DeleteChannel)
 		}
+		channelTagRoute := apiRouter.Group("/channel_tag")
+		channelTagRoute.Use(middleware.AdminAuth())
+		{
+			channelTagRoute.GET("/_all", controller.GetChannelsTagAllList)
+			channelTagRoute.GET("/", controller.GetChannelsTagList)
+			channelTagRoute.GET("/:tag", controller.GetChannelsTag)
+			channelTagRoute.PUT("/:tag", controller.UpdateChannelsTag)
+			channelTagRoute.DELETE("/:tag", controller.DeleteChannelsTag)
+
+		}
+
 		tokenRoute := apiRouter.Group("/token")
 		tokenRoute.Use(middleware.UserAuth())
 		{

@@ -5,6 +5,8 @@ import (
 	"one-api/common/logger"
 	"sync"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 const (
@@ -75,4 +77,18 @@ func batchUpdate() {
 		}
 	}
 	logger.SysLog("batch update finished")
+}
+
+func BatchInsert[T any](db *gorm.DB, data []T) error {
+	batchSize := 200
+	for i := 0; i < len(data); i += batchSize {
+		end := i + batchSize
+		if end > len(data) {
+			end = len(data)
+		}
+		if err := db.Create(data[i:end]).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }

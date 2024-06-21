@@ -53,6 +53,7 @@ var allowedChannelOrderFields = map[string]bool{
 type SearchChannelsParams struct {
 	Channel
 	PaginationParams
+	FilterTag bool `json:"filter_tag" form:"filter_tag"`
 }
 
 func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error) {
@@ -92,7 +93,15 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 		db = db.Where("test_model LIKE ?", params.TestModel+"%")
 	}
 
-	return PaginateAndOrder[Channel](db, &params.PaginationParams, &channels, allowedChannelOrderFields)
+	if params.Tag != "" {
+		db = db.Where("tag = ?", params.Tag)
+	}
+
+	if params.FilterTag {
+		db = db.Where("tag = ''")
+	}
+
+	return PaginateAndOrder(db, &params.PaginationParams, &channels, allowedChannelOrderFields)
 }
 
 func GetAllChannels() ([]*Channel, error) {
@@ -107,6 +116,17 @@ func GetChannelById(id int) (*Channel, error) {
 	err = DB.First(&channel, "id = ?", id).Error
 
 	return &channel, err
+}
+
+func GetChannelsByTag(tag string) ([]*Channel, error) {
+	var channels []*Channel
+	err := DB.Where("tag = ?", tag).Find(&channels).Error
+	return channels, err
+}
+
+func DeleteChannelTag(channelId int) error {
+	err := DB.Model(&Channel{}).Where("id = ?", channelId).Update("tag", "").Error
+	return err
 }
 
 func BatchInsertChannels(channels []Channel) error {

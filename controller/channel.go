@@ -122,6 +122,22 @@ func DeleteChannel(c *gin.Context) {
 	})
 }
 
+func DeleteChannelTag(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	err := model.DeleteChannelTag(id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+}
+
 func DeleteDisabledChannel(c *gin.Context) {
 	rows, err := model.DeleteDisabledChannel()
 	if err != nil {
