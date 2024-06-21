@@ -418,7 +418,7 @@ export default function ChannelList() {
           count={listCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
+          rowsPerPageOptions={[50,100,200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
           showFirstButton
           showLastButton

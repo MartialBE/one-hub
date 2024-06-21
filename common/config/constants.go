@@ -27,7 +27,7 @@ var SessionSecret = uuid.New().String()
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
-var ItemsPerPage = 30 // 修改单页数量
+var ItemsPerPage = 50 // 修改单页数量
 var MaxRecentItems = 150
 
 var PasswordLoginEnabled = true
