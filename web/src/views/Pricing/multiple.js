@@ -7,11 +7,10 @@ import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import { Button, Card, Stack } from '@mui/material';
+import { Card } from '@mui/material';
 import PricesTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 
 // ----------------------------------------------------------------------
@@ -90,14 +89,6 @@ export default function Multiple({ ownedby, prices, reloadData, noPriceModel }) 
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="flex-start" mb={5} spacing={2}>
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建
-        </Button>
-        <Button variant="contained" onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-          刷新
-        </Button>
-      </Stack>
       <Card>
         <PerfectScrollbar component="div">
           <TableContainer sx={{ overflow: 'unset' }}>
