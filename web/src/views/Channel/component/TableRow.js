@@ -274,11 +274,9 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           />
         </TableCell>
         
-        {/*  总已用额度 */}
-        <TableCell>{renderQuota(item.used_quota)}</TableCell>
 
         <TableCell>
-          {renderQuota(item.used_quota)}
+          {renderQuota(item.used_quota)} / 
           <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
           </Tooltip>

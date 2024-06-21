@@ -11,7 +11,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Alert from '@mui/material/Alert';
 
 import { Button, IconButton, Card, Box, Stack, Container, Typography, Divider } from '@mui/material';
 import ChannelTableRow from './component/TableRow';
@@ -316,20 +315,6 @@ export default function ChannelList() {
           </Button>
         </ButtonGroup>
       </Stack>
-      <Stack mb={5}>
-        <Alert severity="info">
-          优先级/权重解释：
-          <br />
-          1. 优先级越大，越优先使用；(只有该优先级下的节点都冻结或者禁用了，才会使用低优先级的节点)
-          <br />
-          2. 相同优先级下：根据权重进行负载均衡(加权随机)
-          <br />
-          3. 如果在设置-通用设置中设置了“重试次数”和“重试间隔”，则会在失败后重试。
-          <br />
-          4.
-          重试逻辑：1）先在高优先级中的节点重试，如果高优先级中的节点都冻结了，才会在低优先级中的节点重试。2）如果设置了“重试间隔”，则某一渠道失败后，会冻结一段时间，所有人都不会再使用这个渠道，直到冻结时间结束。3）重试次数用完后，直接结束。
-        </Alert>
-      </Stack>
       <Card>
         <Box component="form" noValidate>
           <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} groupOptions={groupOptions} tags={tags} />
@@ -407,7 +392,6 @@ export default function ChannelList() {
                   { id: 'type', label: '类型', disableSort: false },
                   { id: 'status', label: '状态', disableSort: false },
                   { id: 'response_time', label: '响应时间', disableSort: false },
-                  // { id: 'balance', label: '余额', disableSort: false },
                   { id: 'used', label: '已使用/余额', disableSort: false },
                   { id: 'priority', label: '优先级', disableSort: false, width: '80px' },
                   { id: 'weight', label: '权重', disableSort: false, width: '80px' },
