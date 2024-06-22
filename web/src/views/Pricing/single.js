@@ -13,7 +13,6 @@ import {
 } from '@mui/x-data-grid';
 import { zhCN } from '@mui/x-data-grid/locales';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
@@ -50,25 +49,9 @@ function validation(row, rows) {
   return false;
 }
 
-function randomId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-function EditToolbar({ setRows, setRowModesModel }) {
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [{ id, model: '', type: 'tokens', channel_type: 1, input: 0, output: 0, isNew: true }, ...oldRows]);
-    setRowModesModel((oldModel) => ({
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-      ...oldModel
-    }));
-  };
-
+function EditToolbar() {
   return (
     <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        新增
-      </Button>
       <GridToolbarColumnsButton />
       <GridToolbarFilterButton />
       <GridToolbarDensitySelector />
