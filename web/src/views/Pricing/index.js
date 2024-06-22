@@ -9,8 +9,6 @@ import AdminContainer from 'ui-component/AdminContainer';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
 import { CheckUpdates } from './component/CheckUpdates';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
-import EditeModal from './component/EditModal';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,7 +37,6 @@ const Pricing = () => {
   const [ownedby, setOwnedby] = useState([]);
   const [modelList, setModelList] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [openaddModal, setOpenaddModal] = useState(false);
   const [errPrices, setErrPrices] = useState('');
   const [prices, setPrices] = useState([]);
   const [noPriceModel, setNoPriceModel] = useState([]);
@@ -71,29 +68,6 @@ const Pricing = () => {
     if (status === true) {
       reloadData();
       setOpenModal(false);
-    }
-  };
-  const [editPricesItem, setEditPricesItem] = useState(null);
-
-  // 处理刷新
-  const handleRefresh = async () => {
-    reloadData();
-  };
-
-  const handleOpenaddModal = (item) => {
-    setEditPricesItem(item);
-    setOpenaddModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenaddModal(false);
-    setEditPricesItem(null);
-  };
-
-  const handleOkaddModal = (status) => {
-    if (status === true) {
-      handleCloseModal();
-      handleRefresh();
     }
   };
 
@@ -205,12 +179,6 @@ const Pricing = () => {
         </Alert>
       )}
       <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={5} spacing={2}>
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenaddModal(0)}>
-          新建
-        </Button>
-        <Button variant="contained" startIcon={<IconRefresh width={'18px'} />}>
-          刷新
-        </Button>
         <Button
           variant="contained"
           onClick={() => {
@@ -220,14 +188,6 @@ const Pricing = () => {
           更新价格
         </Button>
       </Stack>
-      <EditeModal
-        open={openaddModal}
-        onCancel={handleCloseModal}
-        onOk={handleOkaddModal}
-        pricesItem={editPricesItem}
-        ownedby={ownedby}
-        noPriceModel={noPriceModel}
-      />
       <Card>
         <AdminContainer>
           <Box sx={{ width: '100%' }}>
@@ -241,7 +201,7 @@ const Pricing = () => {
               <Single ownedby={ownedby} reloadData={reloadData} prices={prices} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} />
+              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} noPriceModel={noPriceModel} />
             </CustomTabPanel>
           </Box>
         </AdminContainer>
