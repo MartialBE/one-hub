@@ -23,7 +23,7 @@ import TableSwitch from 'ui-component/Switch';
 import { renderQuota, timestamp2string, copy, getChatLinks, replaceChatPlaceholders } from 'utils/common';
 
 import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled } from '@tabler/icons-react';
-
+import { useTranslation } from 'react-i18next';
 function createMenu(menuItems) {
   return (
     <>
@@ -53,6 +53,7 @@ function statusInfo(status) {
 }
 
 export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [menuItems, setMenuItems] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -186,11 +187,11 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
 
         <TableCell>{renderQuota(item.used_quota)}</TableCell>
 
-        <TableCell>{item.unlimited_quota ? '无限制' : renderQuota(item.remain_quota, 2)}</TableCell>
+        <TableCell>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 2)}</TableCell>
 
         <TableCell>{timestamp2string(item.created_time)}</TableCell>
 
-        <TableCell>{item.expired_time === -1 ? '永不过期' : timestamp2string(item.expired_time)}</TableCell>
+        <TableCell>{item.expired_time === -1 ? t('token_index.neverExpires') : timestamp2string(item.expired_time)}</TableCell>
 
         <TableCell>
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
@@ -198,17 +199,17 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               <Button
                 color="primary"
                 onClick={() => {
-                  copy(`sk-${item.key}`, '令牌');
+                  copy(`sk-${item.key}`, t('token_index.token'));
                 }}
               >
-                复制
+                {t('token_index.copy')}
               </Button>
               <Button size="small" onClick={(e) => handleOpenMenu(e, 'copy')}>
                 <IconCaretDownFilled size={'16px'} />
               </Button>
             </ButtonGroup>
             <ButtonGroup size="small" onClick={(e) => handleOpenMenu(e, 'link')} aria-label="split button">
-              <Button color="primary">聊天</Button>
+              <Button color="primary">{t('token_index.chat')}</Button>
               <Button size="small">
                 <IconCaretDownFilled size={'16px'} />
               </Button>
@@ -233,14 +234,16 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除Token</DialogTitle>
+        <DialogTitle>{t('token_index.deleteToken')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除Token {item.name}？</DialogContentText>
+          <DialogContentText>
+            {t('token_index.confirmDeleteToken')} {item.name}？
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('token_index.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('token_index.delete')}
           </Button>
         </DialogActions>
       </Dialog>

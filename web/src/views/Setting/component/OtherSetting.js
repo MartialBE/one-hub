@@ -20,8 +20,10 @@ import { showError, showSuccess } from 'utils/common'; //,
 import { API } from 'utils/api';
 import { marked } from 'marked';
 import { LoadStatusContext } from 'contexts/StatusContext';
+import { useTranslation } from 'react-i18next';
 
 const OtherSetting = () => {
+  const { t } = useTranslation();
   let [inputs, setInputs] = useState({
     Footer: '',
     Notice: '',
@@ -159,7 +161,7 @@ const OtherSetting = () => {
   return (
     <>
       <Stack spacing={2}>
-        <SubCard title="通用设置">
+        <SubCard title={t('setting_index.otherSettings.generalSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Typography variant="h6" gutterBottom>
@@ -191,7 +193,7 @@ const OtherSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="个性化设置">
+        <SubCard title={t('setting_index.otherSettings.customSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControl fullWidth>

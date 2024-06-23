@@ -1,0 +1,232 @@
+{
+  "analytics": "Analytics",
+  "analytics_index": {
+    "active": "Active",
+    "averageLatency": "Average Latency",
+    "channelCount": "Channel Count",
+    "consumptionStatistics": "Consumption Statistics",
+    "directRegistration": "Direct Registration",
+    "disabled": "Disabled",
+    "endTime": "End Time",
+    "invitationRegistration": "Invitation Registration",
+    "redeemCodeIssued": "Redeem Code Issued",
+    "redemptionStatistics": "Redemption Statistics",
+    "registrationStatistics": "Registration Statistics",
+    "requestsCount": "Requests Count",
+    "startTime": "Start Time",
+    "testDisabled": "Test Disabled",
+    "tokensStatistics": "Tokens Statistics",
+    "totalUserBalance": "Total User Balance",
+    "totalUserSpending": "Total User Spending",
+    "totalUsers": "Total Users",
+    "unused": "Unused",
+    "used": "Used"
+  },
+  "channel": "Channel",
+  "channel_index": {
+    "actions": "Actions",
+    "all": "All",
+    "batchProcessing": "Batch Processing",
+    "channel": "Channel",
+    "channelList": "Channel List",
+    "channelName": "Channel Name",
+    "channelTags": "Channel Tags",
+    "channelType": "Channel Type",
+    "deleteDisabledChannels": "Delete Disabled Channels",
+    "description1": "1. The larger the priority, the higher the priority of use; (only when all nodes under this priority are frozen or disabled, will the lower priority nodes be used)",
+    "description2": "2. Under the same priority: Load balancing based on weight (weighted random selection)",
+    "description3": "3. If 'Retry Times' and 'Retry Interval' are set in Settings - General Settings, retries will occur after a failure.",
+    "description4": "4. Retry logic: 1) Retry in nodes with higher priority first. If all nodes in higher priority are frozen, retries will be attempted in nodes with lower priority. 2) If 'Retry Interval' is set, a channel will be frozen for a period after a failure, and no one will use this channel until the freezing time ends. 3) After the retry times are used up, it will end directly.",
+    "disabled": "Disabled",
+    "enabled": "Enabled",
+    "filterTags": "Filter Tags",
+    "group": "Group",
+    "model": "Model",
+    "modelName": "Model Name",
+    "name": "Name",
+    "newChannel": "New Channel",
+    "otherParameters": "Other Parameters",
+    "priority": "Priority",
+    "priorityWeightExplanation": "Priority/Weight Explanation:",
+    "refreshClearSearchConditions": "Refresh/Clear Search Conditions",
+    "responseTime": "Response Time",
+    "search": "Search",
+    "showAll": "Show All",
+    "speedTestDisabled": "Speed Test Disabled",
+    "status": "Status",
+    "supplier": "Supplier",
+    "tags": "Tags",
+    "testAllChannels": "Test All Channels",
+    "testModel": "Test Model",
+    "type": "Type",
+    "updateEnabledBalance": "Update Enabled Balance",
+    "usedBalance": "Used Balance/Remaining Balance",
+    "weight": "Weight"
+  },
+  "dashboard": "Dashboard",
+  "dashboard_index": {
+    "balance": "Balance",
+    "calls": "Calls",
+    "model_name": "Model Name",
+    "model_price": "Available Models",
+    "no_data": "No Data",
+    "no_data_available": "No data available",
+    "other_models": "Other Models",
+    "statistics": "Statistics",
+    "today_consumption": "Today's Consumption",
+    "today_requests": "Today's Requests",
+    "today_tokens": "Today's Tokens",
+    "unknown": "Unknown",
+    "used": "Used"
+  },
+  "description": "All-in-one OpenAI interface\nIntegrates various API access methods\nOne-click deployment, ready to use",
+  "footer": {
+    "basedOn": "Based on",
+    "developedBy": "Developed by",
+    "license": "MIT License",
+    "sourceCode": "Source code under"
+  },
+  "log": "Log",
+  "log_index": {
+  },
+  "login": {
+    "password": "Password",
+    "passwordRequired": "Password is required",
+    "usernameOrEmail": "Username/Email",
+    "usernameRequired": "Username/Email is required"
+  },
+  "menu": {
+    "about": "About",
+    "console": "Console",
+    "error": "Error",
+    "home": "Home",
+    "login": "Login",
+    "signout": "Signout",
+    "signup": "Signup",
+    "unknownVersion": "Unknown Version",
+    "welcomeBack": "Welcome Back"
+  },
+  "midjourney_index": {
+  },
+  "model_price": "Model Price",
+  "model_price_index": {
+  },
+  "payment": "Payment",
+  "payment_index": {
+  },
+  "pricing": "Pricing",
+  "pricing_index": {
+  },
+  "profile": "Profile",
+  "profile_index": {
+  },
+  "redemption": "Redemption",
+  "redemption_index": {
+  },
+  "setting": "Setting",
+  "setting_index": {
+    "operationSettings": {
+      "chatLinkSettings": {
+        "title": "Chat Link Settings"
+      },
+      "generalSettings": {
+        "title": "General Settings"
+      },
+      "logSettings": {
+        "title": "Log Settings"
+      },
+      "monitoringSettings": {
+        "title": "Monitoring Settings"
+      },
+      "otherSettings": {
+        "title": "Other Settings"
+      },
+      "paymentSettings": {
+        "title": "Payment Settings"
+      },
+      "quotaSettings": {
+        "title": "Quota Settings"
+      },
+      "rateSettings": {
+        "title": "Rate Settings"
+      },
+      "title": "Operation Settings"
+    },
+    "otherSettings": {
+      "customSettings": {
+        "title": "Custom Settings"
+      },
+      "generalSettings": {
+        "title": "General Settings"
+      },
+      "title": "Other Settings"
+    },
+    "systemSettings": {
+      "configureEmailDomainWhitelist": {
+        "title": "Configure Email Domain Whitelist"
+      },
+      "configureFeishuAuthorization": {
+        "title": "Configure Feishu Authorization Login"
+      },
+      "configureGitHubOAuthApp": {
+        "title": "Configure GitHub OAuth App"
+      },
+      "configureLoginRegister": {
+        "title": "Configure Login Register"
+      },
+      "configureSMTP": {
+        "title": "Configure SMTP"
+      },
+      "configureTurnstile": {
+        "title": "Configure Turnstile"
+      },
+      "configureWeChatServer": {
+        "title": "Configure WeChat Server"
+      },
+      "generalSettings": {
+        "title": "General Settings"
+      },
+      "title": "System Settings"
+    }
+  },
+  "telegram_index": {
+  },
+  "token": "Token",
+  "token_index": {
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "chat": "Chat",
+    "close": "Close",
+    "confirmDeleteToken": "Are you sure you want to delete this token?",
+    "copy": "Copy",
+    "createToken": "Create Token",
+    "createdTime": "Created Time",
+    "delete": "Delete",
+    "deleteToken": "Delete Token",
+    "editToken": "Edit Token",
+    "enableCache": "Enable Cache (Enabling this will cache chat history to reduce cost)",
+    "expiryTime": "Expiry Time",
+    "invalidDate": "Invalid date",
+    "name": "Name",
+    "neverExpires": "Never Expires",
+    "quota": "Quota",
+    "quotaNote": "Note: The token's quota is only used to limit the maximum usage of the token itself, actual usage is subject to the remaining quota of the account.",
+    "refresh": "Refresh",
+    "remainingQuota": "Remaining Quota",
+    "replaceApiAddress1": "Replace the OpenAI API base address https://api.openai.com with",
+    "replaceApiAddress2": ", and you can use the key below.",
+    "searchTokenName": "Search for token name...",
+    "status": "Status",
+    "submit": "Submit",
+    "token": "Token",
+    "unlimited": "Unlimited",
+    "unlimitedQuota": "Unlimited Quota",
+    "usedQuota": "Used Quota"
+  },
+  "topup": "Top-up",
+  "topup_index": {
+  },
+  "user": "User",
+  "user_index": {
+  }
+}

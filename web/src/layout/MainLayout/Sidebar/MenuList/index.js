@@ -5,10 +5,19 @@ import { Typography } from '@mui/material';
 import NavGroup from './NavGroup';
 import menuItem from 'menu-items';
 import { isAdmin } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 const MenuList = () => {
   const userIsAdmin = isAdmin();
+  const { t } = useTranslation();
+
+  // 遍历并修改 children 的 title 字段
+  menuItem.items.forEach((group) => {
+    group.children.forEach((item) => {
+      item.title = t(item.id);
+    });
+  });
 
   return (
     <>
@@ -16,7 +25,7 @@ const MenuList = () => {
         if (item.type !== 'group') {
           return (
             <Typography key={item.id} variant="h6" color="error" align="center">
-              Menu Items Error
+              {t('menu.error')}
             </Typography>
           );
         }

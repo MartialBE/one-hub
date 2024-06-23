@@ -9,9 +9,11 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
 import { LoadStatusContext } from 'contexts/StatusContext';
+import { useTranslation } from 'react-i18next';
 require('dayjs/locale/zh-cn');
 
 const OperationSetting = () => {
+  const { t } = useTranslation();
   let now = new Date();
   let [inputs, setInputs] = useState({
     QuotaForNewUser: 0,
@@ -220,7 +222,7 @@ const OperationSetting = () => {
 
   return (
     <Stack spacing={2}>
-      <SubCard title="通用设置">
+      <SubCard title={t('setting_index.operationSettings.generalSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
             <FormControl fullWidth>
@@ -326,7 +328,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="其他设置">
+      <SubCard title={t('setting_index.operationSettings.otherSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack
             direction={{ sm: 'column', md: 'row' }}
@@ -389,7 +391,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="日志设置">
+      <SubCard title={t('setting_index.operationSettings.logSettings.title')}>
         <Stack direction="column" justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <FormControlLabel
             label="启用日志消费"
@@ -426,7 +428,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="监控设置">
+      <SubCard title={t('setting_index.operationSettings.monitoringSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
             <FormControl fullWidth>
@@ -486,7 +488,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="额度设置">
+      <SubCard title={t('setting_index.operationSettings.quotaSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
             <FormControl fullWidth>
@@ -553,7 +555,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="支付设置">
+      <SubCard title={t('setting_index.operationSettings.paymentSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <FormControl fullWidth>
@@ -627,7 +629,7 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
-      <SubCard title="倍率设置">
+      <SubCard title={t('setting_index.operationSettings.rateSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <FormControl fullWidth>
             <TextField
@@ -655,7 +657,7 @@ const OperationSetting = () => {
         </Stack>
       </SubCard>
 
-      <SubCard title="聊天链接设置">
+      <SubCard title={t('setting_index.operationSettings.chatLinkSettings.title')}>
         <Stack spacing={2}>
           <Alert severity="info">
             配置聊天链接，该配置在令牌中的聊天生效以及首页的Playground中的聊天生效. <br />

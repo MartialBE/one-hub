@@ -32,10 +32,12 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { showError, showInfo } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
 const RegisterForm = ({ ...others }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const { register, sendVerificationCode } = useRegister();
   const siteInfo = useSelector((state) => state.siteInfo);
@@ -296,7 +298,7 @@ const RegisterForm = ({ ...others }) => {
             <Box sx={{ mt: 2 }}>
               <AnimateButton>
                 <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                  注册
+                  {t('menu.signup')}
                 </Button>
               </AnimateButton>
             </Box>

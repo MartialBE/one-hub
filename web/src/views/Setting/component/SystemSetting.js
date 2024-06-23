@@ -22,9 +22,11 @@ import { showError, showSuccess, removeTrailingSlash } from 'utils/common'; //,
 import { API } from 'utils/api';
 import { createFilterOptions } from '@mui/material/Autocomplete';
 import { LoadStatusContext } from 'contexts/StatusContext';
+import { useTranslation } from 'react-i18next';
 
 const filter = createFilterOptions();
 const SystemSetting = () => {
+  const { t } = useTranslation();
   let [inputs, setInputs] = useState({
     PasswordLoginEnabled: '',
     PasswordRegisterEnabled: '',
@@ -231,7 +233,7 @@ const SystemSetting = () => {
   return (
     <>
       <Stack spacing={2}>
-        <SubCard title="通用设置">
+        <SubCard title={t('setting_index.systemSettings.generalSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControl fullWidth>
@@ -254,7 +256,7 @@ const SystemSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置登录注册">
+        <SubCard title={t('setting_index.systemSettings.configureLoginRegister.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12} md={3}>
               <FormControlLabel
@@ -322,7 +324,10 @@ const SystemSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置邮箱域名白名单" subTitle="用以防止恶意用户利用临时邮箱批量注册">
+        <SubCard
+          title={t('setting_index.systemSettings.configureEmailDomainWhitelist.title')}
+          subTitle="用以防止恶意用户利用临时邮箱批量注册"
+        >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControlLabel
@@ -374,7 +379,7 @@ const SystemSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置 SMTP" subTitle="用以支持系统的邮件发送">
+        <SubCard title={t('setting_index.systemSettings.configureSMTP.title')} subTitle="用以支持系统的邮件发送">
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info">请注意，有些邮箱服务商发送邮件时会携带你的服务器IP地址，非个人使用时建议使用专业的邮件服务商</Alert>
@@ -457,7 +462,7 @@ const SystemSetting = () => {
           </Grid>
         </SubCard>
         <SubCard
-          title="配置 GitHub OAuth App"
+          title={t('setting_index.systemSettings.configureGitHubOAuthApp.title')}
           subTitle={
             <span>
               {' '}
@@ -512,7 +517,7 @@ const SystemSetting = () => {
           </Grid>
         </SubCard>
         <SubCard
-          title="配置 WeChat Server"
+          title={t('setting_index.systemSettings.configureWeChatServer.title')}
           subTitle={
             <span>
               用以支持通过微信进行登录注册，
@@ -574,7 +579,7 @@ const SystemSetting = () => {
           </Grid>
         </SubCard>
         <SubCard
-          title="配置飞书授权登录"
+          title={t('setting_index.systemSettings.configureFeishuAuthorization.title')}
           subTitle={
             <span>
               {' '}
@@ -629,7 +634,7 @@ const SystemSetting = () => {
           </Grid>
         </SubCard>
         <SubCard
-          title="配置 Turnstile"
+          title={t('setting_index.systemSettings.configureTurnstile.title')}
           subTitle={
             <span>
               用以支持用户校验，

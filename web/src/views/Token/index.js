@@ -20,8 +20,10 @@ import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { useSelector } from 'react-redux';
 import { ITEMS_PER_PAGE } from 'constants';
+import { useTranslation } from 'react-i18next';
 
 export default function Token() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -151,7 +153,7 @@ export default function Token() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">令牌</Typography>
+        <Typography variant="h4">{t('token_index.token')}</Typography>
 
         <Button
           variant="contained"
@@ -161,17 +163,19 @@ export default function Token() {
           }}
           startIcon={<IconPlus />}
         >
-          新建令牌
+          {t('token_index.createToken')}
         </Button>
       </Stack>
       <Stack mb={5}>
         <Alert severity="info">
-          将OpenAI API基础地址https://api.openai.com替换为<b>{siteInfo.server_address}</b>，复制下面的密钥即可使用。
+          {t('token_index.replaceApiAddress1')}
+          <b>{siteInfo.server_address}</b>
+          {t('token_index.replaceApiAddress2')}
         </Alert>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchTokens} noValidate>
-          <TableToolBar placeholder={'搜索令牌的名称...'} />
+          <TableToolBar placeholder={t('token_index.searchTokenName')} />
         </Box>
         <Toolbar
           sx={{
@@ -185,7 +189,7 @@ export default function Token() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新
+                {t('token_index.refresh')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -199,13 +203,13 @@ export default function Token() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'name', label: '名称', disableSort: false },
-                  { id: 'status', label: '状态', disableSort: false },
-                  { id: 'used_quota', label: '已用额度', disableSort: false },
-                  { id: 'remain_quota', label: '剩余额度', disableSort: false },
-                  { id: 'created_time', label: '创建时间', disableSort: false },
-                  { id: 'expired_time', label: '过期时间', disableSort: false },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'name', label: t('token_index.name'), disableSort: false },
+                  { id: 'status', label: t('token_index.status'), disableSort: false },
+                  { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
+                  { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
+                  { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
+                  { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
+                  { id: 'action', label: t('token_index.actions'), disableSort: true }
                 ]}
               />
               <TableBody>

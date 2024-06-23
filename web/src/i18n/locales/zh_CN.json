@@ -1,0 +1,222 @@
+{
+  "dashboard": "仪表盘",
+  "analytics": "分析",
+  "channel": "渠道",
+  "token": "令牌",
+  "log": "日志",
+  "redemption": "兑换",
+  "topup": "充值",
+  "user": "用户",
+  "profile": "个人设置",
+  "pricing": "模型价格",
+  "model_price": "可用模型",
+  "payment": "支付",
+  "setting": "设置",
+  "menu": {
+    "home": "首页",
+    "about": "关于",
+    "login": "登录",
+    "signup": "注册",
+    "signout": "注销",
+    "console": "控制台",
+    "error": "错误",
+    "unknownVersion": "未知版本",
+    "welcomeBack": "欢迎回来"
+  },
+  "dashboard_index": {
+    "model_price": "当前可用模型",
+    "today_requests": "今日请求",
+    "today_consumption": "今日消费",
+    "today_tokens": "今日Token",
+    "no_data": "无数据",
+    "statistics": "统计",
+    "no_data_available": "暂无数据",
+    "model_name": "模型名称",
+    "other_models": "其他模型",
+    "balance": "余额",
+    "used": "已使用",
+    "calls": "调用次数",
+    "unknown": "未知"
+  },
+  "analytics_index": {
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "consumptionStatistics": "消费统计",
+    "tokensStatistics": "Tokens统计",
+    "averageLatency": "平均延迟",
+    "requestsCount": "请求数",
+    "redemptionStatistics": "兑换统计",
+    "registrationStatistics": "注册统计",
+    "totalUserSpending": "用户总消费金额",
+    "totalUserBalance": "用户总余额",
+    "totalUsers": "用户总数",
+    "directRegistration": "直接注册",
+    "invitationRegistration": "邀请注册",
+    "channelCount": "渠道数量",
+    "active": "正常",
+    "disabled": "禁用",
+    "testDisabled": "测试禁用",
+    "redeemCodeIssued": "兑换码发行量",
+    "used": "已使用",
+    "unused": "未使用"
+  },
+  "channel_index": {
+    "channelList": "渠道列表",
+    "channelTags": "渠道标签",
+    "channel": "渠道",
+    "newChannel": "新建渠道",
+    "batchProcessing": "批量处理",
+    "priorityWeightExplanation": "优先级/权重解释：",
+    "description1": "1. 优先级越大，越优先使用；(只有该优先级下的节点都冻结或者禁用了，才会使用低优先级的节点)",
+    "description2": "2. 相同优先级下：根据权重进行负载均衡(加权随机)",
+    "description3": "3. 如果在设置-通用设置中设置了“重试次数”和“重试间隔”，则会在失败后重试。",
+    "description4": "4. 重试逻辑：1）先在高优先级中的节点重试，如果高优先级中的节点都冻结了，才会在低优先级中的节点重试。2）如果设置了“重试间隔”，则某一渠道失败后，会冻结一段时间，所有人都不会再使用这个渠道，直到冻结时间结束。3）重试次数用完后，直接结束。",
+    "refreshClearSearchConditions": "刷新/清除搜索条件",
+    "search": "搜索",
+    "testAllChannels": "测试所有渠道",
+    "updateEnabledBalance": "更新启用余额",
+    "deleteDisabledChannels": "删除禁用渠道",
+    "name": "名称",
+    "group": "分组",
+    "tags": "标签",
+    "type": "类型",
+    "status": "状态",
+    "responseTime": "响应时间",
+    "usedBalance": "已使用/余额",
+    "priority": "优先级",
+    "weight": "权重",
+    "actions": "操作",
+    "supplier": "供应商",
+    "model": "模型",
+    "modelName": "模型名称",
+    "channelName": "渠道名称",
+    "testModel": "测试模型",
+    "otherParameters": "其他参数",
+    "channelType": "渠道类型",
+    "all": "全部",
+    "enabled": "启用",
+    "disabled": "禁用",
+    "speedTestDisabled": "测速禁用",
+    "filterTags": "过滤标签",
+    "showAll": "显示全部"
+  },
+  "token_index": {
+    "token": "令牌",
+    "createToken": "新建令牌",
+    "replaceApiAddress1": "将OpenAI API基础地址https://api.openai.com替换为",
+    "replaceApiAddress2": "，复制下面的密钥即可使用。",
+    "searchTokenName": "搜索令牌的名称...",
+    "refresh": "刷新",
+    "name": "名称",
+    "status": "状态",
+    "usedQuota": "已用额度",
+    "remainingQuota": "剩余额度",
+    "createdTime": "创建时间",
+    "expiryTime": "过期时间",
+    "actions": "操作",
+    "unlimited": "无限制",
+    "neverExpires": "永不过期",
+    "copy": "复制",
+    "chat": "聊天",
+    "deleteToken": "删除Token",
+    "confirmDeleteToken": "是否删除Token",
+    "close": "关闭",
+    "delete": "删除",
+    "editToken": "编辑令牌",
+    "quotaNote": "注意，令牌的额度仅用于限制令牌本身的最大额度使用量，实际的使用受到账户的剩余额度限制。",
+    "invalidDate": "无效的日期",
+    "quota": "额度",
+    "unlimitedQuota": "无限额度",
+    "enableCache": "是否开启缓存(开启后，将会缓存聊天记录，以减少消费)",
+    "cancel": "取消",
+    "submit": "提交"
+  },
+  "log_index": {},
+  "redemption_index": {},
+  "topup_index": {},
+  "midjourney_index": {},
+  "user_index": {},
+  "profile_index": {},
+  "pricing_index": {},
+  "model_price_index": {},
+  "payment_index": {},
+  "setting_index": {
+    "operationSettings": {
+      "title": "运营设置",
+      "generalSettings": {
+        "title": "通用设置"
+      },
+      "otherSettings": {
+        "title": "其他设置"
+      },
+      "logSettings": {
+        "title": "日志设置"
+      },
+      "monitoringSettings": {
+        "title": "监控设置"
+      },
+      "quotaSettings": {
+        "title": "额度设置"
+      },
+      "paymentSettings": {
+        "title": "支付设置"
+      },
+      "rateSettings": {
+        "title": "倍率设置"
+      },
+      "chatLinkSettings": {
+        "title": "聊天链接设置"
+      }
+    },
+    "systemSettings": {
+      "title": "系统设置",
+      "generalSettings": {
+        "title": "通用设置"
+      },
+      "configureLoginRegister": {
+        "title": "配置登录注册"
+      },
+      "configureEmailDomainWhitelist": {
+        "title": "配置邮箱域名白名单"
+      },
+      "configureSMTP": {
+        "title": "配置 SMTP"
+      },
+      "configureGitHubOAuthApp": {
+        "title": "配置 GitHub OAuth App"
+      },
+      "configureWeChatServer": {
+        "title": "配置 WeChat Server"
+      },
+      "configureFeishuAuthorization": {
+        "title": "配置飞书授权登录"
+      },
+      "configureTurnstile": {
+        "title": "配置 Turnstile"
+      }
+    },
+    "otherSettings": {
+      "title": "其他设置",
+      "generalSettings": {
+        "title": "通用设置"
+      },
+      "customSettings": {
+        "title": "个性化设置"
+      }
+    }
+  },
+  "telegram_index": {},
+  "login": {
+    "usernameOrEmail": "用户名/邮箱",
+    "password": "密码",
+    "usernameRequired": "用户名/邮箱是必填项",
+    "passwordRequired": "密码是必填项"
+  },
+  "description": "All in one 的 OpenAI 接口\n整合各种 API 访问方式\n一键部署，开箱即用",
+  "footer": {
+    "developedBy": "由",
+    "basedOn": "基于",
+    "sourceCode": "源代码遵循",
+    "license": "MIT 协议"
+  }
+}

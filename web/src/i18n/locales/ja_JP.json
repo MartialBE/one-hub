@@ -1,0 +1,232 @@
+{
+  "analytics": "分析",
+  "analytics_index": {
+    "active": "アクティブ",
+    "averageLatency": "平均遅延",
+    "channelCount": "チャネル数",
+    "consumptionStatistics": "消費統計",
+    "directRegistration": "直接登録",
+    "disabled": "無効",
+    "endTime": "終了時間",
+    "invitationRegistration": "招待登録",
+    "redeemCodeIssued": "発行された引き換えコード",
+    "redemptionStatistics": "交換統計",
+    "registrationStatistics": "登録統計",
+    "requestsCount": "リクエスト数",
+    "startTime": "開始時間",
+    "testDisabled": "テスト無効",
+    "tokensStatistics": "トークン統計",
+    "totalUserBalance": "ユーザーの総残高",
+    "totalUserSpending": "ユーザーの総消費額",
+    "totalUsers": "ユーザーの総数",
+    "unused": "未使用",
+    "used": "使用済み"
+  },
+  "channel": "チャネル",
+  "channel_index": {
+    "actions": "操作",
+    "all": "すべて",
+    "batchProcessing": "一括処理",
+    "channel": "チャネル",
+    "channelList": "チャネルリスト",
+    "channelName": "チャネル名",
+    "channelTags": "チャネルタグ",
+    "channelType": "チャネルタイプ",
+    "deleteDisabledChannels": "無効なチャネルを削除",
+    "description1": "1. 優先度が高いほど優先的に使用されます。(同じ優先度のノードがすべて凍結または無効になっている場合のみ、低い優先度のノードが使用されます)",
+    "description2": "2. 同じ優先度の場合：ウェイトによる負荷分散が行われます(ウェイト付きランダム)",
+    "description3": "3. 「再試行回数」と「再試行間隔」が一般設定で設定されている場合、失敗後に再試行が行われます。",
+    "description4": "4. 再試行ロジック：1）優先度の高いノードで再試行を行います。優先度が高いノードがすべて凍結されている場合のみ、優先度の低いノードで再試行が行われます。2）「再試行間隔」が設定されている場合、特定のチャネルで失敗した場合、一定時間凍結され、そのチャネルはもう一度使用されません。凍結時間が終了するまで。3）再試行回数が完了すると、直ちに終了します。",
+    "disabled": "無効",
+    "enabled": "有効",
+    "filterTags": "フィルタータグ",
+    "group": "グループ",
+    "model": "モデル",
+    "modelName": "モデル名",
+    "name": "名称",
+    "newChannel": "新規チャネル",
+    "otherParameters": "その他のパラメータ",
+    "priority": "優先度",
+    "priorityWeightExplanation": "優先度/ウェイトの説明：",
+    "refreshClearSearchConditions": "検索条件をリフレッシュ/クリア",
+    "responseTime": "応答時間",
+    "search": "検索",
+    "showAll": "すべて表示",
+    "speedTestDisabled": "速度テスト無効",
+    "status": "ステータス",
+    "supplier": "サプライヤー",
+    "tags": "タグ",
+    "testAllChannels": "すべてのチャネルをテスト",
+    "testModel": "テストモデル",
+    "type": "タイプ",
+    "updateEnabledBalance": "有効残高を更新",
+    "usedBalance": "使用済み/残高",
+    "weight": "ウェイト"
+  },
+  "dashboard": "ダッシュボード",
+  "dashboard_index": {
+    "balance": "残高",
+    "calls": "コール回数",
+    "model_name": "モデル名",
+    "model_price": "現在のモデル価格",
+    "no_data": "データなし",
+    "no_data_available": "利用可能データなし",
+    "other_models": "他のモデル",
+    "statistics": "統計",
+    "today_consumption": "今日の消費",
+    "today_requests": "今日のリクエスト",
+    "today_tokens": "今日のトークン",
+    "unknown": "不明",
+    "used": "使用済み"
+  },
+  "description": "All in one の OpenAI インターフェース\nさまざまな API アクセス方法を統合\nワンクリックで展開、即座に使用可能",
+  "footer": {
+    "basedOn": "ベース",
+    "developedBy": "開発者",
+    "license": "MIT ライセンスに基づく",
+    "sourceCode": "ソースコードは"
+  },
+  "log": "ログ",
+  "log_index": {
+  },
+  "login": {
+    "password": "パスワード",
+    "passwordRequired": "パスワードは必須です",
+    "usernameOrEmail": "ユーザー名/メール",
+    "usernameRequired": "ユーザー名/メールは必須です"
+  },
+  "menu": {
+    "about": "概要",
+    "console": "コンソール",
+    "error": "エラー",
+    "home": "ホーム",
+    "login": "ログイン",
+    "signout": "ログアウト",
+    "signup": "サインアップ",
+    "unknownVersion": "未知バージョン",
+    "welcomeBack": "おかえりなさい"
+  },
+  "midjourney_index": {
+  },
+  "model_price": "モデル価格",
+  "model_price_index": {
+  },
+  "payment": "支払い",
+  "payment_index": {
+  },
+  "pricing": "価格設定",
+  "pricing_index": {
+  },
+  "profile": "プロフィール",
+  "profile_index": {
+  },
+  "redemption": "引き換え",
+  "redemption_index": {
+  },
+  "setting": "設定",
+  "setting_index": {
+    "operationSettings": {
+      "chatLinkSettings": {
+        "title": "チャットリンクの設定"
+      },
+      "generalSettings": {
+        "title": "一般設定"
+      },
+      "logSettings": {
+        "title": "ログ設定"
+      },
+      "monitoringSettings": {
+        "title": "監視設定"
+      },
+      "otherSettings": {
+        "title": "その他の設定"
+      },
+      "paymentSettings": {
+        "title": "支払い設定"
+      },
+      "quotaSettings": {
+        "title": "クォータ設定"
+      },
+      "rateSettings": {
+        "title": "レート設定"
+      },
+      "title": "運営設定"
+    },
+    "otherSettings": {
+      "customSettings": {
+        "title": "カスタム設定"
+      },
+      "generalSettings": {
+        "title": "一般設定"
+      },
+      "title": "その他の設定"
+    },
+    "systemSettings": {
+      "configureEmailDomainWhitelist": {
+        "title": "メールドメインホワイトリストの設定"
+      },
+      "configureFeishuAuthorization": {
+        "title": "Feishu認証の設定"
+      },
+      "configureGitHubOAuthApp": {
+        "title": "GitHub OAuthアプリの設定"
+      },
+      "configureLoginRegister": {
+        "title": "ログイン登録の設定"
+      },
+      "configureSMTP": {
+        "title": "SMTPの設定"
+      },
+      "configureTurnstile": {
+        "title": "Turnstileの設定"
+      },
+      "configureWeChatServer": {
+        "title": "WeChatサーバーの設定"
+      },
+      "generalSettings": {
+        "title": "一般設定"
+      },
+      "title": "システム設定"
+    }
+  },
+  "telegram_index": {
+  },
+  "token": "トークン",
+  "token_index": {
+    "actions": "操作",
+    "cancel": "キャンセル",
+    "chat": "チャット",
+    "close": "閉じる",
+    "confirmDeleteToken": "トークンを削除しますか",
+    "copy": "コピー",
+    "createToken": "トークンを作成する",
+    "createdTime": "作成日時",
+    "delete": "削除",
+    "deleteToken": "トークンを削除",
+    "editToken": "トークンを編集",
+    "enableCache": "キャッシュを有効にする（有効にすると、チャット履歴をキャッシュして消費を減らす）",
+    "expiryTime": "有効期限",
+    "invalidDate": "無効な日付",
+    "name": "名前",
+    "neverExpires": "期限なし",
+    "quota": "クォータ",
+    "quotaNote": "注意：トークンのクォータは、トークン自体の最大使用量を制限するためのものであり、実際の使用はアカウントの残りクォータによって制限されます。",
+    "refresh": "リフレッシュ",
+    "remainingQuota": "残りクォータ",
+    "replaceApiAddress1": "OpenAI APIの基本アドレスhttps://api.openai.comを",
+    "replaceApiAddress2": "に置き換え、以下のキーをコピーして使用してください。",
+    "searchTokenName": "トークン名を検索...",
+    "status": "ステータス",
+    "submit": "提出する",
+    "token": "トークン",
+    "unlimited": "制限なし",
+    "unlimitedQuota": "無制限のクォータ",
+    "usedQuota": "使用済みクォータ"
+  },
+  "topup": "トップアップ",
+  "topup_index": {
+  },
+  "user": "ユーザー",
+  "user_index": {
+  }
+}
