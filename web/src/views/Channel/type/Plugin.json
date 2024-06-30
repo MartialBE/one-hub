@@ -108,5 +108,19 @@
         }
       }
     }
+  },
+  "25": {
+    "code_execution": {
+      "name": "代码执行",
+      "description": "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启",
+      "params": {
+        "enable": {
+          "name": "启用",
+          "description": "是否启用代码执行",
+          "type": "bool",
+          "required": true
+        }
+      }
+    }
   }
 }
