@@ -511,6 +511,13 @@
     "output": 2.1429
   },
   {
+    "model": "SparkDesk-v4.0",
+    "type": "tokens",
+    "channel_type": 18,
+    "input": 7.1429,
+    "output": 7.1429
+  },
+  {
     "model": "360GPT_S2_V9",
     "type": "tokens",
     "channel_type": 19,
