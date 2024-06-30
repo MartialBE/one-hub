@@ -4,7 +4,6 @@ module one-api
 go 1.18
 
 require (
-	github.com/MartialBE/tiktoken-go v0.1.7
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1
 	github.com/aws/smithy-go v1.20.1
@@ -23,6 +22,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/pkoukk/tiktoken-go v0.1.7
 	github.com/shopspring/decimal v1.4.0
 	github.com/smartwalle/alipay/v3 v3.2.21
 	github.com/spf13/viper v1.18.2
