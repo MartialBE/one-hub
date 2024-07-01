@@ -22,10 +22,22 @@ type GeminiInlineData struct {
 }
 
 type GeminiPart struct {
-	FunctionCall     *GeminiFunctionCall     `json:"functionCall,omitempty"`
-	FunctionResponse *GeminiFunctionResponse `json:"functionResponse,omitempty"`
-	Text             string                  `json:"text,omitempty"`
-	InlineData       *GeminiInlineData       `json:"inlineData,omitempty"`
+	FunctionCall        *GeminiFunctionCall            `json:"functionCall,omitempty"`
+	FunctionResponse    *GeminiFunctionResponse        `json:"functionResponse,omitempty"`
+	Text                string                         `json:"text,omitempty"`
+	InlineData          *GeminiInlineData              `json:"inlineData,omitempty"`
+	ExecutableCode      *GeminiPartExecutableCode      `json:"executableCode,omitempty"`
+	CodeExecutionResult *GeminiPartCodeExecutionResult `json:"codeExecutionResult,omitempty"`
+}
+
+type GeminiPartExecutableCode struct {
+	Language string `json:"language,omitempty"`
+	Code     string `json:"code,omitempty"`
+}
+
+type GeminiPartCodeExecutionResult struct {
+	Outcome string `json:"outcome,omitempty"`
+	Output  string `json:"output,omitempty"`
 }
 
 type GeminiFunctionCall struct {
@@ -53,7 +65,13 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 			isTools = true
 			choice.Delta.ToolCalls = append(choice.Delta.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else {
-			content += part.Text
+			if part.ExecutableCode != nil {
+				content += "```" + part.ExecutableCode.Language + "\n" + part.ExecutableCode.Code + "\n```\n"
+			} else if part.CodeExecutionResult != nil {
+				content += "```output\n" + part.CodeExecutionResult.Output + "\n```\n"
+			} else {
+				content += part.Text
+			}
 		}
 	}
 
@@ -92,7 +110,13 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 			useTools = true
 			choice.Message.ToolCalls = append(choice.Message.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else {
-			content += part.Text
+			if part.ExecutableCode != nil {
+				content += "```" + part.ExecutableCode.Language + "\n" + part.ExecutableCode.Code + "\n```\n"
+			} else if part.CodeExecutionResult != nil {
+				content += "```output\n" + part.CodeExecutionResult.Output + "\n```\n"
+			} else {
+				content += part.Text
+			}
 		}
 	}
 
@@ -143,6 +167,10 @@ type GeminiChatSafetySettings struct {
 
 type GeminiChatTools struct {
 	FunctionDeclarations []types.ChatCompletionFunction `json:"functionDeclarations,omitempty"`
+	CodeExecution        *GeminiCodeExecution           `json:"code_execution,omitempty"`
+}
+
+type GeminiCodeExecution struct {
 }
 
 type GeminiChatGenerationConfig struct {

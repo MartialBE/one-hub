@@ -11,7 +11,7 @@ import (
 	"one-api/common/image"
 	"one-api/types"
 
-	"github.com/MartialBE/tiktoken-go"
+	"github.com/pkoukk/tiktoken-go"
 	"github.com/spf13/viper"
 )
 
