@@ -231,7 +231,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   multiple
                   freeSolo
                   id="channel-models-label"
-                  options={selectModel}
+                  options={selectModel || []}
                   value={values.models}
                   onChange={(e, value) => {
                     const event = {
@@ -292,7 +292,8 @@ export default EditModal;
 
 EditModal.propTypes = {
   open: PropTypes.bool,
-  pricesItem: PropTypes.object,
+  // 修正后的代码
+  pricesItem: PropTypes.oneOfType([PropTypes.object, PropTypes.any]),
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   ownedby: PropTypes.array,

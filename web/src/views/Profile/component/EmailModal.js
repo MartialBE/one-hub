@@ -68,7 +68,6 @@ const EmailModal = ({ open, handleClose, turnstileToken, turnstileEnabled }) => 
   }, [disableButton, countdown]);
 
   const handleSendCode = async (email) => {
-    setDisableButton(true);
     if (email === '') {
       showError('请输入邮箱');
       return;
@@ -77,10 +76,12 @@ const EmailModal = ({ open, handleClose, turnstileToken, turnstileEnabled }) => 
       showError('请稍后几秒重试，Turnstile 正在检查用户环境！');
       return;
     }
+    setDisableButton(true);
     setLoading(true);
     const { success, message } = await sendVerificationCode(email, turnstileToken);
     setLoading(false);
     if (!success) {
+      setDisableButton(false);
       showError(message);
       return;
     }

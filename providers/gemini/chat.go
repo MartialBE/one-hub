@@ -16,8 +16,10 @@ const (
 )
 
 type geminiStreamHandler struct {
-	Usage   *types.Usage
-	Request *types.ChatCompletionRequest
+	Usage          *types.Usage
+	LastCandidates int
+	LastType       string
+	Request        *types.ChatCompletionRequest
 }
 
 func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
@@ -51,8 +53,10 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 	}
 
 	chatHandler := &geminiStreamHandler{
-		Usage:   p.Usage,
-		Request: request,
+		Usage:          p.Usage,
+		LastCandidates: 0,
+		LastType:       "",
+		Request:        request,
 	}
 
 	return requester.RequestStream[string](p.Requester, resp, chatHandler.handlerStream)
@@ -76,6 +80,8 @@ func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
+
+	p.pluginHandle(geminiRequest)
 
 	// 创建请求
 	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(geminiRequest), p.Requester.WithHeader(headers))
@@ -219,10 +225,27 @@ func (h *geminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		dataChan <- string(responseBody)
 	}
 
-	if geminiResponse.UsageMetadata != nil {
-		*h.Usage = convertOpenAIUsage(h.Request.Model, geminiResponse.UsageMetadata)
-
+	// 和ExecutableCode的tokens共用，所以跳过
+	if geminiResponse.UsageMetadata == nil || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
+		return
 	}
+
+	lastType := "text"
+	if geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
+		lastType = "code"
+	}
+
+	if h.LastType != lastType {
+		h.LastCandidates = 0
+		h.LastType = lastType
+	}
+
+	adjustTokenCounts(h.Request.Model, geminiResponse.UsageMetadata)
+
+	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
+	h.Usage.CompletionTokens += geminiResponse.UsageMetadata.CandidatesTokenCount - h.LastCandidates
+	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+	h.LastCandidates = geminiResponse.UsageMetadata.CandidatesTokenCount
 }
 
 const tokenThreshold = 1000000
@@ -274,5 +297,24 @@ func convertOpenAIUsage(modelName string, geminiUsage *GeminiUsageMetadata) type
 		PromptTokens:     geminiUsage.PromptTokenCount,
 		CompletionTokens: geminiUsage.CandidatesTokenCount,
 		TotalTokens:      geminiUsage.TotalTokenCount,
+	}
+}
+
+func (p *GeminiProvider) pluginHandle(request *GeminiChatRequest) {
+	if p.Channel.Plugin == nil {
+		return
+	}
+
+	plugin := p.Channel.Plugin.Data()
+
+	if pWeb, ok := plugin["code_execution"]; ok {
+		if len(request.Tools) > 0 {
+			return
+		}
+		if enable, ok := pWeb["enable"].(bool); ok && enable {
+			request.Tools = append(request.Tools, GeminiChatTools{
+				CodeExecution: &GeminiCodeExecution{},
+			})
+		}
 	}
 }
