@@ -22,6 +22,13 @@ const (
 	ChatMessageRoleTool      = "tool"
 )
 
+const (
+	ToolChoiceTypeFunction = "function"
+	ToolChoiceTypeAuto     = "auto"
+	ToolChoiceTypeNone     = "none"
+	ToolChoiceTypeRequired = "required"
+)
+
 type ChatCompletionToolCallsFunction struct {
 	Name      string `json:"name,omitempty"`
 	Arguments string `json:"arguments"`
@@ -181,6 +188,23 @@ type ChatCompletionRequest struct {
 	ToolChoice       any                           `json:"tool_choice,omitempty"`
 }
 
+func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {
+	if choice, ok := r.ToolChoice.(map[string]any); ok {
+		if function, ok := choice["function"].(map[string]any); ok {
+			toolType = ToolChoiceTypeFunction
+			toolFunc = function["name"].(string)
+		}
+	} else if toolChoiceType, ok := r.ToolChoice.(string); ok {
+		toolType = toolChoiceType
+	}
+
+	if toolType == "" {
+		toolType = ToolChoiceTypeAuto
+	}
+
+	return
+}
+
 func (r ChatCompletionRequest) GetFunctionCate() string {
 	if r.Tools != nil {
 		return "tool"
@@ -205,7 +229,6 @@ func (r *ChatCompletionRequest) GetFunctions() []*ChatCompletionFunction {
 
 	return r.Functions
 }
-
 func (r *ChatCompletionRequest) ClearEmptyMessages() {
 	var messages []ChatCompletionMessage
 	for _, message := range r.Messages {

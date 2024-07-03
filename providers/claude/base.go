@@ -52,8 +52,8 @@ func errorHandle(claudeError *ClaudeError) *types.OpenAIError {
 		return nil
 	}
 	return &types.OpenAIError{
-		Message: claudeError.Message,
-		Type:    claudeError.Type,
+		Message: claudeError.Error.Message,
+		Type:    claudeError.Error.Type,
 		Code:    claudeError.Type,
 	}
 }
@@ -84,10 +84,12 @@ func (p *ClaudeProvider) GetFullRequestURL(requestURL string) string {
 
 func stopReasonClaude2OpenAI(reason string) string {
 	switch reason {
-	case "end_turn":
+	case "end_turn", "stop_sequence":
 		return types.FinishReasonStop
 	case "max_tokens":
 		return types.FinishReasonLength
+	case "tool_use":
+		return types.FinishReasonToolCalls
 	default:
 		return reason
 	}
@@ -95,7 +97,7 @@ func stopReasonClaude2OpenAI(reason string) string {
 
 func convertRole(role string) string {
 	switch role {
-	case "user":
+	case types.ChatMessageRoleUser, types.ChatMessageRoleTool, types.ChatMessageRoleFunction:
 		return types.ChatMessageRoleUser
 	default:
 		return types.ChatMessageRoleAssistant
