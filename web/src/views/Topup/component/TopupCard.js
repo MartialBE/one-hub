@@ -169,33 +169,57 @@ const TopupCard = () => {
 
   const calculateTotal = () => {
     if (amount === 0) return 0;
-    const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
-    let newAmount = amount * discount; //折后价格
+    
+    // 找到适用的最大折扣
+    let appliedDiscount = 1;
+    Object.entries(RechargeDiscount).forEach(([threshold, discount]) => {
+      if (amount >= Number(threshold) && discount < appliedDiscount) {
+        appliedDiscount = discount;
+      }
+    });
+  
+    let newAmount = amount * appliedDiscount; // 折后价格
     let total = Number(newAmount) + Number(calculateFee());
     if (selectedPayment && selectedPayment.currency === 'CNY') {
       total = parseFloat((total * siteInfo.PaymentUSDRate).toFixed(2));
     }
     return total;
   };
-
+  
   const handleDiscountTotal = (amount) => {
     if (amount === 0) return 0;
-    // 如果金额在RechargeDiscount中，则应用折扣,手续费和货币换算汇率不算在折扣内
-    const discount = RechargeDiscount[amount] || 1; // 如果没有折扣，则默认为1（即没有折扣）
-    console.log(amount, discount);
+    
+    // 找到适用的最大折扣
+    let appliedDiscount = 1;
+    Object.entries(RechargeDiscount).forEach(([threshold, discount]) => {
+      if (amount >= Number(threshold) && discount < appliedDiscount) {
+        appliedDiscount = discount;
+      }
+    });
+  
+    console.log(amount, appliedDiscount);
   };
 
   //交易汇率计算
   const calculateExchangeRate = () => {
     if (selectedPayment && selectedPayment.currency === 'CNY') {
       const actualPayAmount = calculateTotal();
-
+  
       // 如果amount或actualPayAmount无效，则返回0
       if (!amount || !actualPayAmount || isNaN(actualPayAmount / amount)) {
         return `￥0/ $`;
       }
-
-      return `￥${(actualPayAmount / amount).toFixed(2)}/ $`;
+  
+      // 找到适用的最大折扣
+      let appliedDiscount = 1;
+      Object.entries(RechargeDiscount).forEach(([threshold, discount]) => {
+        if (amount >= Number(threshold) && discount < appliedDiscount) {
+          appliedDiscount = discount;
+        }
+      });
+  
+      const discountInfo = appliedDiscount !== 1 ? ` (${appliedDiscount * 10}折)` : '';
+      return `￥${(actualPayAmount / amount).toFixed(2)}/ $${discountInfo}`;
     }
     return null;
   };

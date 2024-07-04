@@ -190,21 +190,43 @@ func CheckOrderStatus(c *gin.Context) {
 }
 
 // discountMoney优惠金额 fee手续费，payMoney实付金额
+// discountMoney优惠金额 fee手续费，payMoney实付金额
 func calculateOrderAmount(payment *model.Payment, amount int) (discountMoney, fee, payMoney float64) {
-	// 获取折扣
-	discount := common.GetRechargeDiscount(strconv.Itoa(amount))
-	newMoney := float64(amount) * discount // 折后价值
-	oldTotal := float64(amount)            //原价值
+
+	// 步骤1: 获取折扣数据
+	discountData := common.RechargeDiscount
+
+	// 步骤2: 初始化折扣变量
+	discount := 1.0 // 默认无折扣
+	maxThreshold := 0
+
+	// 步骤3: 遍历折扣数据，找到适用的最大阈值
+	for thresholdStr, discountRate := range discountData {
+		threshold, err := strconv.Atoi(thresholdStr)
+		if err != nil {
+			fmt.Printf("Invalid threshold: %s\n", thresholdStr)
+			continue
+		}
+
+		if amount >= threshold && threshold > maxThreshold {
+			discount = discountRate
+			maxThreshold = threshold
+		}
+	}
+
+	// 步骤4: 计算折后价值
+	newMoney := float64(amount) * discount
+	oldTotal := float64(amount)
+
+	// 步骤5: 计算手续费
 	if payment.PercentFee > 0 {
-		//手续费=（原始价值*折扣*手续费率）
-		fee = utils.Decimal(newMoney*payment.PercentFee, 2) //折后手续
+		fee = utils.Decimal(newMoney*payment.PercentFee, 2) // 折后手续
 		oldTotal = utils.Decimal(oldTotal*(1+payment.PercentFee), 2)
 	} else if payment.FixedFee > 0 {
-		//固定费率不计算折扣
 		fee = payment.FixedFee
 	}
 
-	//实际费用=（折后价+折后手续费）*汇率
+	// 步骤6: 计算实际费用
 	total := utils.Decimal(newMoney+fee, 2)
 	if payment.Currency == model.CurrencyTypeUSD {
 		payMoney = total
@@ -212,7 +234,10 @@ func calculateOrderAmount(payment *model.Payment, amount int) (discountMoney, fe
 		oldTotal = utils.Decimal(oldTotal*config.PaymentUSDRate, 2)
 		payMoney = utils.Decimal(total*config.PaymentUSDRate, 2)
 	}
-	discountMoney = oldTotal - payMoney //折扣金额 = 原价值-实际支付价值
+
+	// 步骤7: 计算折扣金额
+	discountMoney = oldTotal - payMoney
+
 	return
 }
 

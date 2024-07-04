@@ -1,9 +1,8 @@
 package model
 
 import (
-	"one-api/common/utils"
-
 	"gorm.io/gorm"
+	"one-api/common/utils"
 )
 
 type CurrencyType string
