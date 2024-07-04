@@ -211,7 +211,6 @@
     "sourceCode": "Source code under"
   },
   "log": "Log",
-  "log_index": {},
   "login": {
     "password": "Password",
     "passwordRequired": "Password is required",
@@ -229,7 +228,6 @@
     "unknownVersion": "Unknown Version",
     "welcomeBack": "Welcome Back"
   },
-  "midjourney_index": {},
   "model_price": "Model Price",
   "modelpricePage": {
     "model": "Model Name",
@@ -348,69 +346,252 @@
     "keepSafe": "Keep it safe. Reset immediately if leaked."
   },
   "redemption": "Redemption",
-  "redemption_index": {},
   "setting": "Setting",
   "setting_index": {
     "operationSettings": {
       "chatLinkSettings": {
-        "title": "Chat Link Settings"
+        "title": "Chat Link Settings",
+        "info": "Configure chat links, which take effect in the chat of the token and in the chat of the Playground on the homepage. <br />In the link, &#123;key&#125; can replace the user's token, and &#123;server&#125; can replace the server address. For example: {'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />If not configured, the following 4 links will be configured by default:<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />Sorting rules: The larger the value, the higher the ranking, and the same value is sorted according to the configuration order",
+        "save": "Save Chat Link Settings"
       },
       "generalSettings": {
-        "title": "General Settings"
+        "title": "General Settings",
+        "topUpLink": {
+          "label": "Top-up Link",
+          "placeholder": "For example, the purchase link of the card issuing website"
+        },
+        "chatLink": {
+          "label": "Chat Link",
+          "placeholder": "For example, the deployment address of ChatGPT Next Web"
+        },
+        "quotaPerUnit": {
+          "label": "Quota Per Unit",
+          "placeholder": "The quota that can be exchanged for one unit of currency"
+        },
+        "retryTimes": {
+          "label": "Retry Times",
+          "placeholder": "Number of retries"
+        },
+        "retryCooldownSeconds": {
+          "label": "Retry Cooldown (seconds)",
+          "placeholder": "Retry cooldown (seconds)"
+        },
+        "displayInCurrency": "Display quota in currency",
+        "displayTokenStat": "Show token quota instead of user quota for billing related APIs",
+        "approximateToken": "Use approximate method to estimate token count to reduce computation",
+        "saveButton": "Save General Settings"
       },
       "logSettings": {
-        "title": "Log Settings"
+        "title": "Log Settings",
+        "logConsume": "Enable Log Consumption",
+        "logCleanupTime": {
+          "label": "Log Cleanup Time",
+          "placeholder": "Log Cleanup Time"
+        },
+        "clearLogs": "Clear Historical Logs"
       },
       "monitoringSettings": {
-        "title": "Monitoring Settings"
+        "title": "Monitoring Settings",
+        "channelDisableThreshold": {
+          "label": "Maximum Response Time",
+          "placeholder": "In seconds, if all running channels exceed this time, the channel will be automatically disabled"
+        },
+        "quotaRemindThreshold": {
+          "label": "Quota Reminder Threshold",
+          "placeholder": "When below this quota, an email will be sent to remind the user"
+        },
+        "automaticDisableChannel": "Automatically Disable Channel on Failure",
+        "automaticEnableChannel": "Automatically Enable Channel on Success",
+        "saveMonitoringSettings": "Save Monitoring Settings"
       },
       "otherSettings": {
-        "title": "Other Settings"
+        "title": "Other Settings",
+        "mjNotify": "Midjourney allows callbacks (will expose server IP address)",
+        "chatCache": "Enable chat cache (if Redis is not enabled, it will be stored in the database)",
+        "chatCacheExpireMinute": {
+          "label": "Cache Expiry Time (minutes)",
+          "placeholder": "Cache expiry time when caching is enabled"
+        },
+        "alert": "When users use the vision model and provide an image link, our server needs to download these images and calculate tokens. To protect the server's IP address from being exposed when downloading images, you can configure a proxy below. This proxy configuration uses HTTP or SOCKS5 proxy. If you are an individual user, you can ignore this configuration. The proxy format is http://127.0.0.1:1080 or socks5://127.0.0.1:1080",
+        "chatImageRequestProxy": {
+          "label": "Image Detection Proxy",
+          "placeholder": "Chat image detection proxy settings, may leak server IP if not set"
+        },
+        "saveButton": "Save Other Settings"
       },
       "paymentSettings": {
-        "title": "Payment Settings"
+        "title": "Payment Settings",
+        "alert": "Payment Settings: <br />1. USD Exchange Rate: Used to calculate the amount of recharge in USD <br />2. Minimum Recharge Amount (USD): Minimum recharge amount, in USD, enter an integer <br />3. All pages are calculated in USD, and the actual currency paid by the user is converted according to the currency set by the payment gateway <br />For example: A gateway sets the currency as CNY, the user pays 100 USD, then the actual payment amount is 100 * USD exchange rate <br />B gateway sets the currency as USD, the user pays 100 USD, then the actual payment amount is 100 USD",
+        "usdRate": {
+          "label": "USD Exchange Rate",
+          "placeholder": "e.g., 7.3"
+        },
+        "minAmount": {
+          "label": "Minimum Recharge Amount (USD)",
+          "placeholder": "e.g., 1, then the minimum recharge amount is 1 USD, please enter an integer"
+        },
+        "discountInfo": "Fixed Amount Recharge Discount Example: <br />It is a JSON text, the key is the recharge amount, and the value is the discount. For example, &#123;&quot;10&quot;:0.9&#125; means that a recharge of 10 USD is calculated at a 10% discount <br />Calculation formula: actual cost = (original value * discount + original value * discount * fee rate) * exchange rate",
+        "discount": {
+          "label": "Fixed Amount Recharge Discount",
+          "placeholder": "It is a JSON text, the key is the recharge amount, and the value is the discount"
+        },
+        "save": "Save Payment Settings"
       },
       "quotaSettings": {
-        "title": "Quota Settings"
+        "title": "Quota Settings",
+        "quotaForNewUser": {
+          "label": "Initial Quota for New Users",
+          "placeholder": "e.g., 100"
+        },
+        "preConsumedQuota": {
+          "label": "Pre-consumed Quota for Requests",
+          "placeholder": "Adjustable after the request ends"
+        },
+        "quotaForInviter": {
+          "label": "Reward Quota for Inviter",
+          "placeholder": "e.g., 2000"
+        },
+        "quotaForInvitee": {
+          "label": "Reward Quota for Invitee",
+          "placeholder": "e.g., 1000"
+        },
+        "saveQuotaSettings": "Save Quota Settings"
       },
       "rateSettings": {
-        "title": "Rate Settings"
+        "title": "Rate Settings",
+        "groupRatio": {
+          "label": "Group Ratio",
+          "placeholder": "It is a JSON text, the key is the group name, and the value is the ratio"
+        },
+        "save": "Save Rate Settings"
       },
       "title": "Operation Settings"
     },
     "otherSettings": {
-      "customSettings": {
-        "title": "Custom Settings"
-      },
+      "title": "Other Settings",
       "generalSettings": {
-        "title": "General Settings"
+        "title": "General Settings",
+        "currentVersion": "Current Version",
+        "checkUpdate": "Check Update",
+        "noticeLabel": "Notice",
+        "noticePlaceholder": "Enter new notice content here, supports Markdown & HTML code",
+        "saveNotice": "Save Notice"
       },
-      "title": "Other Settings"
+      "customSettings": {
+        "title": "Personalization Settings",
+        "systemNameLabel": "System Name",
+        "systemNamePlaceholder": "Enter system name here",
+        "setSystemName": "Set System Name",
+        "logoLabel": "Logo Image URL",
+        "logoPlaceholder": "Enter Logo Image URL here",
+        "setLogo": "Set Logo",
+        "homePageContentLabel": "Home Page Content",
+        "homePageContentPlaceholder": "Enter home page content here, supports Markdown & HTML code. Once set, the home page status information will no longer be displayed. If a link is entered, it will be used as the src attribute of the iframe, allowing you to set any web page as the home page.",
+        "saveHomePageContent": "Save Home Page Content",
+        "aboutLabel": "About",
+        "aboutPlaceholder": "Enter new about content here, supports Markdown & HTML code. If a link is entered, it will be used as the src attribute of the iframe, allowing you to set any web page as the about page.",
+        "saveAbout": "Save About",
+        "copyrightWarning": "Removing the One API copyright must be authorized first. Maintaining the project requires a lot of effort. If this project is meaningful to you, please support it.",
+        "footerLabel": "Footer Settings",
+        "footerPlaceholder": "Enter new footer here, leave blank to use the default footer, supports HTML code",
+        "setFooter": "Set Footer"
+      },
+      "updateDialog": {
+        "newVersion": "New Version",
+        "close": "Close",
+        "viewGitHub": "View on GitHub"
+      }
     },
     "systemSettings": {
       "configureEmailDomainWhitelist": {
-        "title": "Configure Email Domain Whitelist"
+        "title": "Configure Email Domain Whitelist",
+        "subTitle": "Prevent malicious users from registering with temporary email addresses",
+        "emailDomainRestriction": "Enable Email Domain Whitelist",
+        "allowedEmailDomains": "Allowed Email Domains",
+        "save": "Save Email Domain Whitelist Settings"
       },
       "configureFeishuAuthorization": {
-        "title": "Configure Feishu Authorization Login"
+        "title": "Configure Feishu Authorization",
+        "subTitle": "To support login and registration via Feishu.",
+        "manageLink": "Click here",
+        "manage": "Manage your Feishu app",
+        "alert1": "Enter Homepage URL",
+        "alert2": "and Redirect URL",
+        "appId": "App ID",
+        "appIdPlaceholder": "Enter App ID",
+        "appSecret": "App Secret",
+        "appSecretPlaceholder": "Sensitive information will not be sent to the frontend",
+        "saveButton": "Save Feishu OAuth Settings"
       },
       "configureGitHubOAuthApp": {
-        "title": "Configure GitHub OAuth App"
+        "title": "Configure GitHub OAuth App",
+        "subTitle": "To support login and registration via GitHub.",
+        "manageLink": "Click here",
+        "manage": "Manage your GitHub OAuth App",
+        "alert1": "Enter Homepage URL",
+        "alert2": "and Authorization callback URL",
+        "clientId": "GitHub Client ID",
+        "clientSecret": "GitHub Client Secret",
+        "clientIdPlaceholder": "Enter the ID of your registered GitHub OAuth App",
+        "clientSecretPlaceholder": "Sensitive information will not be sent to the frontend",
+        "saveButton": "Save GitHub OAuth Settings"
       },
       "configureLoginRegister": {
-        "title": "Configure Login Register"
+        "title": "Configure Login and Register",
+        "passwordLogin": "Allow Password Login",
+        "passwordRegister": "Allow Password Register",
+        "emailVerification": "Email Verification Required for Password Register",
+        "gitHubOAuth": "Allow Login & Register via GitHub",
+        "weChatAuth": "Allow Login & Register via WeChat",
+        "larkAuth": "Allow Login & Register via Lark",
+        "registerEnabled": "Allow New User Registration (Disabling this will prevent any new registrations)",
+        "turnstileCheck": "Enable Turnstile User Verification"
       },
       "configureSMTP": {
-        "title": "Configure SMTP"
+        "title": "Configure SMTP",
+        "subTitle": "Support system email sending",
+        "alert": "Please note, some email providers include your server IP address in sent emails. For non-personal use, consider using a professional email service provider.",
+        "smtpServer": "SMTP Server Address",
+        "smtpServerPlaceholder": "e.g., smtp.qq.com",
+        "smtpPort": "SMTP Port",
+        "smtpPortPlaceholder": "Default: 587",
+        "smtpAccount": "SMTP Account",
+        "smtpAccountPlaceholder": "Usually your email address",
+        "smtpFrom": "SMTP Sender Email",
+        "smtpFromPlaceholder": "Usually matches your email address",
+        "smtpToken": "SMTP Access Token",
+        "smtpTokenPlaceholder": "Sensitive information will not be sent to the frontend",
+        "save": "Save SMTP Settings"
       },
       "configureTurnstile": {
-        "title": "Configure Turnstile"
+        "title": "Configure Turnstile",
+        "subTitle": "To support user verification.",
+        "manageLink": "Click here",
+        "manage": "Manage your Turnstile Sites, recommend selecting Invisible Widget Type.",
+        "siteKey": "Turnstile Site Key",
+        "siteKeyPlaceholder": "Enter your registered Turnstile Site Key",
+        "secretKey": "Turnstile Secret Key",
+        "secretKeyPlaceholder": "Sensitive information will not be sent to the frontend",
+        "saveButton": "Save Turnstile Settings"
       },
       "configureWeChatServer": {
-        "title": "Configure WeChat Server"
+        "title": "Configure WeChat Server",
+        "subTitle": "To support login and registration via WeChat.",
+        "learnLink": "Click here",
+        "learn": "Learn about WeChat Server",
+        "serverAddress": "WeChat Server Server Address",
+        "serverAddressPlaceholder": "e.g., https://yourdomain.com",
+        "accessToken": "WeChat Server Access Token",
+        "accessTokenPlaceholder": "Sensitive information will not be sent to the frontend",
+        "qrCodeImage": "WeChat Official Account QR Code Image Link",
+        "qrCodeImagePlaceholder": "Enter an image link",
+        "saveButton": "Save WeChat Server Settings"
       },
       "generalSettings": {
-        "title": "General Settings"
+        "title": "System Settings",
+        "serverAddress": "Server Address",
+        "serverAddressPlaceholder": "e.g., https://yourdomain.com",
+        "updateServerAddress": "Update Server Address"
       },
       "title": "System Settings"
     }
@@ -466,7 +647,6 @@
     "usedQuota": "Used Quota"
   },
   "topup": "Top-up",
-  "topup_index": {},
   "user": "User",
   "userPage": {
     "editUser": "Edit User",
@@ -494,5 +674,25 @@
     "creationTime": "Creation Time",
     "status": "Status",
     "action": "Action"
+  },
+  "CheckUpdatesTable": {
+    "checkUpdates": "Check Updates",
+    "url": "URL",
+    "fetchData": "Fetch Data",
+    "noUpdates": "No Updates",
+    "newModels": "New Models",
+    "priceChangeModels": "Price Change Models (for reference only, ignore if you have modified the prices yourself)",
+    "note": "Note",
+    "overwriteOrAddOnly": "You can choose to overwrite or add only new models. If you choose to overwrite, it will delete the prices of the models you added yourself and use the remote configuration completely. If you choose to add only new models, it will only add the prices of the new models.",
+    "overwriteData": "Overwrite Data",
+    "addNewOnly": "Add New Only",
+    "cancel": "Cancel",
+    "dataFormatIncorrect": "Data format is incorrect",
+    "pleaseFetchData": "Please fetch data first",
+    "noNewModels": "No new models",
+    "operationCompleted": "Operation completed successfully!",
+    "inputMultiplierChanged": "Input multiplier changed from",
+    "to": "to",
+    "outputMultiplierChanged": "Output multiplier changed from"
   }
 }

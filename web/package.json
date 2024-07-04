@@ -1,7 +1,7 @@
 {
   "name": "one_api_web",
   "version": "1.2.0",
-  "proxy": "http://localhost:3000",
+  "proxy": "http://127.0.0.1:3000",
   "private": true,
   "homepage": "",
   "dependencies": {

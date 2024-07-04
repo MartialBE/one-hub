@@ -396,64 +396,248 @@
     "operationSettings": {
       "title": "运营设置",
       "generalSettings": {
-        "title": "通用设置"
+        "title": "通用设置",
+        "topUpLink": {
+          "label": "充值链接",
+          "placeholder": "例如发卡网站的购买链接"
+        },
+        "chatLink": {
+          "label": "聊天链接",
+          "placeholder": "例如 ChatGPT Next Web 的部署地址"
+        },
+        "quotaPerUnit": {
+          "label": "单位额度",
+          "placeholder": "一单位货币能兑换的额度"
+        },
+        "retryTimes": {
+          "label": "重试次数",
+          "placeholder": "重试次数"
+        },
+        "retryCooldownSeconds": {
+          "label": "重试间隔(秒)",
+          "placeholder": "重试间隔(秒)"
+        },
+        "displayInCurrency": "以货币形式显示额度",
+        "displayTokenStat": "Billing 相关 API 显示令牌额度而非用户额度",
+        "approximateToken": "使用近似的方式估算 token 数以减少计算量",
+        "saveButton": "保存通用设置"
       },
       "otherSettings": {
-        "title": "其他设置"
+        "title": "其他设置",
+        "mjNotify": "Midjourney 允许回调（会泄露服务器ip地址）",
+        "chatCache": "是否开启聊天缓存(如果没有启用Redis，将会存储在数据库中)",
+        "chatCacheExpireMinute": {
+          "label": "缓存时间(分钟)",
+          "placeholder": "开启缓存时，数据缓存的时间"
+        },
+        "alert": "当用户使用vision模型并提供了图片链接时，我们的服务器需要下载这些图片并计算 tokens。为了在下载图片时保护服务器的 IP 地址不被泄露，可以在下方配置一个代理。这个代理配置使用的是 HTTP 或 SOCKS5 代理。如果你是个人用户，这个配置可以不用理会。代理格式为 http://127.0.0.1:1080 或 socks5://127.0.0.1:1080",
+        "chatImageRequestProxy": {
+          "label": "图片检测代理",
+          "placeholder": "聊天图片检测代理设置，如果不设置可能会泄漏服务器ip"
+        },
+        "saveButton": "保存其他设置"
       },
       "logSettings": {
-        "title": "日志设置"
+        "title": "日志设置",
+        "logConsume": "启用日志消费",
+        "logCleanupTime": {
+          "label": "日志清理时间",
+          "placeholder": "日志清理时间"
+        },
+        "clearLogs": "清理历史日志"
       },
       "monitoringSettings": {
-        "title": "监控设置"
+        "title": "监控设置",
+        "channelDisableThreshold": {
+          "label": "最长响应时间",
+          "placeholder": "单位秒，当运行通道全部测试时，超过此时间将自动禁用通道"
+        },
+        "quotaRemindThreshold": {
+          "label": "额度提醒阈值",
+          "placeholder": "低于此额度时将发送邮件提醒用户"
+        },
+        "automaticDisableChannel": "失败时自动禁用通道",
+        "automaticEnableChannel": "成功时自动启用通道",
+        "saveMonitoringSettings": "保存监控设置"
       },
       "quotaSettings": {
-        "title": "额度设置"
+        "title": "额度设置",
+        "quotaForNewUser": {
+          "label": "新用户初始额度",
+          "placeholder": "例如：100"
+        },
+        "preConsumedQuota": {
+          "label": "请求预扣费额度",
+          "placeholder": "请求结束后多退少补"
+        },
+        "quotaForInviter": {
+          "label": "邀请新用户奖励额度",
+          "placeholder": "例如：2000"
+        },
+        "quotaForInvitee": {
+          "label": "新用户使用邀请码奖励额度",
+          "placeholder": "例如：1000"
+        },
+        "saveQuotaSettings": "保存额度设置"
       },
       "paymentSettings": {
-        "title": "支付设置"
+        "title": "支付设置",
+        "alert": "支付设置： <br />1. 美元汇率：用于计算充值金额的美元金额 <br />2. 最低充值金额（美元）：最低充值金额，单位为美元，填写整数 <br />3. 页面都以美元为单位计算，实际用户支付的货币，按照支付网关设置的货币进行转换 <br />例如： A 网关设置货币为 CNY，用户支付 100 美元，那么实际支付金额为 100 * 美元汇率 <br />B 网关设置货币为 USD，用户支付 100 美元，那么实际支付金额为 100 美元",
+        "usdRate": {
+          "label": "美元汇率",
+          "placeholder": "例如：7.3"
+        },
+        "minAmount": {
+          "label": "最低充值金额（美元）",
+          "placeholder": "例如：1，那么最低充值金额为1美元，请填写整数"
+        },
+        "discountInfo": "固定金额充值折扣设置示例： <br />为一个 JSON文本，键为充值金额，值为折扣，比如 &#123;&quot;10&quot;:0.9&#125; 表示充值10美元按照9折计算 <br />计算公式：实际费用=（原始价值*折扣+原始价值*折扣*手续费率）*汇率",
+        "discount": {
+          "label": "固定金额充值折扣",
+          "placeholder": "为一个 JSON 文本，键为充值金额，值为折扣"
+        },
+        "save": "保存支付设置"
       },
       "rateSettings": {
-        "title": "倍率设置"
+        "title": "倍率设置",
+        "groupRatio": {
+          "label": "分组倍率",
+          "placeholder": "为一个 JSON 文本，键为分组名称，值为倍率"
+        },
+        "save": "保存倍率设置"
       },
       "chatLinkSettings": {
-        "title": "聊天链接设置"
+        "title": "聊天链接设置",
+        "info": "配置聊天链接，该配置在令牌中的聊天生效以及首页的Playground中的聊天生效. <br />链接中可以使&#123;key&#125;替换用户的令牌，&#123;server&#125;替换服务器地址。例如：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />如果未配置，会默认配置以下4个链接：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 问天 ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />排序规则：值越大越靠前，值相同则按照配置顺序",
+        "save": "保存聊天链接设置"
       }
     },
     "systemSettings": {
       "title": "系统设置",
       "generalSettings": {
-        "title": "通用设置"
+        "title": "系统设置",
+        "serverAddress": "服务器地址",
+        "serverAddressPlaceholder": "例如：https://yourdomain.com",
+        "updateServerAddress": "更新服务器地址"
       },
       "configureLoginRegister": {
-        "title": "配置登录注册"
+        "title": "配置登录和注册",
+        "passwordLogin": "允许通过密码进行登录",
+        "passwordRegister": "允许通过密码进行注册",
+        "emailVerification": "通过密码注册时需要进行邮箱验证",
+        "gitHubOAuth": "允许通过 GitHub 账户登录 & 注册",
+        "weChatAuth": "允许通过微信登录 & 注册",
+        "larkAuth": "允许通过飞书登录 & 注册",
+        "registerEnabled": "允许新用户注册（此项为否时，新用户将无法以任何方式进行注册）",
+        "turnstileCheck": "启用 Turnstile 用户校验"
       },
       "configureEmailDomainWhitelist": {
-        "title": "配置邮箱域名白名单"
+        "title": "配置邮箱域名白名单",
+        "subTitle": "用以防止恶意用户利用临时邮箱批量注册",
+        "emailDomainRestriction": "启用邮箱域名白名单",
+        "allowedEmailDomains": "允许的邮箱域名",
+        "save": "保存邮箱域名白名单设置"
       },
       "configureSMTP": {
-        "title": "配置 SMTP"
+        "title": "配置SMTP",
+        "subTitle": "用以支持系统的邮件发送",
+        "alert": "请注意，有些邮箱服务商发送邮件时会携带你的服务器IP地址，非个人使用时建议使用专业的邮件服务商",
+        "smtpServer": "SMTP 服务器地址",
+        "smtpServerPlaceholder": "例如：smtp.qq.com",
+        "smtpPort": "SMTP 端口",
+        "smtpPortPlaceholder": "默认: 587",
+        "smtpAccount": "SMTP 账户",
+        "smtpAccountPlaceholder": "通常是邮箱地址",
+        "smtpFrom": "SMTP 发送者邮箱",
+        "smtpFromPlaceholder": "通常和邮箱地址保持一致",
+        "smtpToken": "SMTP 访问凭证",
+        "smtpTokenPlaceholder": "敏感信息不会发送到前端显示",
+        "save": "保存 SMTP 设置"
       },
       "configureGitHubOAuthApp": {
-        "title": "配置 GitHub OAuth App"
+        "title": "配置 GitHub OAuth 应用",
+        "subTitle": "用以支持通过 GitHub 进行登录注册，",
+        "manageLink": "点击此处",
+        "manage": "管理你的 GitHub OAuth App",
+        "alert1": "Homepage URL 填",
+        "alert2": "，Authorization callback URL 填",
+        "clientId": "GitHub Client ID",
+        "clientSecret": "GitHub Client Secret",
+        "clientIdPlaceholder": "输入你注册的 GitHub OAuth APP 的 ID",
+        "clientSecretPlaceholder": "敏感信息不会发送到前端显示",
+        "saveButton": "保存 GitHub OAuth 设置"
       },
       "configureWeChatServer": {
-        "title": "配置 WeChat Server"
+        "title": "配置 WeChat 服务器",
+        "subTitle": "用以支持通过微信进行登录注册，",
+        "learnLink": "点击此处",
+        "learn": "了解 WeChat Server",
+        "serverAddress": "WeChat Server 服务器地址",
+        "serverAddressPlaceholder": "例如：https://yourdomain.com",
+        "accessToken": "WeChat Server 访问凭证",
+        "accessTokenPlaceholder": "敏感信息不会发送到前端显示",
+        "qrCodeImage": "微信公众号二维码图片链接",
+        "qrCodeImagePlaceholder": "输入一个图片链接",
+        "saveButton": "保存 WeChat Server 设置"
       },
       "configureFeishuAuthorization": {
-        "title": "配置飞书授权登录"
+        "title": "配置飞书授权",
+        "subTitle": "用以支持通过飞书进行登录注册，",
+        "manageLink": "点击此处",
+        "manage": "管理你的飞书应用",
+        "alert1": "主页链接填",
+        "alert2": "，重定向 URL 填 ",
+        "appId": "App ID",
+        "appIdPlaceholder": "输入 App ID",
+        "appSecret": "App Secret",
+        "appSecretPlaceholder": "敏感信息不会发送到前端显示",
+        "saveButton": "保存飞书 OAuth 设置"
       },
       "configureTurnstile": {
-        "title": "配置 Turnstile"
+        "title": "配置 Turnstile",
+        "subTitle": "用以支持用户校验，",
+        "manageLink": "点击此处",
+        "manage": "管理你的 Turnstile Sites，推荐选择 Invisible Widget Type",
+        "siteKey": "Turnstile Site Key",
+        "siteKeyPlaceholder": "输入你注册的 Turnstile Site Key",
+        "secretKey": "Turnstile Secret Key",
+        "secretKeyPlaceholder": "敏感信息不会发送到前端显示",
+        "saveButton": "保存 Turnstile 设置"
       }
     },
     "otherSettings": {
       "title": "其他设置",
       "generalSettings": {
-        "title": "通用设置"
+        "title": "通用设置",
+        "currentVersion": "当前版本",
+        "checkUpdate": "检查更新",
+        "noticeLabel": "公告",
+        "noticePlaceholder": "在此输入新的公告内容，支持 Markdown & HTML 代码",
+        "saveNotice": "保存公告"
       },
       "customSettings": {
-        "title": "个性化设置"
+        "title": "个性化设置",
+        "systemNameLabel": "系统名称",
+        "systemNamePlaceholder": "在此输入系统名称",
+        "setSystemName": "设置系统名称",
+        "logoLabel": "Logo 图片地址",
+        "logoPlaceholder": "在此输入Logo 图片地址",
+        "setLogo": "设置 Logo",
+        "homePageContentLabel": "首页内容",
+        "homePageContentPlaceholder": "在此输入首页内容，支持 Markdown & HTML 代码，设置后首页的状态信息将不再显示。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为首页。",
+        "saveHomePageContent": "保存首页内容",
+        "aboutLabel": "关于",
+        "aboutPlaceholder": "在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。",
+        "saveAbout": "保存关于",
+        "copyrightWarning": "移除 One API 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。",
+        "footerLabel": "页脚设置",
+        "footerPlaceholder": "在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码",
+        "setFooter": "设置页脚"
+      },
+      "updateDialog": {
+        "newVersion": "新版本",
+        "close": "关闭",
+        "viewGitHub": "去GitHub查看"
       }
     }
   },
@@ -493,5 +677,25 @@
     "basedOn": "基于",
     "sourceCode": "源代码遵循",
     "license": "MIT 协议"
+  },
+  "CheckUpdatesTable": {
+    "checkUpdates": "检查更新",
+    "url": "URL",
+    "fetchData": "获取数据",
+    "noUpdates": "无更新",
+    "newModels": "新增模型",
+    "priceChangeModels": "价格变动模型(仅供参考，如果你自己修改了对应模型的价格请忽略)",
+    "note": "注意",
+    "overwriteOrAddOnly": "你可以选择覆盖或者仅添加新增，如果你选择覆盖，将会删除你自己添加的模型价格，完全使用远程配置，如果你选择仅添加新增，将会只会添加 新增模型的价格",
+    "overwriteData": "覆盖数据",
+    "addNewOnly": "仅添加新增",
+    "cancel": "取消",
+    "dataFormatIncorrect": "数据格式不正确",
+    "pleaseFetchData": "请先获取数据",
+    "noNewModels": "没有新增模型",
+    "operationCompleted": "操作成功完成！",
+    "inputMultiplierChanged": "输入倍率由",
+    "to": "变为",
+    "outputMultiplierChanged": "输出倍率由"
   }
 }

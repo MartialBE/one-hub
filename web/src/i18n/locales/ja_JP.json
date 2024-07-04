@@ -211,7 +211,6 @@
     "sourceCode": "ソースコードは"
   },
   "log": "ログ",
-  "log_index": {},
   "login": {
     "password": "パスワード",
     "passwordRequired": "パスワードは必須です",
@@ -229,7 +228,6 @@
     "unknownVersion": "未知バージョン",
     "welcomeBack": "おかえりなさい"
   },
-  "midjourney_index": {},
   "model_price": "モデル価格",
   "modelpricePage": {
     "model": "モデル名",
@@ -348,69 +346,252 @@
     "keepSafe": "安全に保管してください。漏洩した場合はすぐにリセットしてください。"
   },
   "redemption": "引き換え",
-  "redemption_index": {},
   "setting": "設定",
   "setting_index": {
     "operationSettings": {
       "chatLinkSettings": {
-        "title": "チャットリンクの設定"
+        "title": "チャットリンク設定",
+        "info": "チャットリンクを構成します。この設定は、トークン内のチャットやホームページのPlaygroundのチャットで有効です。 <br />リンクでは、&#123;key&#125;がユーザーのトークンを、&#123;server&#125;がサーバーアドレスを置き換えることができます。例えば：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />構成されていない場合、次の4つのリンクがデフォルトで構成されます：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />並べ替えルール：値が大きいほど順位が高く、同じ値の場合は構成順に並べられます",
+        "save": "チャットリンク設定を保存"
       },
       "generalSettings": {
-        "title": "一般設定"
+        "title": "一般設定",
+        "topUpLink": {
+          "label": "チャージリンク",
+          "placeholder": "例えば、カード発行ウェブサイトの購入リンク"
+        },
+        "chatLink": {
+          "label": "チャットリンク",
+          "placeholder": "例えば、ChatGPT Next Web のデプロイ先アドレス"
+        },
+        "quotaPerUnit": {
+          "label": "単位ごとのクオータ",
+          "placeholder": "1単位の通貨で交換できるクオータ"
+        },
+        "retryTimes": {
+          "label": "リトライ回数",
+          "placeholder": "リトライ回数"
+        },
+        "retryCooldownSeconds": {
+          "label": "リトライ間隔（秒）",
+          "placeholder": "リトライ間隔（秒）"
+        },
+        "displayInCurrency": "通貨形式でクオータを表示",
+        "displayTokenStat": "Billing 関連 API でユーザークオータではなくトークンクオータを表示",
+        "approximateToken": "計算量を減らすためにトークン数を概算する方法を使用",
+        "saveButton": "一般設定を保存"
       },
       "logSettings": {
-        "title": "ログ設定"
+        "title": "ログ設定",
+        "logConsume": "ログ消費を有効にする",
+        "logCleanupTime": {
+          "label": "ログクリーニング時間",
+          "placeholder": "ログクリーニング時間"
+        },
+        "clearLogs": "履歴ログをクリア"
       },
       "monitoringSettings": {
-        "title": "監視設定"
+        "title": "モニタリング設定",
+        "channelDisableThreshold": {
+          "label": "最大応答時間",
+          "placeholder": "秒単位、全ての実行チャネルがこの時間を超えると、チャネルは自動的に無効になります"
+        },
+        "quotaRemindThreshold": {
+          "label": "クォータ通知しきい値",
+          "placeholder": "このクォータを下回ると、ユーザーに通知メールが送信されます"
+        },
+        "automaticDisableChannel": "失敗時にチャネルを自動無効化",
+        "automaticEnableChannel": "成功時にチャネルを自動有効化",
+        "saveMonitoringSettings": "モニタリング設定を保存"
       },
       "otherSettings": {
-        "title": "その他の設定"
+        "title": "その他の設定",
+        "mjNotify": "Midjourneyはコールバックを許可します（サーバーのIPアドレスが漏洩する可能性があります）",
+        "chatCache": "チャットキャッシュを有効にする（Redisが有効でない場合、データベースに保存されます）",
+        "chatCacheExpireMinute": {
+          "label": "キャッシュ時間（分）",
+          "placeholder": "キャッシュが有効な場合のデータキャッシュ時間"
+        },
+        "alert": "ユーザーがvisionモデルを使用して画像リンクを提供した場合、サーバーはこれらの画像をダウンロードしてトークンを計算する必要があります。画像をダウンロードする際にサーバーのIPアドレスが漏洩しないように、以下にプロキシを設定できます。このプロキシ設定はHTTPまたはSOCKS5プロキシを使用します。個人ユーザーの場合、この設定は無視できます。プロキシ形式はhttp://127.0.0.1:1080またはsocks5://127.0.0.1:1080です",
+        "chatImageRequestProxy": {
+          "label": "画像検出プロキシ",
+          "placeholder": "チャット画像検出プロキシ設定、設定しないとサーバーのIPが漏洩する可能性があります"
+        },
+        "saveButton": "その他の設定を保存"
       },
       "paymentSettings": {
-        "title": "支払い設定"
+        "title": "支払い設定",
+        "alert": "支払い設定： <br />1. USD為替レート：リチャージ金額のUSD金額を計算するために使用されます <br />2. 最低リチャージ金額（USD）：最低リチャージ金額、単位はUSD、整数を入力してください <br />3. ページはすべてUSD単位で計算され、ユーザーが支払う実際の通貨は支払いゲートウェイに設定された通貨に応じて変換されます <br />例：Aゲートウェイが通貨をCNYに設定すると、ユーザーは100USDを支払い、実際の支払金額は100 * USD為替レートになります <br />Bゲートウェイが通貨をUSDに設定すると、ユーザーは100USDを支払い、実際の支払金額は100USDになります",
+        "usdRate": {
+          "label": "USD為替レート",
+          "placeholder": "例：7.3"
+        },
+        "minAmount": {
+          "label": "最低リチャージ金額（USD）",
+          "placeholder": "例：1、最低リチャージ金額は1USDです、整数を入力してください"
+        },
+        "discountInfo": "固定金額リチャージ割引の例： <br />JSONテキストで、キーはリチャージ金額、値は割引です。例えば、&#123;&quot;10&quot;:0.9&#125;は、10USDのリチャージが10％割引で計算されることを意味します <br />計算式：実際の費用＝（元の価値*割引+元の価値*割引*手数料率）*為替レート",
+        "discount": {
+          "label": "固定金額リチャージ割引",
+          "placeholder": "JSONテキストで、キーはリチャージ金額、値は割引です"
+        },
+        "save": "支払い設定を保存"
       },
       "quotaSettings": {
-        "title": "クォータ設定"
+        "title": "クォータ設定",
+        "quotaForNewUser": {
+          "label": "新規ユーザーの初期クォータ",
+          "placeholder": "例：100"
+        },
+        "preConsumedQuota": {
+          "label": "リクエストの前消費クォータ",
+          "placeholder": "リクエスト終了後に調整可能"
+        },
+        "quotaForInviter": {
+          "label": "招待者への報酬クォータ",
+          "placeholder": "例：2000"
+        },
+        "quotaForInvitee": {
+          "label": "招待された新規ユーザーへの報酬クォータ",
+          "placeholder": "例：1000"
+        },
+        "saveQuotaSettings": "クォータ設定を保存"
       },
       "rateSettings": {
-        "title": "レート設定"
+        "title": "レート設定",
+        "groupRatio": {
+          "label": "グループレート",
+          "placeholder": "JSONテキストで、キーはグループ名、値はレートです"
+        },
+        "save": "レート設定を保存"
       },
       "title": "運営設定"
     },
     "otherSettings": {
-      "customSettings": {
-        "title": "カスタム設定"
-      },
+      "title": "その他の設定",
       "generalSettings": {
-        "title": "一般設定"
+        "title": "一般設定",
+        "currentVersion": "現在のバージョン",
+        "checkUpdate": "更新を確認する",
+        "noticeLabel": "通知",
+        "noticePlaceholder": "ここに新しい通知内容を入力してください。MarkdownおよびHTMLコードがサポートされています。",
+        "saveNotice": "通知を保存する"
       },
-      "title": "その他の設定"
+      "customSettings": {
+        "title": "パーソナライズ設定",
+        "systemNameLabel": "システム名",
+        "systemNamePlaceholder": "ここにシステム名を入力してください",
+        "setSystemName": "システム名を設定する",
+        "logoLabel": "ロゴ画像のURL",
+        "logoPlaceholder": "ここにロゴ画像のURLを入力してください",
+        "setLogo": "ロゴを設定する",
+        "homePageContentLabel": "ホームページの内容",
+        "homePageContentPlaceholder": "ここにホームページの内容を入力してください。MarkdownおよびHTMLコードがサポートされています。設定すると、ホームページのステータス情報は表示されなくなります。リンクを入力した場合、そのリンクはiframeのsrc属性として使用され、任意のウェブページをホームページとして設定できます。",
+        "saveHomePageContent": "ホームページの内容を保存する",
+        "aboutLabel": "概要",
+        "aboutPlaceholder": "ここに新しい概要内容を入力してください。MarkdownおよびHTMLコードがサポートされています。リンクを入力した場合、そのリンクはiframeのsrc属性として使用され、任意のウェブページを概要ページとして設定できます。",
+        "saveAbout": "概要を保存する",
+        "copyrightWarning": "One APIの著作権表示を削除するには、まず認可を受ける必要があります。プロジェクトの維持には多大な努力が必要です。このプロジェクトがあなたにとって意味がある場合は、プロジェクトを積極的にサポートしてください。",
+        "footerLabel": "フッター設定",
+        "footerPlaceholder": "ここに新しいフッターを入力してください。空白のままにするとデフォルトのフッターが使用されます。HTMLコードがサポートされています。",
+        "setFooter": "フッターを設定する"
+      },
+      "updateDialog": {
+        "newVersion": "新しいバージョン",
+        "close": "閉じる",
+        "viewGitHub": "GitHubで表示する"
+      }
     },
     "systemSettings": {
       "configureEmailDomainWhitelist": {
-        "title": "メールドメインホワイトリストの設定"
+        "title": "メールドメインホワイトリストの設定",
+        "subTitle": "一時的なメールアドレスを使用した悪意のあるユーザー登録を防ぐため",
+        "emailDomainRestriction": "メールドメインホワイトリストを有効にする",
+        "allowedEmailDomains": "許可されたメールドメイン",
+        "save": "メールドメインホワイトリスト設定を保存"
       },
       "configureFeishuAuthorization": {
-        "title": "Feishu認証の設定"
+        "title": "飞书授权の設定",
+        "subTitle": "飞书を利用したログインおよび登録をサポートするための設定です。",
+        "manageLink": "こちらをクリックして",
+        "manage": "飞书アプリを管理する",
+        "alert1": "ホームページ URL を入力してください",
+        "alert2": "、リダイレクト URL を入力してください",
+        "appId": "App ID",
+        "appIdPlaceholder": "App ID を入力してください",
+        "appSecret": "App Secret",
+        "appSecretPlaceholder": "敏感情報はフロントエンドに送信されません",
+        "saveButton": "飞书 OAuth 設定を保存する"
       },
       "configureGitHubOAuthApp": {
-        "title": "GitHub OAuthアプリの設定"
+        "title": "GitHub OAuth アプリの設定",
+        "subTitle": "GitHub を利用したログインおよび登録をサポートするための設定です。",
+        "manageLink": "こちらをクリックして",
+        "manage": "GitHub OAuth アプリを管理する",
+        "alert1": "Homepage URL を入力してください",
+        "alert2": "、Authorization callback URL を入力してください",
+        "clientId": "GitHub クライアント ID",
+        "clientSecret": "GitHub クライアントシークレット",
+        "clientIdPlaceholder": "登録した GitHub OAuth アプリの ID を入力してください",
+        "clientSecretPlaceholder": "敏感情報はフロントエンドに送信されません",
+        "saveButton": "GitHub OAuth 設定を保存する"
       },
       "configureLoginRegister": {
-        "title": "ログイン登録の設定"
+        "title": "ログインと登録の設定",
+        "passwordLogin": "パスワードでログインを許可",
+        "passwordRegister": "パスワードで登録を許可",
+        "emailVerification": "パスワード登録時にメール認証が必要",
+        "gitHubOAuth": "GitHubアカウントでのログイン＆登録を許可",
+        "weChatAuth": "WeChatでのログイン＆登録を許可",
+        "larkAuth": "Larkでのログイン＆登録を許可",
+        "registerEnabled": "新規ユーザー登録を許可（これを無効にすると、新規登録はできません）",
+        "turnstileCheck": "Turnstileユーザー検証を有効にする"
       },
       "configureSMTP": {
-        "title": "SMTPの設定"
+        "title": "SMTP設定",
+        "subTitle": "システムのメール送信をサポート",
+        "alert": "一部のメールプロバイダーは送信メールにサーバーIPアドレスを含めます。非個人使用の場合は、プロフェッショナルなメールサービスプロバイダーの使用を検討してください。",
+        "smtpServer": "SMTPサーバーアドレス",
+        "smtpServerPlaceholder": "例：smtp.qq.com",
+        "smtpPort": "SMTPポート",
+        "smtpPortPlaceholder": "デフォルト：587",
+        "smtpAccount": "SMTPアカウント",
+        "smtpAccountPlaceholder": "通常はメールアドレス",
+        "smtpFrom": "SMTP送信者メール",
+        "smtpFromPlaceholder": "通常はメールアドレスと一致",
+        "smtpToken": "SMTPアクセス認証",
+        "smtpTokenPlaceholder": "機密情報はフロントエンドに表示されません",
+        "save": "SMTP設定を保存"
       },
       "configureTurnstile": {
-        "title": "Turnstileの設定"
+        "title": "Turnstile の設定",
+        "subTitle": "ユーザー認証をサポートするための設定です。",
+        "manageLink": "こちらをクリックして",
+        "manage": "Turnstile サイトを管理する。Invisible Widget Type を推奨します。",
+        "siteKey": "Turnstile サイトキー",
+        "siteKeyPlaceholder": "登録した Turnstile サイトキーを入力してください",
+        "secretKey": "Turnstile シークレットキー",
+        "secretKeyPlaceholder": "敏感情報はフロントエンドに送信されません",
+        "saveButton": "Turnstile 設定を保存する"
       },
       "configureWeChatServer": {
-        "title": "WeChatサーバーの設定"
+        "title": "WeChat サーバーの設定",
+        "subTitle": "WeChat を利用したログインおよび登録をサポートするための設定です。",
+        "learnLink": "こちらをクリックして",
+        "learn": "WeChat サーバーについて詳しく学ぶ",
+        "serverAddress": "WeChat サーバーのアドレス",
+        "serverAddressPlaceholder": "例：https://yourdomain.com",
+        "accessToken": "WeChat サーバーアクセス トークン",
+        "accessTokenPlaceholder": "敏感情報はフロントエンドに送信されません",
+        "qrCodeImage": "WeChat 公式アカウント QR コード画像リンク",
+        "qrCodeImagePlaceholder": "画像リンクを入力してください",
+        "saveButton": "WeChat サーバーの設定を保存する"
       },
       "generalSettings": {
-        "title": "一般設定"
+        "title": "システム設定",
+        "serverAddress": "サーバーアドレス",
+        "serverAddressPlaceholder": "例：https://yourdomain.com",
+        "updateServerAddress": "サーバーアドレスを更新"
       },
       "title": "システム設定"
     }
@@ -466,7 +647,6 @@
     "usedQuota": "使用済みクォータ"
   },
   "topup": "トップアップ",
-  "topup_index": {},
   "user": "ユーザー",
   "userPage": {
     "editUser": "ユーザーを編集",
@@ -494,5 +674,25 @@
     "creationTime": "作成時間",
     "status": "状態",
     "action": "アクション"
+  },
+  "CheckUpdatesTable": {
+    "checkUpdates": "更新を確認",
+    "url": "URL",
+    "fetchData": "データを取得",
+    "noUpdates": "更新なし",
+    "newModels": "新しいモデル",
+    "priceChangeModels": "価格変更モデル（参考用。自分で価格を変更した場合は無視してください）",
+    "note": "注意",
+    "overwriteOrAddOnly": "上書きまたは新規追加のみを選択できます。上書きを選択すると、追加したモデルの価格が削除され、リモート設定が完全に使用されます。新規追加のみを選択すると、新しいモデルの価格のみが追加されます。",
+    "overwriteData": "データを上書き",
+    "addNewOnly": "新規追加のみ",
+    "cancel": "キャンセル",
+    "dataFormatIncorrect": "データ形式が正しくありません",
+    "pleaseFetchData": "まずデータを取得してください",
+    "noNewModels": "新しいモデルはありません",
+    "operationCompleted": "操作が正常に完了しました！",
+    "inputMultiplierChanged": "入力倍率が",
+    "to": "から",
+    "outputMultiplierChanged": "出力倍率が"
   }
 }
