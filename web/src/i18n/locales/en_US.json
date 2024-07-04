@@ -1,4 +1,128 @@
 {
+  "about": {
+    "loadingError": "Failed to load about content...",
+    "aboutTitle": "About",
+    "aboutDescription": "You can set the about content in the settings page, supports HTML & Markdown",
+    "projectRepo": "Project repository:"
+  },
+  "registerForm": {
+    "enterEmail": "Please enter your email",
+    "turnstileError": "Please try again in a few seconds, Turnstile is checking the user environment!",
+    "usernameRequired": "Username is required",
+    "passwordRequired": "Password is required",
+    "confirmPasswordRequired": "Confirm password is required",
+    "passwordsNotMatch": "Passwords do not match",
+    "validEmailRequired": "Must be a valid email address",
+    "emailRequired": "Email is required",
+    "verificationCodeRequired": "Verification code is required",
+    "resendCode": "Resend({{countdown}})",
+    "getCode": "Get verification code",
+    "verificationInfo": "Please try again in a few seconds, Turnstile is checking the user environment!"
+  },
+  "registerPage": {
+    "alreadyHaveAccount": "Already have an account? Click to login"
+  },
+  "topupPage": {
+    "alertMessage": "Please check the recharge records and invitation records in the logs. For recharge records, select the type [Recharge] in the log; for invitation records, select [System] in the log."
+  },
+  "logPage": {
+    "title": "Logs",
+    "refreshButton": "Refresh/Clear Search",
+    "searchButton": "Search",
+    "timeLabel": "Time",
+    "channelLabel": "Channel",
+    "userLabel": "User",
+    "tokenLabel": "Token",
+    "typeLabel": "Type",
+    "modelLabel": "Model",
+    "durationLabel": "Duration",
+    "inputLabel": "Input",
+    "outputLabel": "Output",
+    "quotaLabel": "Quota",
+    "detailLabel": "Detail",
+    "searchLogsInfo": "Please check the recharge records and invitation records in the logs. For recharge records, select the type [Recharge] in the log; for invitation records, select [System] in the log."
+  },
+  "tableToolBar": {
+    "tokenName": "Token Name",
+    "modelName": "Model Name",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "type": "Type",
+    "channelId": "Channel ID",
+    "channelIdPlaceholder": "Channel ID",
+    "taskId": "Task ID",
+    "taskIdPlaceholder": "Task ID",
+    "username": "Username"
+  },
+  "redemptionPage": {
+    "pageTitle": "Redemption Management",
+    "createRedemptionCode": "Create Redemption Code",
+    "successMessage": "Operation successful",
+    "searchPlaceholder": "Search redemption code...",
+    "refreshButton": "Refresh",
+    "headLabels": {
+      "id": "ID",
+      "name": "Name",
+      "status": "Status",
+      "quota": "Quota",
+      "createdTime": "Created Time",
+      "redeemedTime": "Redeemed Time",
+      "action": "Action"
+    }
+  },
+  "topupCard": {
+    "topup": "Top up",
+    "topupsuccess": "Top up successful!",
+    "amount": "Top up amount",
+    "currentQuota": "Current quota",
+    "onlineTopup": "Online top-up",
+    "inputLabel": "Redemption code",
+    "inputPlaceholder": "Enter redemption code!",
+    "exchangeButton": {
+      "default": "Exchange",
+      "submitting": "Submitting"
+    },
+    "selectPaymentMethod": "Select payment method",
+    "amountMinLimit": "Amount cannot be less than",
+    "amountMaxLimit": "Amount cannot exceed 1000000",
+    "positiveIntegerAmount": "Please enter a positive integer amount",
+    "topupAmount": "Top up amount",
+    "discountedPrice": "Discounted price",
+    "fee": "Fee",
+    "actualAmountToPay": "Actual amount to pay",
+    "adminSetupRequired": "Admin setup required!",
+    "redemptionCodeTopup": "Redemption code top-up",
+    "noRedemptionCodeText": "No redemption code yet? Click to get redemption code:",
+    "getRedemptionCode": "Get redemption code",
+    "exchangeRate": "Exchange rate"
+  },
+  "inviteCard": {
+    "inviteReward": "Invite Reward",
+    "inviteDescription": "Share your invite link, invite friends to register, and get rewarded!",
+    "inviteUrlLabel": "Invite Link",
+    "generateInvite": "Generate Invite Link",
+    "copyButton": {
+      "copy": "Copy",
+      "generate": "Generate"
+    }
+  },
+  "midjourneyPage": {
+    "midjourney": "Midjourney",
+    "refreshClearSearch": "Refresh / Clear Search Criteria",
+    "search": "Search",
+    "taskID": "Task ID",
+    "submitTime": "Submit Time",
+    "channel": "Channel",
+    "user": "User",
+    "type": "Type",
+    "submissionResult": "Submission Result",
+    "taskStatus": "Task Status",
+    "progress": "Progress",
+    "resultImage": "Result Image",
+    "prompt": "Prompt",
+    "promptEn": "PromptEn",
+    "failureReason": "Failure Reason"
+  },
   "analytics": "Analytics",
   "analytics_index": {
     "active": "Active",
@@ -87,8 +211,7 @@
     "sourceCode": "Source code under"
   },
   "log": "Log",
-  "log_index": {
-  },
+  "log_index": {},
   "login": {
     "password": "Password",
     "passwordRequired": "Password is required",
@@ -106,23 +229,126 @@
     "unknownVersion": "Unknown Version",
     "welcomeBack": "Welcome Back"
   },
-  "midjourney_index": {
-  },
+  "midjourney_index": {},
   "model_price": "Model Price",
-  "model_price_index": {
+  "modelpricePage": {
+    "model": "Model Name",
+    "type": "Type",
+    "channelType": "Supplier",
+    "inputMultiplier": "Input Multiplier",
+    "outputMultiplier": "Output Multiplier",
+    "availableModels": "Available Models"
   },
   "payment": "Payment",
-  "payment_index": {
+  "paymentPage": {
+    "orderList": "Order List",
+    "gatewaySettings": "Gateway Settings"
+  },
+  "paymentGatewayPage": {
+    "title": "Payment Gateway",
+    "createPayment": "Create Payment",
+    "refreshClear": "Refresh/Clear Search Conditions",
+    "search": "Search",
+    "tableHeaders": {
+      "id": "ID",
+      "uuid": "UUID",
+      "name": "Name",
+      "type": "Type",
+      "icon": "Icon",
+      "fixedFee": "Fixed Fee",
+      "percentFee": "Percent Fee",
+      "sort": "Sort",
+      "enable": "Enable",
+      "createdAt": "Created At",
+      "action": "Action"
+    }
+  },
+  "orderlogPage": {
+    "title": "Logs",
+    "refreshClear": "Refresh/Clear Search Conditions",
+    "search": "Search",
+    "tableHeaders": {
+      "created_at": "Time",
+      "gateway_id": "Payment Gateway",
+      "user_id": "User",
+      "trade_no": "Order Number",
+      "gateway_no": "Gateway Order Number",
+      "amount": "Recharge Amount",
+      "fee": "Fee",
+      "discount": "Discount Amount",
+      "order_amount": "Actual Payment Amount",
+      "quota": "Credited Points",
+      "status": "Status"
+    },
+    "gatewayIdLabel": "Gateway ID",
+    "userIdLabel": "User ID",
+    "tradeNoLabel": "Order Number",
+    "gatewayNoLabel": "Gateway Order Number",
+    "startTimeLabel": "Start Time",
+    "endTimeLabel": "End Time",
+    "statusLabel": "Status",
+    "placeholder": {
+      "gatewayId": "Gateway ID",
+      "userId": "User ID",
+      "tradeNo": "Order Number",
+      "gatewayNo": "Gateway Order Number"
+    },
+    "statusOptions": {
+      "status1": "Status 1",
+      "status2": "Status 2",
+      "status3": "Status 3"
+    }
   },
   "pricing": "Pricing",
-  "pricing_index": {
+  "pricingPage": {
+    "currencyInfo1": "USD",
+    "currencyInfo2": ": 1 === $0.002 / 1K tokens",
+    "currencyInfo3": "CNY",
+    "currencyInfo4": ": 1 === ￥0.014 / 1k tokens",
+    "currencyInfo5": "Example",
+    "currencyInfo6": ": gpt-4 Input: $0.03 / 1K tokens Completion: $0.06 / 1K tokens",
+    "currencyInfo7": "0.03 / 0.002 = 15, 0.06 / 0.002 = 30, input multiplier is 15, completion multiplier is 30",
+    "noPriceModelWarning": "There are models without configured prices, please configure the prices in time:",
+    "errPricesWarning": "There are models with incorrect supplier types, please configure them in time:",
+    "newButton": "New",
+    "refreshButton": "Refresh",
+    "updatePricesButton": "Update Prices",
+    "singleOperation": "Single Operation",
+    "multipleOperation": "Multiple Operation"
   },
   "profile": "Profile",
-  "profile_index": {
+  "profilePage": {
+    "personalInfo": "Personal Information",
+    "username": "Username",
+    "displayName": "Display Name",
+    "password": "Password",
+    "usernameRequired": "Username cannot be empty",
+    "usernameMinLength": "Username must be at least 3 characters long",
+    "passwordMinLength": "Password must be at least 8 characters long",
+    "token": "Token",
+    "wechatBindSuccess": "WeChat account successfully bound!",
+    "updateSuccess": "User information updated successfully!",
+    "notBound": "Not Bound",
+    "inputUsernamePlaceholder": "Enter username",
+    "inputPasswordPlaceholder": "Enter password",
+    "inputDisplayNamePlaceholder": "Enter display name",
+    "submit": "Submit",
+    "other": "Other",
+    "accountBinding": "Account Binding",
+    "bindWechatAccount": "Bind WeChat Account",
+    "bindGitHubAccount": "Bind GitHub Account",
+    "bindLarkAccount": "Bind Lark Account",
+    "changeEmail": "Change Email",
+    "bindEmail": "Bind Email",
+    "generateToken": "Generate Access Token",
+    "resetToken": "Reset Access Token",
+    "lark": "Lark",
+    "tokenNotice": "Note: Tokens generated here are for system management, not for accessing OpenAI services.",
+    "yourTokenIs": "Your access token is:",
+    "keepSafe": "Keep it safe. Reset immediately if leaked."
   },
   "redemption": "Redemption",
-  "redemption_index": {
-  },
+  "redemption_index": {},
   "setting": "Setting",
   "setting_index": {
     "operationSettings": {
@@ -189,7 +415,23 @@
       "title": "System Settings"
     }
   },
-  "telegram_index": {
+  "telegramPage": {
+    "title": "Telegram Bot Menu",
+    "createMenu": "Create",
+    "reloadMenu": "Reload Menu",
+    "searchPlaceholder": "Search ID and command...",
+    "refresh": "Refresh",
+    "online": "Online(Webhook)",
+    "offline": "Offline(Polling)",
+    "reloadSuccess": "Reload successful!",
+    "operationSuccess": "Operation successfully completed!",
+    "infoMessage": "After adding or modifying menu commands/descriptions (you do not need to reload if you have not modified commands and descriptions), you need to reload the menu to take effect. If you do not see the new menu, try killing the backend and restarting the program.",
+    "id": "ID",
+    "command": "Command",
+    "description": "Description",
+    "replyType": "Reply Type",
+    "replyContent": "Reply Content",
+    "action": "Action"
   },
   "token": "Token",
   "token_index": {
@@ -224,9 +466,33 @@
     "usedQuota": "Used Quota"
   },
   "topup": "Top-up",
-  "topup_index": {
-  },
+  "topup_index": {},
   "user": "User",
-  "user_index": {
+  "userPage": {
+    "editUser": "Edit User",
+    "createUser": "Create User",
+    "username": "Username",
+    "usernameRequired": "Username is required",
+    "displayName": "Display Name",
+    "password": "Password",
+    "passwordRequired": "Password is required",
+    "quota": "Quota",
+    "quotaMin": "Quota cannot be less than 0",
+    "group": "Group",
+    "groupRequired": "Group is required",
+    "saveSuccess": "Saved successfully!",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "users": "Users",
+    "searchPlaceholder": "Search for user ID, username, group, display name, or email address...",
+    "refresh": "Refresh",
+    "operationSuccess": "Operation successfully completed!",
+    "id": "ID",
+    "statistics": "Statistics",
+    "userRole": "User Role",
+    "bind": "Bind",
+    "creationTime": "Creation Time",
+    "status": "Status",
+    "action": "Action"
   }
 }

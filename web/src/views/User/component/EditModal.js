@@ -25,24 +25,25 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { renderQuotaWithPrompt, showSuccess, showError, trims } from 'utils/common';
 import { API } from 'utils/api';
+import { useTranslation } from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   is_edit: Yup.boolean(),
-  username: Yup.string().required('用户名 不能为空'),
+  username: Yup.string().required('userPage.usernameRequired'),
   display_name: Yup.string(),
   password: Yup.string().when('is_edit', {
     is: false,
-    then: Yup.string().required('密码 不能为空'),
+    then: Yup.string().required('userPage.passwordRequired'),
     otherwise: Yup.string()
   }),
   group: Yup.string().when('is_edit', {
     is: false,
-    then: Yup.string().required('用户组 不能为空'),
+    then: Yup.string().required('userPage.groupRequired'),
     otherwise: Yup.string()
   }),
   quota: Yup.number().when('is_edit', {
     is: false,
-    then: Yup.number().min(0, '额度 不能小于 0'),
+    then: Yup.number().min(0, 'userPage.quotaMin'),
     otherwise: Yup.number()
   })
 });
@@ -61,6 +62,7 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
   const [inputs, setInputs] = useState(originInputs);
   const [groupOptions, setGroupOptions] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -76,9 +78,9 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
       const { success, message } = res.data;
       if (success) {
         if (values.is_edit) {
-          showSuccess('用户更新成功！');
+          showSuccess(t('userPage.saveSuccess'));
         } else {
-          showSuccess('用户创建成功！');
+          showSuccess(t('userPage.saveSuccess'));
         }
         setSubmitting(false);
         setStatus({ success: true });
@@ -137,7 +139,7 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {userId ? '编辑用户' : '新建用户'}
+        {userId ? t('userPage.editUser') : t('userPage.createUser')}
       </DialogTitle>
       <Divider />
       <DialogContent>
@@ -145,10 +147,10 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-username-label">用户名</InputLabel>
+                <InputLabel htmlFor="channel-username-label">{t('userPage.username')}</InputLabel>
                 <OutlinedInput
                   id="channel-username-label"
-                  label="用户名"
+                  label={t('userPage.username')}
                   type="text"
                   value={values.username}
                   name="username"
@@ -159,16 +161,16 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
                 />
                 {touched.username && errors.username && (
                   <FormHelperText error id="helper-tex-channel-username-label">
-                    {errors.username}
+                    {t(errors.username)}
                   </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.display_name && errors.display_name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-display_name-label">显示名称</InputLabel>
+                <InputLabel htmlFor="channel-display_name-label">{t('userPage.displayName')}</InputLabel>
                 <OutlinedInput
                   id="channel-display_name-label"
-                  label="显示名称"
+                  label={t('userPage.displayName')}
                   type="text"
                   value={values.display_name}
                   name="display_name"
@@ -179,16 +181,16 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
                 />
                 {touched.display_name && errors.display_name && (
                   <FormHelperText error id="helper-tex-channel-display_name-label">
-                    {errors.display_name}
+                    {t(errors.display_name)}
                   </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-password-label">密码</InputLabel>
+                <InputLabel htmlFor="channel-password-label">{t('userPage.password')}</InputLabel>
                 <OutlinedInput
                   id="channel-password-label"
-                  label="密码"
+                  label={t('userPage.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={values.password}
                   name="password"
@@ -212,7 +214,7 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
                 />
                 {touched.password && errors.password && (
                   <FormHelperText error id="helper-tex-channel-password-label">
-                    {errors.password}
+                    {t(errors.password)}
                   </FormHelperText>
                 )}
               </FormControl>
@@ -220,10 +222,10 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
               {values.is_edit && (
                 <>
                   <FormControl fullWidth error={Boolean(touched.quota && errors.quota)} sx={{ ...theme.typography.otherInput }}>
-                    <InputLabel htmlFor="channel-quota-label">额度</InputLabel>
+                    <InputLabel htmlFor="channel-quota-label">{t('userPage.quota')}</InputLabel>
                     <OutlinedInput
                       id="channel-quota-label"
-                      label="额度"
+                      label={t('userPage.quota')}
                       type="number"
                       value={values.quota}
                       name="quota"
@@ -236,16 +238,16 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
 
                     {touched.quota && errors.quota && (
                       <FormHelperText error id="helper-tex-channel-quota-label">
-                        {errors.quota}
+                        {t(errors.quota)}
                       </FormHelperText>
                     )}
                   </FormControl>
 
                   <FormControl fullWidth error={Boolean(touched.group && errors.group)} sx={{ ...theme.typography.otherInput }}>
-                    <InputLabel htmlFor="channel-group-label">分组</InputLabel>
+                    <InputLabel htmlFor="channel-group-label">{t('userPage.group')}</InputLabel>
                     <Select
                       id="channel-group-label"
-                      label="分组"
+                      label={t('userPage.group')}
                       value={values.group}
                       name="group"
                       onBlur={handleBlur}
@@ -268,16 +270,16 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
                     </Select>
                     {touched.group && errors.group && (
                       <FormHelperText error id="helper-tex-channel-group-label">
-                        {errors.group}
+                        {t(errors.group)}
                       </FormHelperText>
                     )}
                   </FormControl>
                 </>
               )}
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('userPage.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('userPage.submit')}
                 </Button>
               </DialogActions>
             </form>

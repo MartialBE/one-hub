@@ -1,4 +1,128 @@
 {
+  "about": {
+    "loadingError": "「About」の内容の読み込みに失敗しました...",
+    "aboutTitle": "について",
+    "aboutDescription": "設定ページで「About」内容を設定できます。HTML & Markdownをサポートしています",
+    "projectRepo": "プロジェクトリポジトリ："
+  },
+  "registerForm": {
+    "enterEmail": "メールアドレスを入力してください",
+    "turnstileError": "数秒後に再試行してください。Turnstile がユーザー環境をチェックしています！",
+    "usernameRequired": "ユーザー名は必須項目です",
+    "passwordRequired": "パスワードは必須項目です",
+    "confirmPasswordRequired": "確認パスワードは必須項目です",
+    "passwordsNotMatch": "パスワードが一致しません",
+    "validEmailRequired": "有効なメールアドレスである必要があります",
+    "emailRequired": "メールアドレスは必須項目です",
+    "verificationCodeRequired": "確認コードは必須項目です",
+    "resendCode": "再送信({{countdown}})",
+    "getCode": "確認コードを取得",
+    "verificationInfo": "数秒後に再試行してください。Turnstile がユーザー環境をチェックしています！"
+  },
+  "registerPage": {
+    "alreadyHaveAccount": "既にアカウントをお持ちですか？ログインをクリック"
+  },
+  "topupPage": {
+    "alertMessage": "チャージ記録および招待記録はログで確認してください。チャージ記録はログでタイプ【チャージ】を選択して確認してください；招待記録はログで【システム】を選択して確認してください"
+  },
+  "logPage": {
+    "title": "ログ",
+    "refreshButton": "更新/検索条件をクリア",
+    "searchButton": "検索",
+    "timeLabel": "時間",
+    "channelLabel": "チャネル",
+    "userLabel": "ユーザー",
+    "tokenLabel": "トークン",
+    "typeLabel": "タイプ",
+    "modelLabel": "モデル",
+    "durationLabel": "時間",
+    "inputLabel": "入力",
+    "outputLabel": "出力",
+    "quotaLabel": "クォータ",
+    "detailLabel": "詳細",
+    "searchLogsInfo": "チャージ記録および招待記録はログで確認してください。チャージ記録はログでタイプ【チャージ】を選択して確認してください；招待記録はログで【システム】を選択して確認してください"
+  },
+  "tableToolBar": {
+    "tokenName": "トークン名",
+    "modelName": "モデル名",
+    "startTime": "開始時間",
+    "endTime": "終了時間",
+    "type": "タイプ",
+    "channelId": "チャネルID",
+    "channelIdPlaceholder": "チャネルID",
+    "taskId": "タスクID",
+    "taskIdPlaceholder": "タスクID",
+    "username": "ユーザー名"
+  },
+  "redemptionPage": {
+    "pageTitle": "交換管理",
+    "createRedemptionCode": "交換コードを作成",
+    "successMessage": "操作が成功しました",
+    "searchPlaceholder": "交換コードを検索...",
+    "refreshButton": "更新",
+    "headLabels": {
+      "id": "ID",
+      "name": "名前",
+      "status": "状態",
+      "quota": "クォータ",
+      "createdTime": "作成時間",
+      "redeemedTime": "交換時間",
+      "action": "操作"
+    }
+  },
+  "topupCard": {
+    "topup": "チャージ",
+    "topupsuccess": "チャージが成功しました！",
+    "amount": "チャージ金額",
+    "currentQuota": "現在の割り当て",
+    "onlineTopup": "オンラインチャージ",
+    "inputLabel": "引き換えコード",
+    "inputPlaceholder": "引き換えコードを入力してください！",
+    "exchangeButton": {
+      "default": "交換",
+      "submitting": "送信中"
+    },
+    "selectPaymentMethod": "支払い方法を選択してください",
+    "amountMinLimit": "金額は少なくとも",
+    "amountMaxLimit": "金額は1000000を超えることはできません",
+    "positiveIntegerAmount": "正の整数金額を入力してください",
+    "topupAmount": "チャージ金額",
+    "discountedPrice": "割引後の価格",
+    "fee": "手数料",
+    "actualAmountToPay": "実際の支払金額",
+    "adminSetupRequired": "管理者がチャージリンクを設定していません！",
+    "redemptionCodeTopup": "引き換えコードチャージ",
+    "noRedemptionCodeText": "まだ引き換えコードがありませんか？ コードを取得するにはクリックしてください：",
+    "getRedemptionCode": "引き換えコードを取得",
+    "exchangeRate": "為替レート"
+  },
+  "inviteCard": {
+    "inviteReward": "招待リワード",
+    "inviteDescription": "招待リンクを共有して、友達を招待して登録すると、リワードを獲得できます！",
+    "inviteUrlLabel": "招待リンク",
+    "generateInvite": "クリックして招待リンクを生成する",
+    "copyButton": {
+      "copy": "コピー",
+      "generate": "生成"
+    }
+  },
+  "midjourneyPage": {
+    "midjourney": "Midjourney",
+    "refreshClearSearch": "リフレッシュ/検索条件をクリア",
+    "search": "検索",
+    "taskID": "タスクID",
+    "submitTime": "提出時間",
+    "channel": "チャネル",
+    "user": "ユーザー",
+    "type": "タイプ",
+    "submissionResult": "提出結果",
+    "taskStatus": "タスクステータス",
+    "progress": "進捗",
+    "resultImage": "結果画像",
+    "prompt": "Prompt",
+    "promptEn": "PromptEn",
+    "failureReason": "失敗理由"
+  },
   "analytics": "分析",
   "analytics_index": {
     "active": "アクティブ",
@@ -87,8 +211,7 @@
     "sourceCode": "ソースコードは"
   },
   "log": "ログ",
-  "log_index": {
-  },
+  "log_index": {},
   "login": {
     "password": "パスワード",
     "passwordRequired": "パスワードは必須です",
@@ -106,23 +229,126 @@
     "unknownVersion": "未知バージョン",
     "welcomeBack": "おかえりなさい"
   },
-  "midjourney_index": {
-  },
+  "midjourney_index": {},
   "model_price": "モデル価格",
-  "model_price_index": {
+  "modelpricePage": {
+    "model": "モデル名",
+    "type": "タイプ",
+    "channelType": "サプライヤー",
+    "inputMultiplier": "入力倍率",
+    "outputMultiplier": "出力倍率",
+    "availableModels": "利用可能なモデル"
   },
   "payment": "支払い",
-  "payment_index": {
+  "pricingPage": {
+    "currencyInfo1": "ドル",
+    "currencyInfo2": "：1 === $0.002 / 1K tokens",
+    "currencyInfo3": "人民元",
+    "currencyInfo4": "： 1 === ￥0.014 / 1k tokens",
+    "currencyInfo5": "例",
+    "currencyInfo6": "：gpt-4 入力： $0.03 / 1K tokens 完了：$0.06 / 1K tokens",
+    "currencyInfo7": "0.03 / 0.002 = 15, 0.06 / 0.002 = 30、入力倍率は 15、完了倍率は 30",
+    "noPriceModelWarning": "未設定の価格モデルがあります。価格を設定してください：",
+    "errPricesWarning": "サプライヤータイプが間違っているモデルがあります。設定してください：",
+    "newButton": "新規作成",
+    "refreshButton": "更新",
+    "updatePricesButton": "価格を更新",
+    "singleOperation": "シングル操作",
+    "multipleOperation": "複数操作"
   },
   "pricing": "価格設定",
-  "pricing_index": {
+  "paymentPage": {
+    "orderList": "注文リスト",
+    "gatewaySettings": "ゲートウェイ設定"
+  },
+  "paymentGatewayPage": {
+    "title": "支払いゲートウェイ",
+    "createPayment": "支払いを作成",
+    "refreshClear": "リフレッシュ/検索条件をクリア",
+    "search": "検索",
+    "tableHeaders": {
+      "id": "ID",
+      "uuid": "UUID",
+      "name": "名前",
+      "type": "タイプ",
+      "icon": "アイコン",
+      "fixedFee": "固定手数料",
+      "percentFee": "パーセント手数料",
+      "sort": "並び替え",
+      "enable": "有効にする",
+      "createdAt": "作成日",
+      "action": "アクション"
+    }
+  },
+  "orderlogPage": {
+    "title": "ログ",
+    "refreshClear": "リフレッシュ/検索条件をクリア",
+    "search": "検索",
+    "tableHeaders": {
+      "created_at": "時間",
+      "gateway_id": "支払いゲートウェイ",
+      "user_id": "ユーザー",
+      "trade_no": "注文番号",
+      "gateway_no": "ゲートウェイ注文番号",
+      "amount": "リチャージ金額",
+      "fee": "手数料",
+      "discount": "割引額",
+      "order_amount": "実際の支払い額",
+      "quota": "クレジットポイント",
+      "status": "ステータス"
+    },
+    "gatewayIdLabel": "ゲートウェイID",
+    "userIdLabel": "ユーザーID",
+    "tradeNoLabel": "注文番号",
+    "gatewayNoLabel": "ゲートウェイ注文番号",
+    "startTimeLabel": "開始時間",
+    "endTimeLabel": "終了時間",
+    "statusLabel": "ステータス",
+    "placeholder": {
+      "gatewayId": "ゲートウェイID",
+      "userId": "ユーザーID",
+      "tradeNo": "注文番号",
+      "gatewayNo": "ゲートウェイ注文番号"
+    },
+    "statusOptions": {
+      "status1": "ステータス1",
+      "status2": "ステータス2",
+      "status3": "ステータス3"
+    }
   },
   "profile": "プロフィール",
-  "profile_index": {
+  "profilePage": {
+    "personalInfo": "個人情報",
+    "username": "ユーザー名",
+    "displayName": "表示名",
+    "password": "パスワード",
+    "usernameRequired": "ユーザー名は空にできません",
+    "usernameMinLength": "ユーザー名は3文字以上でなければなりません",
+    "passwordMinLength": "パスワードは8文字以上でなければなりません",
+    "token": "トークン",
+    "wechatBindSuccess": "WeChatアカウントのバインドに成功しました！",
+    "updateSuccess": "ユーザー情報が正常に更新されました！",
+    "notBound": "未バインド",
+    "inputUsernamePlaceholder": "ユーザー名を入力してください",
+    "inputPasswordPlaceholder": "パスワードを入力してください",
+    "inputDisplayNamePlaceholder": "表示名を入力してください",
+    "submit": "送信",
+    "other": "その他",
+    "accountBinding": "アカウントのバインディング",
+    "bindWechatAccount": "WeChatアカウントのバインド",
+    "bindGitHubAccount": "GitHubアカウントのバインド",
+    "bindLarkAccount": "Larkアカウントのバインド",
+    "changeEmail": "メールアドレスの変更",
+    "bindEmail": "メールアドレスのバインド",
+    "generateToken": "アクセストークンの生成",
+    "resetToken": "アクセストークンのリセット",
+    "lark": "Lark",
+    "tokenNotice": "注意：ここで生成されるトークンはシステム管理用であり、OpenAIサービスへのアクセスには使用できません。",
+    "yourTokenIs": "あなたのアクセストークンは次の通りです：",
+    "keepSafe": "安全に保管してください。漏洩した場合はすぐにリセットしてください。"
   },
   "redemption": "引き換え",
-  "redemption_index": {
-  },
+  "redemption_index": {},
   "setting": "設定",
   "setting_index": {
     "operationSettings": {
@@ -189,7 +415,23 @@
       "title": "システム設定"
     }
   },
-  "telegram_index": {
+  "telegramPage": {
+    "title": "Telegramボットメニュー",
+    "createMenu": "作成",
+    "reloadMenu": "メニューをリロード",
+    "searchPlaceholder": "IDとコマンドを検索...",
+    "refresh": "リフレッシュ",
+    "online": "オンライン(Webhook)",
+    "offline": "オフライン(Polling)",
+    "reloadSuccess": "リロードが成功しました！",
+    "operationSuccess": "操作が正常に完了しました！",
+    "infoMessage": "メニューコマンド/説明を追加または変更した後（コマンドと説明を変更していない場合はリロードする必要はありません）、メニューをリロードして有効にする必要があります。新しいメニューが表示されない場合は、バックエンドを停止してプログラムを再起動してください。",
+    "id": "ID",
+    "command": "コマンド",
+    "description": "説明",
+    "replyType": "返信タイプ",
+    "replyContent": "返信内容",
+    "action": "アクション"
   },
   "token": "トークン",
   "token_index": {
@@ -224,9 +466,33 @@
     "usedQuota": "使用済みクォータ"
   },
   "topup": "トップアップ",
-  "topup_index": {
-  },
+  "topup_index": {},
   "user": "ユーザー",
-  "user_index": {
+  "userPage": {
+    "editUser": "ユーザーを編集",
+    "createUser": "ユーザーを作成",
+    "username": "ユーザー名",
+    "usernameRequired": "ユーザー名は必須です",
+    "displayName": "表示名",
+    "password": "パスワード",
+    "passwordRequired": "パスワードは必須です",
+    "quota": "クォータ",
+    "quotaMin": "クォータは0未満にすることはできません",
+    "group": "グループ",
+    "groupRequired": "グループは必須です",
+    "saveSuccess": "保存しました！",
+    "cancel": "キャンセル",
+    "submit": "送信",
+    "users": "ユーザー",
+    "searchPlaceholder": "ユーザーのID、ユーザー名、グループ、表示名、またはメールアドレスを検索...",
+    "refresh": "リフレッシュ",
+    "operationSuccess": "操作が正常に完了しました！",
+    "id": "ID",
+    "statistics": "統計情報",
+    "userRole": "ユーザーの役割",
+    "bind": "バインド",
+    "creationTime": "作成時間",
+    "status": "状態",
+    "action": "アクション"
   }
 }
