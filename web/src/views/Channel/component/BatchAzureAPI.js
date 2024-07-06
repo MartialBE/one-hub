@@ -5,12 +5,14 @@ import { IconSearch, IconSend } from '@tabler/icons-react';
 import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const BatchAzureAPI = () => {
   const [value, setValue] = useState('');
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState([]);
   const [replaceValue, setReplaceValue] = useState('');
+  const { t } = useTranslation();
 
   const handleSearch = async () => {
     const data = await fetchChannelData(0, 100, { other: value, type: 3 }, 'desc', 'id');
@@ -46,7 +48,7 @@ const BatchAzureAPI = () => {
 
       const { success, message, data } = res.data;
       if (success) {
-        showSuccess('成功更新' + data + '条数据');
+        showSuccess(t('channel_index.batchAzureAPISuccess', { count: data }));
         return;
       } else {
         showError(message);
@@ -61,8 +63,8 @@ const BatchAzureAPI = () => {
       <Grid item xs={12}>
         <TextField
           sx={{ ml: 1, flex: 1 }}
-          placeholder="请输入api版本号"
-          inputProps={{ 'aria-label': '请输入api版本号' }}
+          placeholder={t('channel_index.inputAPIVersion')}
+          inputProps={{ 'aria-label': t('channel_index.inputAPIVersion') }}
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
@@ -80,12 +82,14 @@ const BatchAzureAPI = () => {
       </Grid>
       {data.length === 0 ? (
         <Grid item xs={12}>
-          暂无数据
+          {t('common.noData')}
         </Grid>
       ) : (
         <>
           <Grid item xs={12}>
-            <Button onClick={handleSelectAll}>{selected.length === data.length ? '反全选' : '全选'}</Button>
+            <Button onClick={handleSelectAll}>
+              {selected.length === data.length ? t('channel_index.unselectAll') : t('channel_index.selectAll')}
+            </Button>
           </Grid>
           <Grid item xs={12}>
             {data.map((item) => (
@@ -99,8 +103,8 @@ const BatchAzureAPI = () => {
           <Grid item xs={12}>
             <TextField
               sx={{ ml: 1, flex: 1 }}
-              placeholder="替换值"
-              inputProps={{ 'aria-label': '替换值' }}
+              placeholder={t('channel_index.replaceValue')}
+              inputProps={{ 'aria-label': t('channel_index.replaceValue') }}
               value={replaceValue}
               onChange={(e) => {
                 setReplaceValue(e.target.value);

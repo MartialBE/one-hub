@@ -28,19 +28,21 @@ import { createFilterOptions } from '@mui/material/Autocomplete';
 import { ValueFormatter, priceType } from './util';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { useTranslation } from 'react-i18next';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const filter = createFilterOptions();
-const validationSchema = Yup.object().shape({
-  is_edit: Yup.boolean(),
-  type: Yup.string().oneOf(['tokens', 'times'], '类型 错误').required('类型 不能为空'),
-  channel_type: Yup.number().min(1, '渠道类型 错误').required('渠道类型 不能为空'),
-  input: Yup.number().required('输入倍率 不能为空'),
-  output: Yup.number().required('输出倍率 不能为空'),
-  models: Yup.array().min(1, '模型 不能为空')
-});
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    is_edit: Yup.boolean(),
+    type: Yup.string().oneOf(['tokens', 'times'], t('pricing_edit.typeErr')).required(t('pricing_edit.requiredType')),
+    channel_type: Yup.number().min(1, t('pricing_edit.channelTypeErr')).required(t('pricing_edit.requiredChannelType')),
+    input: Yup.number().required(t('pricing_edit.requiredInput')),
+    output: Yup.number().required(t('pricing_edit.requiredOutput')),
+    models: Yup.array().min(1, t('pricing_edit.requiredModels'))
+  });
 
 const originInputs = {
   is_edit: false,
@@ -52,6 +54,7 @@ const originInputs = {
 };
 
 const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
   const [selectModel, setSelectModel] = useState([]);
@@ -73,7 +76,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
       });
       const { success, message } = res.data;
       if (success) {
-        showSuccess('保存成功！');
+        showSuccess(t('common.saveSuccess'));
         setSubmitting(false);
         setStatus({ success: true });
         onOk(true);
@@ -113,18 +116,18 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {pricesItem ? '编辑' : '新建'}
+        {pricesItem ? t('common.edit') : t('common.create')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
+        <Formik initialValues={inputs} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="type-label">名称</InputLabel>
+                <InputLabel htmlFor="type-label">{t('pricing_edit.name')}</InputLabel>
                 <Select
                   id="type-label"
-                  label="类型"
+                  label={t('pricing_edit.type')}
                   value={values.type}
                   name="type"
                   onBlur={handleBlur}
@@ -153,10 +156,10 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.channel_type && errors.channel_type)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel_type-label">渠道类型</InputLabel>
+                <InputLabel htmlFor="channel_type-label">{t('pricing_edit.channelType')}</InputLabel>
                 <Select
                   id="channel_type-label"
-                  label="渠道类型"
+                  label={t('pricing_edit.channelType')}
                   value={values.channel_type}
                   name="channel_type"
                   onBlur={handleBlur}
@@ -185,10 +188,10 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.input && errors.input)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-input-label">输入倍率</InputLabel>
+                <InputLabel htmlFor="channel-input-label">{t('modelpricePage.inputMultiplier')}</InputLabel>
                 <OutlinedInput
                   id="channel-input-label"
-                  label="输入倍率"
+                  label={t('modelpricePage.inputMultiplier')}
                   type="number"
                   value={values.input}
                   name="input"
@@ -206,10 +209,10 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.output && errors.output)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-output-label">输出倍率</InputLabel>
+                <InputLabel htmlFor="channel-output-label">{t('modelpricePage.outputMultiplier')}</InputLabel>
                 <OutlinedInput
                   id="channel-output-label"
-                  label="输出倍率"
+                  label={t('modelpricePage.outputMultiplier')}
                   type="number"
                   value={values.output}
                   name="output"
@@ -245,7 +248,9 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   onBlur={handleBlur}
                   // filterSelectedOptions
                   disableCloseOnSelect
-                  renderInput={(params) => <TextField {...params} name="models" error={Boolean(errors.models)} label="模型" />}
+                  renderInput={(params) => (
+                    <TextField {...params} name="models" error={Boolean(errors.models)} label={t('pricing_edit.model')} />
+                  )}
                   filterOptions={(options, params) => {
                     const filtered = filter(options, params);
                     const { inputValue } = params;
@@ -267,17 +272,14 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                     {errors.models}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-channel-models-label">
-                    {' '}
-                    请选择该价格所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的{' '}
-                  </FormHelperText>
+                  <FormHelperText id="helper-tex-channel-models-label"> {t('pricing_edit.modelTip')} </FormHelperText>
                 )}
               </FormControl>
 
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('common.submit')}
                 </Button>
               </DialogActions>
             </form>

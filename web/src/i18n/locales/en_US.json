@@ -185,7 +185,17 @@
     "type": "Type",
     "updateEnabledBalance": "Update Enabled Balance",
     "usedBalance": "Used Balance/Remaining Balance",
-    "weight": "Weight"
+    "weight": "Weight",
+    "AzureApiVersion": "Azure version number",
+    "batchAzureAPISuccess": "Successfully updated {{count}} pieces of data",
+    "batchDelete": "Delete models in batches",
+    "batchDeleteModel": "Please enter the full model name",
+    "batchDeleteSuccess": "Successfully deleted {{count}} pieces of data",
+    "batchDeleteTip": "If the channel has only one model, it will not be displayed. Please manually delete the channel from the list.",
+    "inputAPIVersion": "Please enter the api version number",
+    "replaceValue": "Replacement value",
+    "selectAll": "select all",
+    "unselectAll": "Anti-select all"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -215,7 +225,12 @@
     "password": "Password",
     "passwordRequired": "Password is required",
     "usernameOrEmail": "Username/Email",
-    "usernameRequired": "Username/Email is required"
+    "usernameRequired": "Username/Email is required",
+    "forgotPassword": "Forgot password?",
+    "codeRequired": "verification code must be filled",
+    "qrCode": "QR code",
+    "wechatLoginInfo": "Please use WeChat to scan the QR code to follow the official account and enter the \"verification code\" to obtain the verification code (valid within three minutes)",
+    "wechatVerificationCodeLogin": "WeChat verification code login"
   },
   "menu": {
     "about": "About",
@@ -343,7 +358,10 @@
     "lark": "Lark",
     "tokenNotice": "Note: Tokens generated here are for system management, not for accessing OpenAI services.",
     "yourTokenIs": "Your access token is:",
-    "keepSafe": "Keep it safe. Reset immediately if leaked."
+    "keepSafe": "Keep it safe. Reset immediately if leaked.",
+    "telegramBot": "Telegram bot",
+    "telegramStep1": "1. Click the button below, the robot will open in Telegram, click /start to start.",
+    "telegramStep2": "2. After sending the /bind command to the robot, enter the access token below to bind. \n(If it is not generated, please click the button below to generate it)"
   },
   "redemption": "Redemption",
   "setting": "Setting",
@@ -694,5 +712,113 @@
     "inputMultiplierChanged": "Input multiplier changed from",
     "to": "to",
     "outputMultiplierChanged": "Output multiplier changed from"
+  },
+  "channel_edit": {
+    "addSuccess": "Created successfully!",
+    "batchAdd": "Add in batches",
+    "customModelTip": "Customize: Click or press Enter to enter",
+    "editSuccess": "update completed!",
+    "modelListError": "Failed to get model list",
+    "batchBaseurlTip": ", one per line, the order corresponds to the following keys. If the corresponding key cannot be matched, the first one will be used by default.",
+    "batchKeytip": ", one key per line",
+    "inputAllModel": "Fill in all models",
+    "inputChannelModel": "Fill in the channel support model",
+    "isEnable": "Whether to enable",
+    "requiredBaseUrl": "Channel API address cannot be empty",
+    "requiredChannel": "Channel cannot be empty",
+    "requiredGroup": "User group cannot be empty",
+    "requiredKey": "Key cannot be empty",
+    "requiredModels": "Model cannot be empty",
+    "requiredName": "Name is required",
+    "validJson": "Must be a valid JSON string"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "create": "create",
+    "delete": "delete",
+    "edit": "edit",
+    "noData": "No data",
+    "submit": "submit",
+    "verificationCode": "Verification code",
+    "close": "closure",
+    "saveSuccess": "Saved successfully!",
+    "unknown": "unknown"
+  },
+  "error": {
+    "unknownError": "unknown mistake"
+  },
+  "channel_row": {
+    "auto": "automatic",
+    "canModels": "Available models:",
+    "channelWeb": "Official website",
+    "clickUpdateQuota": "Click to update balance",
+    "delChannel": "Delete channel",
+    "delChannelInfo": "Whether to delete the channel",
+    "delTag": "Delete tag",
+    "manual": "Manual",
+    "modelTestSuccess": "Channel {{channel}}: {{model}} tested successfully and took {{time}} seconds.",
+    "modelTestTip": "Please set up the test model first",
+    "onlyChat": "Only supports chat model",
+    "otherArg": "Other parameters:",
+    "priorityTip": "Priority cannot be less than 0",
+    "proxy": "Agent address:",
+    "test": "test",
+    "testModels": "Speed ​​test model:",
+    "weightTip": "Weight cannot be less than 1"
+  },
+  "payment_edit": {
+    "FixedTip": "A fixed handling fee is charged for each payment, in USD",
+    "addOk": "Created successfully!",
+    "currencyTip": "What currency does this gateway charge? Please check the corresponding gateway documentation.",
+    "currencyType": "Gateway currency type",
+    "notifyDomain": "Callback domain name",
+    "notifyDomainTip": "The domain name for payment callback. Unless you have configured it yourself, keep it empty.",
+    "paymentEdit": "Edit payment",
+    "paymentType": "Payment Types",
+    "percentTip": "Each payment is charged a handling fee based on a percentage. If it is 5%, please fill in 0.05",
+    "requiredCurrency": "Currency cannot be empty",
+    "requiredFixedFee": "Fixed handling fee cannot be less than 0",
+    "requiredIcon": "Icon cannot be empty",
+    "requiredPercentFee": "Percentage fee cannot be less than 0",
+    "updateOk": "update completed!"
+  },
+  "payment_row": {
+    "delPayment": "Delete payment",
+    "delPaymentTip": "Whether to delete payment",
+    "sortTip": "Sort cannot be less than 0"
+  },
+  "pricing_edit": {
+    "channelType": "Channel type",
+    "channelTypeErr": "Channel type error",
+    "model": "Model",
+    "modelTip": "Please select the model supported by the price. You can also enter the wildcard character * to match the model, for example: gpt-3.5*, which means that all models starting with gpt-3.5 are supported. The * sign can only be used in the last digit, and there must be characters in front of it. \n, for example: gpt-3.5* is correct, *gpt-3.5 is wrong",
+    "name": "name",
+    "requiredChannelType": "Channel type cannot be empty",
+    "requiredInput": "Input magnification cannot be empty",
+    "requiredModels": "Model cannot be empty",
+    "requiredOutput": "Output magnification cannot be empty",
+    "requiredType": "Type cannot be empty",
+    "type": "type",
+    "typeErr": "type error"
+  },
+  "redemption_edit": {
+    "addOk": "Redemption code created successfully!",
+    "editOk": "Redemption code updated successfully!",
+    "number": "quantity",
+    "requiredCount": "Must be greater than or equal to 1",
+    "requiredQuota": "Must be greater than or equal to 0"
+  },
+  "telegram_edit": {
+    "addOk": "Menu created successfully!",
+    "msgInfo": "Message content",
+    "msgType": "Message type",
+    "requiredCommand": "command cannot be empty",
+    "requiredDes": "Description cannot be empty",
+    "requiredMes": "Message content cannot be empty",
+    "requiredParseMode": "Message type cannot be empty",
+    "updateOk": "Menu updated successfully!"
+  },
+  "validation": {
+    "requiredName": "Name is required"
   }
 }

@@ -208,7 +208,7 @@ const LoginForm = ({ ...others }) => {
                 name="username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                label="用户名/邮箱"
+                label={t('login.usernameOrEmail')}
                 inputProps={{ autoComplete: 'username' }}
               />
               {touched.username && errors.username && (
@@ -249,12 +249,6 @@ const LoginForm = ({ ...others }) => {
               )}
             </FormControl>
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-              {/* <FormControlLabel
-                control={
-                  <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />
-                }
-                label="记住我"
-              /> */}
               <Typography
                 component={Link}
                 to="/reset"
@@ -262,7 +256,7 @@ const LoginForm = ({ ...others }) => {
                 color="primary"
                 sx={{ textDecoration: 'none', cursor: 'pointer' }}
               >
-                忘记密码?
+                {t('login.forgetPassword')}
               </Typography>
             </Stack>
             {errors.submit && (

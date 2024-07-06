@@ -115,7 +115,36 @@
     "disabled": "禁用",
     "speedTestDisabled": "测速禁用",
     "filterTags": "过滤标签",
-    "showAll": "显示全部"
+    "showAll": "显示全部",
+    "batchAzureAPISuccess": "成功更新 {{count}} 条数据",
+    "inputAPIVersion": "请输入api版本号",
+    "selectAll": "全选",
+    "unselectAll": "反全选",
+    "replaceValue": "替换值",
+    "batchDeleteSuccess": "成功删除 {{count}} 条数据",
+    "batchDeleteTip": "如果渠道只有一个模型的，将不会显示，请手动去列表删除渠道",
+    "batchDeleteModel": "请输入完整模型名称",
+    "AzureApiVersion": "Azure 版本号",
+    "batchDelete": "批量删除模型"
+  },
+  "channel_edit": {
+    "customModelTip": "自定义：点击或回车输入",
+    "modelListError": "获取模型列表失败",
+    "editSuccess": "更新成功!",
+    "addSuccess": "创建成功！",
+    "batchAdd": "批量添加",
+    "isEnable": "是否启用",
+    "batchBaseurlTip": "，一行一个,顺序对应下面的key，如果对应不上则默认使用第一个",
+    "batchKeytip": "，一行一个密钥",
+    "inputAllModel": "填入所有模型",
+    "inputChannelModel": "填入渠道支持模型",
+    "requiredName": "名称 不能为空",
+    "requiredChannel": "渠道 不能为空",
+    "requiredKey": "密钥 不能为空",
+    "requiredModels": "模型 不能为空",
+    "requiredGroup": "用户组 不能为空",
+    "requiredBaseUrl": "渠道API地址 不能为空",
+    "validJson": "必须是有效的JSON字符串"
   },
   "token_index": {
     "token": "令牌",
@@ -663,7 +692,12 @@
     "usernameOrEmail": "用户名/邮箱",
     "password": "密码",
     "usernameRequired": "用户名/邮箱是必填项",
-    "passwordRequired": "密码是必填项"
+    "passwordRequired": "密码是必填项",
+    "forgotPassword": "忘记密码?",
+    "wechatVerificationCodeLogin": "微信验证码登录",
+    "wechatLoginInfo": "请使用微信扫描二维码关注公众号，输入「验证码」获取验证码（三分钟内有效）",
+    "qrCode": "二维码",
+    "codeRequired": "验证码不能为空"
   },
   "description": "All in one 的 OpenAI 接口\n整合各种 API 访问方式\n一键部署，开箱即用",
   "about": {
@@ -697,5 +731,94 @@
     "inputMultiplierChanged": "输入倍率由",
     "to": "变为",
     "outputMultiplierChanged": "输出倍率由"
+  },
+  "error": {
+    "unknownError": "未知错误"
+  },
+  "common": {
+    "submit": "提交",
+    "cancel": "取消",
+    "delete": "删除",
+    "verificationCode": "验证码",
+    "noData": "暂无数据",
+    "edit": "编辑",
+    "create": "创建",
+    "unknown": "未知",
+    "close": "关闭",
+    "saveSuccess": "保存成功！"
+  },
+  "channel_row": {
+    "priorityTip": "优先级不能小于 0",
+    "weightTip": "权重不能小于 1",
+    "modelTestTip": "请先设置测试模型",
+    "modelTestSuccess": "通道 {{channel}}: {{model}} 测试成功，耗时 {{time}} 秒。",
+    "clickUpdateQuota": "点击更新余额",
+    "onlyChat": "仅支持chat模型",
+    "test": "测试",
+    "channelWeb": "官网",
+    "delTag": "删除标签",
+    "canModels": "可用模型:",
+    "testModels": "测速模型:",
+    "proxy": "代理地址:",
+    "otherArg": "其他参数:",
+    "delChannel": "删除渠道",
+    "delChannelInfo": "是否删除渠道",
+    "manual": "手动",
+    "auto": "自动"
+  },
+  "validation": {
+    "requiredName": "名称 不能为空"
+  },
+  "payment_edit": {
+    "requiredIcon": "图标 不能为空",
+    "requiredFixedFee": "固定手续费 不能小于 0",
+    "requiredPercentFee": "百分比手续费 不能小于 0",
+    "requiredCurrency": "货币 不能为空",
+    "updateOk": "更新成功！",
+    "addOk": "创建成功！",
+    "paymentEdit": "编辑支付",
+    "paymentType": "支付类型",
+    "notifyDomain": "回调域名",
+    "notifyDomainTip": "支付回调的域名，除非你自行配置过，否则保持为空",
+    "FixedTip": "每次支付收取固定的手续费，单位 美元",
+    "percentTip": "每次支付按百分比收取手续费，如果为5%，请填写 0.05",
+    "currencyType": "网关货币类型",
+    "currencyTip": "该网关是收取什么货币的，请查询对应网关文档"
+  },
+  "payment_row": {
+    "sortTip": "排序不能小于 0",
+    "delPayment": "删除支付",
+    "delPaymentTip": "是否删除支付"
+  },
+  "pricing_edit": {
+    "typeErr": "类型 错误",
+    "requiredType": "类型 不能为空",
+    "channelTypeErr": "渠道类型 错误",
+    "requiredChannelType": "渠道类型 不能为空",
+    "requiredInput": "输入倍率 不能为空",
+    "requiredOutput": "输出倍率 不能为空",
+    "requiredModels": "模型 不能为空",
+    "name": "名称",
+    "type": "类型",
+    "channelType": "渠道类型",
+    "model": "模型",
+    "modelTip": "请选择该价格所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的"
+  },
+  "redemption_edit": {
+    "requiredQuota": "必须大于等于0",
+    "requiredCount": "必须大于等于1",
+    "addOk": "兑换码创建成功！",
+    "editOk": "兑换码更新成功！",
+    "number": "数量"
+  },
+  "telegram_edit": {
+    "requiredCommand": "命令 不能为空",
+    "requiredDes": "说明 不能为空",
+    "requiredParseMode": "消息类型 不能为空",
+    "requiredMes": "消息内容 不能为空",
+    "updateOk": "菜单更新成功！",
+    "addOk": "菜单创建成功！",
+    "msgType": "消息类型",
+    "msgInfo": "消息内容"
   }
 }

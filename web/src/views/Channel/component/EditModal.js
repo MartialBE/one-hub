@@ -35,45 +35,48 @@ import { defaultConfig, typeConfig } from '../type/Config'; //typeConfig
 import { createFilterOptions } from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { useTranslation } from 'react-i18next';
 
 const pluginList = require('../type/Plugin.json');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const filter = createFilterOptions();
-const validationSchema = Yup.object().shape({
-  is_edit: Yup.boolean(),
-  // is_tag: Yup.boolean(),
-  name: Yup.string().required('名称 不能为空'),
-  type: Yup.number().required('渠道 不能为空'),
-  key: Yup.string().when('is_edit', { is: false, then: Yup.string().required('密钥 不能为空') }),
-  other: Yup.string(),
-  proxy: Yup.string(),
-  test_model: Yup.string(),
-  models: Yup.array().min(1, '模型 不能为空'),
-  groups: Yup.array().min(1, '用户组 不能为空'),
-  base_url: Yup.string().when('type', {
-    is: (value) => [3, 8].includes(value),
-    then: Yup.string().required('渠道API地址 不能为空'), // base_url 是必需的
-    otherwise: Yup.string() // 在其他情况下，base_url 可以是任意字符串
-  }),
-  model_mapping: Yup.string().test('is-json', '必须是有效的JSON字符串', function (value) {
-    try {
-      if (value === '' || value === null || value === undefined) {
-        return true;
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    is_edit: Yup.boolean(),
+    // is_tag: Yup.boolean(),
+    name: Yup.string().required(t('channel_edit.requiredName')),
+    type: Yup.number().required(t('channel_edit.requiredChannel')),
+    key: Yup.string().when('is_edit', { is: false, then: Yup.string().required(t('channel_edit.requiredKey')) }),
+    other: Yup.string(),
+    proxy: Yup.string(),
+    test_model: Yup.string(),
+    models: Yup.array().min(1, t('channel_edit.requiredModels')),
+    groups: Yup.array().min(1, t('channel_edit.requiredGroup')),
+    base_url: Yup.string().when('type', {
+      is: (value) => [3, 8].includes(value),
+      then: Yup.string().required(t('channel_edit.requiredBaseUrl')), // base_url 是必需的
+      otherwise: Yup.string() // 在其他情况下，base_url 可以是任意字符串
+    }),
+    model_mapping: Yup.string().test('is-json', t('channel_edit.validJson'), function (value) {
+      try {
+        if (value === '' || value === null || value === undefined) {
+          return true;
+        }
+        const parsedValue = JSON.parse(value);
+        if (typeof parsedValue === 'object') {
+          return true;
+        }
+      } catch (e) {
+        return false;
       }
-      const parsedValue = JSON.parse(value);
-      if (typeof parsedValue === 'object') {
-        return true;
-      }
-    } catch (e) {
       return false;
-    }
-    return false;
-  })
-});
+    })
+  });
 
 const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   // const [loading, setLoading] = useState(false);
   const [initialInput, setInitialInput] = useState(defaultConfig.input);
@@ -159,13 +162,13 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
         let modelList = uniqueModels.map((model) => {
           return {
             id: model,
-            group: '自定义：点击或回车输入'
+            group: t('channel_edit.customModelTip')
           };
         });
 
         setFieldValue('models', modelList);
       } else {
-        showError(message || '获取模型列表失败');
+        showError(message || t('channel_edit.modelListError'));
       }
     } catch (error) {
       showError(error.message);
@@ -229,9 +232,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
       const { success, message } = res.data;
       if (success) {
         if (channelId) {
-          showSuccess('更新成功！');
+          showSuccess(t('channel_edit.editSuccess'));
         } else {
-          showSuccess('创建成功！');
+          showSuccess(t('channel_edit.addSuccess'));
         }
         setSubmitting(false);
         setStatus({ success: true });
@@ -264,7 +267,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
       if (modelOption) {
         return modelOption;
       }
-      return { id: model, group: '自定义：点击或回车输入' };
+      return { id: model, group: t('channel_edit.customModelTip') };
     });
     return modelList;
   }
@@ -332,11 +335,11 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {channelId ? '编辑' : '新建'}
+        {channelId ? t('common.edit') : t('common.create')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Formik initialValues={initialInput} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
+        <Formik initialValues={initialInput} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => (
             <form noValidate onSubmit={handleSubmit}>
               {!isTag && (
@@ -431,7 +434,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   }}
                 >
                   <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
-                  批量添加
+                  {t('channel_edit.batchAdd')}
                 </Container>
               )}
 
@@ -463,7 +466,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       onChange={handleChange}
                       aria-describedby="helper-text-channel-base_url-label"
                       minRows={5}
-                      placeholder={inputPrompt.base_url + '，一行一个,顺序对应下面的key，如果对应不上则默认使用第一个'}
+                      placeholder={inputPrompt.base_url + t('channel_edit.batchBaseurlTip')}
                     />
                   )}
 
@@ -544,7 +547,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     const event = {
                       target: {
                         name: 'models',
-                        value: value.map((item) => (typeof item === 'string' ? { id: item, group: '自定义：点击或回车输入' } : item))
+                        value: value.map((item) =>
+                          typeof item === 'string' ? { id: item, group: t('channel_edit.customModelTip') } : item
+                        )
                       }
                     };
                     handleChange(event);
@@ -570,7 +575,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     if (inputValue !== '' && !isExisting) {
                       filtered.push({
                         id: inputValue,
-                        group: '自定义：点击或回车输入'
+                        group: t('channel_edit.customModelTip')
                       });
                     }
                     return filtered;
@@ -602,7 +607,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       setFieldValue('models', basicModels(values.type));
                     }}
                   >
-                    填入渠道支持模型
+                    {t('channel_edit.inputChannelModel')}
                   </Button>
                   <Button
                     disabled={hasTag}
@@ -610,7 +615,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       setFieldValue('models', modelOptions);
                     }}
                   >
-                    填入所有模型
+                    {t('channel_edit.inputAllModel')}
                   </Button>
                   {inputLabel.provider_models_list && (
                     <Tooltip title={inputPrompt.provider_models_list} placement="top">
@@ -655,7 +660,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       onChange={handleChange}
                       aria-describedby="helper-text-channel-key-label"
                       minRows={5}
-                      placeholder={inputPrompt.key + '，一行一个密钥'}
+                      placeholder={inputPrompt.key + t('channel_edit.batchKeytip')}
                     />
                   )}
 
@@ -788,7 +793,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                                   }}
                                 />
                               }
-                              label="是否启用"
+                              label={t('channel_edit.isEnable')}
                             />
                             <FormHelperText id="helper-tex-channel-key-label"> {param.description} </FormHelperText>
                           </FormControl>
@@ -812,9 +817,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   );
                 })}
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('common.submit')}
                 </Button>
               </DialogActions>
             </form>

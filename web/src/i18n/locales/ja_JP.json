@@ -185,7 +185,17 @@
     "type": "タイプ",
     "updateEnabledBalance": "有効残高を更新",
     "usedBalance": "使用済み/残高",
-    "weight": "ウェイト"
+    "weight": "ウェイト",
+    "AzureApiVersion": "Azureのバージョン番号",
+    "batchAzureAPISuccess": "{{count}} 個のデータが正常に更新されました",
+    "batchDelete": "モデルを一括で削除する",
+    "batchDeleteModel": "完全なモデル名を入力してください",
+    "batchDeleteSuccess": "{{count}} 個のデータが正常に削除されました",
+    "batchDeleteTip": "チャンネルにモデルが 1 つしかない場合は、リストから手動でチャンネルを削除してください。",
+    "inputAPIVersion": "APIのバージョン番号を入力してください",
+    "replaceValue": "交換価値",
+    "selectAll": "すべて選択",
+    "unselectAll": "すべてを非選択にする"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -215,7 +225,12 @@
     "password": "パスワード",
     "passwordRequired": "パスワードは必須です",
     "usernameOrEmail": "ユーザー名/メール",
-    "usernameRequired": "ユーザー名/メールは必須です"
+    "usernameRequired": "ユーザー名/メールは必須です",
+    "forgotPassword": "パスワードを忘れましたか？",
+    "codeRequired": "確認コードを入力する必要があります",
+    "qrCode": "QRコード",
+    "wechatLoginInfo": "WeChatでQRコードをスキャンして公式アカウントをフォローし、「認証コード」を入力して認証コードを取得してください（3分以内有効）",
+    "wechatVerificationCodeLogin": "WeChat認証コードログイン"
   },
   "menu": {
     "about": "概要",
@@ -343,7 +358,10 @@
     "lark": "Lark",
     "tokenNotice": "注意：ここで生成されるトークンはシステム管理用であり、OpenAIサービスへのアクセスには使用できません。",
     "yourTokenIs": "あなたのアクセストークンは次の通りです：",
-    "keepSafe": "安全に保管してください。漏洩した場合はすぐにリセットしてください。"
+    "keepSafe": "安全に保管してください。漏洩した場合はすぐにリセットしてください。",
+    "telegramBot": "電報ボット",
+    "telegramStep1": "1. 下のボタンをクリックすると、ロボットが Telegram で開きます。/start をクリックして開始します。",
+    "telegramStep2": "2. /bind コマンドをロボットに送信した後、以下のアクセス トークンを入力してバインドします。 \n(生成されていない場合は、下のボタンをクリックして生成してください)"
   },
   "redemption": "引き換え",
   "setting": "設定",
@@ -694,5 +712,113 @@
     "inputMultiplierChanged": "入力倍率が",
     "to": "から",
     "outputMultiplierChanged": "出力倍率が"
+  },
+  "channel_edit": {
+    "addSuccess": "無事作成されました！",
+    "batchAdd": "バッチで追加",
+    "customModelTip": "カスタマイズ: をクリックするか Enter キーを押して入力します。",
+    "editSuccess": "アップデート完了！",
+    "modelListError": "モデルリストの取得に失敗しました",
+    "batchBaseurlTip": "1 行に 1 つずつ、順序は次のキーに対応します。対応するキーが一致しない場合は、最初のキーがデフォルトで使用されます。",
+    "batchKeytip": "、1 行に 1 つのキー",
+    "inputAllModel": "すべてのモデルを入力してください",
+    "inputChannelModel": "チャネルサポートモデルを入力します",
+    "isEnable": "有効にするかどうか",
+    "requiredBaseUrl": "チャネル API アドレスを空にすることはできません",
+    "requiredChannel": "チャンネルを空にすることはできません",
+    "requiredGroup": "ユーザーグループを空にすることはできません",
+    "requiredKey": "キーを空にすることはできません",
+    "requiredModels": "モデルを空にすることはできません",
+    "requiredName": "名前は必須です",
+    "validJson": "有効な JSON 文字列である必要があります"
+  },
+  "common": {
+    "cancel": "キャンセル",
+    "create": "作成する",
+    "delete": "消去",
+    "edit": "編集",
+    "noData": "データなし",
+    "submit": "提出する",
+    "verificationCode": "検証コード",
+    "close": "閉鎖",
+    "saveSuccess": "正常に保存！",
+    "unknown": "未知"
+  },
+  "error": {
+    "unknownError": "未知の間違い"
+  },
+  "channel_row": {
+    "auto": "自動",
+    "canModels": "利用可能なモデル:",
+    "channelWeb": "公式ウェブサイト",
+    "clickUpdateQuota": "クリックして残高を更新します",
+    "delChannel": "チャンネルの削除",
+    "delChannelInfo": "チャンネルを削除するかどうか",
+    "delTag": "タグの削除",
+    "manual": "マニュアル",
+    "modelTestSuccess": "チャンネル {{channel}}: {{model}} のテストは成功し、所要時間は {{time}} 秒でした。",
+    "modelTestTip": "最初にテストモデルをセットアップしてください",
+    "onlyChat": "チャットモデルのみをサポート",
+    "otherArg": "その他のパラメータ:",
+    "priorityTip": "優先度を 0 未満にすることはできません",
+    "proxy": "エージェントのアドレス:",
+    "test": "テスト",
+    "testModels": "スピードテストモデル：",
+    "weightTip": "重みは 1 未満にはできません"
+  },
+  "payment_edit": {
+    "FixedTip": "支払いごとに米ドルで固定の手数料がかかります",
+    "addOk": "無事作成されました！",
+    "currencyTip": "このゲートウェイはどの通貨で請求されますか? 対応するゲートウェイのドキュメントを確認してください。",
+    "currencyType": "ゲートウェイ通貨の種類",
+    "notifyDomain": "コールバックドメイン名",
+    "notifyDomainTip": "支払いコールバックのドメイン名。自分で設定していない限り、空のままにしておきます。",
+    "paymentEdit": "支払いの編集",
+    "paymentType": "支払いの種類",
+    "percentTip": "各支払いにはパーセンテージに基づいて手数料がかかります。5% の場合は、0.05 を入力してください。",
+    "requiredCurrency": "通貨を空にすることはできません",
+    "requiredFixedFee": "固定手数料は 0 未満にはできません",
+    "requiredIcon": "アイコンを空にすることはできません",
+    "requiredPercentFee": "割合手数料は 0 未満にはできません",
+    "updateOk": "アップデート完了！"
+  },
+  "payment_row": {
+    "delPayment": "支払いを削除する",
+    "delPaymentTip": "支払いを削除するかどうか",
+    "sortTip": "並べ替えを 0 未満にすることはできません"
+  },
+  "pricing_edit": {
+    "channelType": "チャンネルの種類",
+    "channelTypeErr": "チャンネルタイプエラー",
+    "model": "モデル",
+    "modelTip": "価格でサポートされるモデルを選択してください。たとえば、gpt-3.5* のように、モデルに一致するワイルドカード文字 * を入力することもできます。これは、gpt-3.5 で始まるすべてのモデルがサポートされることを意味します。最後の桁に があり、その前に文字が必要です。例: gpt-3.5* は正しいですが、*gpt-3.5 は間違っています。",
+    "name": "名前",
+    "requiredChannelType": "チャネルタイプを空にすることはできません",
+    "requiredInput": "入力倍率を空にすることはできません",
+    "requiredModels": "モデルを空にすることはできません",
+    "requiredOutput": "出力倍率を空にすることはできません",
+    "requiredType": "型を空にすることはできません",
+    "type": "タイプ",
+    "typeErr": "タイプエラー"
+  },
+  "redemption_edit": {
+    "addOk": "引き換えコードが正常に作成されました。",
+    "editOk": "引き換えコードが正常に更新されました。",
+    "number": "量",
+    "requiredCount": "1 以上である必要があります",
+    "requiredQuota": "0以上である必要があります"
+  },
+  "telegram_edit": {
+    "addOk": "メニューが正常に作成されました。",
+    "msgInfo": "メッセージ内容",
+    "msgType": "メッセージの種類",
+    "requiredCommand": "コマンドを空にすることはできません",
+    "requiredDes": "説明を空にすることはできません",
+    "requiredMes": "メッセージの内容を空にすることはできません",
+    "requiredParseMode": "メッセージタイプを空にすることはできません",
+    "updateOk": "メニューが正常に更新されました!"
+  },
+  "validation": {
+    "requiredName": "名前は必須です"
   }
 }
