@@ -318,7 +318,9 @@ const SystemSetting = () => {
             <Grid xs={12} md={3}>
               <FormControlLabel
                 label={t('setting_index.systemSettings.configureLoginRegister.turnstileCheck')}
-                control={<Checkbox checked={inputs.TurnstileCheckEnabled === 'true'} onChange={handleInputChange} name="TurnstileCheckEnabled" />}
+                control={
+                  <Checkbox checked={inputs.TurnstileCheckEnabled === 'true'} onChange={handleInputChange} name="TurnstileCheckEnabled" />
+                }
               />
             </Grid>
           </Grid>
@@ -360,7 +362,11 @@ const SystemSetting = () => {
                   }}
                   filterSelectedOptions
                   renderInput={(params) => (
-                    <TextField {...params} name="EmailDomainWhitelist" label={t('setting_index.systemSettings.configureEmailDomainWhitelist.allowedEmailDomains')} />
+                    <TextField
+                      {...params}
+                      name="EmailDomainWhitelist"
+                      label={t('setting_index.systemSettings.configureEmailDomainWhitelist.allowedEmailDomains')}
+                    />
                   )}
                   filterOptions={(options, params) => {
                     const filtered = filter(options, params);
@@ -382,7 +388,10 @@ const SystemSetting = () => {
           </Grid>
         </SubCard>
 
-        <SubCard title={t('setting_index.systemSettings.configureSMTP.title')} subTitle={t('setting_index.systemSettings.configureSMTP.subTitle')}>
+        <SubCard
+          title={t('setting_index.systemSettings.configureSMTP.title')}
+          subTitle={t('setting_index.systemSettings.configureSMTP.subTitle')}
+        >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info">{t('setting_index.systemSettings.configureSMTP.alert')}</Alert>
@@ -472,7 +481,7 @@ const SystemSetting = () => {
               {' '}
               {t('setting_index.systemSettings.configureGitHubOAuthApp.subTitle')}
               <a href="https://github.com/settings/developers" target="_blank" rel="noopener noreferrer">
-              {t('setting_index.systemSettings.configureGitHubOAuthApp.manageLink')}
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.manageLink')}
               </a>
               {t('setting_index.systemSettings.configureGitHubOAuthApp.manage')}
             </span>
@@ -481,15 +490,13 @@ const SystemSetting = () => {
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info" sx={{ wordWrap: 'break-word' }}>
-              {t('setting_index.systemSettings.configureGitHubOAuthApp.alert1')} <b>{inputs.ServerAddress}</b>
-              {t('setting_index.systemSettings.configureGitHubOAuthApp.alert2')} <b>{`${inputs.ServerAddress}/oauth/github`}</b>
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.alert1')} <b>{inputs.ServerAddress}</b>
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.alert2')} <b>{`${inputs.ServerAddress}/oauth/github`}</b>
               </Alert>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="GitHubClientId">
-                  {t('setting_index.systemSettings.configureGitHubOAuthApp.clientId')}
-                </InputLabel>
+                <InputLabel htmlFor="GitHubClientId">{t('setting_index.systemSettings.configureGitHubOAuthApp.clientId')}</InputLabel>
                 <OutlinedInput
                   id="GitHubClientId"
                   name="GitHubClientId"
@@ -531,7 +538,7 @@ const SystemSetting = () => {
             <span>
               {t('setting_index.systemSettings.configureWeChatServer.subTitle')}
               <a href="https://github.com/songquanpeng/wechat-server" target="_blank" rel="noopener noreferrer">
-              {t('setting_index.systemSettings.configureWeChatServer.learnLink')}
+                {t('setting_index.systemSettings.configureWeChatServer.learnLink')}
               </a>
               {t('setting_index.systemSettings.configureWeChatServer.learn')}
             </span>
@@ -556,9 +563,7 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="WeChatServerToken">
-                  {t('setting_index.systemSettings.configureWeChatServer.accessToken')}
-                </InputLabel>
+                <InputLabel htmlFor="WeChatServerToken">{t('setting_index.systemSettings.configureWeChatServer.accessToken')}</InputLabel>
                 <OutlinedInput
                   id="WeChatServerToken"
                   name="WeChatServerToken"
@@ -601,7 +606,7 @@ const SystemSetting = () => {
               {' '}
               {t('setting_index.systemSettings.configureFeishuAuthorization.subTitle')}
               <a href="https://open.feishu.cn/app" target="_blank" rel="noreferrer">
-              {t('setting_index.systemSettings.configureFeishuAuthorization.manageLink')}
+                {t('setting_index.systemSettings.configureFeishuAuthorization.manageLink')}
               </a>
               {t('setting_index.systemSettings.configureFeishuAuthorization.manage')}
             </span>
@@ -610,15 +615,13 @@ const SystemSetting = () => {
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info" sx={{ wordWrap: 'break-word' }}>
-              {t('setting_index.systemSettings.configureFeishuAuthorization.alert1')} <code>{inputs.ServerAddress}</code>
-              {t('setting_index.systemSettings.configureFeishuAuthorization.alert2')} <code>{`${inputs.ServerAddress}/oauth/lark`}</code>
+                {t('setting_index.systemSettings.configureFeishuAuthorization.alert1')} <code>{inputs.ServerAddress}</code>
+                {t('setting_index.systemSettings.configureFeishuAuthorization.alert2')} <code>{`${inputs.ServerAddress}/oauth/lark`}</code>
               </Alert>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="LarkClientId">
-                  {t('setting_index.systemSettings.configureFeishuAuthorization.appId')}
-                </InputLabel>
+                <InputLabel htmlFor="LarkClientId">{t('setting_index.systemSettings.configureFeishuAuthorization.appId')}</InputLabel>
                 <OutlinedInput
                   id="LarkClientId"
                   name="LarkClientId"
@@ -660,7 +663,7 @@ const SystemSetting = () => {
             <span>
               {t('setting_index.systemSettings.configureTurnstile.subTitle')}
               <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">
-              {t('setting_index.systemSettings.configureTurnstile.manageLink')}
+                {t('setting_index.systemSettings.configureTurnstile.manageLink')}
               </a>
               {t('setting_index.systemSettings.configureTurnstile.manage')}
             </span>
@@ -669,9 +672,7 @@ const SystemSetting = () => {
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="TurnstileSiteKey">
-                  {t('setting_index.systemSettings.configureTurnstile.siteKey')}
-                </InputLabel>
+                <InputLabel htmlFor="TurnstileSiteKey">{t('setting_index.systemSettings.configureTurnstile.siteKey')}</InputLabel>
                 <OutlinedInput
                   id="TurnstileSiteKey"
                   name="TurnstileSiteKey"
@@ -685,9 +686,7 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="TurnstileSecretKey">
-                  {t('setting_index.systemSettings.configureTurnstile.secretKey')}
-                </InputLabel>
+                <InputLabel htmlFor="TurnstileSecretKey">{t('setting_index.systemSettings.configureTurnstile.secretKey')}</InputLabel>
                 <OutlinedInput
                   id="TurnstileSecretKey"
                   name="TurnstileSecretKey"
@@ -707,7 +706,6 @@ const SystemSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-
       </Stack>
       <Dialog open={showPasswordWarningModal} onClose={() => setShowPasswordWarningModal(false)} maxWidth={'md'}>
         <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>

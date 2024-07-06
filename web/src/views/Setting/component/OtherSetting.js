@@ -211,7 +211,7 @@ const OtherSetting = () => {
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitSystemName}>
-              {t('setting_index.otherSettings.customSettings.setSystemName')}
+                {t('setting_index.otherSettings.customSettings.setSystemName')}
               </Button>
             </Grid>
             <Grid xs={12}>
@@ -274,9 +274,7 @@ const OtherSetting = () => {
               </Button>
             </Grid>
             <Grid xs={12}>
-              <Alert severity="warning">
-                {t('setting_index.otherSettings.customSettings.copyrightWarning')}
-              </Alert>
+              <Alert severity="warning">{t('setting_index.otherSettings.customSettings.copyrightWarning')}</Alert>
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth>
@@ -311,9 +309,7 @@ const OtherSetting = () => {
           <div dangerouslySetInnerHTML={{ __html: updateData.content }}></div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowUpdateModal(false)}>
-            {t('setting_index.otherSettings.updateDialog.close')}
-          </Button>
+          <Button onClick={() => setShowUpdateModal(false)}>{t('setting_index.otherSettings.updateDialog.close')}</Button>
           <Button
             onClick={async () => {
               setShowUpdateModal(false);

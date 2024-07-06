@@ -300,7 +300,9 @@ const TopupCard = () => {
               <Grid item xs={6} md={3}>
                 {calculateTotal()}{' '}
                 {selectedPayment &&
-                  (selectedPayment.currency === 'CNY' ? `CNY (${t('topupCard.exchangeRate')}: ${siteInfo.PaymentUSDRate})` : selectedPayment.currency)}
+                  (selectedPayment.currency === 'CNY'
+                    ? `CNY (${t('topupCard.exchangeRate')}: ${siteInfo.PaymentUSDRate})`
+                    : selectedPayment.currency)}
               </Grid>
             </Grid>
             <Divider />

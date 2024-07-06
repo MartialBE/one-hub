@@ -187,13 +187,17 @@ const Pricing = () => {
   return (
     <Stack spacing={3}>
       <Alert severity="info">
-      <b>{t('pricingPage.currencyInfo1')}</b>
-      {t('pricingPage.currencyInfo2')}<br/>
-      <b>{t('pricingPage.currencyInfo3')}</b>
-      {t('pricingPage.currencyInfo4')}<br/><br/>
-      <b>{t('pricingPage.currencyInfo5')}</b>
-      {t('pricingPage.currencyInfo6')}<br/>
-      {t('pricingPage.currencyInfo7')}
+        <b>{t('pricingPage.currencyInfo1')}</b>
+        {t('pricingPage.currencyInfo2')}
+        <br />
+        <b>{t('pricingPage.currencyInfo3')}</b>
+        {t('pricingPage.currencyInfo4')}
+        <br />
+        <br />
+        <b>{t('pricingPage.currencyInfo5')}</b>
+        {t('pricingPage.currencyInfo6')}
+        <br />
+        {t('pricingPage.currencyInfo7')}
       </Alert>
 
       {noPriceModel.length > 0 && (

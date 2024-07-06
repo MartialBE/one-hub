@@ -9,6 +9,6 @@ module.exports = defineConfig({
   modelName: 'gpt-3.5-turbo',
   splitToken: 2048,
   experimental: {
-    jsonMode: true,
-  },
+    jsonMode: true
+  }
 });

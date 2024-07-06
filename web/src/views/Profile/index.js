@@ -254,7 +254,7 @@ export default function Profile() {
                       setOpenEmail(true);
                     }}
                   >
-                    {inputs.email ? t('profilePage.changeEmail') : t('profilePage.bindEmail') }
+                    {inputs.email ? t('profilePage.changeEmail') : t('profilePage.bindEmail')}
                   </Button>
                   {turnstileEnabled ? (
                     <Turnstile

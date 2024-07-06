@@ -49,7 +49,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "i18n": "lobe-i18n",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint:fix": "eslint --fix \"./**/*.{js,jsx,ts,tsx}\"",
+    "fm:fix": "prettier --write \"./**/*.{js,jsx}\""
   },
   "eslintConfig": {
     "extends": [

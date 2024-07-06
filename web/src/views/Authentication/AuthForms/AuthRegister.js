@@ -129,8 +129,12 @@ const RegisterForm = ({ ...others }) => {
           confirmPassword: Yup.string()
             .required(t('registerForm.confirmPasswordRequired'))
             .oneOf([Yup.ref('password'), null], t('registerForm.passwordsNotMatch')),
-          email: showEmailVerification ? Yup.string().email(t('registerForm.validEmailRequired')).max(255).required(t('registerForm.emailRequired')) : Yup.mixed(),
-          verification_code: showEmailVerification ? Yup.string().max(255).required(t('registerForm.verificationCodeRequired')) : Yup.mixed()
+          email: showEmailVerification
+            ? Yup.string().email(t('registerForm.validEmailRequired')).max(255).required(t('registerForm.emailRequired'))
+            : Yup.mixed(),
+          verification_code: showEmailVerification
+            ? Yup.string().max(255).required(t('registerForm.verificationCodeRequired'))
+            : Yup.mixed()
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           if (turnstileEnabled && turnstileToken === '') {
@@ -281,7 +285,9 @@ const RegisterForm = ({ ...others }) => {
                   error={Boolean(touched.verification_code && errors.verification_code)}
                   sx={{ ...theme.typography.customInput }}
                 >
-                  <InputLabel htmlFor="outlined-adornment-verification_code-register">{t('registerForm.verificationCodeRequired')}</InputLabel>
+                  <InputLabel htmlFor="outlined-adornment-verification_code-register">
+                    {t('registerForm.verificationCodeRequired')}
+                  </InputLabel>
                   <OutlinedInput
                     id="outlined-adornment-verification_code-register"
                     type="text"

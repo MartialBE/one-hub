@@ -153,8 +153,7 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
                 </Alert>
               )}
               <Alert severity="warning">
-                {t('CheckUpdatesTable.note')}:
-                {t('CheckUpdatesTable.overwriteOrAddOnly')}
+                {t('CheckUpdatesTable.note')}:{t('CheckUpdatesTable.overwriteOrAddOnly')}
               </Alert>
               <Stack direction="row" justifyContent="center" spacing={1} flexWrap="wrap">
                 <LoadingButton

@@ -274,7 +274,9 @@ const OperationSetting = () => {
               />
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel htmlFor="RetryCooldownSeconds">{t('setting_index.operationSettings.generalSettings.retryCooldownSeconds.label')}</InputLabel>
+              <InputLabel htmlFor="RetryCooldownSeconds">
+                {t('setting_index.operationSettings.generalSettings.retryCooldownSeconds.label')}
+              </InputLabel>
               <OutlinedInput
                 id="RetryCooldownSeconds"
                 name="RetryCooldownSeconds"
@@ -349,7 +351,9 @@ const OperationSetting = () => {
           </Stack>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
             <FormControl>
-              <InputLabel htmlFor="ChatCacheExpireMinute">{t('setting_index.operationSettings.otherSettings.chatCacheExpireMinute.label')}</InputLabel>
+              <InputLabel htmlFor="ChatCacheExpireMinute">
+                {t('setting_index.operationSettings.otherSettings.chatCacheExpireMinute.label')}
+              </InputLabel>
               <OutlinedInput
                 id="ChatCacheExpireMinute"
                 name="ChatCacheExpireMinute"
@@ -362,11 +366,11 @@ const OperationSetting = () => {
             </FormControl>
           </Stack>
           <Stack spacing={2}>
-            <Alert severity="info">
-              {t('setting_index.operationSettings.otherSettings.alert')}
-            </Alert>
+            <Alert severity="info">{t('setting_index.operationSettings.otherSettings.alert')}</Alert>
             <FormControl>
-              <InputLabel htmlFor="ChatImageRequestProxy">{t('setting_index.operationSettings.otherSettings.chatImageRequestProxy.label')}</InputLabel>
+              <InputLabel htmlFor="ChatImageRequestProxy">
+                {t('setting_index.operationSettings.otherSettings.chatImageRequestProxy.label')}
+              </InputLabel>
               <OutlinedInput
                 id="ChatImageRequestProxy"
                 name="ChatImageRequestProxy"
@@ -428,7 +432,9 @@ const OperationSetting = () => {
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
             <FormControl fullWidth>
-              <InputLabel htmlFor="ChannelDisableThreshold">{t('setting_index.operationSettings.monitoringSettings.channelDisableThreshold.label')}</InputLabel>
+              <InputLabel htmlFor="ChannelDisableThreshold">
+                {t('setting_index.operationSettings.monitoringSettings.channelDisableThreshold.label')}
+              </InputLabel>
               <OutlinedInput
                 id="ChannelDisableThreshold"
                 name="ChannelDisableThreshold"
@@ -441,7 +447,9 @@ const OperationSetting = () => {
               />
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel htmlFor="QuotaRemindThreshold">{t('setting_index.operationSettings.monitoringSettings.quotaRemindThreshold.label')}</InputLabel>
+              <InputLabel htmlFor="QuotaRemindThreshold">
+                {t('setting_index.operationSettings.monitoringSettings.quotaRemindThreshold.label')}
+              </InputLabel>
               <OutlinedInput
                 id="QuotaRemindThreshold"
                 name="QuotaRemindThreshold"
@@ -501,7 +509,9 @@ const OperationSetting = () => {
               />
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel htmlFor="PreConsumedQuota">{t('setting_index.operationSettings.quotaSettings.preConsumedQuota.label')}</InputLabel>
+              <InputLabel htmlFor="PreConsumedQuota">
+                {t('setting_index.operationSettings.quotaSettings.preConsumedQuota.label')}
+              </InputLabel>
               <OutlinedInput
                 id="PreConsumedQuota"
                 name="PreConsumedQuota"
@@ -555,9 +565,7 @@ const OperationSetting = () => {
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <FormControl fullWidth>
-              <Alert severity="info">
-                {t('setting_index.operationSettings.paymentSettings.alert')}
-              </Alert>
+              <Alert severity="info">{t('setting_index.operationSettings.paymentSettings.alert')}</Alert>
             </FormControl>
             <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
               <FormControl fullWidth>
@@ -589,9 +597,7 @@ const OperationSetting = () => {
             </Stack>
           </Stack>
           <Stack spacing={2}>
-            <Alert severity="info">
-              {t('setting_index.operationSettings.paymentSettings.discountInfo')}
-            </Alert>
+            <Alert severity="info">{t('setting_index.operationSettings.paymentSettings.discountInfo')}</Alert>
             <FormControl fullWidth>
               <TextField
                 multiline
@@ -648,9 +654,7 @@ const OperationSetting = () => {
 
       <SubCard title={t('setting_index.operationSettings.chatLinkSettings.title')}>
         <Stack spacing={2}>
-          <Alert severity="info">
-            {t('setting_index.operationSettings.chatLinkSettings.info')}
-          </Alert>
+          <Alert severity="info">{t('setting_index.operationSettings.chatLinkSettings.info')}</Alert>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <ChatLinksDataGrid links={inputs.ChatLinks || '[]'} onChange={handleInputChange} />
 

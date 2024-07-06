@@ -10,9 +10,7 @@ const Topup = () => {
   return (
     <Grid container spacing={2}>
       <Grid xs={12}>
-        <Alert severity="warning">
-          {t('topupPage.alertMessage')}
-        </Alert>
+        <Alert severity="warning">{t('topupPage.alertMessage')}</Alert>
       </Grid>
       <Grid xs={12} md={6} lg={8}>
         <Stack spacing={2}>

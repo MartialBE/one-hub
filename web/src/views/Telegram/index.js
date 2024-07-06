@@ -184,9 +184,7 @@ export default function Telegram() {
         </Button>
       </Stack>
       <Stack mb={5}>
-        <Alert severity="info">
-          {t('telegramPage.infoMessage')}
-        </Alert>
+        <Alert severity="info">{t('telegramPage.infoMessage')}</Alert>
       </Stack>
       <Stack direction="row" alignItems="center" justifyContent="flex-start" mb={2} spacing={2}>
         <Chip
