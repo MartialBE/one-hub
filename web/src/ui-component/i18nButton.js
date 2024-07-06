@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase, Menu, MenuItem } from '@mui/material';
 import { IconLanguageHiragana } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import i18nList from 'i18n/i18nList';
 
 export default function I18nButton() {
   const theme = useTheme();
@@ -64,9 +65,11 @@ export default function I18nButton() {
           horizontal: 'center'
         }}
       >
-        <MenuItem onClick={() => handleLanguageChange('zh_CN')}>中文</MenuItem>
-        <MenuItem onClick={() => handleLanguageChange('ja_JP')}>日本語</MenuItem>
-        <MenuItem onClick={() => handleLanguageChange('en_US')}>English</MenuItem>
+        {i18nList.map((item) => (
+          <MenuItem key={item.lng} onClick={() => handleLanguageChange(item.lng)}>
+            {item.name}
+          </MenuItem>
+        ))}
       </Menu>
     </Box>
   );
