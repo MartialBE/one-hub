@@ -13,8 +13,6 @@ import { store } from 'store';
 import 'assets/scss/style.scss';
 import config from './config';
 
-// locales
-import './i18n/i18n';
 // ==============================|| REACT DOM RENDER  ||============================== //
 
 const container = document.getElementById('root');
