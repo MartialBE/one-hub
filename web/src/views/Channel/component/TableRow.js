@@ -195,7 +195,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
       if (success) {
         setItemBalance(balance);
 
-        showInfo(`余额更新成功！`);
+        showInfo(t('channel_row.updateOk'));
       } else {
         showError(message);
       }
@@ -407,7 +407,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                       color="primary"
                       key={model}
                       onClick={() => {
-                        copy(model, '模型名称');
+                        copy(model, t('channel_index.modelName'));
                       }}
                     >
                       {model}
@@ -419,14 +419,14 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                     <Typography variant="h6" gutterBottom component="div">
-                      {t('channel_row.testModels')}
+                      {t('channel_row.testModels') + ':'}
                     </Typography>
                     <Label
                       variant="outlined"
                       color="default"
                       key={item.test_model}
                       onClick={() => {
-                        copy(item.test_model, '测速模型');
+                        copy(item.test_model, t('channel_row.testModels'));
                       }}
                     >
                       {item.test_model}
@@ -448,14 +448,14 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                     <Typography variant="h6" gutterBottom component="div">
-                      {t('channel_row.otherArg')}
+                      {t('channel_row.otherArg') + ':'}
                     </Typography>
                     <Label
                       variant="outlined"
                       color="default"
                       key={item.other}
                       onClick={() => {
-                        copy(item.other, '其他参数');
+                        copy(item.other, t('channel_row.otherArg'));
                       }}
                     >
                       {item.other}

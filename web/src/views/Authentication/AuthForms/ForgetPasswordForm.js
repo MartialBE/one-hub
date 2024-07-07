@@ -16,10 +16,12 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 
 // assets
 import { showError, showInfo, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
 const ForgetPasswordForm = ({ ...others }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const siteInfo = useSelector((state) => state.siteInfo);
 
@@ -40,7 +42,7 @@ const ForgetPasswordForm = ({ ...others }) => {
     setDisableButton(true);
     setSubmitting(true);
     if (turnstileEnabled && turnstileToken === '') {
-      showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+      showInfo(t('registerForm.verificationInfo'));
       setSubmitting(false);
       return;
     }
@@ -48,13 +50,13 @@ const ForgetPasswordForm = ({ ...others }) => {
       const res = await API.get(`/api/reset_password?email=${values.email}&turnstile=${turnstileToken}`);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('重置邮件发送成功，请检查邮箱！');
+        showSuccess(t('registerForm.restSendEmail'));
         setSendEmail(true);
       } else {
         handleFailure(message);
       }
     } catch (error) {
-      handleFailure('服务器错误');
+      handleFailure(t('common.serverError'));
     }
     setSubmitting(false);
   };
@@ -83,7 +85,7 @@ const ForgetPasswordForm = ({ ...others }) => {
     <>
       {sendEmail ? (
         <Typography variant="h3" padding={'20px'}>
-          重置邮件发送成功，请检查邮箱！
+          {t('registerForm.restSendEmail')}
         </Typography>
       ) : (
         <Formik
@@ -91,7 +93,7 @@ const ForgetPasswordForm = ({ ...others }) => {
             email: ''
           }}
           validationSchema={Yup.object().shape({
-            email: Yup.string().email('必须是有效的Email地址').max(255).required('Email是必填项')
+            email: Yup.string().email(t('registerForm.validEmailRequired')).max(255).required(t('registerForm.emailRequired'))
           })}
           onSubmit={submit}
         >
@@ -137,7 +139,7 @@ const ForgetPasswordForm = ({ ...others }) => {
                     variant="contained"
                     color="primary"
                   >
-                    {disableButton ? `重试 (${countdown})` : '提交'}
+                    {disableButton ? t('common.again', { count: countdown }) : t('common.submit')}
                   </Button>
                 </AnimateButton>
               </Box>

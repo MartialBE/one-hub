@@ -173,7 +173,7 @@ export default function ChannelList() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy' || action == 'delete_tag') {
           await handleRefresh();
         }
@@ -202,7 +202,7 @@ export default function ChannelList() {
       const res = await API.get(`/api/channel/test`);
       const { success, message } = res.data;
       if (success) {
-        showInfo('已成功开始测试所有通道，请刷新页面查看结果。');
+        showInfo(t('channel_row.testAllChannel'));
       } else {
         showError(message);
       }
@@ -217,7 +217,7 @@ export default function ChannelList() {
       const res = await API.delete(`/api/channel/disabled`);
       const { success, message, data } = res.data;
       if (success) {
-        showSuccess(`已删除所有禁用渠道，共计 ${data} 个`);
+        showSuccess(t('channel_row.delChannelCount', { count: data }));
         await handleRefresh();
       } else {
         showError(message);
@@ -234,7 +234,7 @@ export default function ChannelList() {
       const res = await API.get(`/api/channel/update_balance`);
       const { success, message } = res.data;
       if (success) {
-        showInfo('已更新完毕所有已启用通道余额！');
+        showInfo(t('channel_row.updateChannelBalance'));
       } else {
         showError(message);
       }

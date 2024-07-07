@@ -99,7 +99,7 @@ export default function ChannelTag() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy') {
           await handleRefresh();
         }

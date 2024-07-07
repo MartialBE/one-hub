@@ -36,7 +36,7 @@ const ResetPassword = () => {
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
                           <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                            密码重置确认
+                            {t('login.passwordRest')}
                           </Typography>
                         </Stack>
                       </Grid>

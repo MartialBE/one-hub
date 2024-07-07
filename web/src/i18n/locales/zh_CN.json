@@ -35,7 +35,8 @@
     "verificationCodeRequired": "验证码是必填项",
     "resendCode": "重新发送({{countdown}})",
     "getCode": "获取验证码",
-    "verificationInfo": "请稍后几秒重试，Turnstile 正在检查用户环境！"
+    "verificationInfo": "请稍后几秒重试，Turnstile 正在检查用户环境！",
+    "restSendEmail": "重置邮件发送成功，请检查邮箱！"
   },
   "registerPage": {
     "alreadyHaveAccount": "已经有帐号了?点击登录"
@@ -352,7 +353,8 @@
     "refreshButton": "刷新",
     "updatePricesButton": "更新价格",
     "singleOperation": "单条操作",
-    "multipleOperation": "合并操作"
+    "multipleOperation": "合并操作",
+    "ModelCount": "模型数量"
   },
   "modelpricePage": {
     "model": "模型名称",
@@ -697,7 +699,15 @@
     "wechatVerificationCodeLogin": "微信验证码登录",
     "wechatLoginInfo": "请使用微信扫描二维码关注公众号，输入「验证码」获取验证码（三分钟内有效）",
     "qrCode": "二维码",
-    "codeRequired": "验证码不能为空"
+    "codeRequired": "验证码不能为空",
+    "githubError": "操作失败，重定向至登录界面中...",
+    "githubCountError": "出现错误，第 {{count}} 次重试中...",
+    "githubLogin": "GitHub 登录",
+    "larkLogin": "飞书 登录",
+    "passwordRest": "密码重置确认",
+    "useGithubLogin": "使用 Github 登录",
+    "useWechatLogin": "使用 Wechat 登录",
+    "useLarkLogin": "使用飞书登录"
   },
   "description": "All in one 的 OpenAI 接口\n整合各种 API 访问方式\n一键部署，开箱即用",
   "about": {
@@ -745,7 +755,23 @@
     "create": "创建",
     "unknown": "未知",
     "close": "关闭",
-    "saveSuccess": "保存成功！"
+    "saveSuccess": "保存成功！",
+    "unableServer": "无法正常连接至服务器！",
+    "unableServerTip": "新版本可用：{{version}}，请使用快捷键 Shift + F5 刷新页面",
+    "bindOk": "绑定成功！",
+    "loginOk": "登录成功！",
+    "registerOk": "注册成功！",
+    "registerTip": "验证码发送成功，请检查你的邮箱！",
+    "processing": "处理中...",
+    "serverError": "服务器错误",
+    "again": "重试 ({{count}})",
+    "back": "返回",
+    "none": "无",
+    "show": "显示",
+    "copyUrl": "复制地址",
+    "downImg": "下载图片",
+    "newWindos": "新窗口打开",
+    "imgUrl": "图片地址"
   },
   "channel_row": {
     "priorityTip": "优先级不能小于 0",
@@ -758,13 +784,19 @@
     "channelWeb": "官网",
     "delTag": "删除标签",
     "canModels": "可用模型:",
-    "testModels": "测速模型:",
+    "testModels": "测速模型",
     "proxy": "代理地址:",
-    "otherArg": "其他参数:",
+    "otherArg": "其他参数",
     "delChannel": "删除渠道",
     "delChannelInfo": "是否删除渠道",
     "manual": "手动",
-    "auto": "自动"
+    "auto": "自动",
+    "testAllChannel": "已成功开始测试所有通道，请刷新页面查看结果。",
+    "updateChannelBalance": "已更新完毕所有已启用通道余额！",
+    "delChannelCount": "已删除所有禁用渠道，共计 {{count}} 个",
+    "updateOk": "更新成功！",
+    "delTagInfo1": "是否删除标签",
+    "delTagInfo2": "⚠️ 注意：该操作会删除渠道。"
   },
   "validation": {
     "requiredName": "名称 不能为空"
@@ -802,7 +834,18 @@
     "type": "类型",
     "channelType": "渠道类型",
     "model": "模型",
-    "modelTip": "请选择该价格所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的"
+    "modelTip": "请选择该价格所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的",
+    "requiredModelName": "模型名称不能为空",
+    "typeCheck": "类型只能是tokens或times",
+    "channelTypeErr2": "所属渠道类型错误",
+    "modelNameRe": "模型名称不能重复",
+    "inputVal": "输入倍率必须大于等于0",
+    "outputVal": "输出倍率必须大于等于0",
+    "saveOk": "保存成功",
+    "delTip": "确定删除?",
+    "delInfoTip": "确定删除 {{name}} 吗？",
+    "delGroup": "删除价格组",
+    "delGroupTip": "是否删除价格组？"
   },
   "redemption_edit": {
     "requiredQuota": "必须大于等于0",
@@ -820,5 +863,27 @@
     "addOk": "菜单创建成功！",
     "msgType": "消息类型",
     "msgInfo": "消息内容"
-  }
+  },
+  "ui-component": {
+    "allModels": "查看全部模型",
+    "modelName": "模型名称"
+  },
+  "auth": {
+    "restPassword": "密码重置",
+    "newPassword": "新密码",
+    "invalidLink": "无效的链接",
+    "newPasswordInfo": "你的新密码是:",
+    "newPasswordEdit": "请登录后及时修改密码",
+    "restPasswordClick": "点击重置密码"
+  },
+  "res_time": {
+    "second": "秒",
+    "testClick": "点击测速(仅支持chat模型)",
+    "lastTime": "上次测速时间：",
+    "noTest": "未测试"
+  },
+  "home": {
+    "loadingErr": "加载首页内容失败..."
+  },
+  "jump": "正在跳转中..."
 }

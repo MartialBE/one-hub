@@ -113,7 +113,7 @@ export default function Gateway() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         await handleRefresh();
       } else {
         showError(message);

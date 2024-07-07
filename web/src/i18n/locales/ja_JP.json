@@ -17,7 +17,8 @@
     "verificationCodeRequired": "確認コードは必須項目です",
     "resendCode": "再送信({{countdown}})",
     "getCode": "確認コードを取得",
-    "verificationInfo": "数秒後に再試行してください。Turnstile がユーザー環境をチェックしています！"
+    "verificationInfo": "数秒後に再試行してください。Turnstile がユーザー環境をチェックしています！",
+    "restSendEmail": "リセットメールは正常に送信されました。メールを確認してください。"
   },
   "registerPage": {
     "alreadyHaveAccount": "既にアカウントをお持ちですか？ログインをクリック"
@@ -230,7 +231,15 @@
     "codeRequired": "確認コードを入力する必要があります",
     "qrCode": "QRコード",
     "wechatLoginInfo": "WeChatでQRコードをスキャンして公式アカウントをフォローし、「認証コード」を入力して認証コードを取得してください（3分以内有効）",
-    "wechatVerificationCodeLogin": "WeChat認証コードログイン"
+    "wechatVerificationCodeLogin": "WeChat認証コードログイン",
+    "githubCountError": "エラーが発生しました。{{count}} を再試行しています...",
+    "githubError": "操作が失敗し、ログイン インターフェイスにリダイレクトされました...",
+    "githubLogin": "GitHub ログイン",
+    "larkLogin": "フェイシュログイン",
+    "passwordRest": "パスワードリセットの確認",
+    "useGithubLogin": "Github を使用してログインする",
+    "useLarkLogin": "フェイシュでログイン",
+    "useWechatLogin": "Wechatでログイン"
   },
   "menu": {
     "about": "概要",
@@ -267,7 +276,8 @@
     "refreshButton": "更新",
     "updatePricesButton": "価格を更新",
     "singleOperation": "シングル操作",
-    "multipleOperation": "複数操作"
+    "multipleOperation": "複数操作",
+    "ModelCount": "モデル数"
   },
   "pricing": "価格設定",
   "paymentPage": {
@@ -742,7 +752,23 @@
     "verificationCode": "検証コード",
     "close": "閉鎖",
     "saveSuccess": "正常に保存！",
-    "unknown": "未知"
+    "unknown": "未知",
+    "again": "再試行 ({{count}})",
+    "back": "戻る",
+    "bindOk": "バインド成功！",
+    "copyUrl": "アドレスをコピーする",
+    "downImg": "写真をダウンロードする",
+    "imgUrl": "地図の住所",
+    "loginOk": "ログイン成功！",
+    "newWindos": "新しいウィンドウで開く",
+    "none": "なし",
+    "processing": "処理...",
+    "registerOk": "登録完了！",
+    "registerTip": "確認コードは正常に送信されました。メールを確認してください。",
+    "serverError": "サーバーエラー",
+    "show": "見せる",
+    "unableServer": "サーバーに正しく接続できません!",
+    "unableServerTip": "新しいバージョンが利用可能です: {{version}}、ショートカット キー Shift F5 を使用してページを更新してください"
   },
   "error": {
     "unknownError": "未知の間違い"
@@ -764,7 +790,13 @@
     "proxy": "エージェントのアドレス:",
     "test": "テスト",
     "testModels": "スピードテストモデル：",
-    "weightTip": "重みは 1 未満にはできません"
+    "weightTip": "重みは 1 未満にはできません",
+    "delChannelCount": "合計 {{count}} 個の無効なチャンネルをすべて削除しました",
+    "delTagInfo1": "ラベルを削除するかどうか",
+    "delTagInfo2": "⚠️ 注: この操作によりチャンネルが削除されます。",
+    "testAllChannel": "すべてのチャネルのテストが正常に開始されました。結果を表示するにはページを更新してください。",
+    "updateChannelBalance": "有効になっているすべてのチャンネルバランスが更新されました。",
+    "updateOk": "アップデート完了！"
   },
   "payment_edit": {
     "FixedTip": "支払いごとに米ドルで固定の手数料がかかります",
@@ -799,7 +831,18 @@
     "requiredOutput": "出力倍率を空にすることはできません",
     "requiredType": "型を空にすることはできません",
     "type": "タイプ",
-    "typeErr": "タイプエラー"
+    "typeErr": "タイプエラー",
+    "channelTypeErr2": "チャンネルタイプが間違っています",
+    "delGroup": "価格グループの削除",
+    "delGroupTip": "価格グループを削除しますか?",
+    "delInfoTip": "本当に {{name}} を削除してもよろしいですか?",
+    "delTip": "削除を確認しますか？",
+    "inputVal": "入力倍率は 0 以上である必要があります",
+    "modelNameRe": "モデル名を重複して使用することはできません",
+    "outputVal": "出力倍率は 0 以上でなければなりません",
+    "requiredModelName": "モデル名を空にすることはできません",
+    "saveOk": "正常に保存",
+    "typeCheck": "タイプはトークンまたは時間のみです"
   },
   "redemption_edit": {
     "addOk": "引き換えコードが正常に作成されました。",
@@ -820,5 +863,27 @@
   },
   "validation": {
     "requiredName": "名前は必須です"
+  },
+  "auth": {
+    "invalidLink": "無効なリンク",
+    "newPassword": "新しいパスワード",
+    "newPasswordEdit": "ログイン後は速やかにパスワードを変更してください",
+    "newPasswordInfo": "新しいパスワードは次のとおりです。",
+    "restPassword": "パスワードを再設定する",
+    "restPasswordClick": "クリックしてパスワードをリセット"
+  },
+  "home": {
+    "loadingErr": "ホームページのコンテンツを読み込めませんでした..."
+  },
+  "jump": "リダイレクト中...",
+  "res_time": {
+    "lastTime": "前回のスピードテスト時間:",
+    "noTest": "未検証",
+    "second": "2番",
+    "testClick": "クリック速度テスト（チャットモデルのみサポート）"
+  },
+  "ui-component": {
+    "allModels": "すべてのモデルを見る",
+    "modelName": "機種名"
   }
 }

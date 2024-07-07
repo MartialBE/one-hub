@@ -6,8 +6,10 @@ import { useState } from 'react';
 import { copy } from 'utils/common';
 import { Popover, Stack } from '@mui/material';
 import Label from 'ui-component/Label';
+import { useTranslation } from 'react-i18next';
 
 export default function ModelsPopover({ model }) {
+  const { t } = useTranslation();
   const modelList = model.split(',');
   const [openModel, setOpenModel] = useState(null);
   const handleOpenModel = (event) => {
@@ -21,7 +23,7 @@ export default function ModelsPopover({ model }) {
   return (
     <>
       <Label onClick={handleOpenModel} color="primary">
-        查看全部模型
+        {t('ui-component.allModels')}
       </Label>
       <StyledModel
         open={!!openModel}
@@ -37,7 +39,7 @@ export default function ModelsPopover({ model }) {
                 variant="outlined"
                 color="primary"
                 onClick={() => {
-                  copy(model, '模型名称');
+                  copy(model, t('ui-component.modelName'));
                 }}
                 key={index}
               >

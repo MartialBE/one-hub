@@ -2,24 +2,26 @@ import PropTypes from 'prop-types';
 import { OutlinedInput, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { PaymentType } from '../type/Config';
 require('dayjs/locale/zh-cn');
+import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 
 export default function TableToolBar({ filterName, handleFilterName }) {
+  const { t } = useTranslation();
   return (
     <>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
         <FormControl>
-          <InputLabel htmlFor="channel-name-label">名称</InputLabel>
+          <InputLabel htmlFor="channel-name-label">{t('paymentGatewayPage.tableHeaders.name')}</InputLabel>
           <OutlinedInput
             id="name"
             name="name"
             sx={{
               minWidth: '100%'
             }}
-            label="名称"
+            label={t('paymentGatewayPage.tableHeaders.name')}
             value={filterName.name}
             onChange={handleFilterName}
-            placeholder="名称"
+            placeholder={t('paymentGatewayPage.tableHeaders.name')}
           />
         </FormControl>
         <FormControl>
@@ -30,17 +32,17 @@ export default function TableToolBar({ filterName, handleFilterName }) {
             sx={{
               minWidth: '100%'
             }}
-            label="模型名称"
+            label={t('channel_index.modelName')}
             value={filterName.uuid}
             onChange={handleFilterName}
             placeholder="UUID"
           />
         </FormControl>
         <FormControl sx={{ minWidth: '22%' }}>
-          <InputLabel htmlFor="channel-type-label">类型</InputLabel>
+          <InputLabel htmlFor="channel-type-label">{t('paymentGatewayPage.tableHeaders.type')}</InputLabel>
           <Select
             id="channel-type-label"
-            label="类型"
+            label={t('paymentGatewayPage.tableHeaders.type')}
             value={filterName.type}
             name="type"
             onChange={handleFilterName}

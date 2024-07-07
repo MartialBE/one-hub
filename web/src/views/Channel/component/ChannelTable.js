@@ -13,8 +13,10 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess, trims } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 export default function ChannelTable({ tag }) {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -102,7 +104,7 @@ export default function ChannelTable({ tag }) {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy') {
           await handleRefresh();
         }
@@ -145,16 +147,16 @@ export default function ChannelTable({ tag }) {
               headLabel={[
                 { id: 'collapse', label: '', disableSort: true, width: '50px' },
                 { id: 'id', label: 'ID', disableSort: false, width: '80px' },
-                { id: 'name', label: '名称', disableSort: false },
-                { id: 'group', label: '分组', disableSort: true },
-                { id: 'tag', label: '标签', disableSort: true },
-                { id: 'type', label: '类型', disableSort: false },
-                { id: 'status', label: '状态', disableSort: false },
-                { id: 'response_time', label: '响应时间', disableSort: false },
-                { id: 'used', label: '已使用/余额', disableSort: false },
-                { id: 'priority', label: '优先级', disableSort: false, width: '80px' },
-                { id: 'weight', label: '权重', disableSort: false, width: '80px' },
-                { id: 'action', label: '操作', disableSort: true }
+                { id: 'name', label: t('channel_index.name'), disableSort: false },
+                { id: 'group', label: t('channel_index.group'), disableSort: true },
+                { id: 'tag', label: t('channel_index.tags'), disableSort: true },
+                { id: 'type', label: t('channel_index.type'), disableSort: false },
+                { id: 'status', label: t('channel_index.status'), disableSort: false },
+                { id: 'response_time', label: t('channel_index.responseTime'), disableSort: false },
+                { id: 'used', label: t('channel_index.usedBalance'), disableSort: false },
+                { id: 'priority', label: t('channel_index.priority'), disableSort: false, width: '80px' },
+                { id: 'weight', label: t('channel_index.weight'), disableSort: false, width: '80px' },
+                { id: 'action', label: t('userPage.action'), disableSort: true }
               ]}
             />
             <TableBody>

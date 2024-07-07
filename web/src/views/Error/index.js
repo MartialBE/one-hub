@@ -3,10 +3,12 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import NotFound from 'assets/images/404.svg';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
 
 export default function NotFoundView() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
@@ -38,7 +40,7 @@ export default function NotFoundView() {
           />
 
           <Button size="large" variant="contained" onClick={goBack}>
-            返回
+            {t('common.back')}
           </Button>
         </Box>
       </Container>

@@ -29,7 +29,7 @@ const Footer = () => {
               JustSong
             </Link>{' '}
             One API，{t('footer.sourceCode')}
-            <Link href="https://opensource.org/licenses/mit-license.php"> MIT 协议</Link>
+            <Link href="https://opensource.org/licenses/mit-license.php"> {t('footer.license')}</Link>
           </>
         )}
       </Box>

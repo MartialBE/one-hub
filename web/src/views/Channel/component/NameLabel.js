@@ -3,6 +3,7 @@ import { Tooltip, Stack, Container } from '@mui/material';
 import Label from 'ui-component/Label';
 import { styled } from '@mui/material/styles';
 import { copy } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const TooltipContainer = styled(Container)({
   maxHeight: '250px',
@@ -13,6 +14,7 @@ const TooltipContainer = styled(Container)({
 });
 
 const NameLabel = ({ name, models }) => {
+  const { t } = useTranslation();
   let modelMap = [];
   modelMap = models.split(',');
   modelMap.sort();
@@ -28,10 +30,10 @@ const NameLabel = ({ name, models }) => {
                   variant="ghost"
                   key={index}
                   onClick={() => {
-                    copy(item, '模型名称');
+                    copy(item, t('modelpricePage.model'));
                   }}
                   onTouchEnd={() => {
-                    copy(item, '模型名称');
+                    copy(item, t('modelpricePage.model'));
                   }}
                 >
                   {item}

@@ -3,8 +3,10 @@ import { useDispatch } from 'react-redux';
 import { LOGIN } from 'store/actions';
 import { useNavigate } from 'react-router';
 import { showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const useLogin = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const login = async (username, password) => {
@@ -32,12 +34,12 @@ const useLogin = () => {
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
-          showSuccess('绑定成功！');
+          showSuccess(t('common.bindOk'));
           navigate('/panel');
         } else {
           dispatch({ type: LOGIN, payload: data });
           localStorage.setItem('user', JSON.stringify(data));
-          showSuccess('登录成功！');
+          showSuccess(t('common.loginOk'));
           navigate('/panel');
         }
       }
@@ -54,12 +56,12 @@ const useLogin = () => {
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
-          showSuccess('绑定成功！');
+          showSuccess(t('common.bindOk'));
           navigate('/panel');
         } else {
           dispatch({ type: LOGIN, payload: data });
           localStorage.setItem('user', JSON.stringify(data));
-          showSuccess('登录成功！');
+          showSuccess(t('common.loginOk'));
           navigate('/panel');
         }
       }
@@ -77,7 +79,7 @@ const useLogin = () => {
       if (success) {
         dispatch({ type: LOGIN, payload: data });
         localStorage.setItem('user', JSON.stringify(data));
-        showSuccess('登录成功！');
+        showSuccess(t('common.loginOk'));
         navigate('/panel');
       }
       return { success, message };

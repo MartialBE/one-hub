@@ -17,7 +17,8 @@
     "verificationCodeRequired": "Verification code is required",
     "resendCode": "Resend({{countdown}})",
     "getCode": "Get verification code",
-    "verificationInfo": "Please try again in a few seconds, Turnstile is checking the user environment!"
+    "verificationInfo": "Please try again in a few seconds, Turnstile is checking the user environment!",
+    "restSendEmail": "The reset email was sent successfully, please check your email!"
   },
   "registerPage": {
     "alreadyHaveAccount": "Already have an account? Click to login"
@@ -230,7 +231,15 @@
     "codeRequired": "verification code must be filled",
     "qrCode": "QR code",
     "wechatLoginInfo": "Please use WeChat to scan the QR code to follow the official account and enter the \"verification code\" to obtain the verification code (valid within three minutes)",
-    "wechatVerificationCodeLogin": "WeChat verification code login"
+    "wechatVerificationCodeLogin": "WeChat verification code login",
+    "githubCountError": "An error occurred, retrying {{count}}...",
+    "githubError": "The operation failed and redirected to the login interface...",
+    "githubLogin": "GitHub login",
+    "larkLogin": "Feishu Login",
+    "passwordRest": "Password reset confirmation",
+    "useGithubLogin": "Log in using Github",
+    "useLarkLogin": "Log in using Feishu",
+    "useWechatLogin": "Log in with Wechat"
   },
   "menu": {
     "about": "About",
@@ -327,7 +336,8 @@
     "refreshButton": "Refresh",
     "updatePricesButton": "Update Prices",
     "singleOperation": "Single Operation",
-    "multipleOperation": "Multiple Operation"
+    "multipleOperation": "Multiple Operation",
+    "ModelCount": "Number of models"
   },
   "profile": "Profile",
   "profilePage": {
@@ -742,7 +752,23 @@
     "verificationCode": "Verification code",
     "close": "closure",
     "saveSuccess": "Saved successfully!",
-    "unknown": "unknown"
+    "unknown": "unknown",
+    "again": "Retry ({{count}})",
+    "back": "return",
+    "bindOk": "Binding successful!",
+    "copyUrl": "Copy address",
+    "downImg": "Download pictures",
+    "imgUrl": "The map's address",
+    "loginOk": "login successful!",
+    "newWindos": "open in a new window",
+    "none": "none",
+    "processing": "Processing...",
+    "registerOk": "registration success!",
+    "registerTip": "The verification code was sent successfully, please check your email!",
+    "serverError": "Server Error",
+    "show": "show",
+    "unableServer": "Unable to connect to the server properly!",
+    "unableServerTip": "New version available: {{version}}, please use the shortcut key Shift F5 to refresh the page"
   },
   "error": {
     "unknownError": "unknown mistake"
@@ -764,7 +790,13 @@
     "proxy": "Agent address:",
     "test": "test",
     "testModels": "Speed ​​test model:",
-    "weightTip": "Weight cannot be less than 1"
+    "weightTip": "Weight cannot be less than 1",
+    "delChannelCount": "Removed all disabled channels, {{count}} in total",
+    "delTagInfo1": "Whether to delete the label",
+    "delTagInfo2": "⚠️ Note: This operation will delete the channel.",
+    "testAllChannel": "Testing of all channels has been started successfully, please refresh the page to view the results.",
+    "updateChannelBalance": "All enabled channel balances have been updated!",
+    "updateOk": "update completed!"
   },
   "payment_edit": {
     "FixedTip": "A fixed handling fee is charged for each payment, in USD",
@@ -799,7 +831,18 @@
     "requiredOutput": "Output magnification cannot be empty",
     "requiredType": "Type cannot be empty",
     "type": "type",
-    "typeErr": "type error"
+    "typeErr": "type error",
+    "channelTypeErr2": "The channel type is wrong",
+    "delGroup": "Delete price group",
+    "delGroupTip": "Delete price group?",
+    "delInfoTip": "Are you sure you want to delete {{name}}?",
+    "delTip": "confirm delete?",
+    "inputVal": "The input magnification must be greater than or equal to 0",
+    "modelNameRe": "Model names cannot be repeated",
+    "outputVal": "The output magnification must be greater than or equal to 0",
+    "requiredModelName": "Model name cannot be empty",
+    "saveOk": "Saved successfully",
+    "typeCheck": "The type can only be tokens or times"
   },
   "redemption_edit": {
     "addOk": "Redemption code created successfully!",
@@ -820,5 +863,27 @@
   },
   "validation": {
     "requiredName": "Name is required"
+  },
+  "auth": {
+    "invalidLink": "Invalid link",
+    "newPassword": "New Password",
+    "newPasswordEdit": "Please change your password promptly after logging in",
+    "newPasswordInfo": "Your new password is:",
+    "restPassword": "reset Password",
+    "restPasswordClick": "Click to reset password"
+  },
+  "home": {
+    "loadingErr": "Failed to load homepage content..."
+  },
+  "jump": "Redirecting...",
+  "res_time": {
+    "lastTime": "Last speed test time:",
+    "noTest": "Not tested",
+    "second": "Second",
+    "testClick": "Click speed test (only supports chat model)"
+  },
+  "ui-component": {
+    "allModels": "View all models",
+    "modelName": "Model name"
   }
 }
