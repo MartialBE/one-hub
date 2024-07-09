@@ -183,6 +183,7 @@ const (
 	ChannelTypeCoze           = 38
 	ChannelTypeOllama         = 39
 	ChannelTypeHunyuan        = 40
+	ChannelTypeSuno           = 41
 )
 
 var ChannelBaseURLs = []string{
@@ -227,6 +228,7 @@ var ChannelBaseURLs = []string{
 	"https://api.coze.com/open_api",       //38
 	"",                                    //39
 	"https://hunyuan.tencentcloudapi.com", //40
+	"",                                    //41
 }
 
 const (
@@ -242,4 +244,7 @@ const (
 	RelayModeAudioSpeech
 	RelayModeAudioTranscription
 	RelayModeAudioTranslation
+	RelayModeSuno
 )
+
+type ContextKey string

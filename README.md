@@ -102,6 +102,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                        | -          | -      | ⚠️ 图片生成 | -                                                                |
 | [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                       | -          | -      | -           | -                                                                |
 | [Ollama](https://github.com/ollama/ollama)                            | ✅                       | ✅         | -      | -           | -                                                                |
+| [Suno](https://suno.com/)                                             | -                        | -          | -      | -           | [Suno-API](https://github.com/Suno-API/Suno-API)                 |
 
 ## 感谢
 
@@ -109,7 +110,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
   - [one-api](https://github.com/songquanpeng/one-api)为本项目的基础
   - [Berry Free React Admin Template](https://github.com/codedthemes/berry-free-react-admin-template)为本项目的前端界面
   - [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react),使用了其中的部分样式
-  - [new api](https://github.com/Calcium-Ion/new-api)，Midjourney 模块的代码来源于此
+  - [new api](https://github.com/Calcium-Ion/new-api)，Midjourney/Suno 模块的代码来源于此
 
 感谢以上项目的作者和贡献者
 

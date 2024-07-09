@@ -98,6 +98,7 @@ Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                                | -          | -      | ⚠️ image | -                                                                |
 | [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                               | -          | -      | -        | -                                                                |
 | [Ollama](https://github.com/ollama/ollama)                            | ✅                               | ✅         | -      | -        | -                                                                |
+| [Suno](https://suno.com/)                                             | -                                | -          | -      | -        | [Suno-API](https://github.com/Suno-API/Suno-API)                 |
 
 ## Acknowledgements
 
@@ -105,7 +106,7 @@ Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
   - [one-api](https://github.com/songquanpeng/one-api) serves as the foundation of this project.
   - [Berry Free React Admin Template](https://github.com/codedthemes/berry-free-react-admin-template) provides the frontend interface for this project.
   - [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react), some styles from this project were used.
-  - [new api](https://github.com/Calcium-Ion/new-api), the code for the Midjourney module is sourced from here.
+  - [new api](https://github.com/Calcium-Ion/new-api), the code for the Midjourney/Suno module is sourced from here.
 
 Special thanks to the authors and contributors of the above projects.
 

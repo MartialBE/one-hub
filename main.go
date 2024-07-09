@@ -16,6 +16,7 @@ import (
 	"one-api/middleware"
 	"one-api/model"
 	"one-api/relay/relay_util"
+	"one-api/relay/task"
 	"one-api/router"
 	"time"
 
@@ -53,6 +54,7 @@ func main() {
 	telegram.InitTelegramBot()
 
 	controller.InitMidjourneyTask()
+	task.InitTask()
 	notify.InitNotifier()
 	cron.InitCron()
 	storage.InitStorage()
