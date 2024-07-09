@@ -6,6 +6,7 @@ import (
 	"io"
 	"one-api/common/logger"
 	"one-api/types"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -39,6 +40,12 @@ func ErrorWrapper(err error, code string, statusCode int) *types.OpenAIErrorWith
 	if err != nil {
 		errString = err.Error()
 	}
+
+	if strings.Contains(errString, "Post") || strings.Contains(errString, "dial") {
+		logger.SysLog(fmt.Sprintf("error: %s", errString))
+		errString = "请求上游地址失败"
+	}
+
 	return StringErrorWrapper(errString, code, statusCode)
 }
 
