@@ -26,7 +26,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Label from 'ui-component/Label';
 import { copy } from 'utils/common';
 
-export default function PricesTableRow({ item, managePrices, handleOpenModal, setModalPricesItem, ownedby }) {
+export default function PricesTableRow({ item, managePrices, handleOpenModal, ownedby }) {
   const [open, setOpen] = useState(null);
   const [openRow, setOpenRow] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -117,8 +117,7 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, se
         <MenuItem
           onClick={() => {
             handleCloseMenu();
-            handleOpenModal();
-            setModalPricesItem(item);
+            handleOpenModal(item);
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
@@ -150,7 +149,6 @@ PricesTableRow.propTypes = {
   item: PropTypes.object,
   managePrices: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalPricesItem: PropTypes.func,
   priceType: PropTypes.array,
   ownedby: PropTypes.array
 };

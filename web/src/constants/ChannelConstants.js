@@ -181,6 +181,12 @@ export const CHANNEL_OPTIONS = {
     color: 'default',
     url: 'https://cloud.tencent.com/product/hunyuan'
   },
+  41: {
+    key: 41,
+    text: 'Suno',
+    value: 41,
+    color: 'default'
+  },
   24: {
     key: 24,
     text: 'Azure Speech',

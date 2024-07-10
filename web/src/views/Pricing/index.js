@@ -241,7 +241,7 @@ const Pricing = () => {
               <Single ownedby={ownedby} reloadData={reloadData} prices={prices} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} />
+              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} handleOpenModal={handleOpenaddModal} />
             </CustomTabPanel>
           </Box>
         </AdminContainer>

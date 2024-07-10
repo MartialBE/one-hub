@@ -141,13 +141,3 @@ func convertRole(roleName string) string {
 		return types.ChatMessageRoleUser
 	}
 }
-
-func convertTopP(topP float64) float64 {
-	// 检测 topP 是否在 0-1 之间 如果等于0 设为0.1 如果大于等于1 设为0.9
-	if topP <= 0 {
-		return 0.1
-	} else if topP >= 1 {
-		return 0.9
-	}
-	return topP
-}

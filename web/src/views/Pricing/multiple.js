@@ -11,14 +11,10 @@ import { Card } from '@mui/material';
 import PricesTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import EditeModal from './component/EditModal';
 
 // ----------------------------------------------------------------------
-export default function Multiple({ ownedby, prices, reloadData, noPriceModel }) {
+export default function Multiple({ prices, reloadData, handleOpenModal, ownedby }) {
   const [rows, setRows] = useState([]);
-
-  const [openModal, setOpenModal] = useState(false);
-  const [editPricesItem, setEditPricesItem] = useState(null);
 
   // 处理刷新
   const handleRefresh = async () => {
@@ -70,23 +66,6 @@ export default function Multiple({ ownedby, prices, reloadData, noPriceModel }) 
     }
   };
 
-  const handleOpenModal = (item) => {
-    setEditPricesItem(item);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setEditPricesItem(null);
-  };
-
-  const handleOkModal = (status) => {
-    if (status === true) {
-      handleCloseModal();
-      handleRefresh();
-    }
-  };
-
   return (
     <>
       <Card>
@@ -106,28 +85,13 @@ export default function Multiple({ ownedby, prices, reloadData, noPriceModel }) 
               />
               <TableBody>
                 {rows.map((row) => (
-                  <PricesTableRow
-                    item={row}
-                    managePrices={managePrices}
-                    key={row.id}
-                    handleOpenModal={handleOpenModal}
-                    setModalPricesItem={setEditPricesItem}
-                    ownedby={ownedby}
-                  />
+                  <PricesTableRow item={row} managePrices={managePrices} key={row.id} handleOpenModal={handleOpenModal} ownedby={ownedby} />
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         </PerfectScrollbar>
       </Card>
-      <EditeModal
-        open={openModal}
-        onCancel={handleCloseModal}
-        onOk={handleOkModal}
-        pricesItem={editPricesItem}
-        ownedby={ownedby}
-        noPriceModel={noPriceModel}
-      />
     </>
   );
 }
@@ -135,6 +99,6 @@ export default function Multiple({ ownedby, prices, reloadData, noPriceModel }) 
 Multiple.propTypes = {
   prices: PropTypes.array,
   ownedby: PropTypes.array,
-  reloadData: PropTypes.func,
-  noPriceModel: PropTypes.array
+  handleOpenModal: PropTypes.func,
+  reloadData: PropTypes.func
 };

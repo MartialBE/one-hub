@@ -362,5 +362,20 @@ func GetDefaultPrice() []*Price {
 		})
 	}
 
+	var DefaultSunoPrice = map[string]float64{
+		"suno_lyrics": 5,
+		"chirp-v3-0":  50,
+		"chirp-v3-5":  50,
+	}
+	for model, sunoPrice := range DefaultSunoPrice {
+		prices = append(prices, &Price{
+			Model:       model,
+			Type:        TimesPriceType,
+			ChannelType: config.ChannelTypeSuno,
+			Input:       sunoPrice,
+			Output:      sunoPrice,
+		})
+	}
+
 	return prices
 }
