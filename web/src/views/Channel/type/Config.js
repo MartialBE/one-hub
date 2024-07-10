@@ -373,6 +373,18 @@ const typeConfig = {
       key: '按照如下格式输入：SecretId|SecretKey'
     },
     modelGroup: 'Hunyuan'
+  },
+  41: {
+    input: {
+      models: ['suno_lyrics', 'chirp-v3-0', 'chirp-v3-5']
+    },
+    prompt: {
+      key: '密钥填写Suno-API的密钥，如果没有设置密钥，可以随便填',
+      base_url: '地址填写Suno-API部署的地址',
+      test_model: '',
+      model_mapping: ''
+    },
+    modelGroup: 'Suno'
   }
 };
 

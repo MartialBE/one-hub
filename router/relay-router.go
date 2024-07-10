@@ -4,6 +4,8 @@ import (
 	"one-api/middleware"
 	"one-api/relay"
 	"one-api/relay/midjourney"
+	"one-api/relay/task"
+	"one-api/relay/task/suno"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +15,7 @@ func SetRelayRouter(router *gin.Engine) {
 	// https://platform.openai.com/docs/api-reference/introduction
 	setOpenAIRouter(router)
 	setMJRouter(router)
+	setSunoRouter(router)
 }
 
 func setOpenAIRouter(router *gin.Engine) {
@@ -82,5 +85,15 @@ func registerMjRouterGroup(relayMjRouter *gin.RouterGroup) {
 		relayMjRouter.GET("/task/:id/image-seed", midjourney.RelayMidjourney)
 		relayMjRouter.POST("/task/list-by-condition", midjourney.RelayMidjourney)
 		relayMjRouter.POST("/insight-face/swap", midjourney.RelayMidjourney)
+	}
+}
+
+func setSunoRouter(router *gin.Engine) {
+	relaySunoRouter := router.Group("/suno")
+	relaySunoRouter.Use(middleware.OpenaiAuth(), middleware.Distribute())
+	{
+		relaySunoRouter.POST("/submit/:action", task.RelayTaskSubmit)
+		relaySunoRouter.POST("/fetch", suno.GetFetch)
+		relaySunoRouter.GET("/fetch/:id", suno.GetFetchByID)
 	}
 }

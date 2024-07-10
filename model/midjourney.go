@@ -47,7 +47,7 @@ type Midjourney struct {
 }
 
 // TaskQueryParams 用于包含所有搜索条件的结构体，可以根据需求添加更多字段
-type TaskQueryParams struct {
+type MJTaskQueryParams struct {
 	ChannelID      int    `form:"channel_id"`
 	MjID           string `form:"mj_id"`
 	StartTimestamp int    `form:"start_timestamp"`
@@ -68,7 +68,7 @@ var allowedMidjourneyOrderFields = map[string]bool{
 	"channel_id":  true,
 }
 
-func GetAllUserTask(userId int, params *TaskQueryParams) (*DataResult[Midjourney], error) {
+func GetAllUserMJTask(userId int, params *MJTaskQueryParams) (*DataResult[Midjourney], error) {
 	var tasks []*Midjourney
 
 	// 初始化查询构建器
@@ -88,7 +88,7 @@ func GetAllUserTask(userId int, params *TaskQueryParams) (*DataResult[Midjourney
 	return PaginateAndOrder(query, &params.PaginationParams, &tasks, allowedMidjourneyOrderFields)
 }
 
-func GetAllTasks(params *TaskQueryParams) (*DataResult[Midjourney], error) {
+func GetAllMJTasks(params *MJTaskQueryParams) (*DataResult[Midjourney], error) {
 	var tasks []*Midjourney
 
 	// 初始化查询构建器

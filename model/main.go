@@ -162,6 +162,10 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
+		err = db.AutoMigrate(&Task{})
+		if err != nil {
+			return err
+		}
 		logger.SysLog("database migrated")
 		err = createRootAccountIfNeed()
 		return err
