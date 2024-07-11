@@ -82,3 +82,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           file: Dockerfile-action
+          
+      - name: 部署到服务器
+        uses: appleboy/ssh-action@master
+        env:
+          DOCKER_IMAGE: ${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_HUB_REPO }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: DOCKER_IMAGE,PROJECT_PATH
+          script: |
+            docker pull $DOCKER_IMAGE
+            cd $PROJECT_PATH
+            docker compose down
+            docker compose up -d
