@@ -7,6 +7,7 @@ import (
 	"one-api/common"
 	"one-api/common/requester"
 	"one-api/common/utils"
+	"one-api/providers/base"
 	"one-api/types"
 	"strings"
 )
@@ -15,7 +16,7 @@ const (
 	GeminiVisionMaxImageNum = 16
 )
 
-type geminiStreamHandler struct {
+type GeminiStreamHandler struct {
 	Usage          *types.Usage
 	LastCandidates int
 	LastType       string
@@ -36,7 +37,7 @@ func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		return nil, errWithCode
 	}
 
-	return p.convertToChatOpenai(geminiChatResponse, request)
+	return ConvertToChatOpenai(p, geminiChatResponse, request)
 }
 
 func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
@@ -52,14 +53,14 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		return nil, errWithCode
 	}
 
-	chatHandler := &geminiStreamHandler{
+	chatHandler := &GeminiStreamHandler{
 		Usage:          p.Usage,
 		LastCandidates: 0,
 		LastType:       "",
 		Request:        request,
 	}
 
-	return requester.RequestStream[string](p.Requester, resp, chatHandler.handlerStream)
+	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerStream)
 }
 
 func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
@@ -76,7 +77,7 @@ func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 		headers["Accept"] = "text/event-stream"
 	}
 
-	geminiRequest, errWithCode := convertFromChatOpenai(request)
+	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -92,7 +93,7 @@ func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 	return req, nil
 }
 
-func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
+func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
 	request.ClearEmptyMessages()
 	geminiRequest := GeminiChatRequest{
 		Contents: make([]GeminiChatContent, 0, len(request.Messages)),
@@ -141,7 +142,7 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 	return &geminiRequest, nil
 }
 
-func (p *GeminiProvider) convertToChatOpenai(response *GeminiChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
 	aiError := errorHandle(&response.GeminiErrorResponse)
 	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
@@ -162,14 +163,15 @@ func (p *GeminiProvider) convertToChatOpenai(response *GeminiChatResponse, reque
 		openaiResponse.Choices = append(openaiResponse.Choices, candidate.ToOpenAIChoice(request))
 	}
 
-	*p.Usage = convertOpenAIUsage(request.Model, response.UsageMetadata)
-	openaiResponse.Usage = p.Usage
+	usage := provider.GetUsage()
+	*usage = convertOpenAIUsage(request.Model, response.UsageMetadata)
+	openaiResponse.Usage = usage
 
 	return
 }
 
 // 转换为OpenAI聊天流式请求体
-func (h *geminiStreamHandler) handlerStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
+func (h *GeminiStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
 	// 如果rawLine 前缀不为data:，则直接返回
 	if !strings.HasPrefix(string(*rawLine), "data: ") {
 		*rawLine = nil
@@ -196,7 +198,7 @@ func (h *geminiStreamHandler) handlerStream(rawLine *[]byte, dataChan chan strin
 
 }
 
-func (h *geminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatResponse, dataChan chan string) {
+func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatResponse, dataChan chan string) {
 	streamResponse := types.ChatCompletionStreamResponse{
 		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",

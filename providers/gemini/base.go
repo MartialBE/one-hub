@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
@@ -19,7 +20,7 @@ func (f GeminiProviderFactory) Create(channel *model.Channel) base.ProviderInter
 		BaseProvider: base.BaseProvider{
 			Config:    getConfig(),
 			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle),
+			Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
 		},
 	}
 }
@@ -37,7 +38,7 @@ func getConfig() base.ProviderConfig {
 }
 
 // 请求错误处理
-func requestErrorHandle(resp *http.Response) *types.OpenAIError {
+func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 	geminiError := &GeminiErrorResponse{}
 	err := json.NewDecoder(resp.Body).Decode(geminiError)
 	if err != nil {
@@ -52,6 +53,12 @@ func errorHandle(geminiError *GeminiErrorResponse) *types.OpenAIError {
 	if geminiError.Error.Message == "" {
 		return nil
 	}
+
+	if strings.Contains(geminiError.Error.Message, "Publisher Model") {
+		logger.SysError(fmt.Sprintf("Gemini Error: %s", geminiError.Error.Message))
+		geminiError.Error.Message = "上游错误，请联系管理员."
+	}
+
 	return &types.OpenAIError{
 		Message: geminiError.Error.Message,
 		Type:    "gemini_error",
