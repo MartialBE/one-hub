@@ -4,10 +4,10 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ChatCacheProps struct {
@@ -42,7 +42,7 @@ func NewChatCacheProps(c *gin.Context, allow bool) *ChatCacheProps {
 		props.Cache = true
 	}
 
-	if common.RedisEnabled {
+	if config.RedisEnabled {
 		props.Driver = &ChatCacheRedis{}
 	} else {
 		props.Driver = &ChatCacheDB{}
