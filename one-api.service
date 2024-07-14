@@ -4,7 +4,7 @@
 # sudo systemctl enable one-api
 # sudo systemctl status one-api
 [Unit]
-Description=One API Service
+Description=One Hub Service
 After=network.target
 
 [Service]

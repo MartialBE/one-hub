@@ -1,9 +1,9 @@
 version: "3.4"
 
 services:
-  one-api:
+  one-hub:
     image: martialbe/one-api:latest
-    container_name: one-api
+    container_name: one-hub
     restart: always
     command: --log-dir /app/logs
     ports:

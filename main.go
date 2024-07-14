@@ -38,7 +38,7 @@ func main() {
 	cli.InitCli()
 	config.InitConf()
 	logger.SetupLogger()
-	logger.SysLog("One API " + config.Version + " started")
+	logger.SysLog("One Hub " + config.Version + " started")
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()

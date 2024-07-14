@@ -4,14 +4,14 @@
 
 <p align="center">
    <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-api/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
+   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-hub/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
    <img height="90" src="https://raw.githubusercontent.com/MartialBE/one-api/main/web/src/assets/images/logo.svg">
    </picture>
 </p>
 
 <div align="center">
 
-# One API
+# One Hub
 
 _This project is based on [one-api](https://github.com/songquanpeng/one-api) and has been developed for the second time._
 
@@ -19,7 +19,7 @@ _This project is based on [one-api](https://github.com/songquanpeng/one-api) and
   <a href="https://raw.githubusercontent.com/MartialBE/one-api/main/LICENSE">
     <img src="https://img.shields.io/github/license/MartialBE/one-api?color=brightgreen" alt="license">
   </a>
-  <a href="https://github.com/MartialBE/one-api/releases/latest">
+  <a href="https://github.com/MartialBE/one-hub/releases/latest">
     <img src="https://img.shields.io/github/v/release/MartialBE/one-api?color=brightgreen&include_prereleases" alt="release">
   </a>
   <a href="https://github.com/users/MartialBE/packages/container/package/one-api">
@@ -68,7 +68,7 @@ If you find that a new model is missing, please update the newly added model in 
 
 ## Documentation
 
-Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
+Please refer to the [documentation](https://github.com/MartialBE/one-hub/wiki).
 
 ## Current Supported Providers
 

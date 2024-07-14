@@ -39,7 +39,7 @@ func (s *StmpConfig) Send(to, subject, body string) error {
 	message.Subject(subject)
 	message.SetGenHeader("References", s.getReferences())
 	message.SetBodyString(mail.TypeTextHTML, body)
-	message.SetUserAgent(fmt.Sprintf("One API %s // https://github.com/MartialBE/one-api", config.Version))
+	message.SetUserAgent(fmt.Sprintf("One Hub %s // https://github.com/MartialBE/one-hub", config.Version))
 
 	client, err := mail.NewClient(
 		s.Host,

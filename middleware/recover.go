@@ -17,7 +17,7 @@ func RelayPanicRecover() gin.HandlerFunc {
 				logger.SysError(fmt.Sprintf("stacktrace from panic: %s", string(debug.Stack())))
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": gin.H{
-						"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-api", err),
+						"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub", err),
 						"type":    "one_api_panic",
 					},
 				})

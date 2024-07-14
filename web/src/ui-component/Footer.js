@@ -15,7 +15,7 @@ const Footer = () => {
           <div className="custom-footer" dangerouslySetInnerHTML={{ __html: siteInfo.footer_html }}></div>
         ) : (
           <>
-            <Link href="https://github.com/MartialBE/one-api" target="_blank">
+            <Link href="https://github.com/MartialBE/one-hub" target="_blank">
               {siteInfo.system_name} {process.env.REACT_APP_VERSION}{' '}
             </Link>
             由{' '}
@@ -26,7 +26,7 @@ const Footer = () => {
             <Link href="https://github.com/songquanpeng" target="_blank">
               JustSong
             </Link>{' '}
-            One API，源代码遵循
+            One Hub，源代码遵循
             <Link href="https://opensource.org/licenses/mit-license.php"> MIT 协议</Link>
           </>
         )}
