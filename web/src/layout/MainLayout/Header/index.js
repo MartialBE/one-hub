@@ -8,6 +8,7 @@ import { Avatar, Box, ButtonBase } from '@mui/material';
 import LogoSection from '../LogoSection';
 import ProfileSection from './ProfileSection';
 import ThemeButton from 'ui-component/ThemeButton';
+import I18nButton from 'ui-component/i18nButton';
 
 // assets
 import { IconMenu2 } from '@tabler/icons-react';
@@ -56,6 +57,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />
       <ThemeButton />
+      <I18nButton />
       <ProfileSection />
     </>
   );

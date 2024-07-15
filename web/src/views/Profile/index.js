@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import UserCard from 'ui-component/cards/UserCard';
 import {
   Card,
@@ -37,6 +38,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Profile() {
+  const { t } = useTranslation();
   const [inputs, setInputs] = useState([]);
   const [turnstileEnabled, setTurnstileEnabled] = useState(false);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
@@ -80,7 +82,7 @@ export default function Profile() {
       const res = await API.get(`/api/oauth/wechat/bind?code=${code}`);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('微信账户绑定成功！');
+        showSuccess(t('profilePage.wechatBindSuccess'));
       }
       return { success, message };
     } catch (err) {
@@ -95,7 +97,7 @@ export default function Profile() {
       const { success, message, data } = res.data;
       if (success) {
         setInputs((inputs) => ({ ...inputs, access_token: data }));
-        copy(data, '令牌');
+        copy(data, t('profilePage.token'));
       } else {
         showError(message);
       }
@@ -113,7 +115,7 @@ export default function Profile() {
       const res = await API.put(`/api/user/self`, inputValue);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('用户信息更新成功！');
+        showSuccess(t('profilePage.updateSuccess'));
       } else {
         showError(message);
       }
@@ -146,93 +148,93 @@ export default function Profile() {
             >
               {status.wechat_login && (
                 <Label variant="ghost" color={inputs.wechat_id ? 'primary' : 'default'}>
-                  <IconBrandWechat /> {inputs.wechat_id || '未绑定'}
+                  <IconBrandWechat /> {inputs.wechat_id || t('profilePage.notBound')}
                 </Label>
               )}
               {status.github_oauth && (
                 <Label variant="ghost" color={inputs.github_id ? 'primary' : 'default'}>
-                  <IconBrandGithub /> {inputs.github_id || '未绑定'}
+                  <IconBrandGithub /> {inputs.github_id || t('profilePage.notBound')}
                 </Label>
               )}
               <Label variant="ghost" color={inputs.email ? 'primary' : 'default'}>
-                <IconMail /> {inputs.email || '未绑定'}
+                <IconMail /> {inputs.email || t('profilePage.notBound')}
               </Label>
               {status.telegram_bot && (
                 <Label variant="ghost" color={inputs.telegram_id ? 'primary' : 'default'}>
-                  <IconBrandTelegram /> {inputs.telegram_id || '未绑定'}
+                  <IconBrandTelegram /> {inputs.telegram_id || t('profilePage.notBound')}
                 </Label>
               )}
               {status.lark_login && (
                 <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
-                  <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || '未绑定'}
+                  <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || t('profilePage.notBound')}
                 </Label>
               )}
             </Stack>
-            <SubCard title="个人信息">
+            <SubCard title={t('profilePage.personalInfo')}>
               <Grid container spacing={2}>
                 <Grid xs={12}>
                   <FormControl fullWidth variant="outlined">
-                    <InputLabel htmlFor="username">用户名</InputLabel>
+                    <InputLabel htmlFor="username">{t('profilePage.username')}</InputLabel>
                     <OutlinedInput
                       id="username"
-                      label="用户名"
+                      label={t('profilePage.username')}
                       type="text"
                       value={inputs.username || ''}
                       // onChange={handleInputChange}
                       disabled
                       name="username"
-                      placeholder="请输入用户名"
+                      placeholder={t('profilePage.inputUsernamePlaceholder')}
                     />
                   </FormControl>
                 </Grid>
                 <Grid xs={12}>
                   <FormControl fullWidth variant="outlined">
-                    <InputLabel htmlFor="password">密码</InputLabel>
+                    <InputLabel htmlFor="password">{t('profilePage.password')}</InputLabel>
                     <OutlinedInput
                       id="password"
-                      label="密码"
+                      label={t('profilePage.password')}
                       type="password"
                       value={inputs.password || ''}
                       onChange={handleInputChange}
                       name="password"
-                      placeholder="请输入密码"
+                      placeholder={t('profilePage.inputPasswordPlaceholder')}
                     />
                   </FormControl>
                 </Grid>
                 <Grid xs={12}>
                   <FormControl fullWidth variant="outlined">
-                    <InputLabel htmlFor="display_name">显示名称</InputLabel>
+                    <InputLabel htmlFor="display_name">{t('profilePage.displayName')}</InputLabel>
                     <OutlinedInput
                       id="display_name"
-                      label="显示名称"
+                      label={t('profilePage.displayName')}
                       type="text"
                       value={inputs.display_name || ''}
                       onChange={handleInputChange}
                       name="display_name"
-                      placeholder="请输入显示名称"
+                      placeholder={t('profilePage.inputDisplayNamePlaceholder')}
                     />
                   </FormControl>
                 </Grid>
                 <Grid xs={12}>
                   <Button variant="contained" color="primary" onClick={submit}>
-                    提交
+                    {t('profilePage.submit')}
                   </Button>
                 </Grid>
               </Grid>
             </SubCard>
-            <SubCard title="账号绑定">
+            <SubCard title={t('profilePage.accountBinding')}>
               <Grid container spacing={2}>
                 {status.wechat_login && !inputs.wechat_id && (
                   <Grid xs={12} md={4}>
                     <Button variant="contained" onClick={handleWechatOpen}>
-                      绑定微信账号
+                      {t('profilePage.bindWechatAccount')}
                     </Button>
                   </Grid>
                 )}
                 {status.github_oauth && !inputs.github_id && (
                   <Grid xs={12} md={4}>
                     <Button variant="contained" onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}>
-                      绑定GitHub账号
+                      {t('profilePage.bindGitHubAccount')}
                     </Button>
                   </Grid>
                 )}
@@ -240,7 +242,7 @@ export default function Profile() {
                 {status.lark_client_id && !inputs.lark_id && (
                   <Grid xs={12} md={4}>
                     <Button variant="contained" onClick={() => onLarkOAuthClicked(status.lark_client_id)}>
-                      绑定 飞书 账号
+                      {t('profilePage.bindLarkAccount')}
                     </Button>
                   </Grid>
                 )}
@@ -252,7 +254,7 @@ export default function Profile() {
                       setOpenEmail(true);
                     }}
                   >
-                    {inputs.email ? '更换邮箱' : '绑定邮箱'}
+                    {inputs.email ? t('profilePage.changeEmail') : t('profilePage.bindEmail')}
                   </Button>
                   {turnstileEnabled ? (
                     <Turnstile
@@ -272,10 +274,10 @@ export default function Profile() {
                       <Divider />
 
                       <Alert severity="info">
-                        <Typography variant="h3">Telegram 机器人</Typography>
+                        <Typography variant="h3">{t('profilePage.telegramBot')}</Typography>
                         <br />
                         <Typography variant="body1">
-                          1. 点击下方按钮，将会在 Telegram 中打开 机器人，点击 /start 开始。
+                          {t('profilePage.telegramStep1')}
                           <br />
                           <Chip
                             icon={<IconBrandTelegram />}
@@ -287,31 +289,30 @@ export default function Profile() {
                           />
                           <br />
                           <br />
-                          2. 向机器人发送/bind命令后，输入下方的访问令牌即可绑定。(如果没有生成，请点击下方按钮生成)
+                          {t('profilePage.telegramStep2')}
                         </Typography>
                       </Alert>
-                      {/* <Typography variant="">  */}
                     </Stack>
                   </Grid>
                 )}
               </Grid>
             </SubCard>
-            <SubCard title="其他">
+            <SubCard title={t('profilePage.other')}>
               <Grid container spacing={2}>
                 <Grid xs={12}>
-                  <Alert severity="info">注意，此处生成的令牌用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。</Alert>
+                  <Alert severity="info">{t('profilePage.tokenNotice')}</Alert>
                 </Grid>
                 {inputs.access_token && (
                   <Grid xs={12}>
                     <Alert severity="error">
-                      你的访问令牌是: <b>{inputs.access_token}</b> <br />
-                      请妥善保管。如有泄漏，请立即重置。
+                      {t('profilePage.yourTokenIs')} <b>{inputs.access_token}</b> <br />
+                      {t('profilePage.keepSafe')}
                     </Alert>
                   </Grid>
                 )}
                 <Grid xs={12}>
                   <Button variant="contained" onClick={generateAccessToken}>
-                    {inputs.access_token ? '重置访问令牌' : '生成访问令牌'}
+                    {inputs.access_token ? t('profilePage.resetToken') : t('profilePage.generateToken')}
                   </Button>
                 </Grid>
               </Grid>

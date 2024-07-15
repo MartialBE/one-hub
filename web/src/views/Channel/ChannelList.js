@@ -22,6 +22,7 @@ import EditeModal from './component/EditModal';
 import { ITEMS_PER_PAGE } from 'constants';
 import TableToolBar from './component/TableToolBar';
 import BatchModal from './component/BatchModal';
+import { useTranslation } from 'react-i18next';
 
 const originalKeyword = {
   type: 0,
@@ -65,6 +66,7 @@ export async function fetchChannelData(page, rowsPerPage, keyword, order, orderB
 // ----------------------------------------------------------------------
 // CHANNEL_OPTIONS,
 export default function ChannelList() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -171,7 +173,7 @@ export default function ChannelList() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy' || action == 'delete_tag') {
           await handleRefresh();
         }
@@ -200,7 +202,7 @@ export default function ChannelList() {
       const res = await API.get(`/api/channel/test`);
       const { success, message } = res.data;
       if (success) {
-        showInfo('已成功开始测试所有通道，请刷新页面查看结果。');
+        showInfo(t('channel_row.testAllChannel'));
       } else {
         showError(message);
       }
@@ -215,7 +217,7 @@ export default function ChannelList() {
       const res = await API.delete(`/api/channel/disabled`);
       const { success, message, data } = res.data;
       if (success) {
-        showSuccess(`已删除所有禁用渠道，共计 ${data} 个`);
+        showSuccess(t('channel_row.delChannelCount', { count: data }));
         await handleRefresh();
       } else {
         showError(message);
@@ -232,7 +234,7 @@ export default function ChannelList() {
       const res = await API.get(`/api/channel/update_balance`);
       const { success, message } = res.data;
       if (success) {
-        showInfo('已更新完毕所有已启用通道余额！');
+        showInfo(t('channel_row.updateChannelBalance'));
       } else {
         showError(message);
       }
@@ -305,29 +307,28 @@ export default function ChannelList() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">渠道</Typography>
+        <Typography variant="h4">{t('channel_index.channel')}</Typography>
 
         <ButtonGroup variant="contained" aria-label="outlined small primary button group">
           <Button color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-            新建渠道
+            {t('channel_index.newChannel')}
           </Button>
           <Button color="primary" startIcon={<IconMenu2 />} onClick={() => setOpenBatchModal(true)}>
-            批量处理
+            {t('channel_index.batchProcessing')}
           </Button>
         </ButtonGroup>
       </Stack>
       <Stack mb={5}>
         <Alert severity="info">
-          优先级/权重解释：
+          {t('channel_index.priorityWeightExplanation')}
           <br />
-          1. 优先级越大，越优先使用；(只有该优先级下的节点都冻结或者禁用了，才会使用低优先级的节点)
+          {t('channel_index.description1')}
           <br />
-          2. 相同优先级下：根据权重进行负载均衡(加权随机)
+          {t('channel_index.description2')}
           <br />
-          3. 如果在设置-通用设置中设置了“重试次数”和“重试间隔”，则会在失败后重试。
+          {t('channel_index.description3')}
           <br />
-          4.
-          重试逻辑：1）先在高优先级中的节点重试，如果高优先级中的节点都冻结了，才会在低优先级中的节点重试。2）如果设置了“重试间隔”，则某一渠道失败后，会冻结一段时间，所有人都不会再使用这个渠道，直到冻结时间结束。3）重试次数用完后，直接结束。
+          {t('channel_index.description4')}
         </Alert>
       </Stack>
       <Card>
@@ -348,19 +349,19 @@ export default function ChannelList() {
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
                 <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                  刷新/清除搜索条件
+                  {t('channel_index.refreshClearSearchConditions')}
                 </Button>
                 <Button onClick={searchChannels} startIcon={<IconSearch width={'18px'} />}>
-                  搜索
+                  {t('channel_index.search')}
                 </Button>
                 <Button onClick={testAllChannels} startIcon={<IconBrandSpeedtest width={'18px'} />}>
-                  测试所有渠道
+                  {t('channel_index.testAllChannels')}
                 </Button>
                 <Button onClick={updateAllChannelsBalance} startIcon={<IconCoinYuan width={'18px'} />}>
-                  更新启用余额
+                  {t('channel_index.updateEnabledBalance')}
                 </Button>
                 <Button onClick={deleteAllDisabledChannels} startIcon={<IconTrash width={'18px'} />}>
-                  删除禁用渠道
+                  {t('channel_index.deleteDisabledChannels')}
                 </Button>
               </ButtonGroup>
             ) : (
@@ -401,17 +402,17 @@ export default function ChannelList() {
                 headLabel={[
                   { id: 'collapse', label: '', disableSort: true, width: '50px' },
                   { id: 'id', label: 'ID', disableSort: false, width: '80px' },
-                  { id: 'name', label: '名称', disableSort: false },
-                  { id: 'group', label: '分组', disableSort: true },
-                  { id: 'tag', label: '标签', disableSort: true },
-                  { id: 'type', label: '类型', disableSort: false },
-                  { id: 'status', label: '状态', disableSort: false },
-                  { id: 'response_time', label: '响应时间', disableSort: false },
+                  { id: 'name', label: t('channel_index.name'), disableSort: false },
+                  { id: 'group', label: t('channel_index.group'), disableSort: true },
+                  { id: 'tag', label: t('channel_index.tags'), disableSort: true },
+                  { id: 'type', label: t('channel_index.type'), disableSort: false },
+                  { id: 'status', label: t('channel_index.status'), disableSort: false },
+                  { id: 'response_time', label: t('channel_index.responseTime'), disableSort: false },
                   // { id: 'balance', label: '余额', disableSort: false },
-                  { id: 'used', label: '已使用/余额', disableSort: false },
-                  { id: 'priority', label: '优先级', disableSort: false, width: '80px' },
-                  { id: 'weight', label: '权重', disableSort: false, width: '80px' },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'used', label: t('channel_index.usedBalance'), disableSort: false },
+                  { id: 'priority', label: t('channel_index.priority'), disableSort: false, width: '80px' },
+                  { id: 'weight', label: t('channel_index.weight'), disableSort: false, width: '80px' },
+                  { id: 'action', label: t('channel_index.actions'), disableSort: true }
                 ]}
               />
               <TableBody>

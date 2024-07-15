@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // assets
 // import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
@@ -88,6 +89,7 @@ const MenuCard = () => {
   const theme = useTheme();
   const account = useSelector((state) => state.account);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <CardStyle>
@@ -117,7 +119,7 @@ const MenuCard = () => {
                   {account.user?.username}
                 </Typography>
               }
-              secondary={<Typography variant="caption"> 欢迎回来 </Typography>}
+              secondary={<Typography variant="caption"> {t('menu.welcomeBack')} </Typography>}
             />
           </ListItem>
         </List>

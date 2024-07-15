@@ -22,9 +22,11 @@ import { showError, showSuccess, removeTrailingSlash } from 'utils/common'; //,
 import { API } from 'utils/api';
 import { createFilterOptions } from '@mui/material/Autocomplete';
 import { LoadStatusContext } from 'contexts/StatusContext';
+import { useTranslation } from 'react-i18next';
 
 const filter = createFilterOptions();
 const SystemSetting = () => {
+  const { t } = useTranslation();
   let [inputs, setInputs] = useState({
     PasswordLoginEnabled: '',
     PasswordRegisterEnabled: '',
@@ -231,34 +233,35 @@ const SystemSetting = () => {
   return (
     <>
       <Stack spacing={2}>
-        <SubCard title="通用设置">
+        <SubCard title={t('setting_index.systemSettings.generalSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="ServerAddress">服务器地址</InputLabel>
+                <InputLabel htmlFor="ServerAddress">{t('setting_index.systemSettings.generalSettings.serverAddress')}</InputLabel>
                 <OutlinedInput
                   id="ServerAddress"
                   name="ServerAddress"
                   value={inputs.ServerAddress || ''}
                   onChange={handleInputChange}
-                  label="服务器地址"
-                  placeholder="例如：https://yourdomain.com"
+                  label={t('setting_index.systemSettings.generalSettings.serverAddress')}
+                  placeholder={t('setting_index.systemSettings.generalSettings.serverAddressPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitServerAddress}>
-                更新服务器地址
+                {t('setting_index.systemSettings.generalSettings.updateServerAddress')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置登录注册">
+
+        <SubCard title={t('setting_index.systemSettings.configureLoginRegister.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许通过密码进行登录"
+                label={t('setting_index.systemSettings.configureLoginRegister.passwordLogin')}
                 control={
                   <Checkbox checked={inputs.PasswordLoginEnabled === 'true'} onChange={handleInputChange} name="PasswordLoginEnabled" />
                 }
@@ -266,7 +269,7 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许通过密码进行注册"
+                label={t('setting_index.systemSettings.configureLoginRegister.passwordRegister')}
                 control={
                   <Checkbox
                     checked={inputs.PasswordRegisterEnabled === 'true'}
@@ -278,7 +281,7 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="通过密码注册时需要进行邮箱验证"
+                label={t('setting_index.systemSettings.configureLoginRegister.emailVerification')}
                 control={
                   <Checkbox
                     checked={inputs.EmailVerificationEnabled === 'true'}
@@ -290,31 +293,31 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许通过 GitHub 账户登录 & 注册"
+                label={t('setting_index.systemSettings.configureLoginRegister.gitHubOAuth')}
                 control={<Checkbox checked={inputs.GitHubOAuthEnabled === 'true'} onChange={handleInputChange} name="GitHubOAuthEnabled" />}
               />
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许通过微信登录 & 注册"
+                label={t('setting_index.systemSettings.configureLoginRegister.weChatAuth')}
                 control={<Checkbox checked={inputs.WeChatAuthEnabled === 'true'} onChange={handleInputChange} name="WeChatAuthEnabled" />}
               />
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许通过飞书登录 & 注册"
+                label={t('setting_index.systemSettings.configureLoginRegister.larkAuth')}
                 control={<Checkbox checked={inputs.LarkAuthEnabled === 'true'} onChange={handleInputChange} name="LarkAuthEnabled" />}
               />
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="允许新用户注册（此项为否时，新用户将无法以任何方式进行注册）"
+                label={t('setting_index.systemSettings.configureLoginRegister.registerEnabled')}
                 control={<Checkbox checked={inputs.RegisterEnabled === 'true'} onChange={handleInputChange} name="RegisterEnabled" />}
               />
             </Grid>
             <Grid xs={12} md={3}>
               <FormControlLabel
-                label="启用 Turnstile 用户校验"
+                label={t('setting_index.systemSettings.configureLoginRegister.turnstileCheck')}
                 control={
                   <Checkbox checked={inputs.TurnstileCheckEnabled === 'true'} onChange={handleInputChange} name="TurnstileCheckEnabled" />
                 }
@@ -322,11 +325,15 @@ const SystemSetting = () => {
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置邮箱域名白名单" subTitle="用以防止恶意用户利用临时邮箱批量注册">
+
+        <SubCard
+          title={t('setting_index.systemSettings.configureEmailDomainWhitelist.title')}
+          subTitle={t('setting_index.systemSettings.configureEmailDomainWhitelist.subTitle')}
+        >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControlLabel
-                label="启用邮箱域名白名单"
+                label={t('setting_index.systemSettings.configureEmailDomainWhitelist.emailDomainRestriction')}
                 control={
                   <Checkbox
                     checked={inputs.EmailDomainRestrictionEnabled === 'true'}
@@ -354,7 +361,13 @@ const SystemSetting = () => {
                     handleInputChange(event);
                   }}
                   filterSelectedOptions
-                  renderInput={(params) => <TextField {...params} name="EmailDomainWhitelist" label="允许的邮箱域名" />}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="EmailDomainWhitelist"
+                      label={t('setting_index.systemSettings.configureEmailDomainWhitelist.allowedEmailDomains')}
+                    />
+                  )}
                   filterOptions={(options, params) => {
                     const filtered = filter(options, params);
                     const { inputValue } = params;
@@ -369,310 +382,326 @@ const SystemSetting = () => {
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitEmailDomainWhitelist}>
-                保存邮箱域名白名单设置
+                {t('setting_index.systemSettings.configureEmailDomainWhitelist.save')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="配置 SMTP" subTitle="用以支持系统的邮件发送">
+
+        <SubCard
+          title={t('setting_index.systemSettings.configureSMTP.title')}
+          subTitle={t('setting_index.systemSettings.configureSMTP.subTitle')}
+        >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
-              <Alert severity="info">请注意，有些邮箱服务商发送邮件时会携带你的服务器IP地址，非个人使用时建议使用专业的邮件服务商</Alert>
+              <Alert severity="info">{t('setting_index.systemSettings.configureSMTP.alert')}</Alert>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SMTPServer">SMTP 服务器地址</InputLabel>
+                <InputLabel htmlFor="SMTPServer">{t('setting_index.systemSettings.configureSMTP.smtpServer')}</InputLabel>
                 <OutlinedInput
                   id="SMTPServer"
                   name="SMTPServer"
                   value={inputs.SMTPServer || ''}
                   onChange={handleInputChange}
-                  label="SMTP 服务器地址"
-                  placeholder="例如：smtp.qq.com"
+                  label={t('setting_index.systemSettings.configureSMTP.smtpServer')}
+                  placeholder={t('setting_index.systemSettings.configureSMTP.smtpServerPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SMTPPort">SMTP 端口</InputLabel>
+                <InputLabel htmlFor="SMTPPort">{t('setting_index.systemSettings.configureSMTP.smtpPort')}</InputLabel>
                 <OutlinedInput
                   id="SMTPPort"
                   name="SMTPPort"
                   value={inputs.SMTPPort || ''}
                   onChange={handleInputChange}
-                  label="SMTP 端口"
-                  placeholder="默认: 587"
+                  label={t('setting_index.systemSettings.configureSMTP.smtpPort')}
+                  placeholder={t('setting_index.systemSettings.configureSMTP.smtpPortPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SMTPAccount">SMTP 账户</InputLabel>
+                <InputLabel htmlFor="SMTPAccount">{t('setting_index.systemSettings.configureSMTP.smtpAccount')}</InputLabel>
                 <OutlinedInput
                   id="SMTPAccount"
                   name="SMTPAccount"
                   value={inputs.SMTPAccount || ''}
                   onChange={handleInputChange}
-                  label="SMTP 账户"
-                  placeholder="通常是邮箱地址"
+                  label={t('setting_index.systemSettings.configureSMTP.smtpAccount')}
+                  placeholder={t('setting_index.systemSettings.configureSMTP.smtpAccountPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SMTPFrom">SMTP 发送者邮箱</InputLabel>
+                <InputLabel htmlFor="SMTPFrom">{t('setting_index.systemSettings.configureSMTP.smtpFrom')}</InputLabel>
                 <OutlinedInput
                   id="SMTPFrom"
                   name="SMTPFrom"
                   value={inputs.SMTPFrom || ''}
                   onChange={handleInputChange}
-                  label="SMTP 发送者邮箱"
-                  placeholder="通常和邮箱地址保持一致"
+                  label={t('setting_index.systemSettings.configureSMTP.smtpFrom')}
+                  placeholder={t('setting_index.systemSettings.configureSMTP.smtpFromPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SMTPToken">SMTP 访问凭证</InputLabel>
+                <InputLabel htmlFor="SMTPToken">{t('setting_index.systemSettings.configureSMTP.smtpToken')}</InputLabel>
                 <OutlinedInput
                   id="SMTPToken"
                   name="SMTPToken"
                   value={inputs.SMTPToken || ''}
                   onChange={handleInputChange}
-                  label="SMTP 访问凭证"
-                  placeholder="敏感信息不会发送到前端显示"
+                  label={t('setting_index.systemSettings.configureSMTP.smtpToken')}
+                  placeholder={t('setting_index.systemSettings.configureSMTP.smtpTokenPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitSMTP}>
-                保存 SMTP 设置
+                {t('setting_index.systemSettings.configureSMTP.save')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
+
         <SubCard
-          title="配置 GitHub OAuth App"
+          title={t('setting_index.systemSettings.configureGitHubOAuthApp.title')}
           subTitle={
             <span>
               {' '}
-              用以支持通过 GitHub 进行登录注册，
+              {t('setting_index.systemSettings.configureGitHubOAuthApp.subTitle')}
               <a href="https://github.com/settings/developers" target="_blank" rel="noopener noreferrer">
-                点击此处
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.manageLink')}
               </a>
-              管理你的 GitHub OAuth App
+              {t('setting_index.systemSettings.configureGitHubOAuthApp.manage')}
             </span>
           }
         >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info" sx={{ wordWrap: 'break-word' }}>
-                Homepage URL 填 <b>{inputs.ServerAddress}</b>
-                ，Authorization callback URL 填 <b>{`${inputs.ServerAddress}/oauth/github`}</b>
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.alert1')} <b>{inputs.ServerAddress}</b>
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.alert2')} <b>{`${inputs.ServerAddress}/oauth/github`}</b>
               </Alert>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="GitHubClientId">GitHub Client ID</InputLabel>
+                <InputLabel htmlFor="GitHubClientId">{t('setting_index.systemSettings.configureGitHubOAuthApp.clientId')}</InputLabel>
                 <OutlinedInput
                   id="GitHubClientId"
                   name="GitHubClientId"
                   value={inputs.GitHubClientId || ''}
                   onChange={handleInputChange}
-                  label="GitHub Client ID"
-                  placeholder="输入你注册的 GitHub OAuth APP 的 ID"
+                  label={t('setting_index.systemSettings.configureGitHubOAuthApp.clientId')}
+                  placeholder={t('setting_index.systemSettings.configureGitHubOAuthApp.clientIdPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="GitHubClientSecret">GitHub Client Secret</InputLabel>
+                <InputLabel htmlFor="GitHubClientSecret">
+                  {t('setting_index.systemSettings.configureGitHubOAuthApp.clientSecret')}
+                </InputLabel>
                 <OutlinedInput
                   id="GitHubClientSecret"
                   name="GitHubClientSecret"
                   value={inputs.GitHubClientSecret || ''}
                   onChange={handleInputChange}
-                  label="GitHub Client Secret"
-                  placeholder="敏感信息不会发送到前端显示"
+                  label={t('setting_index.systemSettings.configureGitHubOAuthApp.clientSecret')}
+                  placeholder={t('setting_index.systemSettings.configureGitHubOAuthApp.clientSecretPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitGitHubOAuth}>
-                保存 GitHub OAuth 设置
+                {t('setting_index.systemSettings.configureGitHubOAuthApp.saveButton')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
+
         <SubCard
-          title="配置 WeChat Server"
+          title={t('setting_index.systemSettings.configureWeChatServer.title')}
           subTitle={
             <span>
-              用以支持通过微信进行登录注册，
+              {t('setting_index.systemSettings.configureWeChatServer.subTitle')}
               <a href="https://github.com/songquanpeng/wechat-server" target="_blank" rel="noopener noreferrer">
-                点击此处
+                {t('setting_index.systemSettings.configureWeChatServer.learnLink')}
               </a>
-              了解 WeChat Server
+              {t('setting_index.systemSettings.configureWeChatServer.learn')}
             </span>
           }
         >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="WeChatServerAddress">WeChat Server 服务器地址</InputLabel>
+                <InputLabel htmlFor="WeChatServerAddress">
+                  {t('setting_index.systemSettings.configureWeChatServer.serverAddress')}
+                </InputLabel>
                 <OutlinedInput
                   id="WeChatServerAddress"
                   name="WeChatServerAddress"
                   value={inputs.WeChatServerAddress || ''}
                   onChange={handleInputChange}
-                  label="WeChat Server 服务器地址"
-                  placeholder="例如：https://yourdomain.com"
+                  label={t('setting_index.systemSettings.configureWeChatServer.serverAddress')}
+                  placeholder={t('setting_index.systemSettings.configureWeChatServer.serverAddressPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="WeChatServerToken">WeChat Server 访问凭证</InputLabel>
+                <InputLabel htmlFor="WeChatServerToken">{t('setting_index.systemSettings.configureWeChatServer.accessToken')}</InputLabel>
                 <OutlinedInput
                   id="WeChatServerToken"
                   name="WeChatServerToken"
                   value={inputs.WeChatServerToken || ''}
                   onChange={handleInputChange}
-                  label="WeChat Server 访问凭证"
-                  placeholder="敏感信息不会发送到前端显示"
+                  label={t('setting_index.systemSettings.configureWeChatServer.accessToken')}
+                  placeholder={t('setting_index.systemSettings.configureWeChatServer.accessTokenPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="WeChatAccountQRCodeImageURL">微信公众号二维码图片链接</InputLabel>
+                <InputLabel htmlFor="WeChatAccountQRCodeImageURL">
+                  {t('setting_index.systemSettings.configureWeChatServer.qrCodeImage')}
+                </InputLabel>
                 <OutlinedInput
                   id="WeChatAccountQRCodeImageURL"
                   name="WeChatAccountQRCodeImageURL"
                   value={inputs.WeChatAccountQRCodeImageURL || ''}
                   onChange={handleInputChange}
-                  label="微信公众号二维码图片链接"
-                  placeholder="输入一个图片链接"
+                  label={t('setting_index.systemSettings.configureWeChatServer.qrCodeImage')}
+                  placeholder={t('setting_index.systemSettings.configureWeChatServer.qrCodeImagePlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitWeChat}>
-                保存 WeChat Server 设置
+                {t('setting_index.systemSettings.configureWeChatServer.saveButton')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
+
         <SubCard
-          title="配置飞书授权登录"
+          title={t('setting_index.systemSettings.configureFeishuAuthorization.title')}
           subTitle={
             <span>
               {' '}
-              用以支持通过飞书进行登录注册，
+              {t('setting_index.systemSettings.configureFeishuAuthorization.subTitle')}
               <a href="https://open.feishu.cn/app" target="_blank" rel="noreferrer">
-                点击此处
+                {t('setting_index.systemSettings.configureFeishuAuthorization.manageLink')}
               </a>
-              管理你的飞书应用
+              {t('setting_index.systemSettings.configureFeishuAuthorization.manage')}
             </span>
           }
         >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Alert severity="info" sx={{ wordWrap: 'break-word' }}>
-                主页链接填 <code>{inputs.ServerAddress}</code>
-                ，重定向 URL 填 <code>{`${inputs.ServerAddress}/oauth/lark`}</code>
+                {t('setting_index.systemSettings.configureFeishuAuthorization.alert1')} <code>{inputs.ServerAddress}</code>
+                {t('setting_index.systemSettings.configureFeishuAuthorization.alert2')} <code>{`${inputs.ServerAddress}/oauth/lark`}</code>
               </Alert>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="LarkClientId">App ID</InputLabel>
+                <InputLabel htmlFor="LarkClientId">{t('setting_index.systemSettings.configureFeishuAuthorization.appId')}</InputLabel>
                 <OutlinedInput
                   id="LarkClientId"
                   name="LarkClientId"
                   value={inputs.LarkClientId || ''}
                   onChange={handleInputChange}
-                  label="App ID"
-                  placeholder="输入 App ID"
+                  label={t('setting_index.systemSettings.configureFeishuAuthorization.appId')}
+                  placeholder={t('setting_index.systemSettings.configureFeishuAuthorization.appIdPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="LarkClientSecret">App Secret</InputLabel>
+                <InputLabel htmlFor="LarkClientSecret">
+                  {t('setting_index.systemSettings.configureFeishuAuthorization.appSecret')}
+                </InputLabel>
                 <OutlinedInput
                   id="LarkClientSecret"
                   name="LarkClientSecret"
                   value={inputs.LarkClientSecret || ''}
                   onChange={handleInputChange}
-                  label="App Secret"
-                  placeholder="敏感信息不会发送到前端显示"
+                  label={t('setting_index.systemSettings.configureFeishuAuthorization.appSecret')}
+                  placeholder={t('setting_index.systemSettings.configureFeishuAuthorization.appSecretPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitLarkOAuth}>
-                保存飞书 OAuth 设置
+                {t('setting_index.systemSettings.configureFeishuAuthorization.saveButton')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
+
         <SubCard
-          title="配置 Turnstile"
+          title={t('setting_index.systemSettings.configureTurnstile.title')}
           subTitle={
             <span>
-              用以支持用户校验，
+              {t('setting_index.systemSettings.configureTurnstile.subTitle')}
               <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">
-                点击此处
+                {t('setting_index.systemSettings.configureTurnstile.manageLink')}
               </a>
-              管理你的 Turnstile Sites，推荐选择 Invisible Widget Type
+              {t('setting_index.systemSettings.configureTurnstile.manage')}
             </span>
           }
         >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="TurnstileSiteKey">Turnstile Site Key</InputLabel>
+                <InputLabel htmlFor="TurnstileSiteKey">{t('setting_index.systemSettings.configureTurnstile.siteKey')}</InputLabel>
                 <OutlinedInput
                   id="TurnstileSiteKey"
                   name="TurnstileSiteKey"
                   value={inputs.TurnstileSiteKey || ''}
                   onChange={handleInputChange}
-                  label="Turnstile Site Key"
-                  placeholder="输入你注册的 Turnstile Site Key"
+                  label={t('setting_index.systemSettings.configureTurnstile.siteKey')}
+                  placeholder={t('setting_index.systemSettings.configureTurnstile.siteKeyPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="TurnstileSecretKey">Turnstile Secret Key</InputLabel>
+                <InputLabel htmlFor="TurnstileSecretKey">{t('setting_index.systemSettings.configureTurnstile.secretKey')}</InputLabel>
                 <OutlinedInput
                   id="TurnstileSecretKey"
                   name="TurnstileSecretKey"
                   type="password"
                   value={inputs.TurnstileSecretKey || ''}
                   onChange={handleInputChange}
-                  label="Turnstile Secret Key"
-                  placeholder="敏感信息不会发送到前端显示"
+                  label={t('setting_index.systemSettings.configureTurnstile.secretKey')}
+                  placeholder={t('setting_index.systemSettings.configureTurnstile.secretKeyPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitTurnstile}>
-                保存 Turnstile 设置
+                {t('setting_index.systemSettings.configureTurnstile.saveButton')}
               </Button>
             </Grid>
           </Grid>

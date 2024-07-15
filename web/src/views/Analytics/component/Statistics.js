@@ -4,8 +4,10 @@ import DataCard from 'ui-component/cards/DataCard';
 import { gridSpacing } from 'store/constant';
 import { showError, renderQuota } from 'utils/common';
 import { API } from 'utils/api';
+import { useTranslation } from 'react-i18next';
 
 export default function Overview() {
+  const { t } = useTranslation();
   const [userLoading, setUserLoading] = useState(true);
   const [channelLoading, setChannelLoading] = useState(true);
   const [redemptionLoading, setRedemptionLoading] = useState(true);
@@ -105,19 +107,20 @@ export default function Overview() {
       <Grid item lg={3} xs={12}>
         <DataCard
           isLoading={userLoading}
-          title="用户总消费金额"
+          title={t('analytics_index.totalUserSpending')}
           content={userStatistics?.total_used_quota || '0'}
-          subContent={'用户总余额：' + (userStatistics?.total_quota || '0')}
+          subContent={t('analytics_index.totalUserBalance') + '：' + (userStatistics?.total_quota || '0')}
         />
       </Grid>
       <Grid item lg={3} xs={12}>
         <DataCard
           isLoading={userLoading}
-          title="用户总数"
+          title={t('analytics_index.totalUsers')}
           content={userStatistics?.total_user || '0'}
           subContent={
             <>
-              直接注册：{userStatistics?.total_direct_user || '0'} <br /> 邀请注册：{userStatistics?.total_inviter_user || '0'}
+              {t('analytics_index.directRegistration')}：{userStatistics?.total_direct_user || '0'} <br />
+              {t('analytics_index.invitationRegistration')}：{userStatistics?.total_inviter_user || '0'}
             </>
           }
         />
@@ -125,11 +128,12 @@ export default function Overview() {
       <Grid item lg={3} xs={12}>
         <DataCard
           isLoading={channelLoading}
-          title="渠道数量"
+          title={t('analytics_index.channelCount')}
           content={channelStatistics.total}
           subContent={
             <>
-              正常：{channelStatistics.active} / 禁用：{channelStatistics.disabled} / 测试禁用：{channelStatistics.test_disabled}
+              {t('analytics_index.active')}：{channelStatistics.active} / {t('analytics_index.disabled')}：{'·'}
+              {channelStatistics.disabled} / {t('analytics_index.testDisabled')}：{channelStatistics.test_disabled}
             </>
           }
         />
@@ -137,11 +141,11 @@ export default function Overview() {
       <Grid item lg={3} xs={12}>
         <DataCard
           isLoading={redemptionLoading}
-          title="兑换码发行量"
+          title={t('analytics_index.redeemCodeIssued')}
           content={redemptionStatistics.total}
           subContent={
             <>
-              已使用: {redemptionStatistics.used} <br /> 未使用: {redemptionStatistics.unused}
+              {t('analytics_index.used')}: {redemptionStatistics.used} <br /> {t('analytics_index.unused')}: {redemptionStatistics.unused}
             </>
           }
         />

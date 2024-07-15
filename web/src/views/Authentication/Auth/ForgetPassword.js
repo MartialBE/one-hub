@@ -11,10 +11,12 @@ import ForgetPasswordForm from '../AuthForms/ForgetPasswordForm';
 import Logo from 'ui-component/Logo';
 
 // assets
+import { useTranslation } from 'react-i18next';
 
 // ================================|| AUTH3 - LOGIN ||================================ //
 
 const ForgetPassword = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -36,7 +38,7 @@ const ForgetPassword = () => {
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
                           <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                            密码重置
+                            {t('auth.restPassword')}
                           </Typography>
                         </Stack>
                       </Grid>
@@ -51,7 +53,7 @@ const ForgetPassword = () => {
                   <Grid item xs={12}>
                     <Grid item container direction="column" alignItems="center" xs={12}>
                       <Typography component={Link} to="/login" variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                        登录
+                        {t('menu.login')}
                       </Typography>
                     </Grid>
                   </Grid>

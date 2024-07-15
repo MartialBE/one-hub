@@ -19,8 +19,10 @@ import { isAdmin } from 'utils/common';
 import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 export default function Log() {
+  const { t } = useTranslation();
   const originalKeyword = {
     p: 0,
     username: '',
@@ -124,7 +126,7 @@ export default function Log() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">日志</Typography>
+        <Typography variant="h4">{t('logPage.title')}</Typography>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -142,11 +144,11 @@ export default function Log() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新/清除搜索条件
+                {t('logPage.refreshButton')}
               </Button>
 
               <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
-                搜索
+                {t('logPage.searchButton')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -162,60 +164,60 @@ export default function Log() {
                 headLabel={[
                   {
                     id: 'created_at',
-                    label: '时间',
+                    label: t('logPage.timeLabel'),
                     disableSort: false
                   },
                   {
                     id: 'channel_id',
-                    label: '渠道',
+                    label: t('logPage.channelLabel'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'user_id',
-                    label: '用户',
+                    label: t('logPage.userLabel'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'token_name',
-                    label: '令牌',
+                    label: t('logPage.tokenLabel'),
                     disableSort: false
                   },
                   {
                     id: 'type',
-                    label: '类型',
+                    label: t('logPage.typeLabel'),
                     disableSort: false
                   },
                   {
                     id: 'model_name',
-                    label: '模型',
+                    label: t('logPage.modelLabel'),
                     disableSort: false
                   },
                   {
                     id: 'duration',
-                    label: '耗时',
-                    tooltip: 't/s：输出令牌的数量除以总生成时间，表示生成速度',
+                    label: t('logPage.durationLabel'),
+                    tooltip: t('logPage.durationTooltip'),
                     disableSort: true
                   },
                   {
                     id: 'message',
-                    label: '输入',
+                    label: t('logPage.inputLabel'),
                     disableSort: true
                   },
                   {
                     id: 'completion',
-                    label: '输出',
+                    label: t('logPage.outputLabel'),
                     disableSort: true
                   },
                   {
                     id: 'quota',
-                    label: '额度',
+                    label: t('logPage.quotaLabel'),
                     disableSort: true
                   },
                   {
                     id: 'detail',
-                    label: '详情',
+                    label: t('logPage.detailLabel'),
                     disableSort: true
                   }
                 ]}

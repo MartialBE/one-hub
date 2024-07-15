@@ -16,20 +16,22 @@ import {
   InputAdornment,
   FormHelperText
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { renderQuotaWithPrompt, showSuccess, showError, downloadTextAsFile, trims } from 'utils/common';
 import { API } from 'utils/api';
 
-const validationSchema = Yup.object().shape({
-  is_edit: Yup.boolean(),
-  name: Yup.string().required('名称 不能为空'),
-  quota: Yup.number().min(0, '必须大于等于0'),
-  count: Yup.number().when('is_edit', {
-    is: false,
-    then: Yup.number().min(1, '必须大于等于1'),
-    otherwise: Yup.number()
-  })
-});
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    is_edit: Yup.boolean(),
+    name: Yup.string().required(t('validation.requiredName')),
+    quota: Yup.number().min(0, t('redemption_edit.requiredQuota')),
+    count: Yup.number().when('is_edit', {
+      is: false,
+      then: Yup.number().min(1, t('redemption_edit.requiredCount')),
+      otherwise: Yup.number()
+    })
+  });
 
 const originInputs = {
   is_edit: false,
@@ -39,6 +41,7 @@ const originInputs = {
 };
 
 const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
 
@@ -55,9 +58,9 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
       const { success, message, data } = res.data;
       if (success) {
         if (values.is_edit) {
-          showSuccess('兑换码更新成功！');
+          showSuccess(t('redemption_edit.editOk'));
         } else {
-          showSuccess('兑换码创建成功！');
+          showSuccess(t('redemption_edit.addOk'));
           if (data.length > 1) {
             let text = '';
             for (let i = 0; i < data.length; i++) {
@@ -105,18 +108,18 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {redemptiondId ? '编辑兑换码' : '新建兑换码'}
+        {redemptiondId ? t('common.edit') : t('common.create')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
+        <Formik initialValues={inputs} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-name-label">名称</InputLabel>
+                <InputLabel htmlFor="channel-name-label">{t('redemptionPage.headLabels.name')}</InputLabel>
                 <OutlinedInput
                   id="channel-name-label"
-                  label="名称"
+                  label={t('redemptionPage.headLabels.name')}
                   type="text"
                   value={values.name}
                   name="name"
@@ -133,10 +136,10 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.quota && errors.quota)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-quota-label">额度</InputLabel>
+                <InputLabel htmlFor="channel-quota-label">{t('redemptionPage.headLabels.quota')}</InputLabel>
                 <OutlinedInput
                   id="channel-quota-label"
-                  label="额度"
+                  label={t('redemptionPage.headLabels.quota')}
                   type="number"
                   value={values.quota}
                   name="quota"
@@ -156,10 +159,10 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
 
               {!values.is_edit && (
                 <FormControl fullWidth error={Boolean(touched.count && errors.count)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-count-label">数量</InputLabel>
+                  <InputLabel htmlFor="channel-count-label">{t('redemption_edit.number')}</InputLabel>
                   <OutlinedInput
                     id="channel-count-label"
-                    label="数量"
+                    label={t('redemption_edit.number')}
                     type="number"
                     value={values.count}
                     name="count"
@@ -176,9 +179,9 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
                 </FormControl>
               )}
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('common.submit')}
                 </Button>
               </DialogActions>
             </form>

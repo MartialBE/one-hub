@@ -5,42 +5,45 @@ import { Dialog, DialogTitle, DialogContent, TextField, Button, Typography, Grid
 import { Formik, Form, Field } from 'formik';
 import { showError } from 'utils/common';
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
 
-const validationSchema = Yup.object().shape({
-  code: Yup.string().required('验证码不能为空')
-});
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    code: Yup.string().required(t('login.codeRequired'))
+  });
 
 const WechatModal = ({ open, handleClose, wechatLogin, qrCode }) => {
+  const { t } = useTranslation();
   const handleSubmit = (values) => {
     const { success, message } = wechatLogin(values.code);
     if (success) {
       handleClose();
     } else {
-      showError(message || '未知错误');
+      showError(message || t('error.unknownError'));
     }
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>微信验证码登录</DialogTitle>
+      <DialogTitle>{t('login.wechatVerificationCodeLogin')}</DialogTitle>
       <DialogContent>
         <Grid container direction="column" alignItems="center">
-          <img src={qrCode} alt="二维码" style={{ maxWidth: '300px', maxHeight: '300px', width: 'auto', height: 'auto' }} />
+          <img src={qrCode} alt={t('login.qrCode')} style={{ maxWidth: '300px', maxHeight: '300px', width: 'auto', height: 'auto' }} />
           <Typography
             variant="body2"
             color="text.secondary"
             style={{ marginTop: '10px', textAlign: 'center', wordWrap: 'break-word', maxWidth: '300px' }}
           >
-            请使用微信扫描二维码关注公众号，输入「验证码」获取验证码（三分钟内有效）
+            {t('login.wechatLoginInfo')}
           </Typography>
-          <Formik initialValues={{ code: '' }} validationSchema={validationSchema} onSubmit={handleSubmit}>
+          <Formik initialValues={{ code: '' }} validationSchema={getValidationSchema(t)} onSubmit={handleSubmit}>
             {({ errors, touched }) => (
               <Form style={{ width: '100%' }}>
                 <Grid item xs={12}>
                   <Field
                     as={TextField}
                     name="code"
-                    label="验证码"
+                    label={t('common.verificationCode')}
                     error={touched.code && Boolean(errors.code)}
                     helperText={touched.code && errors.code}
                     fullWidth
@@ -48,7 +51,7 @@ const WechatModal = ({ open, handleClose, wechatLogin, qrCode }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button type="submit" fullWidth>
-                    提交
+                    {t('common.submit')}
                   </Button>
                 </Grid>
               </Form>

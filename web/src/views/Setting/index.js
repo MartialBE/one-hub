@@ -7,6 +7,7 @@ import SystemSetting from './component/SystemSetting';
 import OtherSetting from './component/OtherSetting';
 import AdminContainer from 'ui-component/AdminContainer';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -32,6 +33,7 @@ function a11yProps(index) {
 }
 
 const Setting = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const hash = location.hash.replace('#', '');
@@ -69,9 +71,9 @@ const Setting = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label="运营设置" {...a11yProps(0)} icon={<IconCpu />} iconPosition="start" />
-                <Tab label="系统设置" {...a11yProps(1)} icon={<IconServerCog />} iconPosition="start" />
-                <Tab label="其他设置" {...a11yProps(2)} icon={<IconWorldCog />} iconPosition="start" />
+                <Tab label={t('setting_index.operationSettings.title')} {...a11yProps(0)} icon={<IconCpu />} iconPosition="start" />
+                <Tab label={t('setting_index.systemSettings.title')} {...a11yProps(1)} icon={<IconServerCog />} iconPosition="start" />
+                <Tab label={t('setting_index.otherSettings.title')} {...a11yProps(2)} icon={<IconWorldCog />} iconPosition="start" />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

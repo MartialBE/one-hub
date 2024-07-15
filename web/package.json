@@ -1,5 +1,5 @@
 {
-  "name": "one_api_web",
+  "name": "one_hub_web",
   "version": "1.2.0",
   "proxy": "http://127.0.0.1:3000",
   "private": true,
@@ -8,6 +8,7 @@
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@lobehub/i18n-cli": "^1.18.1",
     "@mui/icons-material": "^5.15.7",
     "@mui/lab": "^5.0.0-alpha.163",
     "@mui/material": "^5.15.7",
@@ -23,6 +24,8 @@
     "framer-motion": "^11.0.3",
     "highlight.js": "^11.10.0",
     "history": "^5.3.0",
+    "i18next": "^23.11.5",
+    "i18next-browser-languagedetector": "^8.0.0",
     "marked": "^4.1.1",
     "material-ui-popup-state": "^5.0.10",
     "notistack": "^3.0.1",
@@ -31,6 +34,7 @@
     "react-apexcharts": "^1.4.1",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
+    "react-i18next": "^14.1.2",
     "react-perfect-scrollbar": "^1.5.8",
     "react-qrcode-logo": "^3.0.0",
     "react-redux": "^9.1.0",
@@ -45,7 +49,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "i18n": "lobe-i18n",
+    "eject": "react-scripts eject",
+    "lint:fix": "eslint --fix \"./**/*.{js,jsx,ts,tsx}\"",
+    "fm:fix": "prettier --write \"./**/*.{js,jsx}\""
   },
   "eslintConfig": {
     "extends": [

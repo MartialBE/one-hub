@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab, Box, Card } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import Gateway from './Gateway';
 import Order from './Order';
 import AdminContainer from 'ui-component/AdminContainer';
@@ -30,6 +31,7 @@ function a11yProps(index) {
 }
 
 const Payment = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const hash = location.hash.replace('#', '');
@@ -66,8 +68,8 @@ const Payment = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label="订单列表" {...a11yProps(0)} />
-                <Tab label="网关设置" {...a11yProps(1)} />
+                <Tab label={t('paymentPage.orderList')} {...a11yProps(0)} />
+                <Tab label={t('paymentPage.gatewaySettings')} {...a11yProps(1)} />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

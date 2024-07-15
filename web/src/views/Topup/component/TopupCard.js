@@ -24,8 +24,10 @@ import PayDialog from './PayDialog';
 import { API } from 'utils/api';
 import React, { useEffect, useState } from 'react';
 import { showError, showInfo, showSuccess, renderQuota, trims } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const TopupCard = () => {
+  const { t } = useTranslation(); // Translation hook
   const theme = useTheme();
   const [redemptionCode, setRedemptionCode] = useState('');
   const [userQuota, setUserQuota] = useState(0);
@@ -47,7 +49,7 @@ const TopupCard = () => {
   });
   const topUp = async () => {
     if (redemptionCode === '') {
-      showInfo('请输入充值码！');
+      showInfo(t('topupCard.inputPlaceholder'));
       return;
     }
     setIsSubmitting(true);
@@ -74,23 +76,23 @@ const TopupCard = () => {
 
   const handlePay = () => {
     if (!selectedPayment) {
-      showError('请选择支付方式');
+      showError(t('topupCard.selectPaymentMethod'));
       return;
     }
 
     if (amount <= 0 || amount < siteInfo.PaymentMinAmount) {
-      showError('金额不能小于' + siteInfo.PaymentMinAmount);
+      showError(`${t('topupCard.amountMinLimit')} ${siteInfo.PaymentMinAmount}`);
       return;
     }
 
     if (amount > 1000000) {
-      showError('金额不能大于1000000');
+      showError(t('topupCard.amountMaxLimit'));
       return;
     }
 
     // 判读金额是否是正整数
     if (!/^[1-9]\d*$/.test(amount)) {
-      showError('请输入正整数金额');
+      showError(t('topupCard.positiveIntegerAmount'));
       return;
     }
 
@@ -121,7 +123,7 @@ const TopupCard = () => {
 
   const openTopUpLink = () => {
     if (!siteInfo.top_up_link) {
-      showError('超级管理员未设置充值链接！');
+      showError(t('topupCard.adminSetupRequired'));
       return;
     }
     window.open(siteInfo.top_up_link, '_blank');
@@ -199,7 +201,7 @@ const TopupCard = () => {
     <UserCard>
       <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
         <IconBuildingBank color={theme.palette.primary.main} />
-        <Typography variant="h4">当前额度:</Typography>
+        <Typography variant="h4">{t('topupCard.currentQuota')}</Typography>
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
 
@@ -208,7 +210,7 @@ const TopupCard = () => {
           sx={{
             marginTop: '40px'
           }}
-          title="在线充值"
+          title={t('topupCard.onlineTopup')}
         >
           <Stack spacing={2}>
             {payment.map((item, index) => (
@@ -248,22 +250,22 @@ const TopupCard = () => {
                 </Grid>
               ))}
             </Grid>
-            <TextField label="金额" type="number" onChange={handleAmountChange} value={amount} />
+            <TextField label={t('topupCard.amount')} type="number" onChange={handleAmountChange} value={amount} />
             <Divider />
             <Grid container direction="row" justifyContent="flex-end" spacing={2}>
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  充值金额:{' '}
+                  {t('topupCard.topupAmount')}:{' '}
                 </Typography>
               </Grid>
               <Grid item xs={6} md={3}>
                 ${Number(amount)}
               </Grid>
-              {discountTotal != amount && (
+              {discountTotal !== amount && (
                 <>
                   <Grid item xs={6} md={9}>
                     <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                      折后价:{' '}
+                      {t('topupCard.discountedPrice')}:{' '}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} md={3}>
@@ -275,7 +277,7 @@ const TopupCard = () => {
                 <>
                   <Grid item xs={6} md={9}>
                     <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                      手续费:
+                      {t('topupCard.fee')}:{' '}
                       {selectedPayment &&
                         (selectedPayment.fixed_fee > 0
                           ? '(固定)'
@@ -292,18 +294,20 @@ const TopupCard = () => {
 
               <Grid item xs={6} md={9}>
                 <Typography variant="h6" style={{ textAlign: 'right', fontSize: '0.875rem' }}>
-                  实际支付金额:{' '}
+                  {t('topupCard.actualAmountToPay')}:{' '}
                 </Typography>
               </Grid>
               <Grid item xs={6} md={3}>
                 {calculateTotal()}{' '}
                 {selectedPayment &&
-                  (selectedPayment.currency === 'CNY' ? `CNY (汇率：${siteInfo.PaymentUSDRate})` : selectedPayment.currency)}
+                  (selectedPayment.currency === 'CNY'
+                    ? `CNY (${t('topupCard.exchangeRate')}: ${siteInfo.PaymentUSDRate})`
+                    : selectedPayment.currency)}
               </Grid>
             </Grid>
             <Divider />
             <Button variant="contained" onClick={handlePay} disabled={disabledPay}>
-              充值
+              {t('topupCard.topup')}
             </Button>
           </Stack>
           <PayDialog open={open} onClose={onClosePayDialog} amount={amount} uuid={selectedPayment.uuid} />
@@ -314,24 +318,22 @@ const TopupCard = () => {
         sx={{
           marginTop: '40px'
         }}
-        title="兑换码充值"
+        title={t('topupCard.redemptionCodeTopup')}
       >
         <FormControl fullWidth variant="outlined">
-          <InputLabel htmlFor="key">兑换码</InputLabel>
+          <InputLabel htmlFor="key">{t('topupCard.inputLabel')}</InputLabel>
           <OutlinedInput
             id="key"
-            label="兑换码"
+            label={t('topupCard.inputLabel')}
             type="text"
             value={redemptionCode}
-            onChange={(e) => {
-              setRedemptionCode(e.target.value);
-            }}
+            onChange={(e) => setRedemptionCode(e.target.value)}
             name="key"
-            placeholder="请输入兑换码"
+            placeholder={t('topupCard.inputPlaceholder')}
             endAdornment={
               <InputAdornment position="end">
                 <Button variant="contained" onClick={topUp} disabled={isSubmitting}>
-                  {isSubmitting ? '兑换中...' : '兑换'}
+                  {isSubmitting ? t('topupCard.exchangeButton.submitting') : t('topupCard.exchangeButton.default')}
                 </Button>
               </InputAdornment>
             }
@@ -341,10 +343,10 @@ const TopupCard = () => {
 
         <Stack justifyContent="center" alignItems={'center'} spacing={3} paddingTop={'20px'}>
           <Typography variant={'h4'} color={theme.palette.grey[700]}>
-            还没有兑换码？ 点击获取兑换码：
+            {t('topupCard.noRedemptionCodeText')}
           </Typography>
           <Button variant="contained" onClick={openTopUpLink}>
-            获取兑换码
+            {t('topupCard.getRedemptionCode')}
           </Button>
         </Stack>
       </SubCard>

@@ -4,8 +4,10 @@ import { API } from 'utils/api';
 import { marked } from 'marked';
 import BaseIndex from './baseIndex';
 import { Box, Container } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
+  const { t } = useTranslation();
   const [homePageContentLoaded, setHomePageContentLoaded] = useState(false);
   const [homePageContent, setHomePageContent] = useState('');
   const displayNotice = async () => {
@@ -41,7 +43,7 @@ const Home = () => {
         localStorage.setItem('home_page_content', content);
       } else {
         showError(message);
-        setHomePageContent('加载首页内容失败...');
+        setHomePageContent(t('home.loadingErr'));
       }
       setHomePageContentLoaded(true);
     } catch (error) {

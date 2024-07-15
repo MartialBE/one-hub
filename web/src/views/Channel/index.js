@@ -6,6 +6,7 @@ import ChannelList from './ChannelList';
 import ChannelTag from './ChannelTag';
 import AdminContainer from 'ui-component/AdminContainer';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -31,6 +32,7 @@ function a11yProps(index) {
 }
 
 const ChannelTab = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const hash = location.hash.replace('#', '');
@@ -67,8 +69,8 @@ const ChannelTab = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label="渠道列表" {...a11yProps(0)} icon={<IconList />} iconPosition="start" />
-                <Tab label="渠道标签" {...a11yProps(1)} icon={<IconListDetails />} iconPosition="start" />
+                <Tab label={t('channel_index.channelList')} {...a11yProps(0)} icon={<IconList />} iconPosition="start" />
+                <Tab label={t('channel_index.channelTags')} {...a11yProps(1)} icon={<IconListDetails />} iconPosition="start" />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

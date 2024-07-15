@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Divider, Button, Tabs, Tab, Box } from '@mui/material';
 import BatchAzureAPI from './BatchAzureAPI';
 import BatchDelModel from './BatchDelModel';
+import { useTranslation } from 'react-i18next';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -28,6 +29,7 @@ function a11yProps(index) {
 }
 
 const BatchModal = ({ open, setOpen }) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -38,8 +40,8 @@ const BatchModal = ({ open, setOpen }) => {
       <DialogTitle>
         <Box>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs channel">
-            <Tab label="Azure 版本号" {...a11yProps(0)} />
-            <Tab label="批量删除模型" {...a11yProps(1)} />
+            <Tab label={t('channel_index.AzureApiVersion')} {...a11yProps(0)} />
+            <Tab label={t('channel_index.batchDelete')} {...a11yProps(1)} />
           </Tabs>
         </Box>
       </DialogTitle>
@@ -52,7 +54,7 @@ const BatchModal = ({ open, setOpen }) => {
           <BatchDelModel />
         </CustomTabPanel>
         <DialogActions>
-          <Button onClick={() => setOpen(!open)}>取消</Button>
+          <Button onClick={() => setOpen(!open)}>{t('common.cancel')}</Button>
         </DialogActions>
       </DialogContent>
     </Dialog>

@@ -27,6 +27,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { renderQuotaWithPrompt, showSuccess, showError } from 'utils/common';
 import { API } from 'utils/api';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 require('dayjs/locale/zh-cn');
 
 const validationSchema = Yup.object().shape({
@@ -47,6 +48,7 @@ const originInputs = {
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
   const siteInfo = useSelector((state) => state.siteInfo);
@@ -109,19 +111,19 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {tokenId ? '编辑令牌' : '新建令牌'}
+        {tokenId ? t('token_index.editToken') : t('token_index.createToken')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Alert severity="info">注意，令牌的额度仅用于限制令牌本身的最大额度使用量，实际的使用受到账户的剩余额度限制。</Alert>
+        <Alert severity="info">{t('token_index.quotaNote')}</Alert>
         <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldError, setFieldValue, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-name-label">名称</InputLabel>
+                <InputLabel htmlFor="channel-name-label">{t('token_index.name')}</InputLabel>
                 <OutlinedInput
                   id="channel-name-label"
-                  label="名称"
+                  label={t('token_index.name')}
                   type="text"
                   value={values.name}
                   name="name"
@@ -140,14 +142,14 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                 <FormControl fullWidth error={Boolean(touched.expired_time && errors.expired_time)} sx={{ ...theme.typography.otherInput }}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
                     <DateTimePicker
-                      label="过期时间"
+                      label={t('token_index.expiryTime')}
                       ampm={false}
                       value={dayjs.unix(values.expired_time)}
                       onError={(newError) => {
                         if (newError === null) {
                           setFieldError('expired_time', null);
                         } else {
-                          setFieldError('expired_time', '无效的日期');
+                          setFieldError('expired_time', t('token_index.invalidDate'));
                         }
                       }}
                       onChange={(newValue) => {
@@ -180,14 +182,14 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                     }}
                   />
                 }
-                label="永不过期"
+                label={t('token_index.neverExpires')}
               />
 
               <FormControl fullWidth error={Boolean(touched.remain_quota && errors.remain_quota)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-remain_quota-label">额度</InputLabel>
+                <InputLabel htmlFor="channel-remain_quota-label">{t('token_index.quota')}</InputLabel>
                 <OutlinedInput
                   id="channel-remain_quota-label"
-                  label="额度"
+                  label={t('token_index.quota')}
                   type="number"
                   value={values.remain_quota}
                   name="remain_quota"
@@ -214,7 +216,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                       }}
                     />
                   }
-                  label="无限额度"
+                  label={t('token_index.unlimitedQuota')}
                 />
                 {siteInfo.chat_cache_enabled && (
                   <FormControlLabel
@@ -226,14 +228,14 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                         }}
                       />
                     }
-                    label="是否开启缓存(开启后，将会缓存聊天记录，以减少消费)"
+                    label={t('token_index.enableCache')}
                   />
                 )}
               </FormControl>
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('token_index.submit')}
                 </Button>
               </DialogActions>
             </form>

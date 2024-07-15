@@ -21,8 +21,10 @@ import TableSwitch from 'ui-component/Switch';
 import { timestamp2string, renderQuota, copy } from 'utils/common';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RedemptionTableRow({ item, manageRedemption, handleOpenModal, setModalRedemptionId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
@@ -67,7 +69,7 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
         <TableCell>
           {item.status !== 1 && item.status !== 2 ? (
             <Label variant="filled" color={item.status === 3 ? 'success' : 'orange'}>
-              {item.status === 3 ? '已使用' : '未知'}
+              {item.status === 3 ? t('analytics_index.used') : t('common.unknown')}
             </Label>
           ) : (
             <TableSwitch id={`switch-${item.id}`} checked={statusSwitch === 1} onChange={handleStatus} />
@@ -76,7 +78,7 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
 
         <TableCell>{renderQuota(item.quota)}</TableCell>
         <TableCell>{timestamp2string(item.created_time)}</TableCell>
-        <TableCell>{item.redeemed_time ? timestamp2string(item.redeemed_time) : '尚未兑换'}</TableCell>
+        <TableCell>{item.redeemed_time ? timestamp2string(item.redeemed_time) : t('redemptionPage.unredeemed')}</TableCell>
         <TableCell>
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
             <Button
@@ -84,10 +86,10 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
               color="primary"
               size="small"
               onClick={() => {
-                copy(item.key, '兑换码');
+                copy(item.key, t('topupCard.inputLabel'));
               }}
             >
-              复制
+              {t('token_index.copy')}
             </Button>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
               <IconDotsVertical />
@@ -115,23 +117,25 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
-          编辑
+          {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
-          删除
+          {t('common.delete')}
         </MenuItem>
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除兑换码</DialogTitle>
+        <DialogTitle>{t('redemptionPage.del')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除兑换码 {item.name}？</DialogContentText>
+          <DialogContentText>
+            {t('redemptionPage.delTip')} {item.name}？
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('common.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -6,9 +6,11 @@ import { showError, copy } from 'utils/common';
 import { Typography, Accordion, AccordionSummary, AccordionDetails, Box, Stack } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Label from 'ui-component/Label';
+import { useTranslation } from 'react-i18next';
 
 const SupportModels = () => {
   const [modelList, setModelList] = useState([]);
+  const { t } = useTranslation();
 
   const fetchModels = async () => {
     try {
@@ -37,12 +39,12 @@ const SupportModels = () => {
   return (
     <Accordion key="support_models" sx={{ borderRadius: '12px' }}>
       <AccordionSummary aria-controls="support_models" expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">当前可用模型</Typography>
+        <Typography variant="subtitle1">{t('dashboard_index.model_price')}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={1}>
           {Object.entries(modelList).map(([title, models]) => (
-            <SubCard key={title} title={title === 'null' ? '其他模型' : title}>
+            <SubCard key={title} title={title === 'null' ? t('dashboard_index.other_models') : title}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {models.map((model) => (
                   <Label
@@ -50,7 +52,7 @@ const SupportModels = () => {
                     color="primary"
                     key={model}
                     onClick={() => {
-                      copy(model, '模型名称');
+                      copy(model, t('dashboard_index.model_name'));
                     }}
                   >
                     {model}

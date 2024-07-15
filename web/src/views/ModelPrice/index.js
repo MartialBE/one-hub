@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Card, Stack, Typography } from '@mui/material';
 import {
@@ -16,6 +17,8 @@ import { ValueFormatter, priceType } from 'views/Pricing/component/util';
 
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
+  const { t } = useTranslation();
+
   const [rows, setRows] = useState([]);
   const [userModelList, setUserModelList] = useState([]);
   const [prices, setPrices] = useState({});
@@ -113,14 +116,14 @@ export default function ModelPrice() {
       {
         field: 'model',
         sortable: true,
-        headerName: '模型名称',
+        headerName: t('modelpricePage.model'),
         minWidth: 220,
         flex: 1
       },
       {
         field: 'type',
         sortable: true,
-        headerName: '类型',
+        headerName: t('modelpricePage.type'),
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
@@ -129,7 +132,7 @@ export default function ModelPrice() {
       {
         field: 'channel_type',
         sortable: true,
-        headerName: '供应商',
+        headerName: t('modelpricePage.channelType'),
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
@@ -138,7 +141,7 @@ export default function ModelPrice() {
       {
         field: 'input',
         sortable: true,
-        headerName: '输入倍率',
+        headerName: t('modelpricePage.inputMultiplier'),
         flex: 0.8,
         minWidth: 150,
         type: 'number',
@@ -147,14 +150,14 @@ export default function ModelPrice() {
       {
         field: 'output',
         sortable: true,
-        headerName: '输出倍率',
+        headerName: t('modelpricePage.outputMultiplier'),
         flex: 0.8,
         minWidth: 150,
         type: 'number',
         valueFormatter: (params) => ValueFormatter(params.value)
       }
     ],
-    [ownedby]
+    [ownedby, t]
   );
 
   function EditToolbar() {
@@ -171,7 +174,7 @@ export default function ModelPrice() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">可用模型</Typography>
+        <Typography variant="h4">{t('modelpricePage.availableModels')}</Typography>
       </Stack>
       <Card>
         <DataGrid

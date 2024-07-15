@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { showError, trims, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -20,6 +21,8 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch, IconPlus } from '@tabler/icons-react';
 
 export default function Gateway() {
+  const { t } = useTranslation();
+
   const originalKeyword = {
     p: 0,
     type: '',
@@ -110,7 +113,7 @@ export default function Gateway() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         await handleRefresh();
       } else {
         showError(message);
@@ -166,9 +169,9 @@ export default function Gateway() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">支付网关</Typography>
+        <Typography variant="h4">{t('paymentGatewayPage.title')}</Typography>
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建支付
+          {t('paymentGatewayPage.createPayment')}
         </Button>
       </Stack>
       <Card>
@@ -187,11 +190,10 @@ export default function Gateway() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新/清除搜索条件
+                {t('paymentGatewayPage.refreshClear')}
               </Button>
-
               <Button onClick={search} startIcon={<IconSearch width={'18px'} />}>
-                搜索
+                {t('paymentGatewayPage.search')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -207,57 +209,57 @@ export default function Gateway() {
                 headLabel={[
                   {
                     id: 'id',
-                    label: 'ID',
+                    label: t('paymentGatewayPage.tableHeaders.id'),
                     disableSort: false
                   },
                   {
                     id: 'uuid',
-                    label: 'UUID',
+                    label: t('paymentGatewayPage.tableHeaders.uuid'),
                     disableSort: false
                   },
                   {
                     id: 'name',
-                    label: '名称',
+                    label: t('paymentGatewayPage.tableHeaders.name'),
                     disableSort: true
                   },
                   {
                     id: 'type',
-                    label: '类型',
+                    label: t('paymentGatewayPage.tableHeaders.type'),
                     disableSort: false
                   },
                   {
                     id: 'icon',
-                    label: '图标',
+                    label: t('paymentGatewayPage.tableHeaders.icon'),
                     disableSort: true
                   },
                   {
                     id: 'fixed_fee',
-                    label: '固定手续费',
+                    label: t('paymentGatewayPage.tableHeaders.fixedFee'),
                     disableSort: true
                   },
                   {
                     id: 'percent_fee',
-                    label: '百分比手续费',
+                    label: t('paymentGatewayPage.tableHeaders.percentFee'),
                     disableSort: true
                   },
                   {
                     id: 'sort',
-                    label: '排序',
+                    label: t('paymentGatewayPage.tableHeaders.sort'),
                     disableSort: false
                   },
                   {
                     id: 'enable',
-                    label: '启用',
+                    label: t('paymentGatewayPage.tableHeaders.enable'),
                     disableSort: false
                   },
                   {
                     id: 'created_at',
-                    label: '创建时间',
+                    label: t('paymentGatewayPage.tableHeaders.createdAt'),
                     disableSort: false
                   },
                   {
                     id: 'action',
-                    label: '操作',
+                    label: t('paymentGatewayPage.tableHeaders.action'),
                     disableSort: true
                   }
                 ]}

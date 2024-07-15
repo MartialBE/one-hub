@@ -28,8 +28,10 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import GroupLabel from './GroupLabel';
 import ChannelTable from './ChannelTable';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 export default function TagTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openRow, setOpenRow] = useState(false);
@@ -73,7 +75,7 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
             <Label color="error" variant="outlined">
-              未知
+              {t('common.unknown')}
             </Label>
           ) : (
             <Label color={CHANNEL_OPTIONS[item.type].color} variant="outlined">
@@ -136,25 +138,26 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
-          编辑
+          {t('common.edit')}
         </MenuItem>
 
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
-          删除
+          {t('common.delete')}
         </MenuItem>
       </Popover>
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除标签</DialogTitle>
+        <DialogTitle>{t('channel_row.delTag')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            是否删除标签{item.name}？<br /> ⚠️ 注意：该操作会删除渠道。
+            {t('channel_row.delTagInfo1')}
+            {item.name}？<br /> {t('channel_row.delTagInfo2')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('common.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
