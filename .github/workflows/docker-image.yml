@@ -31,6 +31,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 22
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            ~/.cache/yarn
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Build Frontend
         env:
           CI: ""
@@ -44,6 +53,15 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ">=1.18.0"
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Build Backend (amd64)
         run: |
           go mod download
