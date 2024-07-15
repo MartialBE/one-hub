@@ -37,18 +37,18 @@ function createMenu(menuItems) {
   );
 }
 
-function statusInfo(status) {
+function statusInfo(t, status) {
   switch (status) {
     case 1:
-      return '已启用';
+      return t('common.enable');
     case 2:
-      return '已禁用';
+      return t('common.disable');
     case 3:
-      return '已过期';
+      return t('common.expired');
     case 4:
-      return '已耗尽';
+      return t('common.exhaust');
     default:
-      return '未知';
+      return t('common.unknown');
   }
 }
 
@@ -103,7 +103,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
 
   const actionItems = createMenu([
     {
-      text: '编辑',
+      text: t('common.edit'),
       icon: <IconEdit style={{ marginRight: '16px' }} />,
       onClick: () => {
         handleCloseMenu();
@@ -113,7 +113,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
       color: undefined
     },
     {
-      text: '删除',
+      text: t('common.delete'),
       icon: <IconTrash style={{ marginRight: '16px' }} />,
       onClick: handleDeleteOpen,
       color: 'error.main'
@@ -137,7 +137,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     if (type === 'link') {
       window.open(text);
     } else {
-      copy(text, '链接');
+      copy(text, t('common.link'));
     }
     handleCloseMenu();
   };
@@ -172,7 +172,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
         <TableCell>
           <Tooltip
             title={(() => {
-              return statusInfo(statusSwitch);
+              return statusInfo(t, statusSwitch);
             })()}
             placement="top"
           >

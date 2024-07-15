@@ -8,6 +8,7 @@ import Label from 'ui-component/Label';
 import { STATUS_TYPE } from '../type/Type';
 import CodeBlock from 'ui-component/CodeBlock';
 import SunoMusic from './SunoMusic';
+import { useTranslation } from 'react-i18next';
 
 function renderType(types, type) {
   const typeOption = types[type];
@@ -45,6 +46,7 @@ function TruncatedText(text) {
 }
 
 export default function LogTableRow({ item, userIsAdmin }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -90,7 +92,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
         <DialogContent>{renderDialog(item)}</DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            关闭
+            {t('common.close')}
           </Button>
         </DialogActions>
       </Dialog>
