@@ -99,6 +99,13 @@ function Item({ item, isSelected, onClick, sx, ...other }) {
   );
 }
 
+Item.propTypes = {
+  item: PropTypes.any,
+  isSelected: PropTypes.bool,
+  onClick: PropTypes.func,
+  sx: PropTypes.any
+};
+
 function TruncatedText(text) {
   return text.length > 30 ? text.substring(0, 30) + '...' : text;
 }
