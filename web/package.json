@@ -1,5 +1,5 @@
 {
-  "name": "one_api_web",
+  "name": "one_hub_web",
   "version": "1.2.0",
   "proxy": "http://127.0.0.1:3000",
   "private": true,
@@ -22,6 +22,7 @@
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",
     "framer-motion": "^11.0.3",
+    "highlight.js": "^11.10.0",
     "history": "^5.3.0",
     "i18next": "^23.11.5",
     "i18next-browser-languagedetector": "^8.0.0",

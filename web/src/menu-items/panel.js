@@ -15,7 +15,8 @@ import {
   IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
-  IconBrandPaypal
+  IconBrandPaypal,
+  IconList
 } from '@tabler/icons-react';
 
 // constant
@@ -35,7 +36,8 @@ const icons = {
   IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
-  IconBrandPaypal
+  IconBrandPaypal,
+  IconList
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -118,6 +120,14 @@ const panel = {
       type: 'item',
       url: '/panel/midjourney',
       icon: icons.IconBrush,
+      breadcrumbs: false
+    },
+    {
+      id: 'task',
+      title: '异步任务',
+      type: 'item',
+      url: '/panel/task',
+      icon: icons.IconList,
       breadcrumbs: false
     },
     {

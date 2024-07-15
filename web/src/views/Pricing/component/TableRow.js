@@ -27,7 +27,7 @@ import Label from 'ui-component/Label';
 import { copy } from 'utils/common';
 import { useTranslation } from 'react-i18next';
 
-export default function PricesTableRow({ item, managePrices, handleOpenModal, setModalPricesItem, ownedby }) {
+export default function PricesTableRow({ item, managePrices, handleOpenModal, ownedby }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openRow, setOpenRow] = useState(false);
@@ -119,8 +119,7 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, se
         <MenuItem
           onClick={() => {
             handleCloseMenu();
-            handleOpenModal();
-            setModalPricesItem(item);
+            handleOpenModal(item);
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
@@ -152,7 +151,6 @@ PricesTableRow.propTypes = {
   item: PropTypes.object,
   managePrices: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalPricesItem: PropTypes.func,
   priceType: PropTypes.array,
   ownedby: PropTypes.array
 };

@@ -33,5 +33,6 @@ func init() {
 		config.ChannelTypeCoze:         "Coze",
 		config.ChannelTypeOllama:       "Ollama",
 		config.ChannelTypeHunyuan:      "Hunyuan",
+		config.ChannelTypeSuno:         "Suno",
 	}
 }

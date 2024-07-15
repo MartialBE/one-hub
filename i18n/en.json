@@ -472,7 +472,7 @@
   "项目仓库地址：": "Project repository address:{' '}",
   "由{' '}": "By{' '}",
   "开发，基于": "developed based on",
-  "One API，源代码遵循": "One API. Source code follows",
+  "One Hub": "One Hub. Source code follows",
   "MIT 协议": "MIT License",
   "OpenAI 接口聚合管理，支持多种渠道包括 Azure，可用于二次分发管理 key，仅单可执行文件，已打包好 Docker 镜像，一键部署，开箱即用": "OpenAI interface aggregation management. Supports multiple channels including Azure. Can be used for secondary distribution management key. Only single executable file, packaged Docker image, one-click deployment, ready to use",
   "百度文心千帆": "Baidu Wenxin Qianfan",

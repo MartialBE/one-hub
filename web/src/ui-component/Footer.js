@@ -17,7 +17,7 @@ const Footer = () => {
           <div className="custom-footer" dangerouslySetInnerHTML={{ __html: siteInfo.footer_html }}></div>
         ) : (
           <>
-            <Link href="https://github.com/MartialBE/one-api" target="_blank">
+            <Link href="https://github.com/MartialBE/one-hub" target="_blank">
               {siteInfo.system_name} {process.env.REACT_APP_VERSION}{' '}
             </Link>
             {t('footer.developedBy')}{' '}
@@ -28,7 +28,7 @@ const Footer = () => {
             <Link href="https://github.com/songquanpeng" target="_blank">
               JustSong
             </Link>{' '}
-            One API，{t('footer.sourceCode')}
+            One Hub，{t('footer.sourceCode')}
             <Link href="https://opensource.org/licenses/mit-license.php"> {t('footer.license')}</Link>
           </>
         )}

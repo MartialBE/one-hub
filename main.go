@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"one-api/cli"
 	"one-api/common"
+	"one-api/common/cache"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/notify"
+	"one-api/common/redis"
 	"one-api/common/requester"
 	"one-api/common/storage"
 	"one-api/common/telegram"
@@ -16,6 +18,7 @@ import (
 	"one-api/middleware"
 	"one-api/model"
 	"one-api/relay/relay_util"
+	"one-api/relay/task"
 	"one-api/router"
 	"time"
 
@@ -35,12 +38,13 @@ func main() {
 	cli.InitCli()
 	config.InitConf()
 	logger.SetupLogger()
-	logger.SysLog("One API " + config.Version + " started")
+	logger.SysLog("One Hub " + config.Version + " started")
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
 	// Initialize Redis
-	common.InitRedisClient()
+	redis.InitRedisClient()
+	cache.InitCacheManager()
 	// Initialize options
 	model.InitOptionMap()
 	relay_util.NewPricing()
@@ -53,6 +57,7 @@ func main() {
 	telegram.InitTelegramBot()
 
 	controller.InitMidjourneyTask()
+	task.InitTask()
 	notify.InitNotifier()
 	cron.InitCron()
 	storage.InitStorage()

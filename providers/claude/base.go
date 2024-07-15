@@ -19,7 +19,7 @@ func (f ClaudeProviderFactory) Create(channel *model.Channel) base.ProviderInter
 		BaseProvider: base.BaseProvider{
 			Config:    getConfig(),
 			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle),
+			Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
 		},
 	}
 }
@@ -36,7 +36,7 @@ func getConfig() base.ProviderConfig {
 }
 
 // 请求错误处理
-func requestErrorHandle(resp *http.Response) *types.OpenAIError {
+func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 	claudeError := &ClaudeError{}
 	err := json.NewDecoder(resp.Body).Decode(claudeError)
 	if err != nil {

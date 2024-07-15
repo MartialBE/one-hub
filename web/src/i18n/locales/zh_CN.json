@@ -12,6 +12,7 @@
   "model_price": "可用模型",
   "payment": "支付",
   "setting": "设置",
+  "task": "异步任务",
   "menu": {
     "home": "首页",
     "about": "关于",
@@ -660,7 +661,7 @@
         "aboutLabel": "关于",
         "aboutPlaceholder": "在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。",
         "saveAbout": "保存关于",
-        "copyrightWarning": "移除 One API 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。",
+        "copyrightWarning": "移除 One Hub 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。",
         "footerLabel": "页脚设置",
         "footerPlaceholder": "在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码",
         "setFooter": "设置页脚"

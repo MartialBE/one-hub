@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/redis"
 	"one-api/common/utils"
 	"time"
 
@@ -36,7 +37,7 @@ var (
 
 func redisRateLimiter(c *gin.Context, maxRequestNum int, duration int64, mark string) {
 	ctx := context.Background()
-	rdb := common.RDB
+	rdb := redis.RDB
 	key := "rateLimit:" + mark + c.ClientIP()
 	listLength, err := rdb.LLen(ctx, key).Result()
 	if err != nil {
@@ -87,7 +88,7 @@ func memoryRateLimiter(c *gin.Context, maxRequestNum int, duration int64, mark s
 }
 
 func rateLimitFactory(maxRequestNum int, duration int64, mark string) func(c *gin.Context) {
-	if common.RedisEnabled {
+	if config.RedisEnabled {
 		return func(c *gin.Context) {
 			redisRateLimiter(c, maxRequestNum, duration, mark)
 		}

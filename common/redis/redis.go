@@ -1,4 +1,4 @@
-package common
+package redis
 
 import (
 	"context"
@@ -6,12 +6,11 @@ import (
 	"one-api/common/logger"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 )
 
 var RDB *redis.Client
-var RedisEnabled = false
 
 // InitRedisClient This function is called after init()
 func InitRedisClient() (err error) {
@@ -40,7 +39,7 @@ func InitRedisClient() (err error) {
 	if err != nil {
 		logger.FatalLog("Redis ping test failed: " + err.Error())
 	} else {
-		RedisEnabled = true
+		config.RedisEnabled = true
 		// for compatibility with old versions
 		config.MemoryCacheEnabled = true
 	}

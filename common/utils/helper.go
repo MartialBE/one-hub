@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math"
 	"math/rand"
 	"net"
 	"os"
@@ -317,4 +318,8 @@ func Decimal(value float64, decimalPlace int) float64 {
 
 func GetUnixTime() int64 {
 	return time.Now().Unix()
+}
+
+func NumClamp(value, minVal, maxVal float64) float64 {
+	return math.Max(minVal, math.Min(maxVal, value))
 }

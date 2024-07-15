@@ -519,7 +519,7 @@
         "aboutLabel": "About",
         "aboutPlaceholder": "Enter new about content here, supports Markdown & HTML code. If a link is entered, it will be used as the src attribute of the iframe, allowing you to set any web page as the about page.",
         "saveAbout": "Save About",
-        "copyrightWarning": "Removing the One API copyright must be authorized first. Maintaining the project requires a lot of effort. If this project is meaningful to you, please support it.",
+        "copyrightWarning": "Removing the One Hub copyright must be authorized first. Maintaining the project requires a lot of effort. If this project is meaningful to you, please support it.",
         "footerLabel": "Footer Settings",
         "footerPlaceholder": "Enter new footer here, leave blank to use the default footer, supports HTML code",
         "setFooter": "Set Footer"
@@ -885,5 +885,6 @@
   "ui-component": {
     "allModels": "View all models",
     "modelName": "Model name"
-  }
+  },
+  "task": "Asynchronous tasks"
 }

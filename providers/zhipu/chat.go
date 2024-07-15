@@ -7,6 +7,7 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -123,8 +124,8 @@ func (p *ZhipuProvider) convertFromChatOpenai(request *types.ChatCompletionReque
 		Model:       request.Model,
 		Messages:    request.Messages,
 		Stream:      request.Stream,
-		Temperature: request.Temperature,
-		TopP:        convertTopP(request.TopP),
+		Temperature: utils.NumClamp(request.Temperature, 0.01, 0.99),
+		TopP:        utils.NumClamp(request.TopP, 0.01, 0.99),
 		MaxTokens:   request.MaxTokens,
 		Stop:        request.Stop,
 		ToolChoice:  request.ToolChoice,

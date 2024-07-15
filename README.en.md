@@ -4,14 +4,14 @@
 
 <p align="center">
    <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-api/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
+   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-hub/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
    <img height="90" src="https://raw.githubusercontent.com/MartialBE/one-api/main/web/src/assets/images/logo.svg">
    </picture>
 </p>
 
 <div align="center">
 
-# One API
+# One Hub
 
 _This project is based on [one-api](https://github.com/songquanpeng/one-api) and has been developed for the second time._
 
@@ -19,7 +19,7 @@ _This project is based on [one-api](https://github.com/songquanpeng/one-api) and
   <a href="https://raw.githubusercontent.com/MartialBE/one-api/main/LICENSE">
     <img src="https://img.shields.io/github/license/MartialBE/one-api?color=brightgreen" alt="license">
   </a>
-  <a href="https://github.com/MartialBE/one-api/releases/latest">
+  <a href="https://github.com/MartialBE/one-hub/releases/latest">
     <img src="https://img.shields.io/github/v/release/MartialBE/one-api?color=brightgreen&include_prereleases" alt="release">
   </a>
   <a href="https://github.com/users/MartialBE/packages/container/package/one-api">
@@ -68,7 +68,7 @@ If you find that a new model is missing, please update the newly added model in 
 
 ## Documentation
 
-Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
+Please refer to the [documentation](https://github.com/MartialBE/one-hub/wiki).
 
 ## Current Supported Providers
 
@@ -98,6 +98,7 @@ Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                                | -          | -      | ⚠️ image | -                                                                |
 | [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                               | -          | -      | -        | -                                                                |
 | [Ollama](https://github.com/ollama/ollama)                            | ✅                               | ✅         | -      | -        | -                                                                |
+| [Suno](https://suno.com/)                                             | -                                | -          | -      | -        | [Suno-API](https://github.com/Suno-API/Suno-API)                 |
 
 ## Acknowledgements
 
@@ -105,7 +106,7 @@ Please refer to the [documentation](https://github.com/MartialBE/one-api/wiki).
   - [one-api](https://github.com/songquanpeng/one-api) serves as the foundation of this project.
   - [Berry Free React Admin Template](https://github.com/codedthemes/berry-free-react-admin-template) provides the frontend interface for this project.
   - [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react), some styles from this project were used.
-  - [new api](https://github.com/Calcium-Ion/new-api), the code for the Midjourney module is sourced from here.
+  - [new api](https://github.com/Calcium-Ion/new-api), the code for the Midjourney/Suno module is sourced from here.
 
 Special thanks to the authors and contributors of the above projects.
 

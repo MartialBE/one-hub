@@ -4,14 +4,14 @@
 
 <p align="center">
    <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-api/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
+   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/MartialBE/one-hub/assets/42402987/c4125d1a-5577-446d-ba15-2a71c52140c1">
    <img height="90" src="https://raw.githubusercontent.com/MartialBE/one-api/main/web/src/assets/images/logo.svg">
    </picture>
 </p>
 
 <div align="center">
 
-# One API
+# One Hub
 
 _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开发而来的_
 
@@ -19,7 +19,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
   <a href="https://raw.githubusercontent.com/MartialBE/one-api/main/LICENSE">
     <img src="https://img.shields.io/github/license/MartialBE/one-api?color=brightgreen" alt="license">
   </a>
-  <a href="https://github.com/MartialBE/one-api/releases/latest">
+  <a href="https://github.com/MartialBE/one-hub/releases/latest">
     <img src="https://img.shields.io/github/v/release/MartialBE/one-api?color=brightgreen&include_prereleases" alt="release">
   </a>
   <a href="https://github.com/users/MartialBE/packages/container/package/one-api">
@@ -72,7 +72,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 
 ## 文档
 
-请查看[文档](https://github.com/MartialBE/one-api/wiki)
+请查看[文档](https://github.com/MartialBE/one-hub/wiki)
 
 ## 当前支持的供应商
 
@@ -102,6 +102,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 | [Stability AI](https://platform.stability.ai/account/credits)         | -                        | -          | -      | ⚠️ 图片生成 | -                                                                |
 | [Coze](https://www.coze.com/open/docs/chat?_lang=zh)                  | ✅                       | -          | -      | -           | -                                                                |
 | [Ollama](https://github.com/ollama/ollama)                            | ✅                       | ✅         | -      | -           | -                                                                |
+| [Suno](https://suno.com/)                                             | -                        | -          | -      | -           | [Suno-API](https://github.com/Suno-API/Suno-API)                 |
 
 ## 感谢
 
@@ -109,13 +110,13 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
   - [one-api](https://github.com/songquanpeng/one-api)为本项目的基础
   - [Berry Free React Admin Template](https://github.com/codedthemes/berry-free-react-admin-template)为本项目的前端界面
   - [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react),使用了其中的部分样式
-  - [new api](https://github.com/Calcium-Ion/new-api)，Midjourney 模块的代码来源于此
+  - [new api](https://github.com/Calcium-Ion/new-api)，Midjourney/Suno 模块的代码来源于此
 
 感谢以上项目的作者和贡献者
 
 ## 交流群
 
-<img src="https://github.com/MartialBE/one-api/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
+<img src="https://github.com/MartialBE/one-hub/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
 
 ## 其他
 

@@ -246,13 +246,13 @@ func checkMjTaskNeedUpdate(oldTask *model.Midjourney, newTask provider.Midjourne
 }
 
 func GetAllMidjourney(c *gin.Context) {
-	var params model.TaskQueryParams
+	var params model.MJTaskQueryParams
 	if err := c.ShouldBindQuery(&params); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
 
-	midjourneys, err := model.GetAllTasks(&params)
+	midjourneys, err := model.GetAllMJTasks(&params)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
@@ -267,13 +267,13 @@ func GetAllMidjourney(c *gin.Context) {
 func GetUserMidjourney(c *gin.Context) {
 	userId := c.GetInt("id")
 
-	var params model.TaskQueryParams
+	var params model.MJTaskQueryParams
 	if err := c.ShouldBindQuery(&params); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
 
-	midjourneys, err := model.GetAllUserTask(userId, &params)
+	midjourneys, err := model.GetAllUserMJTask(userId, &params)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return

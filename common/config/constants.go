@@ -9,7 +9,7 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "One API"
+var SystemName = "One Hub"
 var ServerAddress = "http://localhost:3000"
 var Footer = ""
 var Logo = ""
@@ -183,6 +183,8 @@ const (
 	ChannelTypeCoze           = 38
 	ChannelTypeOllama         = 39
 	ChannelTypeHunyuan        = 40
+	ChannelTypeSuno           = 41
+	ChannelTypeVertexAI       = 42
 )
 
 var ChannelBaseURLs = []string{
@@ -227,6 +229,8 @@ var ChannelBaseURLs = []string{
 	"https://api.coze.com/open_api",       //38
 	"",                                    //39
 	"https://hunyuan.tencentcloudapi.com", //40
+	"",                                    //41
+	"",                                    //42
 }
 
 const (
@@ -242,4 +246,7 @@ const (
 	RelayModeAudioSpeech
 	RelayModeAudioTranscription
 	RelayModeAudioTranslation
+	RelayModeSuno
 )
+
+type ContextKey string
