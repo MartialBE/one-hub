@@ -82,7 +82,7 @@ func (p *VertexAIProvider) GetRequestHeaders() (headers map[string]string) {
 	token, err := p.GetToken()
 	if err != nil {
 		logger.SysError("Failed to get token: " + err.Error())
-		return headers
+		return nil
 	}
 
 	headers["Authorization"] = "Bearer " + token
@@ -140,6 +140,7 @@ func RequestErrorHandle(otherErr requester.HttpErrorHandler) requester.HttpError
 	return func(resp *http.Response) *types.OpenAIError {
 		requestBody, _ := io.ReadAll(resp.Body)
 		resp.Body = io.NopCloser(bytes.NewBuffer(requestBody))
+
 		if otherErr != nil {
 			err := otherErr(resp)
 			if err != nil {
@@ -147,14 +148,18 @@ func RequestErrorHandle(otherErr requester.HttpErrorHandler) requester.HttpError
 			}
 		}
 		vertexaiErrors := &VertexaiErrors{}
-		err := json.Unmarshal(requestBody, vertexaiErrors)
-		if err != nil {
-			return nil
+		if err := json.Unmarshal(requestBody, vertexaiErrors); err == nil {
+			if vertexaiError := vertexaiErrors.Error(); vertexaiError != nil {
+				return errorHandle(vertexaiError)
+			}
+		} else {
+			vertexaiError := &VertexaiError{}
+			if err := json.Unmarshal(requestBody, vertexaiError); err == nil {
+				return errorHandle(vertexaiError)
+			}
 		}
-		vertexaiError := vertexaiErrors.Error()
 
-		return errorHandle(vertexaiError)
-
+		return nil
 	}
 }
 
