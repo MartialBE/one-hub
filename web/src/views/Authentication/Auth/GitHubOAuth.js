@@ -11,17 +11,19 @@ import { Grid, Stack, Typography, useMediaQuery, CircularProgress } from '@mui/m
 import AuthWrapper from '../AuthWrapper';
 import AuthCardWrapper from '../AuthCardWrapper';
 import Logo from 'ui-component/Logo';
+import { useTranslation } from 'react-i18next';
 
 // assets
 
 // ================================|| AUTH3 - LOGIN ||================================ //
 
 const GitHubOAuth = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const [searchParams] = useSearchParams();
-  const [prompt, setPrompt] = useState('处理中...');
+  const [prompt, setPrompt] = useState(t('common.processing'));
   const { githubLogin } = useLogin();
 
   let navigate = useNavigate();
@@ -33,13 +35,13 @@ const GitHubOAuth = () => {
         showError(message);
       }
       if (count === 0) {
-        setPrompt(`操作失败，重定向至登录界面中...`);
+        setPrompt(t('login.githubError'));
         await new Promise((resolve) => setTimeout(resolve, 2000));
         navigate('/login');
         return;
       }
       count++;
-      setPrompt(`出现错误，第 ${count} 次重试中...`);
+      setPrompt(t('login.githubCountError', { count }));
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await sendCode(code, state, count);
     }
@@ -70,7 +72,7 @@ const GitHubOAuth = () => {
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
                           <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
-                            GitHub 登录
+                            {t('login.githubLogin')}
                           </Typography>
                         </Stack>
                       </Grid>

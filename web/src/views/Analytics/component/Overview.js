@@ -7,8 +7,10 @@ import { showError, calculateQuota } from 'utils/common';
 import dayjs from 'dayjs';
 import { API } from 'utils/api';
 import { generateBarChartOptions, renderChartNumber } from 'utils/chart';
+import { useTranslation } from 'react-i18next';
 
 export default function Overview() {
+  const { t } = useTranslation();
   const [channelLoading, setChannelLoading] = useState(true);
   const [redemptionLoading, setRedemptionLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -99,7 +101,11 @@ export default function Overview() {
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item lg={8} xs={12}>
-        <DateRangePicker defaultValue={dateRange} onChange={handleDateRangeChange} localeText={{ start: '开始时间', end: '结束时间' }} />
+        <DateRangePicker
+          defaultValue={dateRange}
+          onChange={handleDateRangeChange}
+          localeText={{ start: t('analytics_index.startTime'), end: t('analytics_index.endTime') }}
+        />
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h3">
@@ -110,22 +116,46 @@ export default function Overview() {
         <Divider />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts id="cost" isLoading={channelLoading} chartDatas={channelData?.costs || {}} title="消费统计" decimal={3} />
+        <ApexCharts
+          id="cost"
+          isLoading={channelLoading}
+          chartDatas={channelData?.costs || {}}
+          title={t('analytics_index.consumptionStatistics')}
+          decimal={3}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts id="token" isLoading={channelLoading} chartDatas={channelData?.tokens || {}} title="Tokens统计" unit="" />
+        <ApexCharts
+          id="token"
+          isLoading={channelLoading}
+          chartDatas={channelData?.tokens || {}}
+          title={t('analytics_index.tokensStatistics')}
+          unit=""
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts id="latency" isLoading={channelLoading} chartDatas={channelData?.latency || {}} title="平均延迟" unit="" />
+        <ApexCharts
+          id="latency"
+          isLoading={channelLoading}
+          chartDatas={channelData?.latency || {}}
+          title={t('analytics_index.averageLatency')}
+          unit=""
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts id="requests" isLoading={channelLoading} chartDatas={channelData?.requests || {}} title="请求数" unit="" />
+        <ApexCharts
+          id="requests"
+          isLoading={channelLoading}
+          chartDatas={channelData?.requests || {}}
+          title={t('analytics_index.requestsCount')}
+          unit=""
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts isLoading={redemptionLoading} chartDatas={redemptionData} title="兑换统计" />
+        <ApexCharts isLoading={redemptionLoading} chartDatas={redemptionData} title={t('analytics_index.redemptionStatistics')} />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCharts isLoading={usersLoading} chartDatas={usersData} title="注册统计" />
+        <ApexCharts isLoading={usersLoading} chartDatas={usersData} title={t('analytics_index.registrationStatistics')} />
       </Grid>
     </Grid>
   );

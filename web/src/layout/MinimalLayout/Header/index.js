@@ -19,9 +19,14 @@ import LogoSection from 'layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import ThemeButton from 'ui-component/ThemeButton';
+import I18nButton from 'ui-component/i18nButton';
+import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
+import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from 'ui-component/extended/Transitions';
 import MainCard from 'ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { IconMenu2 } from '@tabler/icons-react';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 
@@ -33,9 +38,11 @@ const Header = () => {
   const account = useSelector((state) => state.account);
   const [open, setOpen] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t, i18n } = useTranslation();
 
   const handleOpenMenu = (event) => {
     setOpen(open ? null : event.currentTarget);
+    i18n.changeLanguage('ja_JP');
   };
 
   const handleCloseMenu = () => {
@@ -63,6 +70,8 @@ const Header = () => {
       <Stack spacing={2} direction="row" justifyContent="center" alignItems="center">
         {isMobile ? (
           <>
+            <ThemeButton />
+            <I18nButton />
             <IconButton onClick={handleOpenMenu}>
               <IconMenu2 />
             </IconButton>
@@ -70,10 +79,10 @@ const Header = () => {
         ) : (
           <>
             <Button component={Link} variant="text" to="/" color={pathname === '/' ? 'primary' : 'inherit'}>
-              首页
+              {t('menu.home')}
             </Button>
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
-              接口
+            {t('menu.about')}
             </Button>
             <Button
               variant="text"
@@ -93,16 +102,18 @@ const Header = () => {
             >
               对话
             </Button>
+            <ThemeButton />
+            <I18nButton />
             {account.user ? (
               <>
-              <Button component={Link} variant="contained" to="/panel" color="primary">
-              控制台
-            </Button>
-              <ProfileSection />
+                <Button component={Link} variant="contained" to="/panel" color="primary">
+                  {t('menu.console')}
+                </Button>
+                <ProfileSection />
               </>
             ) : (
               <Button component={Link} variant="contained" to="/login" color="primary">
-                登录
+                {t('menu.login')}
               </Button>
             )}
           </>
@@ -146,11 +157,11 @@ const Header = () => {
                     onClick={handleCloseMenu}
                   >
                     <ListItemButton component={Link} variant="text" to="/">
-                      <ListItemText primary={<Typography variant="body2">首页</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('menu.home')}</Typography>} />
                     </ListItemButton>
 
                     <ListItemButton component={Link} variant="text" to="/about">
-                      <ListItemText primary={<Typography variant="body2">接口</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('menu.about')}</Typography>} />
                     </ListItemButton>
                     <ListItemButton
                       variant="text"
@@ -173,11 +184,11 @@ const Header = () => {
                     <Divider />
                     {account.user ? (
                       <ListItemButton component={Link} variant="contained" to="/panel" color="primary">
-                        控制台
+                        {t('menu.console')}
                       </ListItemButton>
                     ) : (
                       <ListItemButton component={Link} variant="contained" to="/login" color="primary">
-                        登录
+                        {t('menu.login')}
                       </ListItemButton>
                     )}
                   </List>

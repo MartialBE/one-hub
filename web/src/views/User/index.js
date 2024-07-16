@@ -19,8 +19,10 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 
+import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 export default function Users() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -117,7 +119,7 @@ export default function Users() {
       res = await API.post(url, data);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         await handleRefresh();
       } else {
         showError(message);
@@ -149,15 +151,15 @@ export default function Users() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">用户</Typography>
+        <Typography variant="h4">{t('userPage.users')}</Typography>
 
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建用户
+          {t('userPage.createUser')}
         </Button>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchUsers} noValidate>
-          <TableToolBar placeholder={'搜索用户的ID，用户名，分组，显示名称，以及邮箱地址...'} />
+          <TableToolBar placeholder={t('userPage.searchPlaceholder')} />
         </Box>
         <Toolbar
           sx={{
@@ -171,7 +173,7 @@ export default function Users() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新
+                {t('userPage.refresh')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -185,15 +187,15 @@ export default function Users() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'id', label: 'ID', disableSort: false },
-                  { id: 'username', label: '用户名', disableSort: false },
-                  { id: 'group', label: '分组', disableSort: true },
-                  { id: 'stats', label: '统计信息', disableSort: true },
-                  { id: 'role', label: '用户角色', disableSort: false },
-                  { id: 'bind', label: '绑定', disableSort: true },
-                  { id: 'created_time', label: '创建时间', disableSort: false },
-                  { id: 'status', label: '状态', disableSort: false },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'id', label: t('userPage.id'), disableSort: false },
+                  { id: 'username', label: t('userPage.username'), disableSort: false },
+                  { id: 'group', label: t('userPage.group'), disableSort: true },
+                  { id: 'stats', label: t('userPage.statistics'), disableSort: true },
+                  { id: 'role', label: t('userPage.userRole'), disableSort: false },
+                  { id: 'bind', label: t('userPage.bind'), disableSort: true },
+                  { id: 'created_time', label: t('userPage.creationTime'), disableSort: false },
+                  { id: 'status', label: t('userPage.status'), disableSort: false },
+                  { id: 'action', label: t('userPage.action'), disableSort: true }
                 ]}
               />
               <TableBody>

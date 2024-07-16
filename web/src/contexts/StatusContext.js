@@ -3,11 +3,13 @@ import { API } from 'utils/api';
 import { showError } from 'utils/common';
 import { SET_SITE_INFO } from 'store/actions';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 export const LoadStatusContext = createContext();
 
 // eslint-disable-next-line
 const StatusProvider = ({ children }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const loadStatus = useCallback(async () => {
@@ -40,12 +42,13 @@ const StatusProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      showError('无法正常连接至服务器！');
+      showError(t('common.unableServer'));
     }
 
     if (system_name) {
       document.title = system_name;
     }
+    // eslint-disable-next-line
   }, [dispatch]);
 
   useEffect(() => {

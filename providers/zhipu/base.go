@@ -4,20 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"one-api/common/cache"
 	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
 	"one-api/types"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
-var zhipuTokens sync.Map
 var expSeconds int64 = 24 * 3600
+
+var zhiPuCacheKey = "api_token:zhipu"
 
 type ZhipuProviderFactory struct{}
 
@@ -84,15 +85,17 @@ func (p *ZhipuProvider) GetFullRequestURL(requestURL string) string {
 }
 
 func (p *ZhipuProvider) getZhipuToken() string {
-	apikey := p.Channel.Key
-	data, ok := zhipuTokens.Load(apikey)
-	if ok {
-		tokenData := data.(zhipuTokenData)
-		if time.Now().Before(tokenData.ExpiryTime) {
-			return tokenData.Token
-		}
+	cacheKey := fmt.Sprintf("%s:%d", zhiPuCacheKey, p.Channel.Id)
+	tokenStr, err := cache.GetCache[string](cacheKey)
+	if err != nil {
+		logger.SysError("get zhipu token error: " + err.Error())
 	}
 
+	if tokenStr != "" {
+		return tokenStr
+	}
+
+	apikey := p.Channel.Key
 	split := strings.Split(apikey, ".")
 	if len(split) != 2 {
 		logger.SysError("invalid zhipu key: " + apikey)
@@ -103,7 +106,6 @@ func (p *ZhipuProvider) getZhipuToken() string {
 	secret := split[1]
 
 	expMillis := time.Now().Add(time.Duration(expSeconds)*time.Second).UnixNano() / 1e6
-	expiryTime := time.Now().Add(time.Duration(expSeconds) * time.Second)
 
 	timestamp := time.Now().UnixNano() / 1e6
 
@@ -123,10 +125,7 @@ func (p *ZhipuProvider) getZhipuToken() string {
 		return ""
 	}
 
-	zhipuTokens.Store(apikey, zhipuTokenData{
-		Token:      tokenString,
-		ExpiryTime: expiryTime,
-	})
+	cache.SetCache(cacheKey, tokenString, time.Duration(expSeconds)*time.Second)
 
 	return tokenString
 }

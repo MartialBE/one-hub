@@ -16,6 +16,7 @@ type ContextKey string
 
 const ProxyHTTPAddrKey ContextKey = "proxyHttpAddr"
 const ProxySock5AddrKey ContextKey = "proxySock5Addr"
+const ProxyAddrKey ContextKey = "proxyAddr"
 
 func ProxyFunc(req *http.Request) (*url.URL, error) {
 	proxyAddr := req.Context().Value(ProxyHTTPAddrKey)

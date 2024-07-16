@@ -53,7 +53,7 @@ ghcr.io/martialbe/one-api
 
 ## 文档
 
-请查看[文档](https://github.com/MartialBE/one-api/wiki)
+请查看[文档](https://github.com/MartialBE/one-hub/wiki)
 
 ## 当前支持的供应商
 
@@ -97,7 +97,7 @@ ghcr.io/martialbe/one-api
 
 ## 交流群
 
-<img src="https://github.com/MartialBE/one-api/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
+<img src="https://github.com/MartialBE/one-hub/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
 
 ## 其他
 

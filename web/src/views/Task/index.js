@@ -19,6 +19,7 @@ import { isAdmin } from 'utils/common';
 import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 export default function Task() {
   const originalKeyword = {
@@ -31,6 +32,7 @@ export default function Task() {
     end_timestamp: dayjs().unix() + 3600
   };
 
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -140,11 +142,11 @@ export default function Task() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新/清除搜索条件
+                {t('midjourneyPage.refreshClearSearch')}
               </Button>
 
               <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
-                搜索
+                {t('midjourneyPage.search')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -160,59 +162,59 @@ export default function Task() {
                 headLabel={[
                   {
                     id: 'task_id',
-                    label: '任务ID',
+                    label: t('taskPage.task'),
                     disableSort: true
                   },
                   {
                     id: 'submit_time',
-                    label: '提交时间',
+                    label: t('taskPage.subTime'),
                     disableSort: false
                   },
                   {
                     id: 'finish_time',
-                    label: '完成时间',
+                    label: t('taskPage.finishTime'),
                     disableSort: false
                   },
                   {
                     id: 'channel_id',
-                    label: '渠道',
+                    label: t('taskPage.channel'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'user_id',
-                    label: '用户',
+                    label: t('taskPage.user'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'platform',
-                    label: '平台',
+                    label: t('taskPage.platform'),
                     disableSort: false
                   },
                   {
                     id: 'action',
-                    label: '类型',
+                    label: t('taskPage.type'),
                     disableSort: true
                   },
                   {
                     id: 'time',
-                    label: '耗时',
+                    label: t('taskPage.time'),
                     disableSort: true
                   },
                   {
                     id: 'progress',
-                    label: '进度',
+                    label: t('taskPage.progress'),
                     disableSort: true
                   },
                   {
                     id: 'status',
-                    label: '任务状态(点击查看结果)',
+                    label: t('taskPage.status'),
                     disableSort: false
                   },
                   {
                     id: 'fail_reason',
-                    label: '失败原因',
+                    label: t('taskPage.fail'),
                     disableSort: true
                   }
                 ]}

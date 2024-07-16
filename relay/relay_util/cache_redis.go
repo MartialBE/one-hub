@@ -3,7 +3,7 @@ package relay_util
 import (
 	"errors"
 	"fmt"
-	"one-api/common"
+	"one-api/common/redis"
 	"one-api/common/utils"
 	"time"
 )
@@ -13,7 +13,7 @@ type ChatCacheRedis struct{}
 var chatCacheKey = "chat_cache"
 
 func (r *ChatCacheRedis) Get(hash string, userId int) *ChatCacheProps {
-	cache, err := common.RedisGet(r.getKey(hash, userId))
+	cache, err := redis.RedisGet(r.getKey(hash, userId))
 	if err != nil {
 		return nil
 	}
@@ -37,7 +37,7 @@ func (r *ChatCacheRedis) Set(hash string, props *ChatCacheProps, expire int64) e
 		return errors.New("marshal error")
 	}
 
-	return common.RedisSet(r.getKey(hash, props.UserId), data, time.Duration(expire)*time.Minute)
+	return redis.RedisSet(r.getKey(hash, props.UserId), data, time.Duration(expire)*time.Minute)
 }
 
 func (r *ChatCacheRedis) getKey(hash string, userId int) string {

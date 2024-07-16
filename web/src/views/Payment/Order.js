@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { showError, trims } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -20,6 +21,8 @@ import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
 export default function Order() {
+  const { t } = useTranslation();
+
   const originalKeyword = {
     p: 0,
     user_id: '',
@@ -112,7 +115,7 @@ export default function Order() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">日志</Typography>
+        <Typography variant="h4">{t('orderlogPage.title')}</Typography>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -130,11 +133,10 @@ export default function Order() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新/清除搜索条件
+                {t('orderlogPage.refreshClear')}
               </Button>
-
               <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
-                搜索
+                {t('orderlogPage.search')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -148,61 +150,17 @@ export default function Order() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  {
-                    id: 'created_at',
-                    label: '时间',
-                    disableSort: false
-                  },
-                  {
-                    id: 'gateway_id',
-                    label: '支付网关',
-                    disableSort: false
-                  },
-                  {
-                    id: 'user_id',
-                    label: '用户',
-                    disableSort: false
-                  },
-                  {
-                    id: 'trade_no',
-                    label: '订单号',
-                    disableSort: true
-                  },
-                  {
-                    id: 'gateway_no',
-                    label: '网关订单号',
-                    disableSort: true
-                  },
-                  {
-                    id: 'amount',
-                    label: '充值金额',
-                    disableSort: true
-                  },
-                  {
-                    id: 'fee',
-                    label: '手续费',
-                    disableSort: true
-                  },
-                  {
-                    id: 'discount',
-                    label: '优惠金额',
-                    disableSort: true
-                  },
-                  {
-                    id: 'order_amount',
-                    label: '实际支付金额',
-                    disableSort: true
-                  },
-                  {
-                    id: 'quota',
-                    label: '到帐点数',
-                    disableSort: true
-                  },
-                  {
-                    id: 'status',
-                    label: '状态',
-                    disableSort: false
-                  }
+                  { id: 'created_at', label: t('orderlogPage.tableHeaders.created_at'), disableSort: false },
+                  { id: 'gateway_id', label: t('orderlogPage.tableHeaders.gateway_id'), disableSort: false },
+                  { id: 'user_id', label: t('orderlogPage.tableHeaders.user_id'), disableSort: false },
+                  { id: 'trade_no', label: t('orderlogPage.tableHeaders.trade_no'), disableSort: true },
+                  { id: 'gateway_no', label: t('orderlogPage.tableHeaders.gateway_no'), disableSort: true },
+                  { id: 'amount', label: t('orderlogPage.tableHeaders.amount'), disableSort: true },
+                  { id: 'fee', label: t('orderlogPage.tableHeaders.fee'), disableSort: true },
+                  { id: 'discount', label: t('orderlogPage.tableHeaders.discount'), disableSort: true },
+                  { id: 'order_amount', label: t('orderlogPage.tableHeaders.order_amount'), disableSort: true },
+                  { id: 'quota', label: t('orderlogPage.tableHeaders.quota'), disableSort: true },
+                  { id: 'status', label: t('orderlogPage.tableHeaders.status'), disableSort: false }
                 ]}
               />
               <TableBody>

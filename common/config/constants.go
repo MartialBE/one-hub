@@ -184,6 +184,7 @@ const (
 	ChannelTypeOllama         = 39
 	ChannelTypeHunyuan        = 40
 	ChannelTypeSuno           = 41
+	ChannelTypeVertexAI       = 42
 )
 
 var ChannelBaseURLs = []string{
@@ -229,6 +230,7 @@ var ChannelBaseURLs = []string{
 	"",                                    //39
 	"https://hunyuan.tencentcloudapi.com", //40
 	"",                                    //41
+	"",                                    //42
 }
 
 const (

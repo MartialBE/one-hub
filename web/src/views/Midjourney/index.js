@@ -20,7 +20,9 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
+import { useTranslation } from 'react-i18next'; // Add this import
 export default function Log() {
+  const { t } = useTranslation(); // Use i18n translations
   const originalKeyword = {
     p: 0,
     channel_id: '',
@@ -120,7 +122,7 @@ export default function Log() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Midjourney</Typography>
+        <Typography variant="h4">{t('midjourneyPage.midjourney')}</Typography>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -138,11 +140,11 @@ export default function Log() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新/清除搜索条件
+                {t('midjourneyPage.refreshClearSearch')}
               </Button>
 
               <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
-                搜索
+                {t('midjourneyPage.search')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -158,67 +160,67 @@ export default function Log() {
                 headLabel={[
                   {
                     id: 'mj_id',
-                    label: '任务ID',
+                    label: t('midjourneyPage.taskID'),
                     disableSort: false
                   },
                   {
                     id: 'submit_time',
-                    label: '提交时间',
+                    label: t('midjourneyPage.submitTime'),
                     disableSort: false
                   },
                   {
                     id: 'channel_id',
-                    label: '渠道',
+                    label: t('midjourneyPage.channel'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'user_id',
-                    label: '用户',
+                    label: t('midjourneyPage.user'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'action',
-                    label: '类型',
+                    label: t('midjourneyPage.type'),
                     disableSort: false
                   },
                   {
                     id: 'code',
-                    label: '提交结果',
+                    label: t('midjourneyPage.submissionResult'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'status',
-                    label: '任务状态',
+                    label: t('midjourneyPage.taskStatus'),
                     disableSort: false,
                     hide: !userIsAdmin
                   },
                   {
                     id: 'progress',
-                    label: '进度',
+                    label: t('midjourneyPage.progress'),
                     disableSort: true
                   },
                   {
                     id: 'image_url',
-                    label: '结果图片',
+                    label: t('midjourneyPage.resultImage'),
                     disableSort: true,
                     width: '120px'
                   },
                   {
                     id: 'prompt',
-                    label: 'Prompt',
+                    label: t('midjourneyPage.prompt'),
                     disableSort: true
                   },
                   {
                     id: 'prompt_en',
-                    label: 'PromptEn',
+                    label: t('midjourneyPage.promptEn'),
                     disableSort: true
                   },
                   {
                     id: 'fail_reason',
-                    label: '失败原因',
+                    label: t('midjourneyPage.failureReason'),
                     disableSort: true
                   }
                 ]}

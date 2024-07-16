@@ -187,6 +187,13 @@ export const CHANNEL_OPTIONS = {
     value: 41,
     color: 'default'
   },
+  42: {
+    key: 42,
+    text: 'VertexAI',
+    value: 42,
+    color: 'orange',
+    url: 'https://console.cloud.google.com/'
+  },
   24: {
     key: 24,
     text: 'Azure Speech',

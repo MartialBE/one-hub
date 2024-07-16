@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { showInfo, showError } from 'utils/common';
 import { API } from 'utils/api';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
+import { useTranslation } from 'react-i18next';
 
 import {
   Popover,
@@ -76,22 +77,23 @@ const StyledMenu = styled((props) => (
   }
 }));
 
-function statusInfo(status) {
+function statusInfo(t, status) {
   switch (status) {
     case 1:
-      return '启用';
+      return t('channel_index.enabled');
     case 2:
-      return '手动';
+      return t('channel_row.manual');
     case 3:
-      return '自动';
+      return t('channel_row.auto');
     default:
-      return '未知';
+      return t('common.unknown');
   }
 }
 import Checkbox from '@mui/material/Checkbox';
 import { red, grey, purple } from '@mui/material/colors';
 
 export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openTest, setOpenTest] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -142,7 +144,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
 
     if (currentValue < 0) {
-      showError('优先级不能小于 0');
+      showError(t('channel_row.priorityTip'));
       return;
     }
 
@@ -157,7 +159,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
 
     if (currentValue < 1) {
-      showError('权重不能小于 1');
+      showError(t('channel_row.weightTip'));
       return;
     }
 
@@ -173,13 +175,13 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
 
     if (modelName == '') {
-      showError('请先设置测试模型');
+      showError(t('channel_row.modelTestTip'));
       return;
     }
     const { success, time } = await manageChannel(item.id, 'test', modelName);
     if (success) {
       setResponseTimeData({ test_time: Date.now() / 1000, response_time: time * 1000 });
-      showInfo(`渠道 ${item.name}: ${modelName} 测试成功，耗时 ${time.toFixed(2)} 秒。`);
+      showInfo(t('channel_row.modelTestSuccess', { channel: item.name, model: modelName, time: time.toFixed(2) }));
     }
   };
 
@@ -195,7 +197,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
       if (success) {
         setItemBalance(balance);
 
-        showInfo(`余额更新成功！`);
+        showInfo(t('channel_row.updateOk'));
       } else {
         showError(message);
       }
@@ -253,7 +255,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
             <Label color="error" variant="outlined">
-              未知
+              {t('common.unknown')}
             </Label>
           ) : (
             <Label color={CHANNEL_OPTIONS[item.type].color} variant="outlined">
@@ -263,7 +265,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </TableCell>
         <TableCell>
           <TableSwitch id={`switch-${item.id}`} checked={statusSwitch === 1} onChange={handleStatus} />
-          {statusInfo(statusSwitch)}
+          {statusInfo(t, statusSwitch)}
         </TableCell>
 
         <TableCell>
@@ -276,8 +278,8 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         
 
         <TableCell>
-          {renderQuota(item.used_quota)} / 
-          <Tooltip title={'点击更新余额'} placement="top" onClick={updateChannelBalance}>
+          {renderQuota(item.used_quota)}
+          <Tooltip title={t('channel_row.clickUpdateQuota')} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
           </Tooltip>
         </TableCell>
@@ -287,7 +289,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             id={`priority-${item.id}`}
             onBlur={handlePriority}
             type="number"
-            label="优先级"
+            label={t('channel_index.priority')}
             variant="standard"
             defaultValue={item.priority}
             inputProps={{ min: '0' }}
@@ -298,7 +300,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             id={`weight-${item.id}`}
             onBlur={handleWeight}
             type="number"
-            label="权重"
+            label={t('channel_index.weight')}
             variant="standard"
             defaultValue={item.weight}
             inputProps={{ min: '1' }}
@@ -307,7 +309,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
 
         <TableCell>
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
-            <Tooltip title="仅支持chat模型" placement="top">
+            <Tooltip title={t('channel_row.onlyChat')} placement="top">
               <Button
                 id="test-model-button"
                 aria-controls={openTest ? 'test-model-menu' : undefined}
@@ -319,7 +321,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 endIcon={<KeyboardArrowDownIcon />}
                 size="small"
               >
-                测试
+                {t('channel_row.test')}
               </Button>
             </Tooltip>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
@@ -348,7 +350,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             }}
           >
             <IconEdit style={{ marginRight: '16px' }} />
-            编辑
+            {t('common.edit')}
           </MenuItem>
         )}
 
@@ -358,7 +360,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             manageChannel(item.id, 'copy');
           }}
         >
-          <IconCopy style={{ marginRight: '16px' }} /> 复制{' '}
+          <IconCopy style={{ marginRight: '16px' }} /> {t('token_index.copy')}{' '}
         </MenuItem>
         {CHANNEL_OPTIONS[item.type]?.url && (
           <MenuItem
@@ -369,19 +371,19 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             }}
           >
             <IconWorldWww style={{ marginRight: '16px' }} />
-            官网
+            {t('channel_row.channelWeb')}
           </MenuItem>
         )}
 
         {item.tag && (
           <MenuItem onClick={handleDeleteTag} sx={{ color: 'error.main' }}>
             <IconTrash style={{ marginRight: '16px' }} />
-            删除标签
+            {t('channel_row.delTag')}
           </MenuItem>
         )}
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
-          删除
+          {t('common.delete')}
         </MenuItem>
       </Popover>
 
@@ -414,7 +416,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                   <Typography variant="h6" gutterBottom component="div">
-                    可用模型:
+                    {t('channel_row.canModels')}
                   </Typography>
                   {modelMap.map((model) => (
                     <Label
@@ -422,7 +424,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                       color="primary"
                       key={model}
                       onClick={() => {
-                        copy(model, '模型名称');
+                        copy(model, t('channel_index.modelName'));
                       }}
                     >
                       {model}
@@ -434,14 +436,14 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                     <Typography variant="h6" gutterBottom component="div">
-                      测速模型:
+                      {t('channel_row.testModels') + ':'}
                     </Typography>
                     <Label
                       variant="outlined"
                       color="default"
                       key={item.test_model}
                       onClick={() => {
-                        copy(item.test_model, '测速模型');
+                        copy(item.test_model, t('channel_row.testModels'));
                       }}
                     >
                       {item.test_model}
@@ -453,7 +455,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                     <Typography variant="h6" gutterBottom component="div">
-                      代理地址:
+                      {t('channel_row.proxy')}
                     </Typography>
                     {item.proxy}
                   </Box>
@@ -463,14 +465,14 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                     <Typography variant="h6" gutterBottom component="div">
-                      其他参数:
+                      {t('channel_row.otherArg') + ':'}
                     </Typography>
                     <Label
                       variant="outlined"
                       color="default"
                       key={item.other}
                       onClick={() => {
-                        copy(item.other, '其他参数');
+                        copy(item.other, t('channel_row.otherArg'));
                       }}
                     >
                       {item.other}
@@ -483,14 +485,16 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         </TableCell>
       </TableRow>
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除渠道</DialogTitle>
+        <DialogTitle>{t('channel_row.delChannel')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除渠道 {item.name}？</DialogContentText>
+          <DialogContentText>
+            {t('channel_row.delChannelInfo')} {item.name}？
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('token_index.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

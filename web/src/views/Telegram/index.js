@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { showError, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next'; // 引入 i18n
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,12 +17,13 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
+import { IconRefresh, IconPlus, IconBrandTelegram, IconReload } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
-import { IconBrandTelegram, IconReload } from '@tabler/icons-react';
 
 // ----------------------------------------------------------------------
 export default function Telegram() {
+  const { t } = useTranslation(); // 使用 useTranslation hook 获取 t 函数
+
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -93,7 +95,7 @@ export default function Telegram() {
       const res = await API.put('/api/option/telegram/reload');
       const { success, message } = res.data;
       if (success) {
-        showSuccess('重载成功！');
+        showSuccess(t('telegramPage.reloadSuccess'));
       } else {
         showError(message);
       }
@@ -142,7 +144,7 @@ export default function Telegram() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('telegramPage.operationSuccess'));
         if (action === 'delete') {
           await handleRefresh();
         }
@@ -176,33 +178,30 @@ export default function Telegram() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Telegram Bot菜单</Typography>
+        <Typography variant="h4">{t('telegramPage.title')}</Typography>
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建
+          {t('telegramPage.createMenu')}
         </Button>
       </Stack>
       <Stack mb={5}>
-        <Alert severity="info">
-          添加修改菜单命令/说明后（如果没有修改命令和说明可以不用重载），需要重新载入菜单才能生效。
-          如果未查看到新菜单，请尝试杀后台后重新启动程序。
-        </Alert>
+        <Alert severity="info">{t('telegramPage.infoMessage')}</Alert>
       </Stack>
       <Stack direction="row" alignItems="center" justifyContent="flex-start" mb={2} spacing={2}>
         <Chip
           icon={<IconBrandTelegram />}
-          label={(status ? '在线' : '离线') + (isWebhook ? '(Webhook)' : '(Polling)')}
+          label={(status ? t('telegramPage.online') : t('telegramPage.offline')) + (isWebhook ? '(Webhook)' : '(Polling)')}
           color={status ? 'primary' : 'error'}
           variant="outlined"
           size="small"
         />
 
         <Button variant="contained" size="small" endIcon={<IconReload />} onClick={reload}>
-          重新载入菜单
+          {t('telegramPage.reloadMenu')}
         </Button>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchMenus} noValidate>
-          <TableToolBar placeholder={'搜索ID和命令...'} />
+          <TableToolBar placeholder={t('telegramPage.searchPlaceholder')} />
         </Box>
         <Toolbar
           sx={{
@@ -216,7 +215,7 @@ export default function Telegram() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新
+                {t('telegramPage.refresh')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -230,12 +229,12 @@ export default function Telegram() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'id', label: 'ID', disableSort: false },
-                  { id: 'command', label: '命令', disableSort: false },
-                  { id: 'description', label: '说明', disableSort: false },
-                  { id: 'parse_mode', label: '回复类型', disableSort: false },
-                  { id: 'reply_message', label: '回复内容', disableSort: false },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'id', label: t('telegramPage.id'), disableSort: false },
+                  { id: 'command', label: t('telegramPage.command'), disableSort: false },
+                  { id: 'description', label: t('telegramPage.description'), disableSort: false },
+                  { id: 'parse_mode', label: t('telegramPage.replyType'), disableSort: false },
+                  { id: 'reply_message', label: t('telegramPage.replyContent'), disableSort: false },
+                  { id: 'action', label: t('telegramPage.action'), disableSort: true }
                 ]}
               />
               <TableBody>

@@ -25,8 +25,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Label from 'ui-component/Label';
 import { copy } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 export default function PricesTableRow({ item, managePrices, handleOpenModal, ownedby }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openRow, setOpenRow] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -84,7 +86,7 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
                   <Typography variant="h6" gutterBottom component="div">
-                    可用模型:
+                    {t('channel_row.canModels')}
                   </Typography>
                   {item.models.map((model) => (
                     <Label
@@ -92,7 +94,7 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
                       color="primary"
                       key={model}
                       onClick={() => {
-                        copy(model, '模型名称');
+                        copy(model, t('modelpricePage.model'));
                       }}
                     >
                       {model}
@@ -121,23 +123,23 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
-          编辑
+          {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
-          删除
+          {t('common.delete')}
         </MenuItem>
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除价格组</DialogTitle>
+        <DialogTitle>{t('pricing_edit.delGroup')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除价格组？</DialogContentText>
+          <DialogContentText>{t('pricing_edit.delGroupTip')}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('common.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

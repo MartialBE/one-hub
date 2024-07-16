@@ -4,74 +4,69 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { StatusType } from './OrderTableRow';
+import { useTranslation } from 'react-i18next';
 require('dayjs/locale/zh-cn');
 // ----------------------------------------------------------------------
 
 export default function OrderTableToolBar({ filterName, handleFilterName }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
         <FormControl>
-          <InputLabel htmlFor="channel-gateway_id-label">网关ID</InputLabel>
+          <InputLabel htmlFor="channel-gateway_id-label">{t('orderlogPage.gatewayIdLabel')}</InputLabel>
           <OutlinedInput
             id="gateway_id"
             name="gateway_id"
-            sx={{
-              minWidth: '100%'
-            }}
-            label="网关ID"
+            sx={{ minWidth: '100%' }}
+            label={t('orderlogPage.gatewayIdLabel')}
             value={filterName.gateway_id}
             onChange={handleFilterName}
-            placeholder="网关ID"
+            placeholder={t('orderlogPage.placeholder.gatewayId')}
           />
         </FormControl>
         <FormControl>
-          <InputLabel htmlFor="channel-user_id-label">用户ID</InputLabel>
+          <InputLabel htmlFor="channel-user_id-label">{t('orderlogPage.userIdLabel')}</InputLabel>
           <OutlinedInput
             id="user_id"
             name="user_id"
-            sx={{
-              minWidth: '100%'
-            }}
-            label="用户ID"
+            sx={{ minWidth: '100%' }}
+            label={t('orderlogPage.userIdLabel')}
             value={filterName.user_id}
             onChange={handleFilterName}
-            placeholder="用户ID"
+            placeholder={t('orderlogPage.placeholder.userId')}
           />
         </FormControl>
         <FormControl>
-          <InputLabel htmlFor="channel-trade_no-label">订单号</InputLabel>
+          <InputLabel htmlFor="channel-trade_no-label">{t('orderlogPage.tradeNoLabel')}</InputLabel>
           <OutlinedInput
             id="trade_no"
             name="trade_no"
-            sx={{
-              minWidth: '100%'
-            }}
-            label="订单号"
+            sx={{ minWidth: '100%' }}
+            label={t('orderlogPage.tradeNoLabel')}
             value={filterName.trade_no}
             onChange={handleFilterName}
-            placeholder="订单号"
+            placeholder={t('orderlogPage.placeholder.tradeNo')}
           />
         </FormControl>
         <FormControl>
-          <InputLabel htmlFor="channel-gateway_no-label">网关订单号</InputLabel>
+          <InputLabel htmlFor="channel-gateway_no-label">{t('orderlogPage.gatewayNoLabel')}</InputLabel>
           <OutlinedInput
             id="gateway_no"
             name="gateway_no"
-            sx={{
-              minWidth: '100%'
-            }}
-            label="网关订单号"
+            sx={{ minWidth: '100%' }}
+            label={t('orderlogPage.gatewayNoLabel')}
             value={filterName.gateway_no}
             onChange={handleFilterName}
-            placeholder="网关订单号"
+            placeholder={t('orderlogPage.placeholder.gatewayNo')}
           />
         </FormControl>
 
         <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
-              label="起始时间"
+              label={t('orderlogPage.startTimeLabel')}
               ampm={false}
               name="start_timestamp"
               value={filterName.start_timestamp === 0 ? null : dayjs.unix(filterName.start_timestamp)}
@@ -94,7 +89,7 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
         <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
-              label="结束时间"
+              label={t('orderlogPage.endTimeLabel')}
               name="end_timestamp"
               ampm={false}
               value={filterName.end_timestamp === 0 ? null : dayjs.unix(filterName.end_timestamp)}
@@ -114,16 +109,14 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
           </LocalizationProvider>
         </FormControl>
         <FormControl sx={{ minWidth: '22%' }}>
-          <InputLabel htmlFor="channel-status-label">状态</InputLabel>
+          <InputLabel htmlFor="channel-status-label">{t('orderlogPage.statusLabel')}</InputLabel>
           <Select
             id="channel-type-label"
-            label="状态"
+            label={t('orderlogPage.statusLabel')}
             value={filterName.status}
             name="status"
             onChange={handleFilterName}
-            sx={{
-              minWidth: '100%'
-            }}
+            sx={{ minWidth: '100%' }}
             MenuProps={{
               PaperProps: {
                 style: {
@@ -135,7 +128,7 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
             {Object.values(StatusType).map((option) => {
               return (
                 <MenuItem key={option.value} value={option.value}>
-                  {option.name}
+                  {t(`orderlogPage.statusOptions.${option.key}`)}
                 </MenuItem>
               );
             })}
