@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Chip, Drawer, Stack, useMediaQuery } from '@mui/material';
+import { Box, Drawer, useMediaQuery } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
-  const { t } = useTranslation();
 
   const drawer = (
     <>
@@ -40,30 +39,12 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
         >
           <MenuList />
           <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-            <Chip
-              label={process.env.REACT_APP_VERSION || t('menu.unknownVersion')}
-              disabled
-              chipcolor="secondary"
-              size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
         </PerfectScrollbar>
       </BrowserView>
       <MobileView>
         <Box sx={{ px: 2 }}>
           <MenuList />
           <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-            <Chip
-              label={process.env.REACT_APP_VERSION || t('menu.unknownVersion')}
-              disabled
-              chipcolor="secondary"
-              size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
         </Box>
       </MobileView>
     </>

@@ -220,7 +220,7 @@ const TopupCard = () => {
         }
       });
   
-      const discountInfo = appliedDiscount !== 1 ? ` (${appliedDiscount * 10}折)` : '';
+      const discountInfo = appliedDiscount !== 1 ? ` (${appliedDiscount * 100}%)` : '';
       return `￥${(actualPayAmount / amount).toFixed(2)}/ $${discountInfo}`;
     }
     return null;
@@ -241,7 +241,7 @@ const TopupCard = () => {
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
       <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} paddingTop={'20px'}>
-        <Typography variant="h6">充值$5即可自动升级VIP，当前在线支付自动升级功能有误，请先联系客服人工调整会员等级。</Typography>
+        <Typography variant="h6">充值$5即可升级VIP，当前自动升级功能有误，请联系客服调整会员等级。</Typography>
       </Stack>
 
       {payment.length > 0 && (
@@ -333,7 +333,7 @@ const TopupCard = () => {
                 {calculateTotal()}{' '}
                 {selectedPayment &&
                   (selectedPayment.currency === 'CNY'
-                    ? `CNY (${t('topupCard.exchangeRate')}: ${siteInfo.PaymentUSDRate})`
+                    ? `CNY`
                     : selectedPayment.currency)}
               </Grid>
             </Grid>

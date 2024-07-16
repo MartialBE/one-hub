@@ -150,7 +150,7 @@ export default function Users() {
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+      <Stack direction="row" alignItems="left" justifyContent="space-between" mb={5}>
         <Typography variant="h4">{t('userPage.users')}</Typography>
 
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
@@ -163,7 +163,7 @@ export default function Users() {
         </Box>
         <Toolbar
           sx={{
-            textAlign: 'right',
+            textAlign: 'left',
             height: 50,
             display: 'flex',
             justifyContent: 'space-between',

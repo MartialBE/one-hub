@@ -278,7 +278,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
         
 
         <TableCell>
-          {renderQuota(item.used_quota)}
+          {renderQuota(item.used_quota)} / 
           <Tooltip title={t('channel_row.clickUpdateQuota')} placement="top" onClick={updateChannelBalance}>
             {renderBalance(item.type, itemBalance)}
           </Tooltip>

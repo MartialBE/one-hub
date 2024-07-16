@@ -2,7 +2,7 @@
   "dashboard": "仪表盘",
   "analytics": "分析",
   "channel": "渠道",
-  "token": "令牌",
+  "token": "Key",
   "log": "日志",
   "redemption": "兑换",
   "topup": "充值",
@@ -15,7 +15,7 @@
   "task": "异步任务",
   "menu": {
     "home": "首页",
-    "about": "关于",
+    "about": "接口",
     "login": "登录",
     "signup": "注册",
     "signout": "注销",
@@ -149,11 +149,11 @@
     "validJson": "必须是有效的JSON字符串"
   },
   "token_index": {
-    "token": "令牌",
-    "createToken": "新建令牌",
+    "token": "Key",
+    "createToken": "新建Key",
     "replaceApiAddress1": "将OpenAI API基础地址https://api.openai.com替换为",
     "replaceApiAddress2": "，复制下面的密钥即可使用。",
-    "searchTokenName": "搜索令牌的名称...",
+    "searchTokenName": "搜索Key的名称...",
     "refresh": "刷新",
     "name": "名称",
     "status": "状态",
@@ -170,8 +170,8 @@
     "confirmDeleteToken": "是否删除Token",
     "close": "关闭",
     "delete": "删除",
-    "editToken": "编辑令牌",
-    "quotaNote": "注意，令牌的额度仅用于限制令牌本身的最大额度使用量，实际的使用受到账户的剩余额度限制。",
+    "editToken": "编辑Key",
+    "quotaNote": "注意，Key的额度仅用于限制Key本身的最大额度使用量，实际的使用受到账户的剩余额度限制。",
     "invalidDate": "无效的日期",
     "quota": "额度",
     "unlimitedQuota": "无限额度",
@@ -186,7 +186,7 @@
     "timeLabel": "时间",
     "channelLabel": "渠道",
     "userLabel": "用户",
-    "tokenLabel": "令牌",
+    "tokenLabel": "Key",
     "typeLabel": "类型",
     "modelLabel": "模型",
     "durationLabel": "耗时",
@@ -255,7 +255,7 @@
     }
   },
   "tableToolBar": {
-    "tokenName": "令牌名称",
+    "tokenName": "Key名称",
     "modelName": "模型名称",
     "startTime": "起始时间",
     "endTime": "结束时间",
@@ -327,7 +327,7 @@
     "usernameRequired": "用户名不能为空",
     "usernameMinLength": "用户名不能小于 3 个字符",
     "passwordMinLength": "密码不能小于 8 个字符",
-    "token": "令牌",
+    "token": "Key",
     "wechatBindSuccess": "微信账户绑定成功！",
     "updateSuccess": "用户信息更新成功！",
     "notBound": "未绑定",
@@ -343,13 +343,13 @@
     "bindEmail": "绑定邮箱",
     "telegramBot": "Telegram 机器人",
     "telegramStep1": "1. 点击下方按钮，将会在 Telegram 中打开机器人，点击 /start 开始。",
-    "telegramStep2": "2. 向机器人发送/bind命令后，输入下方的访问令牌即可绑定。(如果没有生成，请点击下方按钮生成)",
+    "telegramStep2": "2. 向机器人发送/bind命令后，输入下方的访问Key即可绑定。(如果没有生成，请点击下方按钮生成)",
     "other": "其他",
-    "generateToken": "生成访问令牌",
-    "resetToken": "重置访问令牌",
+    "generateToken": "生成访问Key",
+    "resetToken": "重置访问Key",
     "lark": "飞书",
-    "tokenNotice": "注意，此处生成的令牌用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。",
-    "yourTokenIs": "你的访问令牌是:",
+    "tokenNotice": "注意，此处生成的Key用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。",
+    "yourTokenIs": "你的访问Key是:",
     "keepSafe": "请妥善保管。如有泄漏，请立即重置。"
   },
   "pricingPage": {
@@ -462,7 +462,7 @@
           "placeholder": "重试间隔(秒)"
         },
         "displayInCurrency": "以货币形式显示额度",
-        "displayTokenStat": "Billing 相关 API 显示令牌额度而非用户额度",
+        "displayTokenStat": "Billing 相关 API 显示Key额度而非用户额度",
         "approximateToken": "使用近似的方式估算 token 数以减少计算量",
         "saveButton": "保存通用设置"
       },
@@ -494,14 +494,14 @@
         "title": "监控设置",
         "channelDisableThreshold": {
           "label": "最长响应时间",
-          "placeholder": "单位秒，当运行通道全部测试时，超过此时间将自动禁用通道"
+          "placeholder": "单位秒，当运行渠道全部测试时，超过此时间将自动禁用渠道"
         },
         "quotaRemindThreshold": {
           "label": "额度提醒阈值",
           "placeholder": "低于此额度时将发送邮件提醒用户"
         },
-        "automaticDisableChannel": "失败时自动禁用通道",
-        "automaticEnableChannel": "成功时自动启用通道",
+        "automaticDisableChannel": "失败时自动禁用渠道",
+        "automaticEnableChannel": "成功时自动启用渠道",
         "saveMonitoringSettings": "保存监控设置"
       },
       "quotaSettings": {
@@ -552,7 +552,7 @@
       },
       "chatLinkSettings": {
         "title": "聊天链接设置",
-        "info": "配置聊天链接，该配置在令牌中的聊天生效以及首页的Playground中的聊天生效. <br />链接中可以使&#123;key&#125;替换用户的令牌，&#123;server&#125;替换服务器地址。例如：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />如果未配置，会默认配置以下4个链接：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 问天 ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />排序规则：值越大越靠前，值相同则按照配置顺序",
+        "info": "配置聊天链接，该配置在Key中的聊天生效以及首页的Playground中的聊天生效. <br />链接中可以使&#123;key&#125;替换用户的Key，&#123;server&#125;替换服务器地址。例如：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />如果未配置，会默认配置以下4个链接：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 问天 ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />排序规则：值越大越靠前，值相同则按照配置顺序",
         "save": "保存聊天链接设置"
       }
     },
@@ -670,9 +670,9 @@
         "homePageContentLabel": "首页内容",
         "homePageContentPlaceholder": "在此输入首页内容，支持 Markdown & HTML 代码，设置后首页的状态信息将不再显示。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为首页。",
         "saveHomePageContent": "保存首页内容",
-        "aboutLabel": "关于",
-        "aboutPlaceholder": "在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。",
-        "saveAbout": "保存关于",
+        "aboutLabel": "接口",
+        "aboutPlaceholder": "在此输入新的接口内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为接口页面。",
+        "saveAbout": "保存接口",
         "copyrightWarning": "移除 One Hub 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目。",
         "footerLabel": "页脚设置",
         "footerPlaceholder": "在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码",
@@ -724,9 +724,9 @@
   },
   "description": "All in one 的 OpenAI 接口\n整合各种 API 访问方式\n一键部署，开箱即用",
   "about": {
-    "loadingError": "加载关于内容失败...",
-    "aboutTitle": "关于",
-    "aboutDescription": "可在设置页面设置关于内容，支持 HTML & Markdown",
+    "loadingError": "加载接口内容失败...",
+    "aboutTitle": "接口",
+    "aboutDescription": "可在设置页面设置接口内容，支持 HTML & Markdown",
     "projectRepo": "项目仓库地址："
   },
   "footer": {
@@ -795,7 +795,7 @@
     "priorityTip": "优先级不能小于 0",
     "weightTip": "权重不能小于 1",
     "modelTestTip": "请先设置测试模型",
-    "modelTestSuccess": "通道 {{channel}}: {{model}} 测试成功，耗时 {{time}} 秒。",
+    "modelTestSuccess": "渠道 {{channel}}: {{model}} 测试成功，耗时 {{time}} 秒。",
     "clickUpdateQuota": "点击更新余额",
     "onlyChat": "仅支持chat模型",
     "test": "测试",
@@ -809,8 +809,8 @@
     "delChannelInfo": "是否删除渠道",
     "manual": "手动",
     "auto": "自动",
-    "testAllChannel": "已成功开始测试所有通道，请刷新页面查看结果。",
-    "updateChannelBalance": "已更新完毕所有已启用通道余额！",
+    "testAllChannel": "已成功开始测试所有渠道，请刷新页面查看结果。",
+    "updateChannelBalance": "已更新完毕所有已启用渠道余额！",
     "delChannelCount": "已删除所有禁用渠道，共计 {{count}} 个",
     "updateOk": "更新成功！",
     "delTagInfo1": "是否删除标签",

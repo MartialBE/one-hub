@@ -19,7 +19,7 @@ import LogoSection from 'layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import ThemeButton from 'ui-component/ThemeButton';
+// import ThemeButton from 'ui-component/ThemeButton';
 import I18nButton from 'ui-component/i18nButton';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 import { IconMenu2 } from '@tabler/icons-react';
@@ -68,7 +68,7 @@ const Header = () => {
       <Stack spacing={2} direction="row" justifyContent="center" alignItems="center">
         {isMobile ? (
           <>
-            <ThemeButton />
+            {/* <ThemeButton /> */}
             <I18nButton />
             <IconButton onClick={handleOpenMenu}>
               <IconMenu2 />
@@ -100,7 +100,7 @@ const Header = () => {
             >
               对话
             </Button>
-            <ThemeButton />
+            {/* <ThemeButton /> */}
             <I18nButton />
             {account.user ? (
               <>

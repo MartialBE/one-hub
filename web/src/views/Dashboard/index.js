@@ -114,7 +114,7 @@ const Dashboard = () => {
                 <Grid container spacing={gridSpacing} justifyContent="center" alignItems="center" paddingTop={'20px'}>
 
                   <Grid item xs={4}>
-                    <Typography variant="h4">用户组:</Typography>
+                    <Typography variant="h4">Group:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="h3">
