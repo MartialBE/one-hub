@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
 import { marked } from 'marked';
 import { Box, Container, Typography } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
+  const { t } = useTranslation();
   const [about, setAbout] = useState('');
   const [aboutLoaded, setAboutLoaded] = useState(false);
 
-  const displayAbout = async () => {
+  const displayAbout = useCallback(async () => {
     setAbout(localStorage.getItem('about') || '');
     try {
       const res = await API.get('/api/about');
@@ -23,18 +25,18 @@ const About = () => {
         localStorage.setItem('about', aboutContent);
       } else {
         showError(message);
-        setAbout('加载接口内容失败...');
+        setAbout(t('about.loadingError'));
       }
     } catch (error) {
-      setAbout('加载接口内容失败...');
+      setAbout(t('about.loadingError'));
     }
 
     setAboutLoaded(true);
-  };
+  }, [t]);
 
   useEffect(() => {
-    displayAbout().then();
-  }, []);
+    displayAbout();
+  }, [displayAbout]);
 
   return (
     <>
@@ -42,7 +44,7 @@ const About = () => {
         <>
           <Box>
             <Container sx={{ paddingTop: '40px' }}>
-              <MainCard title="接口">
+              <MainCard title={t('about.aboutTitle')}>
                 <Typography variant="body2">
                 </Typography>
               </MainCard>

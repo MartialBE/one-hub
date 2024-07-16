@@ -26,9 +26,12 @@ import useLogin from 'hooks/useLogin';
 // assets
 import { IconLogout, IconSettings, IconUserScan } from '@tabler/icons-react';
 
+import { useTranslation } from 'react-i18next';
+
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
   const customization = useSelector((state) => state.customization);
@@ -150,14 +153,14 @@ const ProfileSection = () => {
                       <ListItemIcon>
                         <IconUserScan stroke={1.5} size="1.3rem" />
                       </ListItemIcon>
-                      <ListItemText primary={<Typography variant="body2">设置</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('setting')}</Typography>} />
                     </ListItemButton>
 
                     <ListItemButton sx={{ borderRadius: `${customization.borderRadius}px` }} onClick={handleLogout}>
                       <ListItemIcon>
                         <IconLogout stroke={1.5} size="1.3rem" />
                       </ListItemIcon>
-                      <ListItemText primary={<Typography variant="body2">注销</Typography>} />
+                      <ListItemText primary={<Typography variant="body2">{t('menu.signout')}</Typography>} />
                     </ListItemButton>
                   </List>
                 </MainCard>

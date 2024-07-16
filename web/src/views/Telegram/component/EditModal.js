@@ -18,17 +18,19 @@ import {
   MenuItem,
   TextField
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { showSuccess, showError } from 'utils/common';
 import { API } from 'utils/api';
 
-const validationSchema = Yup.object().shape({
-  is_edit: Yup.boolean(),
-  command: Yup.string().required('命令 不能为空'),
-  description: Yup.string().required('说明 不能为空'),
-  parse_mode: Yup.string().required('消息类型 不能为空'),
-  reply_message: Yup.string().required('消息内容 不能为空')
-});
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    is_edit: Yup.boolean(),
+    command: Yup.string().required(t('telegram_edit.requiredCommand')),
+    description: Yup.string().required(t('telegram_edit.requiredDes')),
+    parse_mode: Yup.string().required(t('telegram_edit.requiredParseMode')),
+    reply_message: Yup.string().required(t('telegram_edit.requiredMes'))
+  });
 
 const originInputs = {
   command: '',
@@ -38,6 +40,7 @@ const originInputs = {
 };
 
 const EditModal = ({ open, actionId, onCancel, onOk }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
 
@@ -54,9 +57,9 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
       const { success, message } = res.data;
       if (success) {
         if (values.is_edit) {
-          showSuccess('菜单更新成功！');
+          showSuccess(t('telegram_edit.updateOk'));
         } else {
-          showSuccess('菜单创建成功！');
+          showSuccess(t('telegram_edit.addOk'));
         }
         setSubmitting(false);
         setStatus({ success: true });
@@ -97,18 +100,18 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {actionId ? '编辑菜单' : '新建菜单'}
+        {actionId ? t('common.edit') : t('common.create')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
+        <Formik initialValues={inputs} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.command && errors.command)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-command-label">命令</InputLabel>
+                <InputLabel htmlFor="channel-command-label">{t('telegramPage.command')}</InputLabel>
                 <OutlinedInput
                   id="channel-command-label"
-                  label="命令"
+                  label={t('telegramPage.command')}
                   type="text"
                   value={values.command}
                   name="command"
@@ -125,10 +128,10 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.description && errors.description)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-description-label">说明</InputLabel>
+                <InputLabel htmlFor="channel-description-label">{t('telegramPage.description')}</InputLabel>
                 <OutlinedInput
                   id="channel-description-label"
-                  label="说明"
+                  label={t('telegramPage.description')}
                   type="text"
                   value={values.description}
                   name="description"
@@ -145,10 +148,10 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.parse_mode && errors.parse_mode)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-parse_mode-label">消息类型</InputLabel>
+                <InputLabel htmlFor="channel-parse_mode-label">{t('telegram_edit.msgType')}</InputLabel>
                 <Select
                   id="channel-parse_mode-label"
-                  label="消息类型"
+                  label={t('telegram_edit.msgType')}
                   value={values.parse_mode}
                   name="parse_mode"
                   onBlur={handleBlur}
@@ -185,14 +188,14 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
                 <TextField
                   multiline
                   id="channel-reply_message-label"
-                  label="消息内容"
+                  label={t('telegram_edit.msgInfo')}
                   value={values.reply_message}
                   name="reply_message"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   aria-describedby="helper-text-channel-reply_message-label"
                   minRows={5}
-                  placeholder="消息内容"
+                  placeholder={t('telegram_edit.msgInfo')}
                 />
                 {touched.reply_message && errors.reply_message && (
                   <FormHelperText error id="helper-tex-channel-reply_message-label">
@@ -202,9 +205,9 @@ const EditModal = ({ open, actionId, onCancel, onOk }) => {
               </FormControl>
 
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('common.submit')}
                 </Button>
               </DialogActions>
             </form>

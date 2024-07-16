@@ -12,8 +12,10 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
 import { API } from 'utils/api';
 import { LoadStatusContext } from 'contexts/StatusContext';
+import { useTranslation } from 'react-i18next';
 
 const OtherSetting = () => {
+  const { t } = useTranslation();
   let [inputs, setInputs] = useState({
     Footer: '',
     Notice: '',
@@ -105,7 +107,7 @@ const OtherSetting = () => {
   return (
     <>
       <Stack spacing={2}>
-        <SubCard title="通用设置">
+        <SubCard title={t('setting_index.otherSettings.generalSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControl fullWidth>
@@ -113,60 +115,60 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="Notice"
-                  label="公告"
+                  label={t('setting_index.otherSettings.generalSettings.noticeLabel')}
                   value={inputs.Notice}
                   name="Notice"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入新的公告内容，支持 Markdown & HTML 代码"
+                  placeholder={t('setting_index.otherSettings.generalSettings.noticePlaceholder')}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitNotice}>
-                保存公告
+                {t('setting_index.otherSettings.generalSettings.saveNotice')}
               </Button>
             </Grid>
           </Grid>
         </SubCard>
-        <SubCard title="个性化设置">
+        <SubCard title={t('setting_index.otherSettings.customSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="SystemName">系统名称</InputLabel>
+                <InputLabel htmlFor="SystemName">{t('setting_index.otherSettings.customSettings.systemNameLabel')}</InputLabel>
                 <OutlinedInput
                   id="SystemName"
                   name="SystemName"
                   value={inputs.SystemName || ''}
                   onChange={handleInputChange}
-                  label="系统名称"
-                  placeholder="在此输入系统名称"
+                  label={t('setting_index.otherSettings.customSettings.systemNameLabel')}
+                  placeholder={t('setting_index.otherSettings.customSettings.systemNamePlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitSystemName}>
-                设置系统名称
+                {t('setting_index.otherSettings.customSettings.setSystemName')}
               </Button>
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="Logo">Logo 图片地址</InputLabel>
+                <InputLabel htmlFor="Logo">{t('setting_index.otherSettings.customSettings.logoLabel')}</InputLabel>
                 <OutlinedInput
                   id="Logo"
                   name="Logo"
                   value={inputs.Logo || ''}
                   onChange={handleInputChange}
-                  label="Logo 图片地址"
-                  placeholder="在此输入Logo 图片地址"
+                  label={t('setting_index.otherSettings.customSettings.logoLabel')}
+                  placeholder={t('setting_index.otherSettings.customSettings.logoPlaceholder')}
                   disabled={loading}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitLogo}>
-                设置 Logo
+                {t('setting_index.otherSettings.customSettings.setLogo')}
               </Button>
             </Grid>
             <Grid xs={12}>
@@ -175,18 +177,18 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="HomePageContent"
-                  label="首页内容"
+                  label={t('setting_index.otherSettings.customSettings.homePageContentLabel')}
                   value={inputs.HomePageContent}
                   name="HomePageContent"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入首页内容，支持 Markdown & HTML 代码，设置后首页的状态信息将不再显示。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为首页。"
+                  placeholder={t('setting_index.otherSettings.customSettings.homePageContentPlaceholder')}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={() => submitOption('HomePageContent')}>
-                保存首页内容
+                {t('setting_index.otherSettings.customSettings.saveHomePageContent')}
               </Button>
             </Grid>
             <Grid xs={12}>
@@ -195,18 +197,18 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="About"
-                  label="接口"
+                  label={t('setting_index.otherSettings.customSettings.aboutLabel')}
                   value={inputs.About}
                   name="About"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入新的接口内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面。"
+                  placeholder={t('setting_index.otherSettings.customSettings.aboutPlaceholder')}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitAbout}>
-                保存接口
+                {t('setting_index.otherSettings.customSettings.saveAbout')}
               </Button>
             </Grid>
             <Grid xs={12}>
@@ -215,18 +217,18 @@ const OtherSetting = () => {
                   multiline
                   maxRows={15}
                   id="Footer"
-                  label="页脚设置"
+                  label={t('setting_index.otherSettings.customSettings.footerLabel')}
                   value={inputs.Footer}
                   name="Footer"
                   onChange={handleInputChange}
                   minRows={10}
-                  placeholder="在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码"
+                  placeholder={t('setting_index.otherSettings.customSettings.footerPlaceholder')}
                 />
               </FormControl>
             </Grid>
             <Grid xs={12}>
               <Button variant="contained" onClick={submitFooter}>
-                设置页脚
+                {t('setting_index.otherSettings.customSettings.setFooter')}
               </Button>
             </Grid>
           </Grid>

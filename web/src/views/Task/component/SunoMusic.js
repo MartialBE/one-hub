@@ -6,8 +6,10 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import CodeBlock from 'ui-component/CodeBlock';
+import { useTranslation } from 'react-i18next';
 
 export default function SunoMusic({ items }) {
+  const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState(items[0]);
 
   return (
@@ -23,7 +25,7 @@ export default function SunoMusic({ items }) {
           <>
             <Accordion>
               <AccordionSummary expandIcon={<ArrowDownwardIcon />} aria-controls="audio-content" id="audio-header">
-                <Typography>音频</Typography>
+                <Typography>{t('suno.music')}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <audio controls src={selectedItem.audio_url} style={{ width: '100%' }}>
@@ -33,7 +35,7 @@ export default function SunoMusic({ items }) {
             </Accordion>
             <Accordion>
               <AccordionSummary expandIcon={<ArrowDownwardIcon />} aria-controls="video-content" id="video-header">
-                <Typography>视频</Typography>
+                <Typography>{t('suno.video')}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <video controls src={selectedItem.video_url} style={{ width: '100%', marginTop: '20px' }}>
@@ -43,7 +45,7 @@ export default function SunoMusic({ items }) {
             </Accordion>
             <Accordion>
               <AccordionSummary expandIcon={<ArrowDownwardIcon />} aria-controls="video-content" id="video-header">
-                <Typography>歌词</Typography>
+                <Typography>{t('suno.lyrics')}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <CodeBlock code={selectedItem.metadata.prompt} />
@@ -51,7 +53,7 @@ export default function SunoMusic({ items }) {
             </Accordion>
             <Accordion>
               <AccordionSummary expandIcon={<ArrowDownwardIcon />} aria-controls="video-content" id="video-header">
-                <Typography>响应体</Typography>
+                <Typography>{t('suno.response')}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <CodeBlock language="json" code={JSON.stringify(selectedItem, null, 2)} />
@@ -96,6 +98,13 @@ function Item({ item, isSelected, onClick, sx, ...other }) {
     </Box>
   );
 }
+
+Item.propTypes = {
+  item: PropTypes.any,
+  isSelected: PropTypes.bool,
+  onClick: PropTypes.func,
+  sx: PropTypes.any
+};
 
 function TruncatedText(text) {
   return text.length > 30 ? text.substring(0, 30) + '...' : text;

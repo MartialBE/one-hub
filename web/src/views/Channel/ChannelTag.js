@@ -15,6 +15,7 @@ import TagTableRow from './component/TagTableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
+import { useTranslation } from 'react-i18next';
 // import TableToolBar from 'ui-component/TableToolBar';
 
 const originalKeyword = {
@@ -22,6 +23,7 @@ const originalKeyword = {
 };
 
 export default function ChannelTag() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -97,7 +99,7 @@ export default function ChannelTag() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy') {
           await handleRefresh();
         }
@@ -160,7 +162,7 @@ export default function ChannelTag() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">渠道标签</Typography>
+        <Typography variant="h4">{t('channel_index.channelTags')}</Typography>
       </Stack>
       <Card>
         {/* <Box component="form" onSubmit={searchRedemptions} noValidate>
@@ -186,11 +188,11 @@ export default function ChannelTag() {
                 onRequestSort={handleSort}
                 headLabel={[
                   { id: 'collapse', label: '', disableSort: true, width: '50px' },
-                  { id: 'Tag', label: '标签', disableSort: false },
-                  { id: 'type', label: '供应商', disableSort: false },
-                  { id: 'group', label: '分组', disableSort: true, width: '80px' },
-                  { id: 'models', label: '模型', disableSort: false },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'Tag', label: t('channel_index.tags'), disableSort: false },
+                  { id: 'type', label: t('channel_index.supplier'), disableSort: false },
+                  { id: 'group', label: t('channel_index.group'), disableSort: true, width: '80px' },
+                  { id: 'models', label: t('channel_index.model'), disableSort: false },
+                  { id: 'action', label: t('channel_index.actions'), disableSort: true }
                 ]}
               />
               <TableBody>

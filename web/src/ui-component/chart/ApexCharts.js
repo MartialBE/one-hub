@@ -11,10 +11,12 @@ import SkeletonTotalGrowthBarChart from 'ui-component/cards/Skeleton/TotalGrowth
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 // ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
 
-const ApexCharts = ({ isLoading, chartDatas, title = '统计' }) => {
+const ApexCharts = ({ isLoading, chartDatas, title = 'dashboard_index.statistics' }) => {
+  const { t } = useTranslation();
   return (
     <>
       {isLoading ? (
@@ -25,7 +27,7 @@ const ApexCharts = ({ isLoading, chartDatas, title = '统计' }) => {
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">
                 <Grid item>
-                  <Typography variant="h3">{title}</Typography>
+                  <Typography variant="h3">{t(title)}</Typography>
                 </Grid>
               </Grid>
             </Grid>
@@ -42,7 +44,7 @@ const ApexCharts = ({ isLoading, chartDatas, title = '统计' }) => {
                   }}
                 >
                   <Typography variant="h3" color={'#697586'}>
-                    暂无数据
+                    {t('dashboard_index.no_data_available')}
                   </Typography>
                 </Box>
               )}

@@ -8,7 +8,7 @@ import { generateLineChartOptions, getLastSevenDays, generateBarChartOptions, re
 import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
 import UserCard from 'ui-component/cards/UserCard';
-
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [quotaChart, setQuotaChart] = useState(null);
   const [tokenChart, setTokenChart] = useState(null);
   const [users, setUsers] = useState([]);
+  const { t } = useTranslation();
 
   const userDashboard = async () => {
     try {
@@ -78,7 +79,7 @@ const Dashboard = () => {
           <Grid item lg={4} xs={12}>
             <StatisticalLineChartCard
               isLoading={isLoading}
-              title="今日请求"
+              title={t('dashboard_index.today_requests')}
               chartData={requestChart?.chartData}
               todayValue={requestChart?.todayValue}
             />
@@ -86,7 +87,7 @@ const Dashboard = () => {
           <Grid item lg={4} xs={12}>
             <StatisticalLineChartCard
               isLoading={isLoading}
-              title="今日消费"
+              title={t('dashboard_index.today_consumption')}
               chartData={quotaChart?.chartData}
               todayValue={quotaChart?.todayValue}
             />
@@ -94,7 +95,7 @@ const Dashboard = () => {
           <Grid item lg={4} xs={12}>
             <StatisticalLineChartCard
               isLoading={isLoading}
-              title="今日Token"
+              title={t('dashboard_index.today_tokens')}
               chartData={tokenChart?.chartData}
               todayValue={tokenChart?.todayValue}
             />
@@ -126,22 +127,24 @@ const Dashboard = () => {
                   </Grid>
 
                   <Grid item xs={4}>
-                    <Typography variant="h4">余 额:</Typography>
+                    <Typography variant="h4">{t('dashboard_index.balance')}:</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    <Typography variant="h3"> {users?.quota ? '$' + calculateQuota(users.quota) : '未知'}</Typography>
+                    <Typography variant="h3">{users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')}</Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant="h4">已使用:</Typography>
+                    <Typography variant="h4">{t('dashboard_index.used')}:</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    <Typography variant="h3"> {users?.used_quota ? '$' + calculateQuota(users.used_quota) : '未知'}</Typography>
+                    <Typography variant="h3">
+                    {users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')}
+                  </Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant="h4">调用次数:</Typography>
+                    <Typography variant="h4">{t('dashboard_index.calls')}:</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    <Typography variant="h3"> {users?.request_count || '未知'}</Typography>
+                    <Typography variant="h3"> {users?.request_count || t('dashboard_index.unknown')}</Typography>
                   </Grid>
                 </Grid>
               </UserCard>

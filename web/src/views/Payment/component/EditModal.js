@@ -22,15 +22,17 @@ import {
 import { showSuccess, showError, trims } from 'utils/common';
 import { API } from 'utils/api';
 import { PaymentType, CurrencyType, PaymentConfig } from '../type/Config';
+import { useTranslation } from 'react-i18next';
 
-const validationSchema = Yup.object().shape({
-  is_edit: Yup.boolean(),
-  name: Yup.string().required('名称 不能为空'),
-  icon: Yup.string().required('图标 不能为空'),
-  fixed_fee: Yup.number().min(0, '固定手续费 不能小于 0'),
-  percent_fee: Yup.number().min(0, '百分比手续费 不能小于 0'),
-  currency: Yup.string().required('货币 不能为空')
-});
+const getValidationSchema = (t) =>
+  Yup.object().shape({
+    is_edit: Yup.boolean(),
+    name: Yup.string().required(t('validation.requiredName')),
+    icon: Yup.string().required(t('payment_edit.requiredIcon')),
+    fixed_fee: Yup.number().min(0, t('payment_edit.requiredFixedFee')),
+    percent_fee: Yup.number().min(0, t('payment_edit.requiredPercentFee')),
+    currency: Yup.string().required(t('payment_edit.requiredCurrency'))
+  });
 
 const originInputs = {
   is_edit: false,
@@ -48,6 +50,7 @@ const originInputs = {
 };
 
 const EditModal = ({ open, paymentId, onCancel, onOk }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
 
@@ -66,9 +69,9 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
       const { success, message } = res.data;
       if (success) {
         if (values.is_edit) {
-          showSuccess('更新成功！');
+          showSuccess(t('payment_edit.updateOk'));
         } else {
-          showSuccess('创建成功！');
+          showSuccess(t('payment_edit.addOk'));
         }
         setSubmitting(false);
         setStatus({ success: true });
@@ -110,18 +113,18 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {paymentId ? '编辑支付' : '新建支付'}
+        {paymentId ? t('payment_edit.paymentEdit') : t('paymentGatewayPage.createPayment')}
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
+        <Formik initialValues={inputs} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
               <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-type-label">类型</InputLabel>
+                <InputLabel htmlFor="channel-type-label">{t('paymentGatewayPage.tableHeaders.type')}</InputLabel>
                 <Select
                   id="channel-type-label"
-                  label="类型"
+                  label={t('paymentGatewayPage.tableHeaders.type')}
                   value={values.type}
                   name="type"
                   onBlur={handleBlur}
@@ -145,15 +148,15 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                     {errors.type}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-channel-type-label"> 支付类型 </FormHelperText>
+                  <FormHelperText id="helper-tex-channel-type-label"> {t('payment_edit.paymentType')} </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-name-label">名称</InputLabel>
+                <InputLabel htmlFor="channel-name-label">{t('paymentGatewayPage.tableHeaders.name')}</InputLabel>
                 <OutlinedInput
                   id="channel-name-label"
-                  label="名称"
+                  label={t('paymentGatewayPage.tableHeaders.name')}
                   type="text"
                   value={values.name}
                   name="name"
@@ -170,10 +173,10 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.icon && errors.icon)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-icon-label">图标</InputLabel>
+                <InputLabel htmlFor="channel-icon-label">{t('paymentGatewayPage.tableHeaders.icon')}</InputLabel>
                 <OutlinedInput
                   id="channel-icon-label"
-                  label="图标"
+                  label={t('paymentGatewayPage.tableHeaders.icon')}
                   type="text"
                   value={values.icon}
                   name="icon"
@@ -190,10 +193,10 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.notify_domain && errors.notify_domain)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-notify_domain-label">回调域名</InputLabel>
+                <InputLabel htmlFor="channel-notify_domain-label">{t('payment_edit.notifyDomain')}</InputLabel>
                 <OutlinedInput
                   id="channel-notify_domain-label"
-                  label="回调域名"
+                  label={t('payment_edit.notifyDomain')}
                   type="text"
                   value={values.notify_domain}
                   name="notify_domain"
@@ -207,15 +210,15 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                     {errors.notify_domain}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-notify_domain-label"> 支付回调的域名，除非你自行配置过，否则保持为空 </FormHelperText>
+                  <FormHelperText id="helper-tex-notify_domain-label"> {t('payment_edit.notifyDomainTip')} </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.fixed_fee && errors.fixed_fee)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-fixed_fee-label">固定手续费</InputLabel>
+                <InputLabel htmlFor="channel-fixed_fee-label">{t('paymentGatewayPage.tableHeaders.fixedFee')}</InputLabel>
                 <OutlinedInput
                   id="channel-fixed_fee-label"
-                  label="固定手续费"
+                  label={t('paymentGatewayPage.tableHeaders.fixedFee')}
                   type="number"
                   value={values.fixed_fee}
                   name="fixed_fee"
@@ -229,15 +232,15 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                     {errors.fixed_fee}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-fixed_fee-label"> 每次支付收取固定的手续费，单位 美元 </FormHelperText>
+                  <FormHelperText id="helper-tex-fixed_fee-label"> {t('payment_edit.FixedTip')} </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.percent_fee && errors.percent_fee)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-percent_fee-label">百分比手续费</InputLabel>
+                <InputLabel htmlFor="channel-percent_fee-label">{t('paymentGatewayPage.tableHeaders.percentFee')}</InputLabel>
                 <OutlinedInput
                   id="channel-percent_fee-label"
-                  label="百分比手续费"
+                  label={t('paymentGatewayPage.tableHeaders.percentFee')}
                   type="number"
                   value={values.percent_fee}
                   name="percent_fee"
@@ -251,15 +254,15 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                     {errors.percent_fee}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-percent_fee-label"> 每次支付按百分比收取手续费，如果为5%，请填写 0.05 </FormHelperText>
+                  <FormHelperText id="helper-tex-percent_fee-label"> {t('payment_edit.percentTip')} </FormHelperText>
                 )}
               </FormControl>
 
               <FormControl fullWidth error={Boolean(touched.currency && errors.currency)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-currency-label">网关货币类型</InputLabel>
+                <InputLabel htmlFor="channel-currency-label">{t('payment_edit.currencyType')}</InputLabel>
                 <Select
                   id="channel-currency-label"
-                  label="网关货币类型"
+                  label={t('payment_edit.currencyType')}
                   value={values.currency}
                   name="currency"
                   onBlur={handleBlur}
@@ -283,7 +286,7 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                     {errors.currency}
                   </FormHelperText>
                 ) : (
-                  <FormHelperText id="helper-tex-channel-currency-label"> 该网关是收取什么货币的，请查询对应网关文档 </FormHelperText>
+                  <FormHelperText id="helper-tex-channel-currency-label"> {t('payment_edit.currencyTip')} </FormHelperText>
                 )}
               </FormControl>
 
@@ -336,9 +339,9 @@ const EditModal = ({ open, paymentId, onCancel, onOk }) => {
                 })}
 
               <DialogActions>
-                <Button onClick={onCancel}>取消</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  提交
+                  {t('common.submit')}
                 </Button>
               </DialogActions>
             </form>

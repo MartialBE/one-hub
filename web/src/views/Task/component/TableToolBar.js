@@ -6,9 +6,11 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 require('dayjs/locale/zh-cn');
+import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 
 export default function TableToolBar({ filterName, handleFilterName, userIsAdmin }) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const grey500 = theme.palette.grey[500];
 
@@ -17,17 +19,17 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
         {userIsAdmin && (
           <FormControl>
-            <InputLabel htmlFor="channel-channel_id-label">渠道ID</InputLabel>
+            <InputLabel htmlFor="channel-channel_id-label">{t('tableToolBar.channelId')}</InputLabel>
             <OutlinedInput
               id="channel_id"
               name="channel_id"
               sx={{
                 minWidth: '100%'
               }}
-              label="渠道ID"
+              label={t('tableToolBar.channelId')}
               value={filterName.channel_id}
               onChange={handleFilterName}
-              placeholder="渠道ID"
+              placeholder={t('tableToolBar.channelId')}
               startAdornment={
                 <InputAdornment position="start">
                   <IconBroadcast stroke={1.5} size="20px" color={grey500} />
@@ -37,17 +39,17 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
           </FormControl>
         )}
         <FormControl>
-          <InputLabel htmlFor="channel-task_id-label">任务ID</InputLabel>
+          <InputLabel htmlFor="channel-task_id-label">{t('tableToolBar.taskId')}</InputLabel>
           <OutlinedInput
             id="task_id"
             name="task_id"
             sx={{
               minWidth: '100%'
             }}
-            label="任务ID"
+            label={t('tableToolBar.taskId')}
             value={filterName.task_id}
             onChange={handleFilterName}
-            placeholder="任务ID"
+            placeholder={t('tableToolBar.taskId')}
             startAdornment={
               <InputAdornment position="start">
                 <IconCalendarEvent stroke={1.5} size="20px" color={grey500} />
@@ -59,7 +61,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
         <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
-              label="起始时间"
+              label={t('tableToolBar.startTime')}
               ampm={false}
               name="start_timestamp"
               value={filterName.start_timestamp === 0 ? null : dayjs.unix(filterName.start_timestamp)}
@@ -82,7 +84,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
         <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
-              label="结束时间"
+              label={t('tableToolBar.endTime')}
               name="end_timestamp"
               ampm={false}
               value={filterName.end_timestamp === 0 ? null : dayjs.unix(filterName.end_timestamp)}

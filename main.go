@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"one-api/cli"
 	"one-api/common"
+	"one-api/common/cache"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/notify"
+	"one-api/common/redis"
 	"one-api/common/requester"
 	"one-api/common/storage"
 	"one-api/common/telegram"
@@ -41,7 +43,8 @@ func main() {
 	model.SetupDB()
 	defer model.CloseDB()
 	// Initialize Redis
-	common.InitRedisClient()
+	redis.InitRedisClient()
+	cache.InitCacheManager()
 	// Initialize options
 	model.InitOptionMap()
 	relay_util.NewPricing()

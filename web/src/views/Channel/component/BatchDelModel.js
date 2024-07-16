@@ -5,12 +5,14 @@ import { IconSearch, IconTrash } from '@tabler/icons-react';
 import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const BatchDelModel = () => {
   const [value, setValue] = useState('');
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState([]);
   const [loadding, setLoadding] = useState(false);
+  const { t } = useTranslation();
 
   const handleSearch = async () => {
     const data = await fetchChannelData(0, 100, { models: value }, 'desc', 'id');
@@ -58,7 +60,7 @@ const BatchDelModel = () => {
 
       const { success, message, data } = res.data;
       if (success) {
-        showSuccess('成功删除' + data + '条数据');
+        showSuccess(t('channel_index.batchDeleteSuccess', { count: data }));
       } else {
         showError(message);
       }
@@ -71,13 +73,13 @@ const BatchDelModel = () => {
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
-        <Alert severity="info">如果渠道只有一个模型的，将不会显示，请手动去列表删除渠道</Alert>
+        <Alert severity="info">{t('channel_index.batchDeleteTip')}</Alert>
       </Grid>
       <Grid item xs={12}>
         <TextField
           sx={{ ml: 1, flex: 1 }}
-          placeholder="请输入完整模型名称"
-          inputProps={{ 'aria-label': '请输入完整模型名称' }}
+          placeholder={t('channel_index.batchDeleteModel')}
+          inputProps={{ 'aria-label': t('channel_index.batchDeleteModel') }}
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
@@ -95,12 +97,14 @@ const BatchDelModel = () => {
       </Grid>
       {data.length === 0 ? (
         <Grid item xs={12}>
-          暂无数据
+          {t('common.noData')}
         </Grid>
       ) : (
         <>
           <Grid item xs={12}>
-            <Button onClick={handleSelectAll}>{selected.length === data.length ? '反全选' : '全选'}</Button>
+            <Button onClick={handleSelectAll}>
+              {selected.length === data.length ? t('channel_index.unselectAll') : t('channel_index.selectAll')}
+            </Button>
           </Grid>
           <Grid item xs={12}>
             {data.map((item) => (
@@ -113,7 +117,7 @@ const BatchDelModel = () => {
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" color="primary" startIcon={<IconTrash />} onClick={handleSubmit} disabled={loadding}>
-              删除
+              {t('common.delete')}
             </Button>
           </Grid>
         </>

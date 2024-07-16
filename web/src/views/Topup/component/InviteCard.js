@@ -5,14 +5,16 @@ import inviteImage from 'assets/images/invite/cwok_casual_19.webp';
 import { useState } from 'react';
 import { API } from 'utils/api';
 import { showError, copy } from 'utils/common';
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const InviteCard = () => {
+  const { t } = useTranslation(); // Initialize useTranslation hook
   const theme = useTheme();
-  const [inviteUl, setInviteUrl] = useState('');
+  const [inviteUrl, setInviteUrl] = useState('');
 
   const handleInviteUrl = async () => {
-    if (inviteUl) {
-      copy(inviteUl, '邀请链接');
+    if (inviteUrl) {
+      copy(inviteUrl, t('inviteCard.inviteUrlLabel'));
       return;
     }
 
@@ -22,7 +24,7 @@ const InviteCard = () => {
       if (success) {
         let link = `${window.location.origin}/register?aff=${data}`;
         setInviteUrl(link);
-        copy(link, '邀请链接');
+        copy(link, t('inviteCard.inviteUrlLabel'));
       } else {
         showError(message);
       }
@@ -51,23 +53,23 @@ const InviteCard = () => {
       >
         <Stack justifyContent="center" alignItems={'center'} spacing={3}>
           <Typography variant="h3" sx={{ color: theme.palette.primary.dark }}>
-            邀请奖励
+            {t('inviteCard.inviteReward')}
           </Typography>
           <Typography variant="body" sx={{ color: theme.palette.primary.dark }}>
-            分享您的邀请链接，邀请好友注册，即可获得奖励!
+            {t('inviteCard.inviteDescription')}
           </Typography>
 
           <OutlinedInput
             id="invite-url"
-            label="邀请链接"
+            label={t('inviteCard.inviteUrlLabel')}
             type="text"
-            value={inviteUl}
+            value={inviteUrl}
             name="invite-url"
-            placeholder="点击生成邀请链接"
+            placeholder={t('inviteCard.generateInvite')}
             endAdornment={
               <InputAdornment position="end">
                 <Button variant="contained" onClick={handleInviteUrl}>
-                  {inviteUl ? '复制' : '生成'}
+                  {inviteUrl ? t('inviteCard.copyButton.copy') : t('inviteCard.copyButton.generate')}
                 </Button>
               </InputAdornment>
             }

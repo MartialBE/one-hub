@@ -5,19 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"one-api/common/cache"
+	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
 	"one-api/types"
 	"strings"
-	"sync"
 	"time"
 )
 
 // 定义供应商工厂
 type BaiduProviderFactory struct{}
 
-var baiduTokenStore sync.Map
+var baiduCacheKey = "api_token:baidu"
 
 // 创建 BaiduProvider
 type BaiduProvider struct {
@@ -105,18 +106,16 @@ func (p *BaiduProvider) GetRequestHeaders() (headers map[string]string) {
 
 func (p *BaiduProvider) getBaiduAccessToken() (string, error) {
 	apiKey := p.Channel.Key
-	if val, ok := baiduTokenStore.Load(apiKey); ok {
-		var accessToken BaiduAccessToken
-		if accessToken, ok = val.(BaiduAccessToken); ok {
-			// soon this will expire
-			if time.Now().Add(time.Hour).After(accessToken.ExpiresAt) {
-				go func() {
-					_, _ = p.getBaiduAccessTokenHelper(apiKey)
-				}()
-			}
-			return accessToken.AccessToken, nil
-		}
+	cacheKey := fmt.Sprintf("%s:%d", baiduCacheKey, p.Channel.Id)
+	tokenStr, err := cache.GetCache[string](cacheKey)
+	if err != nil {
+		logger.SysError("get baidu token error: " + err.Error())
 	}
+
+	if tokenStr != "" {
+		return tokenStr, nil
+	}
+
 	accessToken, err := p.getBaiduAccessTokenHelper(apiKey)
 	if err != nil {
 		return "", err
@@ -124,7 +123,10 @@ func (p *BaiduProvider) getBaiduAccessToken() (string, error) {
 	if accessToken == nil {
 		return "", errors.New("getBaiduAccessToken return a nil token")
 	}
-	return (*accessToken).AccessToken, nil
+
+	cache.SetCache(cacheKey, accessToken.AccessToken, time.Duration(accessToken.ExpiresIn)*time.Second)
+
+	return accessToken.AccessToken, nil
 }
 
 func (p *BaiduProvider) getBaiduAccessTokenHelper(apiKey string) (*BaiduAccessToken, error) {
@@ -155,7 +157,5 @@ func (p *BaiduProvider) getBaiduAccessTokenHelper(apiKey string) (*BaiduAccessTo
 	if accessToken.AccessToken == "" {
 		return nil, errors.New("getBaiduAccessTokenHelper get empty access token")
 	}
-	accessToken.ExpiresAt = time.Now().Add(time.Duration(accessToken.ExpiresIn) * time.Second)
-	baiduTokenStore.Store(apiKey, accessToken)
 	return &accessToken, nil
 }

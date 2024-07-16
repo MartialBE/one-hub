@@ -11,6 +11,7 @@ import { showError } from 'utils/common';
 import { CheckUpdates } from './component/CheckUpdates';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
+import { useTranslation } from 'react-i18next';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,6 +37,7 @@ function a11yProps(index) {
 }
 
 const Pricing = () => {
+  const { t } = useTranslation();
   const [ownedby, setOwnedby] = useState([]);
   const [modelList, setModelList] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -185,14 +187,22 @@ const Pricing = () => {
   return (
     <Stack spacing={3}>
       <Alert severity="info">
-        <b>美元</b>：1 === $0.002 / 1K tokens <b>人民币</b>： 1 === ￥0.014 / 1k tokens
-        <br /> <b>例如</b>：<br /> gpt-4 输入： $0.03 / 1K tokens 完成：$0.06 / 1K tokens <br />
-        0.03 / 0.002 = 15, 0.06 / 0.002 = 30，即输入倍率为 15，完成倍率为 30
+        <b>{t('pricingPage.currencyInfo1')}</b>
+        {t('pricingPage.currencyInfo2')}
+        <br />
+        <b>{t('pricingPage.currencyInfo3')}</b>
+        {t('pricingPage.currencyInfo4')}
+        <br />
+        <br />
+        <b>{t('pricingPage.currencyInfo5')}</b>
+        {t('pricingPage.currencyInfo6')}
+        <br />
+        {t('pricingPage.currencyInfo7')}
       </Alert>
 
       {noPriceModel.length > 0 && (
         <Alert severity="warning">
-          <b>存在未配置价格的模型，请及时配置价格</b>：
+          <b>{t('pricingPage.noPriceModelWarning')}</b>：
           {noPriceModel.map((model) => (
             <span key={model}>{model}, </span>
           ))}
@@ -201,15 +211,15 @@ const Pricing = () => {
 
       {errPrices && (
         <Alert severity="warning">
-          <b>存在供应商类型错误的模型，请及时配置</b>：{errPrices}
+          <b>{t('pricingPage.errPricesWarning')}</b>：{errPrices}
         </Alert>
       )}
       <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={5} spacing={2}>
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenaddModal(0)}>
-          新建
+          {t('pricingPage.newButton')}
         </Button>
         <Button variant="contained" onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-          刷新
+          {t('pricingPage.refreshButton')}
         </Button>
         <Button
           variant="contained"
@@ -217,7 +227,7 @@ const Pricing = () => {
             setOpenModal(true);
           }}
         >
-          更新价格
+          {t('pricingPage.updatePricesButton')}
         </Button>
       </Stack>
       <EditeModal
@@ -233,8 +243,8 @@ const Pricing = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label="单条操作" {...a11yProps(0)} icon={<IconTag />} iconPosition="start" />
-                <Tab label="合并操作" {...a11yProps(1)} icon={<IconTags />} iconPosition="start" />
+                <Tab label={t('pricingPage.singleOperation')} {...a11yProps(0)} icon={<IconTag />} iconPosition="start" />
+                <Tab label={t('pricingPage.multipleOperation')} {...a11yProps(1)} icon={<IconTags />} iconPosition="start" />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

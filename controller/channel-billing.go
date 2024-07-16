@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// https://github.com/woodchen-ink/one-api/issues/79
+// https://github.com/MartialBE/one-hub/issues/79
 
 type OpenAISubscriptionResponse struct {
 	Object             string  `json:"object"`

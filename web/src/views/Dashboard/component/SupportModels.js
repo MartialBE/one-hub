@@ -6,12 +6,14 @@ import { showError, showSuccess } from 'utils/common';
 import { Typography, Accordion, AccordionSummary, AccordionDetails, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Label from 'ui-component/Label';
+import { useTranslation } from 'react-i18next';
 
 import Grid from '@mui/material/Grid';
 
 
 const SupportModels = () => {
   const [modelList, setModelList] = useState([]);
+  const { t } = useTranslation();
 
   const fetchModels = async () => {
     try {
@@ -40,34 +42,29 @@ const SupportModels = () => {
   return (
     <Accordion key="support_models" sx={{ borderRadius: '12px' }}>
       <AccordionSummary aria-controls="support_models" expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">当前可用模型</Typography>
+        <Typography variant="subtitle1">{t('dashboard_index.model_price')}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Grid container spacing={1}>
-          {Object.entries(modelList)
-            .sort((a, b) => b[1].length - a[1].length)
-            .map(([title, models]) => (
-              <Grid item xs={12} sm={6} key={title}>
-                <SubCard title={title === 'null' ? '其他模型' : title} >
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                    {models.sort().map((model) => (
-                      <Label
-                        variant="outlined"
-                        color="primary"
-                        key={model}
-                        onClick={() => {
-                          navigator.clipboard.writeText(model);
-                          showSuccess('复制模型名称成功！');
-                        }}
-                      >
-                        <Typography variant="body2" sx={{ color: 'inherit' }}>{model}</Typography>
-                      </Label>
-                    ))}
-                  </Box>
-                </SubCard>
-              </Grid>
-            ))}
-        </Grid>
+        <Stack spacing={1}>
+          {Object.entries(modelList).map(([title, models]) => (
+            <SubCard key={title} title={title === 'null' ? t('dashboard_index.other_models') : title}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {models.map((model) => (
+                  <Label
+                    variant="outlined"
+                    color="primary"
+                    key={model}
+                    onClick={() => {
+                      copy(model, t('dashboard_index.model_name'));
+                    }}
+                  >
+                    {model}
+                  </Label>
+                ))}
+              </Box>
+            </SubCard>
+          ))}
+        </Stack>
       </AccordionDetails>
     </Accordion>
   );

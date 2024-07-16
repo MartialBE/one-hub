@@ -20,8 +20,10 @@ import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { timestamp2string, showError } from 'utils/common';
 import { PaymentType } from '../type/Config';
 import TableSwitch from 'ui-component/Switch';
+import { useTranslation } from 'react-i18next';
 
 export default function PaymentTableRow({ item, managePayment, handleOpenModal, setModalPaymentId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [sortValve, setSort] = useState(item.sort);
@@ -54,7 +56,7 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
     }
 
     if (currentValue < 0) {
-      showError('排序不能小于 0');
+      showError(t('payment_row.sortTip'));
       return;
     }
 
@@ -68,7 +70,7 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
         <TableCell>{item.id}</TableCell>
         <TableCell>{item.uuid}</TableCell>
         <TableCell>{item.name}</TableCell>
-        <TableCell>{PaymentType?.[item.type] || '未知'}</TableCell>
+        <TableCell>{PaymentType?.[item.type] || t('common.unknown')}</TableCell>
         <TableCell>
           <img src={item.icon} alt="icon" style={{ width: '24px', height: '24px' }} />
         </TableCell>
@@ -79,7 +81,7 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
             id={`sort-${item.id}`}
             onBlur={handleSort}
             type="number"
-            label="排序"
+            label={t('paymentGatewayPage.tableHeaders.sort')}
             variant="standard"
             defaultValue={item.sort}
             inputProps={{ min: '0' }}
@@ -120,24 +122,26 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
           }}
         >
           <IconEdit style={{ marginRight: '16px' }} />
-          编辑
+          {t('common.edit')}
         </MenuItem>
 
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <IconTrash style={{ marginRight: '16px' }} />
-          删除
+          {t('common.delete')}
         </MenuItem>
       </Popover>
 
       <Dialog open={openDelete} onClose={handleDeleteClose}>
-        <DialogTitle>删除通道</DialogTitle>
+        <DialogTitle>{t('payment_row.delPayment')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>是否删除通道 {item.name}？</DialogContentText>
+          <DialogContentText>
+            {t('payment_row.delPaymentTip')} {item.name}？
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>关闭</Button>
+          <Button onClick={handleDeleteClose}>{t('common.close')}</Button>
           <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
-            删除
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

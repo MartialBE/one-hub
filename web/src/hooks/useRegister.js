@@ -1,8 +1,10 @@
 import { API } from 'utils/api';
 import { useNavigate } from 'react-router';
 import { showSuccess } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const useRegister = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const register = async (input, turnstile) => {
     try {
@@ -14,7 +16,7 @@ const useRegister = () => {
       const res = await API.post(`/api/user/register?turnstile=${turnstile}`, input);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('注册成功！');
+        showSuccess(t('common.registerOk'));
         navigate('/login');
       }
       return { success, message };
@@ -29,7 +31,7 @@ const useRegister = () => {
       const res = await API.get(`/api/verification?email=${email}&turnstile=${turnstile}`);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('验证码发送成功，请检查你的邮箱！');
+        showSuccess(t('common.registerTip'));
       }
       return { success, message };
     } catch (err) {

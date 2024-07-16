@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Jump() {
+  const { t } = useTranslation();
   const location = useLocation();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -12,5 +14,5 @@ export default function Jump() {
     }
   }, [location]);
 
-  return <div>正在跳转中...</div>;
+  return <div>{t('jump')}</div>;
 }

@@ -10,6 +10,7 @@ import Chart from 'react-apexcharts';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
+import { useTranslation } from 'react-i18next';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   ...theme.typography.CardWrapper,
@@ -57,6 +58,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -100,7 +102,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue }) =
                           color: theme.palette.primary[200]
                         }}
                       >
-                        无数据
+                        {t('dashboard_index.no_data')}
                       </Typography>
                     )}
                   </Grid>

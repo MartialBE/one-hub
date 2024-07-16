@@ -20,31 +20,32 @@ import CancelIcon from '@mui/icons-material/Close';
 import { showError, showSuccess, trims } from 'utils/common';
 import { API } from 'utils/api';
 import { ValueFormatter, priceType } from './component/util';
+import { useTranslation } from 'react-i18next';
 
-function validation(row, rows) {
+function validation(t, row, rows) {
   if (row.model === '') {
-    return '模型名称不能为空';
+    return t('pricing_edit.requiredModelName');
   }
 
   // 判断 type 是否是 等于 tokens || times
   if (row.type !== 'tokens' && row.type !== 'times') {
-    return '类型只能是tokens或times';
+    return t('pricing_edit.typeCheck');
   }
 
   if (row.channel_type <= 0) {
-    return '所属渠道类型错误';
+    return t('pricing_edit.channelTypeErr2');
   }
 
   // 判断 model是否是唯一值
   if (rows.filter((r) => r.model === row.model && (row.isNew || r.id !== row.id)).length > 0) {
-    return '模型名称不能重复';
+    return t('pricing_edit.modelNameRe');
   }
 
   if (row.input === '' || row.input < 0) {
-    return '输入倍率必须大于等于0';
+    return t('pricing_edit.inputVal');
   }
   if (row.output === '' || row.output < 0) {
-    return '输出倍率必须大于等于0';
+    return t('pricing_edit.outputVal');
   }
   return false;
 }
@@ -67,6 +68,7 @@ EditToolbar.propTypes = {
 };
 
 const Single = ({ ownedby, prices, reloadData }) => {
+  const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
   const [selectedRow, setSelectedRow] = useState(null);
@@ -84,7 +86,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
         }
         const { success, message } = res.data;
         if (success) {
-          showSuccess('保存成功');
+          showSuccess(t('pricing_edit.saveOk'));
           resolve(newRow);
           reloadData();
         } else {
@@ -157,7 +159,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
           return resolve(oldRows);
         }
         const updatedRow = { ...newRow, isNew: false };
-        const error = validation(updatedRow, rows);
+        const error = validation(t, updatedRow, rows);
         if (error) {
           return reject(new Error(error));
         }
@@ -181,7 +183,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'model',
         sortable: true,
-        headerName: '模型名称',
+        headerName: t('modelpricePage.model'),
         minWidth: 220,
         flex: 1,
         editable: true
@@ -189,7 +191,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'type',
         sortable: true,
-        headerName: '类型',
+        headerName: t('paymentGatewayPage.tableHeaders.type'),
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
@@ -199,7 +201,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'channel_type',
         sortable: true,
-        headerName: '供应商',
+        headerName: t('modelpricePage.channelType'),
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
@@ -209,7 +211,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'input',
         sortable: false,
-        headerName: '输入倍率',
+        headerName: t('modelpricePage.inputMultiplier'),
         flex: 0.8,
         minWidth: 150,
         type: 'number',
@@ -219,7 +221,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'output',
         sortable: false,
-        headerName: '输出倍率',
+        headerName: t('modelpricePage.outputMultiplier'),
         flex: 0.8,
         minWidth: 150,
         type: 'number',
@@ -229,7 +231,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       {
         field: 'actions',
         type: 'actions',
-        headerName: '操作',
+        headerName: t('paymentGatewayPage.tableHeaders.action'),
         flex: 0.5,
         minWidth: 100,
         // width: 100,
@@ -290,7 +292,7 @@ const Single = ({ ownedby, prices, reloadData }) => {
       const res = await API.delete('/api/prices/single/' + modelEncode);
       const { success, message } = res.data;
       if (success) {
-        showSuccess('保存成功');
+        showSuccess(t('pricing_edit.saveOk'));
         await reloadData();
       } else {
         showError(message);
@@ -355,11 +357,11 @@ const Single = ({ ownedby, prices, reloadData }) => {
         // TransitionProps={{ onEntered: handleEntered }}
         open={!!selectedRow}
       >
-        <DialogTitle>确定删除?</DialogTitle>
-        <DialogContent dividers>{`确定删除 ${selectedRow?.model} 吗？`}</DialogContent>
+        <DialogTitle>{t('pricing_edit.delTip')}</DialogTitle>
+        <DialogContent dividers>{t('pricing_edit.delInfoTip', { name: selectedRow?.model })}</DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>取消</Button>
-          <Button onClick={handleConfirmDelete}>删除</Button>
+          <Button onClick={handleClose}>{t('common.cancel')}</Button>
+          <Button onClick={handleConfirmDelete}>{t('common.delete')}</Button>
         </DialogActions>
       </Dialog>
     </Box>

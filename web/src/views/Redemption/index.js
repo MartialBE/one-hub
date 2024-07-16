@@ -18,9 +18,11 @@ import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
+import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
 export default function Redemption() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -116,7 +118,7 @@ export default function Redemption() {
       }
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
+        showSuccess(t('redemptionPage.successMessage'));
         if (action === 'delete') {
           await handleRefresh();
         }
@@ -150,15 +152,15 @@ export default function Redemption() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">兑换</Typography>
+        <Typography variant="h4">{t('redemptionPage.pageTitle')}</Typography>
 
         <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          新建兑换码
+          {t('redemptionPage.createRedemptionCode')}
         </Button>
       </Stack>
       <Card>
         <Box component="form" onSubmit={searchRedemptions} noValidate>
-          <TableToolBar placeholder={'搜索兑换码的ID和名称...'} />
+          <TableToolBar placeholder={t('redemptionPage.searchPlaceholder')} />
         </Box>
         <Toolbar
           sx={{
@@ -172,7 +174,7 @@ export default function Redemption() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                刷新
+                {t('redemptionPage.refreshButton')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -186,13 +188,13 @@ export default function Redemption() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'id', label: 'ID', disableSort: false },
-                  { id: 'name', label: '名称', disableSort: false },
-                  { id: 'status', label: '状态', disableSort: false },
-                  { id: 'quota', label: '额度', disableSort: false },
-                  { id: 'created_time', label: '创建时间', disableSort: false },
-                  { id: 'redeemed_time', label: '兑换时间', disableSort: false },
-                  { id: 'action', label: '操作', disableSort: true }
+                  { id: 'id', label: t('redemptionPage.headLabels.id'), disableSort: false },
+                  { id: 'name', label: t('redemptionPage.headLabels.name'), disableSort: false },
+                  { id: 'status', label: t('redemptionPage.headLabels.status'), disableSort: false },
+                  { id: 'quota', label: t('redemptionPage.headLabels.quota'), disableSort: false },
+                  { id: 'created_time', label: t('redemptionPage.headLabels.createdTime'), disableSort: false },
+                  { id: 'redeemed_time', label: t('redemptionPage.headLabels.redeemedTime'), disableSort: false },
+                  { id: 'action', label: t('redemptionPage.headLabels.action'), disableSort: true }
                 ]}
               />
               <TableBody>

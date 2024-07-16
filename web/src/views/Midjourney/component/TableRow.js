@@ -19,6 +19,7 @@ import { timestamp2string, copy } from 'utils/common';
 import Label from 'ui-component/Label';
 import { ACTION_TYPE, CODE_TYPE, STATUS_TYPE } from '../type/Type';
 import { IconCaretDownFilled, IconCopy, IconDownload, IconExternalLink } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 function renderType(types, type) {
   const typeOption = types[type];
@@ -66,6 +67,7 @@ function TruncatedText(text) {
 }
 
 export default function LogTableRow({ item, userIsAdmin }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
   const handleClickOpen = () => {
@@ -99,11 +101,11 @@ export default function LogTableRow({ item, userIsAdmin }) {
         <TableCell>{item.progress}</TableCell>
         <TableCell>
           {item.image_url == '' ? (
-            '无'
+            t('common.none')
           ) : (
             <ButtonGroup size="small" aria-label="split button">
               <Button color="primary" onClick={handleClickOpen}>
-                显示
+                {t('common.show')}
               </Button>
               <Button onClick={handleOpenMenu}>
                 <IconCaretDownFilled size={'16px'} />
@@ -121,7 +123,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            关闭
+            {t('common.close')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -140,11 +142,11 @@ export default function LogTableRow({ item, userIsAdmin }) {
           <MenuItem
             onClick={() => {
               handleCloseMenu();
-              copy(item.image_url, '图片地址');
+              copy(item.image_url, t('common.imgUrl'));
             }}
           >
             <IconCopy style={{ marginRight: '16px' }} />
-            复制地址
+            {t('common.copyUrl')}
           </MenuItem>
 
           <MenuItem
@@ -153,14 +155,14 @@ export default function LogTableRow({ item, userIsAdmin }) {
               await downloadImage(item.image_url, item.mj_id + '.png');
             }}
           >
-            <IconDownload style={{ marginRight: '16px' }} /> 下载图片{' '}
+            <IconDownload style={{ marginRight: '16px' }} /> {t('common.downImg')}{' '}
           </MenuItem>
           <MenuItem
             onClick={() => {
               handleCloseMenu();
             }}
           >
-            <IconExternalLink style={{ marginRight: '16px' }} /> 新窗口打开{' '}
+            <IconExternalLink style={{ marginRight: '16px' }} /> {t('common.newWindos')}{' '}
           </MenuItem>
         </MenuList>
       </Popover>

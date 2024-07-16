@@ -2,15 +2,13 @@ package baidu
 
 import (
 	"one-api/types"
-	"time"
 )
 
 type BaiduAccessToken struct {
-	AccessToken      string    `json:"access_token"`
-	Error            string    `json:"error,omitempty"`
-	ErrorDescription string    `json:"error_description,omitempty"`
-	ExpiresIn        int64     `json:"expires_in,omitempty"`
-	ExpiresAt        time.Time `json:"-"`
+	AccessToken      string `json:"access_token"`
+	Error            string `json:"error,omitempty"`
+	ErrorDescription string `json:"error_description,omitempty"`
+	ExpiresIn        int64  `json:"expires_in,omitempty"`
 }
 
 type BaiduMessage struct {
