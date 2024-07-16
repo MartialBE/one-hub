@@ -230,7 +230,7 @@
     "passwordRequired": "パスワードは必須です",
     "usernameOrEmail": "ユーザー名/メール",
     "usernameRequired": "ユーザー名/メールは必須です",
-    "forgotPassword": "パスワードを忘れましたか？",
+    "forgetPassword": "パスワードを忘れましたか？",
     "codeRequired": "確認コードを入力する必要があります",
     "qrCode": "QRコード",
     "wechatLoginInfo": "WeChatでQRコードをスキャンして公式アカウントをフォローし、「認証コード」を入力して認証コードを取得してください（3分以内有効）",

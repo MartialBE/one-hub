@@ -708,7 +708,7 @@
     "password": "密码",
     "usernameRequired": "用户名/邮箱是必填项",
     "passwordRequired": "密码是必填项",
-    "forgotPassword": "忘记密码?",
+    "forgetPassword": "忘记密码?",
     "wechatVerificationCodeLogin": "微信验证码登录",
     "wechatLoginInfo": "请使用微信扫描二维码关注公众号，输入「验证码」获取验证码（三分钟内有效）",
     "qrCode": "二维码",

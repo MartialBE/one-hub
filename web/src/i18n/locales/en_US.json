@@ -230,7 +230,7 @@
     "passwordRequired": "Password is required",
     "usernameOrEmail": "Username/Email",
     "usernameRequired": "Username/Email is required",
-    "forgotPassword": "Forgot password?",
+    "forgetPassword": "Forgot password?",
     "codeRequired": "verification code must be filled",
     "qrCode": "QR code",
     "wechatLoginInfo": "Please use WeChat to scan the QR code to follow the official account and enter the \"verification code\" to obtain the verification code (valid within three minutes)",

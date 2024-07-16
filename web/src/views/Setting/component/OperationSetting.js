@@ -654,7 +654,9 @@ const OperationSetting = () => {
 
       <SubCard title={t('setting_index.operationSettings.chatLinkSettings.title')}>
         <Stack spacing={2}>
-          <Alert severity="info">{t('setting_index.operationSettings.chatLinkSettings.info')}</Alert>
+          <Alert severity="info">
+            <div dangerouslySetInnerHTML={{ __html: t('setting_index.operationSettings.chatLinkSettings.info') }} />
+          </Alert>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <ChatLinksDataGrid links={inputs.ChatLinks || '[]'} onChange={handleInputChange} />
 
