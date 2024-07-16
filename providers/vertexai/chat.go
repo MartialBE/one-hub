@@ -54,16 +54,16 @@ func (p *VertexAIProvider) getChatRequest(request *types.ChatCompletionRequest) 
 	// 获取请求地址
 	fullRequestURL := p.GetFullRequestURL(modelName, otherUrl)
 	if fullRequestURL == "" {
-		return nil, common.ErrorWrapper(nil, "invalid_claude_config", http.StatusInternalServerError)
+		return nil, common.ErrorWrapper(nil, "invalid_vertexai_config", http.StatusInternalServerError)
 	}
 
 	headers := p.GetRequestHeaders()
 
-	if request.Stream {
-		headers["Accept"] = "text/event-stream"
+	if headers == nil {
+		return nil, common.ErrorWrapper(nil, "invalid_vertexai_config", http.StatusInternalServerError)
 	}
 
-	bedrockRequest, errWithCode := p.Category.ChatComplete(request)
+	vertexaiRequest, errWithCode := p.Category.ChatComplete(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -72,7 +72,7 @@ func (p *VertexAIProvider) getChatRequest(request *types.ChatCompletionRequest) 
 	p.Requester.ErrorHandler = RequestErrorHandle(p.Category.ErrorHandler)
 
 	// 创建请求
-	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(bedrockRequest), p.Requester.WithHeader(headers))
+	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(vertexaiRequest), p.Requester.WithHeader(headers))
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
