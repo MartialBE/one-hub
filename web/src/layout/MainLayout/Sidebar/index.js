@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
-  const { t } = useTranslation();
 
   const drawer = (
     <>

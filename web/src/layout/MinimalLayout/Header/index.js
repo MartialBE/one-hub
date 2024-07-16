@@ -27,7 +27,6 @@ import Transitions from 'ui-component/extended/Transitions';
 import MainCard from 'ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { IconMenu2 } from '@tabler/icons-react';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //

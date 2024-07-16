@@ -1,15 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
-import { Stack, FormControl, InputLabel, OutlinedInput, Checkbox, Button, FormControlLabel, TextField } from '@mui/material';
+import { Stack, FormControl, InputLabel, OutlinedInput, Checkbox, Button, FormControlLabel, TextField, Alert } from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
 import { LoadStatusContext } from 'contexts/StatusContext';
 import { useTranslation } from 'react-i18next';
-import { Alert } from '@mui/material';
 require('dayjs/locale/zh-cn');
 
 const OperationSetting = () => {
@@ -108,7 +108,7 @@ const OperationSetting = () => {
 
     if (name.endsWith('Enabled')) {
       await updateOption(name, value);
-      showSuccess('设置成功！');
+      showSuccess('Success');
     } else {
       setInputs((inputs) => ({ ...inputs, [name]: value }));
     }

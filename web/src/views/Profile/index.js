@@ -30,9 +30,9 @@ import { ReactComponent as Lark } from 'assets/images/icons/lark.svg';
 import { useTheme } from '@mui/material/styles';
 
 const validationSchema = Yup.object().shape({
-  username: Yup.string().required('用户名 不能为空').min(3, '用户名 不能小于 3 个字符'),
+  username: Yup.string().required('Username is required').min(3, 'Username must be at least 3 characters').max(50, 'Username must be at most 50 characters'),
   display_name: Yup.string(),
-  password: Yup.string().test('password', '密码不能小于 8 个字符', (val) => {
+  password: Yup.string().test('password', 'password must be at least 8 characters', (val) => {
     return !val || val.length >= 8;
   })
 });
@@ -256,6 +256,16 @@ export default function Profile() {
                   >
                     {inputs.email ? t('profilePage.changeEmail') : t('profilePage.bindEmail')}
                   </Button>
+                  {turnstileEnabled ? (
+                    <Turnstile
+                      sitekey={turnstileSiteKey}
+                      onVerify={(token) => {
+                        setTurnstileToken(token);
+                      }}
+                    />
+                  ) : (
+                    <></>
+                  )}
                 </Grid>
 
                 {status.telegram_bot && ( //&& !inputs.telegram_id
