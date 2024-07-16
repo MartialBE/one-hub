@@ -88,6 +88,10 @@ func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 		headers["Accept"] = "text/event-stream"
 	}
 
+	if strings.HasPrefix(request.Model, "claude-3-5-sonnet") {
+		headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15"
+	}
+
 	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
 	if errWithCode != nil {
 		return nil, errWithCode
