@@ -6,10 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"one-api/common/cache"
 	"one-api/common/logger"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/model"
 	"one-api/providers/base"
 	"one-api/providers/vertexai/category"
@@ -19,7 +22,9 @@ import (
 
 	credentials "cloud.google.com/go/iam/credentials/apiv1"
 	"cloud.google.com/go/iam/credentials/apiv1/credentialspb"
+	"golang.org/x/net/proxy"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 )
 
 const TokenCacheKey = "api_token:vertexai"
@@ -104,7 +109,11 @@ func (p *VertexAIProvider) GetToken() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := credentials.NewIamCredentialsClient(ctx, option.WithCredentialsJSON([]byte(p.Channel.Key)))
+	if p.Channel.Proxy != nil && *p.Channel.Proxy != "" {
+		ctx = context.WithValue(ctx, utils.ProxyAddrKey, *p.Channel.Proxy)
+	}
+
+	client, err := credentials.NewIamCredentialsClient(ctx, option.WithCredentialsJSON([]byte(p.Channel.Key)), option.WithGRPCDialOption(grpc.WithContextDialer(customDialer)))
 	if err != nil {
 		return "", fmt.Errorf("failed to create IAM credentials client: %w", err)
 	}
@@ -162,4 +171,25 @@ func errorHandle(vertexaiError *VertexaiError) *types.OpenAIError {
 		Param:   vertexaiError.Error.Status,
 		Code:    vertexaiError.Error.Code,
 	}
+}
+
+func customDialer(ctx context.Context, addr string) (net.Conn, error) {
+	proxyAddress, ok := ctx.Value(utils.ProxyAddrKey).(string)
+	if !ok || proxyAddress == "" {
+		return net.Dial("tcp", addr)
+	}
+
+	proxyURL, err := url.Parse(proxyAddress)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing proxy address: %w", err)
+	}
+
+	dialer := &net.Dialer{}
+
+	dialerProxy, err := proxy.FromURL(proxyURL, dialer)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create HTTP dialer: %v", err)
+	}
+
+	return dialerProxy.Dial("tcp", addr)
 }
