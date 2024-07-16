@@ -409,7 +409,7 @@ export default function ChannelList() {
                   { id: 'status', label: t('channel_index.status'), disableSort: false },
                   { id: 'response_time', label: t('channel_index.responseTime'), disableSort: false },
                   // { id: 'balance', label: '余额', disableSort: false },
-                  { id: 'used', label: t('channel_index.usedBalance'), disableSort: false },
+                  { id: 'used', label: t('channel_index.usedBalance'), disableSort: true },
                   { id: 'priority', label: t('channel_index.priority'), disableSort: false, width: '80px' },
                   { id: 'weight', label: t('channel_index.weight'), disableSort: false, width: '80px' },
                   { id: 'action', label: t('channel_index.actions'), disableSort: true }
