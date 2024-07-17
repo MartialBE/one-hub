@@ -14,6 +14,7 @@ import (
 type ChannelChoice struct {
 	Channel       *Channel
 	CooldownsTime int64
+	Disable       bool
 }
 
 type ChannelsChooser struct {
@@ -51,6 +52,34 @@ func (cc *ChannelsChooser) Cooldowns(channelId int) bool {
 	return true
 }
 
+func (cc *ChannelsChooser) Disable(channelId int) {
+	cc.Lock()
+	defer cc.Unlock()
+	if _, ok := cc.Channels[channelId]; !ok {
+		return
+	}
+
+	cc.Channels[channelId].Disable = true
+}
+
+func (cc *ChannelsChooser) Enable(channelId int) {
+	cc.Lock()
+	defer cc.Unlock()
+	if _, ok := cc.Channels[channelId]; !ok {
+		return
+	}
+
+	cc.Channels[channelId].Disable = false
+}
+
+func (cc *ChannelsChooser) ChangeStatus(channelId int, status bool) {
+	if status {
+		cc.Enable(channelId)
+	} else {
+		cc.Disable(channelId)
+	}
+}
+
 func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFunc) *Channel {
 	nowTime := time.Now().Unix()
 	totalWeight := 0
@@ -58,7 +87,7 @@ func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFu
 	validChannels := make([]*ChannelChoice, 0, len(channelIds))
 	for _, channelId := range channelIds {
 		choice, ok := cc.Channels[channelId]
-		if !ok || choice.CooldownsTime >= nowTime {
+		if !ok || choice.Disable || choice.CooldownsTime >= nowTime {
 			continue
 		}
 
@@ -163,7 +192,7 @@ func (cc *ChannelsChooser) Load() {
 
 	abilities, err := GetAbilityChannelGroup()
 	if err != nil {
-		logger.SysLog("get enabled abilities failed: " + err.Error())
+		logger.SysError("get enabled abilities failed: " + err.Error())
 		return
 	}
 
@@ -178,6 +207,7 @@ func (cc *ChannelsChooser) Load() {
 		newChannels[channel.Id] = &ChannelChoice{
 			Channel:       channel,
 			CooldownsTime: 0,
+			Disable:       false,
 		}
 	}
 

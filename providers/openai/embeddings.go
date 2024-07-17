@@ -29,7 +29,9 @@ func (p *OpenAIProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*typ
 		return nil, errWithCode
 	}
 
-	*p.Usage = *response.Usage
+	if response.Usage != nil {
+		*p.Usage = *response.Usage
+	}
 
 	return &response.EmbeddingResponse, nil
 }

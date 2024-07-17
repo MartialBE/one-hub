@@ -43,7 +43,7 @@ func InitTelegramBot() {
 	var err error
 	TGBot, err = gotgbot.NewBot(botKey, getBotOpts())
 	if err != nil {
-		logger.SysLog("failed to create new telegram bot: " + err.Error())
+		logger.SysError("failed to create new telegram bot: " + err.Error())
 		return
 	}
 
@@ -71,7 +71,7 @@ func StartTelegramBot() {
 
 		err := TGupdater.AddWebhook(TGBot, urlPath, webHookOpts)
 		if err != nil {
-			logger.SysLog("Telegram bot failed to add webhook:" + err.Error())
+			logger.SysError("Telegram bot failed to add webhook:" + err.Error())
 			return
 		}
 
@@ -81,7 +81,7 @@ func StartTelegramBot() {
 			SecretToken:        TGWebHookSecret,
 		})
 		if err != nil {
-			logger.SysLog("Telegram bot failed to set webhook:" + err.Error())
+			logger.SysError("Telegram bot failed to set webhook:" + err.Error())
 			return
 		}
 	} else {
@@ -136,7 +136,7 @@ func setDispatcher() *ext.Dispatcher {
 	dispatcher := ext.NewDispatcher(&ext.DispatcherOpts{
 		// If an error is returned by a handler, log it and continue going.
 		Error: func(b *gotgbot.Bot, ctx *ext.Context, err error) ext.DispatcherAction {
-			logger.SysLog("telegram an error occurred while handling update: " + err.Error())
+			logger.SysError("telegram an error occurred while handling update: " + err.Error())
 			return ext.DispatcherActionNoop
 		},
 		MaxRoutines: ext.DefaultMaxRoutines,
@@ -174,7 +174,7 @@ func getMenu() []gotgbot.BotCommand {
 	customMenu, err := model.GetTelegramMenus()
 
 	if err != nil {
-		logger.SysLog("Failed to get custom menu, error: " + err.Error())
+		logger.SysError("Failed to get custom menu, error: " + err.Error())
 	}
 
 	if len(customMenu) > 0 {
@@ -235,7 +235,7 @@ func getHttpClient() (httpClient *http.Client) {
 
 	proxyURL, err := url.Parse(proxyAddr)
 	if err != nil {
-		logger.SysLog("failed to parse TG proxy URL: " + err.Error())
+		logger.SysError("failed to parse TG proxy URL: " + err.Error())
 		return
 	}
 	switch proxyURL.Scheme {
@@ -248,7 +248,7 @@ func getHttpClient() (httpClient *http.Client) {
 	case "socks5":
 		dialer, err := proxy.FromURL(proxyURL, proxy.Direct)
 		if err != nil {
-			logger.SysLog("failed to create TG SOCKS5 dialer: " + err.Error())
+			logger.SysError("failed to create TG SOCKS5 dialer: " + err.Error())
 			return
 		}
 		httpClient = &http.Client{
@@ -259,7 +259,7 @@ func getHttpClient() (httpClient *http.Client) {
 			},
 		}
 	default:
-		logger.SysLog("unknown TG proxy type: " + proxyAddr)
+		logger.SysError("unknown TG proxy type: " + proxyAddr)
 	}
 
 	return

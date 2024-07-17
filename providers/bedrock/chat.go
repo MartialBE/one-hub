@@ -46,7 +46,7 @@ func (p *BedrockProvider) getChatRequest(request *types.ChatCompletionRequest) (
 	var err error
 	p.Category, err = category.GetCategory(request.Model)
 	if err != nil || p.Category.ChatComplete == nil || p.Category.ResponseChatComplete == nil {
-		return nil, common.StringErrorWrapper("bedrock provider not found", "bedrock_err", http.StatusInternalServerError)
+		return nil, common.StringErrorWrapperLocal("bedrock provider not found", "bedrock_err", http.StatusInternalServerError)
 	}
 
 	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)

@@ -42,11 +42,17 @@ func ErrorWrapper(err error, code string, statusCode int) *types.OpenAIErrorWith
 	}
 
 	if strings.Contains(errString, "Post") || strings.Contains(errString, "dial") {
-		logger.SysLog(fmt.Sprintf("error: %s", errString))
+		logger.SysError(fmt.Sprintf("error: %s", errString))
 		errString = "请求上游地址失败"
 	}
 
 	return StringErrorWrapper(errString, code, statusCode)
+}
+
+func ErrorWrapperLocal(err error, code string, statusCode int) *types.OpenAIErrorWithStatusCode {
+	openaiErr := ErrorWrapper(err, code, statusCode)
+	openaiErr.LocalError = true
+	return openaiErr
 }
 
 func ErrorToOpenAIError(err error) *types.OpenAIError {
@@ -67,6 +73,13 @@ func StringErrorWrapper(err string, code string, statusCode int) *types.OpenAIEr
 		OpenAIError: openAIError,
 		StatusCode:  statusCode,
 	}
+}
+
+func StringErrorWrapperLocal(err string, code string, statusCode int) *types.OpenAIErrorWithStatusCode {
+	openaiErr := StringErrorWrapper(err, code, statusCode)
+	openaiErr.LocalError = true
+	return openaiErr
+
 }
 
 func AbortWithMessage(c *gin.Context, statusCode int, message string) {

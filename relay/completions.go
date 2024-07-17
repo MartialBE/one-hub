@@ -55,7 +55,7 @@ func (r *relayCompletions) getPromptTokens() (int, error) {
 func (r *relayCompletions) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 	provider, ok := r.provider.(providersBase.CompletionInterface)
 	if !ok {
-		err = common.StringErrorWrapper("channel not implemented", "channel_error", http.StatusServiceUnavailable)
+		err = common.StringErrorWrapperLocal("channel not implemented", "channel_error", http.StatusServiceUnavailable)
 		done = true
 		return
 	}

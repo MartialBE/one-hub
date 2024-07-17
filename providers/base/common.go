@@ -142,7 +142,7 @@ func (p *BaseProvider) GetAPIUri(relayMode int) string {
 func (p *BaseProvider) GetSupportedAPIUri(relayMode int) (url string, err *types.OpenAIErrorWithStatusCode) {
 	url = p.GetAPIUri(relayMode)
 	if url == "" {
-		err = common.StringErrorWrapper("The API interface is not supported", "unsupported_api", http.StatusNotImplemented)
+		err = common.StringErrorWrapperLocal("The API interface is not supported", "unsupported_api", http.StatusNotImplemented)
 		return
 	}
 

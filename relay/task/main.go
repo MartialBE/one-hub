@@ -95,7 +95,7 @@ func CompletedTask(quotaInstance *relay_util.Quota, taskAdaptor base.TaskInterfa
 
 	err := task.Insert()
 	if err != nil {
-		logger.SysLog(fmt.Sprintf("error: %s", err.Error()))
+		logger.SysError(fmt.Sprintf("task error: %s", err.Error()))
 	}
 
 	// 激活任务

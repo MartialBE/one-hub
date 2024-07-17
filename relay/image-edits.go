@@ -50,7 +50,7 @@ func (r *relayImageEdits) getPromptTokens() (int, error) {
 func (r *relayImageEdits) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 	provider, ok := r.provider.(providersBase.ImageEditsInterface)
 	if !ok {
-		err = common.StringErrorWrapper("channel not implemented", "channel_error", http.StatusServiceUnavailable)
+		err = common.StringErrorWrapperLocal("channel not implemented", "channel_error", http.StatusServiceUnavailable)
 		done = true
 		return
 	}

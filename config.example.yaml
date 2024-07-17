@@ -1,10 +1,11 @@
 # 服务器设置
 port: 3000 # 服务端口
 gin_mode: "release" # gin 模式，可选值为 "release" 或 "debug"，默认为 "release"。
-debug: false # 是否启用调试模式，启用后将输出更多日志信息。
+log_level: "info" # 日志级别，可选值为 "debug"、"info"、"warn"、"error"、"fatal"、"panic"，默认为 "info"。
 log_dir: "./logs" # 日志目录
 session_secret: "" # 会话密钥，未设置则使用随机值。
 disable_token_encoders: false # 是否禁用 token 编码器计算tokens。启用后 内存占用可减少 40MB 左右，但是stream模式下tokens计算不准确
+trusted_header: "" # 可信头部，"CF-Connecting-IP" 用于 Cloudflare，"X-Appengine-Remote-Addr" 用于 Google App Engine，未设置则不使用。 可以解决一些代理问题，如获取用户真实IP
 
 # 数据库设置
 sql_dsn: "" # 设置之后将使用指定数据库而非 SQLite，请使用 MySQL 或 PostgreSQL
