@@ -61,7 +61,7 @@ func UpdateMidjourneyTaskBulk() {
 			return
 		}
 
-		logger.LogInfo(ctx, fmt.Sprintf("检测到未完成的任务数有: %v", len(tasks)))
+		logger.LogWarn(ctx, fmt.Sprintf("检测到未完成的任务数有: %v", len(tasks)))
 		taskChannelM := make(map[int][]string)
 		taskM := make(map[string]*model.Midjourney)
 		nullTaskIds := make([]int, 0)
@@ -90,7 +90,7 @@ func UpdateMidjourneyTaskBulk() {
 		}
 
 		for channelId, taskIds := range taskChannelM {
-			logger.LogInfo(ctx, fmt.Sprintf("渠道 #%d 未完成的任务有: %d", channelId, len(taskIds)))
+			logger.LogWarn(ctx, fmt.Sprintf("渠道 #%d 未完成的任务有: %d", channelId, len(taskIds)))
 			if len(taskIds) == 0 {
 				continue
 			}
@@ -101,7 +101,7 @@ func UpdateMidjourneyTaskBulk() {
 					"status":      "FAILURE",
 					"progress":    "100%",
 				})
-				logger.LogInfo(ctx, fmt.Sprintf("UpdateMidjourneyTask error: %v", err))
+				logger.LogError(ctx, fmt.Sprintf("UpdateMidjourneyTask error: %v", err))
 				continue
 			}
 			requestUrl := fmt.Sprintf("%s/mj/task/list-by-condition", *midjourneyChannel.BaseURL)
@@ -177,7 +177,7 @@ func UpdateMidjourneyTaskBulk() {
 				}
 
 				if (task.Progress != "100%" && responseItem.FailReason != "") || (task.Progress == "100%" && task.Status == "FAILURE") {
-					logger.LogInfo(ctx, task.MjId+" 构建失败，"+task.FailReason)
+					logger.LogError(ctx, task.MjId+" 构建失败，"+task.FailReason)
 					task.Progress = "100%"
 					err = model.CacheUpdateUserQuota(task.UserId)
 					if err != nil {

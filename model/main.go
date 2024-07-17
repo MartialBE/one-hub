@@ -90,7 +90,7 @@ func chooseDB() (*gorm.DB, error) {
 func InitDB() (err error) {
 	db, err := chooseDB()
 	if err == nil {
-		if viper.GetBool("debug") {
+		if config.Debug {
 			db = db.Debug()
 		}
 		DB = db

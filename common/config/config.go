@@ -1,7 +1,6 @@
 package config
 
 import (
-	"one-api/common/logger"
 	"strings"
 	"time"
 
@@ -13,10 +12,6 @@ import (
 func InitConf() {
 	defaultConfig()
 	setEnv()
-
-	if viper.GetBool("debug") {
-		logger.SysLog("running in debug mode")
-	}
 
 	IsMasterNode = viper.GetString("node_type") != "slave"
 	RequestInterval = time.Duration(viper.GetInt("polling_interval")) * time.Second

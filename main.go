@@ -37,6 +37,10 @@ var indexPage []byte
 func main() {
 	cli.InitCli()
 	config.InitConf()
+	if viper.GetString("log_level") == "debug" {
+		config.Debug = true
+	}
+
 	logger.SetupLogger()
 	logger.SysLog("One Hub " + config.Version + " started")
 	// Initialize SQL Database

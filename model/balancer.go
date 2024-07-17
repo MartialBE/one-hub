@@ -192,7 +192,7 @@ func (cc *ChannelsChooser) Load() {
 
 	abilities, err := GetAbilityChannelGroup()
 	if err != nil {
-		logger.SysLog("get enabled abilities failed: " + err.Error())
+		logger.SysError("get enabled abilities failed: " + err.Error())
 		return
 	}
 
