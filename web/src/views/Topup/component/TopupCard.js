@@ -341,14 +341,16 @@ const TopupCard = () => {
           />
         </FormControl>
 
-        <Stack justifyContent="center" alignItems={'center'} spacing={3} paddingTop={'20px'}>
-          <Typography variant={'h4'} color={theme.palette.grey[700]}>
-            {t('topupCard.noRedemptionCodeText')}
-          </Typography>
-          <Button variant="contained" onClick={openTopUpLink}>
-            {t('topupCard.getRedemptionCode')}
-          </Button>
-        </Stack>
+        {siteInfo.top_up_link && (
+          <Stack justifyContent="center" alignItems={'center'} spacing={3} paddingTop={'20px'}>
+            <Typography variant={'h4'} color={theme.palette.grey[700]}>
+              {t('topupCard.noRedemptionCodeText')}
+            </Typography>
+            <Button variant="contained" onClick={openTopUpLink}>
+              {t('topupCard.getRedemptionCode')}
+            </Button>
+          </Stack>
+        )}
       </SubCard>
     </UserCard>
   );
