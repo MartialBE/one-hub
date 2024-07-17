@@ -162,7 +162,7 @@ func (t *SunoTask) UpdateTaskStatus(ctx context.Context, taskChannelM map[int][]
 }
 
 func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, taskM map[string]*model.Task) error {
-	logger.LogInfo(ctx, fmt.Sprintf("渠道 #%d 未完成的任务有: %d", channelId, len(taskIds)))
+	logger.LogWarn(ctx, fmt.Sprintf("渠道 #%d 未完成的任务有: %d", channelId, len(taskIds)))
 	if len(taskIds) == 0 {
 		return nil
 	}
@@ -216,7 +216,7 @@ func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, tas
 		task.FinishTime = lo.If(responseItem.FinishTime != 0, responseItem.FinishTime).Else(task.FinishTime)
 
 		if responseItem.FailReason != "" || task.Status == model.TaskStatusFailure {
-			logger.LogInfo(ctx, task.TaskID+" 构建失败，"+task.FailReason)
+			logger.LogError(ctx, task.TaskID+" 构建失败，"+task.FailReason)
 			task.Progress = 100
 			quota := task.Quota
 			if quota > 0 {

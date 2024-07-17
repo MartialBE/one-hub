@@ -53,7 +53,7 @@ func (r *relayImageGenerations) getPromptTokens() (int, error) {
 func (r *relayImageGenerations) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 	provider, ok := r.provider.(providersBase.ImageGenerationsInterface)
 	if !ok {
-		err = common.StringErrorWrapper("channel not implemented", "channel_error", http.StatusServiceUnavailable)
+		err = common.StringErrorWrapperLocal("channel not implemented", "channel_error", http.StatusServiceUnavailable)
 		done = true
 		return
 	}

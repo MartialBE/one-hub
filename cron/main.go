@@ -10,7 +10,7 @@ import (
 func InitCron() {
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
-		logger.SysLog("Cron scheduler error: " + err.Error())
+		logger.SysError("Cron scheduler error: " + err.Error())
 		return
 	}
 
@@ -28,7 +28,7 @@ func InitCron() {
 	)
 
 	if err != nil {
-		logger.SysLog("Cron job error: " + err.Error())
+		logger.SysError("Cron job error: " + err.Error())
 		return
 	}
 

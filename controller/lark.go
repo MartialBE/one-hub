@@ -59,7 +59,7 @@ func getLarkAppAccessToken() (string, error) {
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		logger.SysLog(err.Error())
+		logger.SysError("无法连接至 飞书 服务器, err:" + err.Error())
 		return "", errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	defer res.Body.Close()
@@ -101,7 +101,7 @@ func getLarkUserAccessToken(code string) (string, error) {
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		logger.SysLog(err.Error())
+		logger.SysError("无法连接至 飞书 服务器, err:" + err.Error())
 		return "", errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	defer res.Body.Close()
@@ -136,7 +136,7 @@ func getLarkUserInfoByCode(code string) (*LarkUser, error) {
 	}
 	res2, err := client.Do(req)
 	if err != nil {
-		logger.SysLog(err.Error())
+		logger.SysError("无法连接至 飞书 服务器, err:" + err.Error())
 		return nil, errors.New("无法连接至飞书服务器，请稍后重试！")
 	}
 	var larkUser LarkUser
