@@ -102,6 +102,11 @@ func initHttpServer() {
 	server.Use(middleware.RequestId())
 	middleware.SetUpLogger(server)
 
+	trustedHeader := viper.GetString("trusted_header")
+	if trustedHeader != "" {
+		server.TrustedPlatform = trustedHeader
+	}
+
 	store := cookie.NewStore([]byte(config.SessionSecret))
 	server.Use(sessions.Sessions("session", store))
 

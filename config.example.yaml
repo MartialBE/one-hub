@@ -5,6 +5,7 @@ log_level: "info" # 日志级别，可选值为 "debug"、"info"、"warn"、"err
 log_dir: "./logs" # 日志目录
 session_secret: "" # 会话密钥，未设置则使用随机值。
 disable_token_encoders: false # 是否禁用 token 编码器计算tokens。启用后 内存占用可减少 40MB 左右，但是stream模式下tokens计算不准确
+trusted_header: "" # 可信头部，"CF-Connecting-IP" 用于 Cloudflare，"X-Appengine-Remote-Addr" 用于 Google App Engine，未设置则不使用。 可以解决一些代理问题，如获取用户真实IP
 
 # 数据库设置
 sql_dsn: "" # 设置之后将使用指定数据库而非 SQLite，请使用 MySQL 或 PostgreSQL
