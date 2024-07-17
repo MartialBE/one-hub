@@ -28,7 +28,8 @@ func (e *OpenAIError) Error() string {
 
 type OpenAIErrorWithStatusCode struct {
 	OpenAIError
-	StatusCode int `json:"status_code"`
+	StatusCode int  `json:"status_code"`
+	LocalError bool `json:"-"`
 }
 
 type OpenAIErrorResponse struct {

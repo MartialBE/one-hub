@@ -21,7 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func testChannel(channel *model.Channel, testModel string) (err error, openaiErr *types.OpenAIError) {
+func testChannel(channel *model.Channel, testModel string) (err error, openaiErr *types.OpenAIErrorWithStatusCode) {
 	if channel.TestModel == "" {
 		return errors.New("请填写测速模型后再试"), nil
 	}
@@ -66,7 +66,7 @@ func testChannel(channel *model.Channel, testModel string) (err error, openaiErr
 	response, openAIErrorWithStatusCode := chatProvider.CreateChatCompletion(request)
 
 	if openAIErrorWithStatusCode != nil {
-		return errors.New(openAIErrorWithStatusCode.Message), &openAIErrorWithStatusCode.OpenAIError
+		return errors.New(openAIErrorWithStatusCode.Message), openAIErrorWithStatusCode
 	}
 
 	// 转换为JSON字符串
@@ -110,22 +110,31 @@ func TestChannel(c *gin.Context) {
 	}
 	testModel := c.Query("model")
 	tik := time.Now()
-	err, _ = testChannel(channel, testModel)
+	err, openaiErr := testChannel(channel, testModel)
 	tok := time.Now()
 	milliseconds := tok.Sub(tik).Milliseconds()
-	go channel.UpdateResponseTime(milliseconds)
 	consumedTime := float64(milliseconds) / 1000.0
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
-			"time":    consumedTime,
-		})
-		return
+
+	success := false
+	msg := ""
+	if openaiErr != nil {
+		if ShouldDisableChannel(channel.Type, openaiErr) {
+			msg = fmt.Sprintf("测速失败，已被禁用，原因：%s", err.Error())
+			DisableChannel(channel.Id, channel.Name, err.Error(), false)
+		} else {
+			msg = fmt.Sprintf("测速失败，原因：%s", err.Error())
+		}
+	} else if err != nil {
+		msg = fmt.Sprintf("测速失败，原因：%s", err.Error())
+	} else {
+		success = true
+		msg = "测速成功"
+		go channel.UpdateResponseTime(milliseconds)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
+		"success": success,
+		"message": msg,
 		"time":    consumedTime,
 	})
 }
@@ -172,7 +181,7 @@ func testAllChannels(isNotify bool) error {
 				}
 				// 如果已被禁用，但是请求成功，需要判断是否需要恢复
 				// 手动禁用的通道，不会自动恢复
-				if shouldEnableChannel(err, openaiErr) {
+				if shouldEnableChannel(err, &openaiErr.OpenAIError) {
 					if channel.Status == config.ChannelStatusAutoDisabled {
 						EnableChannel(channel.Id, channel.Name, false)
 						sendMessage += "- 已被启用 \n\n"
@@ -189,7 +198,7 @@ func testAllChannels(isNotify bool) error {
 					continue
 				}
 
-				if ShouldDisableChannel(openaiErr, -1) {
+				if ShouldDisableChannel(channel.Type, openaiErr) {
 					sendMessage += fmt.Sprintf("- 已被禁用，原因：%s\n\n", utils.EscapeMarkdownText(err.Error()))
 					DisableChannel(channel.Id, channel.Name, err.Error(), false)
 					continue

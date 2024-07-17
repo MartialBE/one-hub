@@ -303,19 +303,24 @@ func (channel *Channel) StatusToStr() string {
 }
 
 func UpdateChannelStatusById(id int, status int) {
-	err := UpdateAbilityStatus(id, status == config.ChannelStatusEnabled)
+	tx := DB.Begin()
+
+	err := UpdateAbilityStatus(tx, id, status == config.ChannelStatusEnabled)
 	if err != nil {
 		logger.SysError("failed to update ability status: " + err.Error())
+		tx.Rollback()
+		return
 	}
-	err = DB.Model(&Channel{}).Where("id = ?", id).Update("status", status).Error
+	err = tx.Model(&Channel{}).Where("id = ?", id).Update("status", status).Error
 	if err != nil {
 		logger.SysError("failed to update channel status: " + err.Error())
+		tx.Rollback()
+		return
 	}
 
-	if err == nil {
+	tx.Commit()
 
-		go ChannelGroup.Load()
-	}
+	go ChannelGroup.ChangeStatus(id, status == config.ChannelStatusEnabled)
 }
 
 func UpdateChannelUsedQuota(id int, quota int) {

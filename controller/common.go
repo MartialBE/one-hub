@@ -25,7 +25,7 @@ func shouldEnableChannel(err error, openAIErr *types.OpenAIError) bool {
 	return true
 }
 
-func ShouldDisableChannel(err *types.OpenAIError, statusCode int) bool {
+func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode) bool {
 	if !config.AutomaticDisableChannelEnabled {
 		return false
 	}
@@ -34,7 +34,27 @@ func ShouldDisableChannel(err *types.OpenAIError, statusCode int) bool {
 		return false
 	}
 
-	if statusCode == http.StatusUnauthorized {
+	if err.LocalError {
+		return false
+	}
+
+	if err.StatusCode == http.StatusUnauthorized {
+		return true
+	}
+
+	if err.StatusCode == http.StatusForbidden {
+		switch channelType {
+		case config.ChannelTypeGemini:
+			return true
+		}
+	}
+
+	switch err.OpenAIError.Code {
+	case "invalid_api_key":
+		return true
+	case "account_deactivated":
+		return true
+	case "billing_not_active":
 		return true
 	}
 
@@ -49,23 +69,25 @@ func ShouldDisableChannel(err *types.OpenAIError, statusCode int) bool {
 	case "forbidden":
 		return true
 	}
-	if err.Code == "invalid_api_key" || err.Code == "account_deactivated" {
+
+	if strings.Contains(err.OpenAIError.Message, "Your credit balance is too low") { // anthropic
 		return true
-	}
-	if strings.HasPrefix(err.Message, "Your credit balance is too low") { // anthropic
+	} else if strings.Contains(err.OpenAIError.Message, "This organization has been disabled.") {
 		return true
-	} else if strings.HasPrefix(err.Message, "This organization has been disabled.") {
+	} else if strings.Contains(err.OpenAIError.Message, "You exceeded your current quota") {
+		return true
+	} else if strings.Contains(err.OpenAIError.Message, "Permission denied") {
 		return true
 	}
 
-	if strings.Contains(err.Message, "credit") {
+	if strings.Contains(err.OpenAIError.Message, "credit") {
 		return true
 	}
-	if strings.Contains(err.Message, "balance") {
+	if strings.Contains(err.OpenAIError.Message, "balance") {
 		return true
 	}
 
-	if strings.Contains(err.Message, "Access denied") {
+	if strings.Contains(err.OpenAIError.Message, "Access denied") {
 		return true
 	}
 	return false

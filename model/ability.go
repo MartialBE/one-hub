@@ -4,6 +4,8 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type Ability struct {
@@ -56,8 +58,8 @@ func (channel *Channel) UpdateAbilities() error {
 	return nil
 }
 
-func UpdateAbilityStatus(channelId int, status bool) error {
-	return DB.Model(&Ability{}).Where("channel_id = ?", channelId).Select("enabled").Update("enabled", status).Error
+func UpdateAbilityStatus(tx *gorm.DB, channelId int, status bool) error {
+	return tx.Model(&Ability{}).Where("channel_id = ?", channelId).Select("enabled").Update("enabled", status).Error
 }
 
 type AbilityChannelGroup struct {
