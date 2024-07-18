@@ -44,6 +44,10 @@ func (r *relayCompletions) setRequest() error {
 	return nil
 }
 
+func (r *relayCompletions) IsStream() bool {
+	return r.request.Stream
+}
+
 func (r *relayCompletions) getRequest() interface{} {
 	return &r.request
 }

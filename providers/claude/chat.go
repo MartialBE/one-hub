@@ -31,7 +31,12 @@ type ClaudeStreamHandler struct {
 }
 
 func (p *ClaudeProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	req, errWithCode := p.getChatRequest(claudeRequest)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -48,7 +53,12 @@ func (p *ClaudeProvider) CreateChatCompletion(request *types.ChatCompletionReque
 }
 
 func (p *ClaudeProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	req, errWithCode := p.getChatRequest(claudeRequest)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -71,7 +81,7 @@ func (p *ClaudeProvider) CreateChatCompletionStream(request *types.ChatCompletio
 	return requester.RequestStream(p.Requester, resp, chatHandler.HandlerStream)
 }
 
-func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+func (p *ClaudeProvider) getChatRequest(claudeRequest *ClaudeRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -80,27 +90,22 @@ func (p *ClaudeProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 	// 获取请求地址
 	fullRequestURL := p.GetFullRequestURL(url)
 	if fullRequestURL == "" {
-		return nil, common.ErrorWrapper(nil, "invalid_claude_config", http.StatusInternalServerError)
+		return nil, common.ErrorWrapperLocal(nil, "invalid_claude_config", http.StatusInternalServerError)
 	}
 
 	headers := p.GetRequestHeaders()
-	if request.Stream {
+	if claudeRequest.Stream {
 		headers["Accept"] = "text/event-stream"
 	}
 
-	if strings.HasPrefix(request.Model, "claude-3-5-sonnet") {
+	if strings.HasPrefix(claudeRequest.Model, "claude-3-5-sonnet") {
 		headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15"
-	}
-
-	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
-	if errWithCode != nil {
-		return nil, errWithCode
 	}
 
 	// 创建请求
 	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(claudeRequest), p.Requester.WithHeader(headers))
 	if err != nil {
-		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		return nil, common.ErrorWrapperLocal(err, "new_request_failed", http.StatusInternalServerError)
 	}
 
 	return req, nil
@@ -189,10 +194,11 @@ func defaultMaxTokens(maxTokens int) int {
 }
 
 func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
-	content := Message{
-		Role:    convertRole(msg.Role),
-		Content: make([]MessageContent, 0),
+	message := Message{
+		Role: convertRole(msg.Role),
 	}
+
+	content := make([]MessageContent, 0)
 
 	if msg.ToolCalls != nil {
 		for _, toolCall := range msg.ToolCalls {
@@ -200,30 +206,33 @@ func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
 			if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &inputParam); err != nil {
 				return nil, err
 			}
-			content.Content = append(content.Content, MessageContent{
+			content = append(content, MessageContent{
 				Type:  ContentTypeToolUes,
 				Id:    toolCall.Id,
 				Name:  toolCall.Function.Name,
 				Input: inputParam,
 			})
 		}
-		return &content, nil
+
+		message.Content = content
+		return &message, nil
 	}
 
 	if msg.Role == types.ChatMessageRoleTool {
-		content.Content = append(content.Content, MessageContent{
+		content = append(content, MessageContent{
 			Type:      ContentTypeToolResult,
 			Content:   msg.StringContent(),
 			ToolUseId: msg.ToolCallID,
 		})
 
-		return &content, nil
+		message.Content = content
+		return &message, nil
 	}
 
 	openaiContent := msg.ParseContent()
 	for _, part := range openaiContent {
 		if part.Type == types.ContentTypeText {
-			content.Content = append(content.Content, MessageContent{
+			content = append(content, MessageContent{
 				Type: "text",
 				Text: part.Text,
 			})
@@ -234,7 +243,7 @@ func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
 			if err != nil {
 				return nil, common.ErrorWrapper(err, "image_url_invalid", http.StatusBadRequest)
 			}
-			content.Content = append(content.Content, MessageContent{
+			content = append(content, MessageContent{
 				Type: "image",
 				Source: &ContentSource{
 					Type:      "base64",
@@ -245,11 +254,13 @@ func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
 		}
 	}
 
-	return &content, nil
+	message.Content = content
+
+	return &message, nil
 }
 
 func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	aiError := errorHandle(&response.Error)
+	aiError := errorHandle(response.Error)
 	if aiError != nil {
 		errWithCode = &types.OpenAIErrorWithStatusCode{
 			OpenAIError: *aiError,
@@ -328,7 +339,7 @@ func (h *ClaudeStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 		return
 	}
 
-	aiError := errorHandle(&claudeResponse.Error)
+	aiError := errorHandle(claudeResponse.Error)
 	if aiError != nil {
 		errChan <- aiError
 		return

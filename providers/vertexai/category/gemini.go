@@ -12,6 +12,7 @@ import (
 
 func init() {
 	CategoryMap["gemini"] = &Category{
+		Category:                  "gemini",
 		ChatComplete:              ConvertGeminiFromChatOpenai,
 		ResponseChatComplete:      ConvertGeminiToChatOpenai,
 		ResponseChatCompleteStrem: GeminiChatCompleteStrem,

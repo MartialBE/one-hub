@@ -34,7 +34,7 @@ func Relay(c *gin.Context) {
 
 	if cache != nil {
 		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache)
+		cacheProcessing(c, cache, relay.IsStream())
 		return
 	}
 
@@ -121,8 +121,8 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 	return
 }
 
-func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps) {
-	responseCache(c, cacheProps.Response)
+func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isStream bool) {
+	responseCache(c, cacheProps.Response, isStream)
 
 	// 写入日志
 	tokenName := c.GetString("token_name")
