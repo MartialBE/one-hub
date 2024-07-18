@@ -181,7 +181,7 @@ func testAllChannels(isNotify bool) error {
 				}
 				// 如果已被禁用，但是请求成功，需要判断是否需要恢复
 				// 手动禁用的通道，不会自动恢复
-				if shouldEnableChannel(err, &openaiErr.OpenAIError) {
+				if shouldEnableChannel(err, openaiErr) {
 					if channel.Status == config.ChannelStatusAutoDisabled {
 						EnableChannel(channel.Id, channel.Name, false)
 						sendMessage += "- 已被启用 \n\n"
