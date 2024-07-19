@@ -48,12 +48,16 @@ func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 
 // 错误处理
 func errorHandle(claudeError *ClaudeError) *types.OpenAIError {
+	if claudeError == nil {
+		return nil
+	}
+
 	if claudeError.Type == "" {
 		return nil
 	}
 	return &types.OpenAIError{
-		Message: claudeError.Error.Message,
-		Type:    claudeError.Error.Type,
+		Message: claudeError.ErrorInfo.Message,
+		Type:    claudeError.ErrorInfo.Type,
 		Code:    claudeError.Type,
 	}
 }

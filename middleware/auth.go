@@ -138,6 +138,13 @@ func OpenaiAuth() func(c *gin.Context) {
 	}
 }
 
+func ClaudeAuth() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		key := c.Request.Header.Get("x-api-key")
+		tokenAuth(c, key)
+	}
+}
+
 func MjAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		key := c.Request.Header.Get("mj-api-secret")

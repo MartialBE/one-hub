@@ -29,6 +29,7 @@ type RelayBaseInterface interface {
 	getContext() *gin.Context
 	SetChatCache(allow bool)
 	GetChatCache() *relay_util.ChatCacheProps
+	IsStream() bool
 }
 
 func (r *relayBase) SetChatCache(allow bool) {
@@ -41,6 +42,10 @@ func (r *relayBase) GetChatCache() *relay_util.ChatCacheProps {
 
 func (r *relayBase) getRequest() interface{} {
 	return nil
+}
+
+func (r *relayBase) IsStream() bool {
+	return false
 }
 
 func (r *relayBase) setProvider(modelName string) error {

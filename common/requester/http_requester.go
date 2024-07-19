@@ -138,10 +138,22 @@ func RequestStream[T streamable](requester *HTTPRequester, resp *http.Response, 
 		reader:        bufio.NewReader(resp.Body),
 		response:      resp,
 		handlerPrefix: handlerPrefix,
+		NoTrim:        false,
 
 		DataChan: make(chan T),
 		ErrChan:  make(chan error),
 	}
+
+	return stream, nil
+}
+
+func RequestNoTrimStream[T streamable](requester *HTTPRequester, resp *http.Response, handlerPrefix HandlerPrefix[T]) (*streamReader[T], *types.OpenAIErrorWithStatusCode) {
+	stream, err := RequestStream(requester, resp, handlerPrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	stream.NoTrim = true
 
 	return stream, nil
 }

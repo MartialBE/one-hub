@@ -10,6 +10,7 @@ import (
 )
 
 type Category struct {
+	Category                  string
 	ChatComplete              ChatCompletionConvert
 	ResponseChatComplete      ChatCompletionResponse
 	ResponseChatCompleteStrem ChatCompletionStreamResponse

@@ -18,8 +18,30 @@ const (
 )
 
 type ClaudeError struct {
-	Type  string          `json:"type"`
-	Error ClaudeErrorInfo `json:"error"`
+	Type      string          `json:"type"`
+	ErrorInfo ClaudeErrorInfo `json:"error"`
+}
+
+func (e *ClaudeError) Error() string {
+	bytes, _ := json.Marshal(e)
+	return string(bytes) + "\n"
+}
+
+type ClaudeErrorWithStatusCode struct {
+	ClaudeError
+	StatusCode int  `json:"status_code"`
+	LocalError bool `json:"-"`
+}
+
+func (e *ClaudeErrorWithStatusCode) ToOpenAiError() *types.OpenAIErrorWithStatusCode {
+	return &types.OpenAIErrorWithStatusCode{
+		StatusCode: e.StatusCode,
+		OpenAIError: types.OpenAIError{
+			Type:    e.Type,
+			Message: e.ErrorInfo.Message,
+		},
+		LocalError: e.LocalError,
+	}
 }
 
 type ClaudeErrorInfo struct {
@@ -66,13 +88,14 @@ type MessageContent struct {
 	Id        string         `json:"id,omitempty"`
 	Name      string         `json:"name,omitempty"`
 	Input     any            `json:"input,omitempty"`
-	Content   string         `json:"content,omitempty"`
+	Content   any            `json:"content,omitempty"`
+	IsError   *bool          `json:"is_error,omitempty"`
 	ToolUseId string         `json:"tool_use_id,omitempty"`
 }
 
 type Message struct {
-	Role    string           `json:"role"`
-	Content []MessageContent `json:"content"`
+	Role    string `json:"role"`
+	Content any    `json:"content"`
 }
 
 type ClaudeRequest struct {
@@ -114,7 +137,7 @@ type ClaudeResponse struct {
 	StopReason   string       `json:"stop_reason,omitempty"`
 	StopSequence string       `json:"stop_sequence,omitempty"`
 	Usage        Usage        `json:"usage,omitempty"`
-	Error        ClaudeError  `json:"error,omitempty"`
+	Error        *ClaudeError `json:"error,omitempty"`
 }
 
 type Delta struct {
@@ -132,7 +155,7 @@ type ClaudeStreamResponse struct {
 	Delta        Delta          `json:"delta,omitempty"`
 	ContentBlock ContentBlock   `json:"content_block,omitempty"`
 	Usage        Usage          `json:"usage,omitempty"`
-	Error        ClaudeError    `json:"error,omitempty"`
+	Error        *ClaudeError   `json:"error,omitempty"`
 }
 
 type ContentBlock struct {

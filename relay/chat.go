@@ -52,6 +52,10 @@ func (r *relayChat) getRequest() interface{} {
 	return &r.chatRequest
 }
 
+func (r *relayChat) IsStream() bool {
+	return r.chatRequest.Stream
+}
+
 func (r *relayChat) getPromptTokens() (int, error) {
 	return common.CountTokenMessages(r.chatRequest.Messages, r.modelName), nil
 }
