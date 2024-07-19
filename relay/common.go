@@ -183,6 +183,38 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 	return nil
 }
 
+func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) {
+	requester.SetEventStreamHeaders(c)
+	dataChan, errChan := stream.Recv()
+
+	defer stream.Close()
+	c.Stream(func(w io.Writer) bool {
+		select {
+		case data := <-dataChan:
+			fmt.Fprint(w, data)
+			cache.SetResponse(data)
+			return true
+		case err := <-errChan:
+			if !errors.Is(err, io.EOF) {
+				fmt.Fprint(w, err.Error())
+				logger.LogError(c.Request.Context(), "Stream err:"+err.Error())
+				// 报错不应该缓存
+				cache.NoCache()
+			}
+
+			if endHandler != nil {
+				streamData := endHandler()
+				if streamData != "" {
+					fmt.Fprint(w, streamData)
+					cache.SetResponse(streamData)
+				}
+			}
+			return false
+		}
+	})
+
+}
+
 func responseMultipart(c *gin.Context, resp *http.Response) *types.OpenAIErrorWithStatusCode {
 	defer resp.Body.Close()
 
@@ -214,10 +246,7 @@ func responseCustom(c *gin.Context, response *types.AudioResponseWrapper) *types
 	return nil
 }
 
-func responseCache(c *gin.Context, response string) {
-	// 检查是否是 data: 开头的流式数据
-	isStream := strings.HasPrefix(response, "data: ")
-
+func responseCache(c *gin.Context, response string, isStream bool) {
 	if isStream {
 		requester.SetEventStreamHeaders(c)
 		c.Stream(func(w io.Writer) bool {
@@ -263,7 +292,10 @@ func shouldRetry(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channe
 
 	if apiErr.StatusCode == http.StatusBadRequest {
 		// 如果是culade 400错误，需要重试
-		return channelType == config.ChannelTypeAnthropic
+		if channelType == config.ChannelTypeAnthropic && strings.Contains(apiErr.Message, "This organization has been disabled") {
+			return true
+		}
+		return false
 	}
 
 	if apiErr.StatusCode == 408 {

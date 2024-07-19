@@ -10,7 +10,7 @@ import (
 	"one-api/types"
 )
 
-const anthropicVersion = "vertex-2023-10-16"
+const AnthropicVersion = "vertex-2023-10-16"
 
 type ClaudeRequest struct {
 	*claude.ClaudeRequest
@@ -26,6 +26,7 @@ var claudeMap = map[string]string{
 
 func init() {
 	CategoryMap["claude"] = &Category{
+		Category:                  "claude",
 		ChatComplete:              ConvertClaudeFromChatOpenai,
 		ResponseChatComplete:      ConvertClaudeToChatOpenai,
 		ResponseChatCompleteStrem: ClaudeChatCompleteStrem,
@@ -43,7 +44,7 @@ func ConvertClaudeFromChatOpenai(request *types.ChatCompletionRequest) (any, *ty
 
 	claudeRequest := &ClaudeRequest{}
 	claudeRequest.ClaudeRequest = rawRequest
-	claudeRequest.AnthropicVersion = anthropicVersion
+	claudeRequest.AnthropicVersion = AnthropicVersion
 
 	// 删除model字段
 	claudeRequest.Model = ""

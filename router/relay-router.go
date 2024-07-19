@@ -16,6 +16,7 @@ func SetRelayRouter(router *gin.Engine) {
 	setOpenAIRouter(router)
 	setMJRouter(router)
 	setSunoRouter(router)
+	setClaudeRouter(router)
 }
 
 func setOpenAIRouter(router *gin.Engine) {
@@ -95,5 +96,14 @@ func setSunoRouter(router *gin.Engine) {
 		relaySunoRouter.POST("/submit/:action", task.RelayTaskSubmit)
 		relaySunoRouter.POST("/fetch", suno.GetFetch)
 		relaySunoRouter.GET("/fetch/:id", suno.GetFetchByID)
+	}
+}
+
+func setClaudeRouter(router *gin.Engine) {
+	relayClaudeRouter := router.Group("/claude")
+	relayV1Router := relayClaudeRouter.Group("/v1")
+	relayV1Router.Use(middleware.ClaudeAuth(), middleware.Distribute())
+	{
+		relayV1Router.POST("/messages", relay.RelaycClaudeOnly)
 	}
 }

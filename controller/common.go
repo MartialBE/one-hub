@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func shouldEnableChannel(err error, openAIErr *types.OpenAIError) bool {
+func shouldEnableChannel(err error, openAIErr *types.OpenAIErrorWithStatusCode) bool {
 	if !config.AutomaticEnableChannelEnabled {
 		return false
 	}

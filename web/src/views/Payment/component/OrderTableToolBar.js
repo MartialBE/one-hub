@@ -128,7 +128,7 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
             {Object.values(StatusType).map((option) => {
               return (
                 <MenuItem key={option.value} value={option.value}>
-                  {t(`orderlogPage.statusOptions.${option.key}`)}
+                  {option.name}
                 </MenuItem>
               );
             })}

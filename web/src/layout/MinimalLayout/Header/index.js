@@ -36,11 +36,10 @@ const Header = () => {
   const account = useSelector((state) => state.account);
   const [open, setOpen] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleOpenMenu = (event) => {
     setOpen(open ? null : event.currentTarget);
-    i18n.changeLanguage('ja_JP');
   };
 
   const handleCloseMenu = () => {

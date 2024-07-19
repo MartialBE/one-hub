@@ -59,7 +59,7 @@ func ErrorToOpenAIError(err error) *types.OpenAIError {
 	return &types.OpenAIError{
 		Code:    "system error",
 		Message: err.Error(),
-		Type:    "one_api_error",
+		Type:    "one_hub_error",
 	}
 }
 
@@ -91,6 +91,12 @@ func AbortWithMessage(c *gin.Context, statusCode int, message string) {
 	})
 	c.Abort()
 	logger.LogError(c.Request.Context(), message)
+}
+
+func AbortWithErr(c *gin.Context, statusCode int, err error) {
+	c.JSON(statusCode, err)
+	c.Abort()
+	logger.LogError(c.Request.Context(), err.Error())
 }
 
 func APIRespondWithError(c *gin.Context, status int, err error) {

@@ -46,7 +46,7 @@ func InitTokenEncoders() {
 	logger.SysLog("token encoders initialized")
 }
 
-func getTokenEncoder(model string) *tiktoken.Tiktoken {
+func GetTokenEncoder(model string) *tiktoken.Tiktoken {
 	if config.DisableTokenEncoders {
 		return nil
 	}
@@ -75,7 +75,7 @@ func getTokenEncoder(model string) *tiktoken.Tiktoken {
 	return tokenEncoder
 }
 
-func getTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
+func GetTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
 	if config.DisableTokenEncoders || config.ApproximateTokenEnabled {
 		return int(float64(len(text)) * 0.38)
 	}
@@ -83,7 +83,7 @@ func getTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
 }
 
 func CountTokenMessages(messages []types.ChatCompletionMessage, model string) int {
-	tokenEncoder := getTokenEncoder(model)
+	tokenEncoder := GetTokenEncoder(model)
 	// Reference:
 	// https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
 	// https://github.com/pkoukk/tiktoken-go/issues/6
@@ -103,13 +103,13 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 		tokenNum += tokensPerMessage
 		switch v := message.Content.(type) {
 		case string:
-			tokenNum += getTokenNum(tokenEncoder, v)
+			tokenNum += GetTokenNum(tokenEncoder, v)
 		case []any:
 			for _, it := range v {
 				m := it.(map[string]any)
 				switch m["type"] {
 				case "text":
-					tokenNum += getTokenNum(tokenEncoder, m["text"].(string))
+					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
 				case "image_url":
 					imageUrl, ok := m["image_url"].(map[string]any)
 					if ok {
@@ -129,10 +129,10 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 				}
 			}
 		}
-		tokenNum += getTokenNum(tokenEncoder, message.Role)
+		tokenNum += GetTokenNum(tokenEncoder, message.Role)
 		if message.Name != nil {
 			tokenNum += tokensPerName
-			tokenNum += getTokenNum(tokenEncoder, *message.Name)
+			tokenNum += GetTokenNum(tokenEncoder, *message.Name)
 		}
 	}
 	tokenNum += 3 // Every reply is primed with <|start|>assistant<|message|>
@@ -220,8 +220,8 @@ func CountTokenInput(input any, model string) int {
 }
 
 func CountTokenText(text string, model string) int {
-	tokenEncoder := getTokenEncoder(model)
-	return getTokenNum(tokenEncoder, text)
+	tokenEncoder := GetTokenEncoder(model)
+	return GetTokenNum(tokenEncoder, text)
 }
 
 func CountTokenImage(input interface{}) (int, error) {
