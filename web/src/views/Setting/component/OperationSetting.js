@@ -41,7 +41,9 @@ const OperationSetting = () => {
     ChatImageRequestProxy: '',
     PaymentUSDRate: 0,
     PaymentMinAmount: 1,
-    RechargeDiscount: ''
+    RechargeDiscount: '',
+    CFWorkerImageUrl: '',
+    CFWorkerImageKey: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -185,6 +187,15 @@ const OperationSetting = () => {
         if (originInputs['ChatImageRequestProxy'] !== inputs.ChatImageRequestProxy) {
           await updateOption('ChatImageRequestProxy', inputs.ChatImageRequestProxy);
         }
+
+        if (originInputs['CFWorkerImageUrl'] !== inputs.CFWorkerImageUrl) {
+          await updateOption('CFWorkerImageUrl', inputs.CFWorkerImageUrl);
+        }
+
+        if (originInputs['CFWorkerImageKey'] !== inputs.CFWorkerImageKey) {
+          await updateOption('CFWorkerImageKey', inputs.CFWorkerImageKey);
+        }
+
         break;
       case 'payment':
         if (originInputs['PaymentUSDRate'] !== inputs.PaymentUSDRate) {
@@ -378,6 +389,37 @@ const OperationSetting = () => {
                 onChange={handleInputChange}
                 label={t('setting_index.operationSettings.otherSettings.chatImageRequestProxy.label')}
                 placeholder={t('setting_index.operationSettings.otherSettings.chatImageRequestProxy.placeholder')}
+                disabled={loading}
+              />
+            </FormControl>
+          </Stack>
+
+          <Stack spacing={2}>
+            <Alert severity="info">{t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.alert')}</Alert>
+            <FormControl>
+              <InputLabel htmlFor="CFWorkerImageUrl">
+                {t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.label')}
+              </InputLabel>
+              <OutlinedInput
+                id="CFWorkerImageUrl"
+                name="CFWorkerImageUrl"
+                value={inputs.CFWorkerImageUrl}
+                onChange={handleInputChange}
+                label={t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.label')}
+                placeholder={t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.label')}
+                disabled={loading}
+              />
+            </FormControl>
+
+            <FormControl>
+              <InputLabel htmlFor="CFWorkerImageKey">{t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.key')}</InputLabel>
+              <OutlinedInput
+                id="CFWorkerImageKey"
+                name="CFWorkerImageKey"
+                value={inputs.CFWorkerImageKey}
+                onChange={handleInputChange}
+                label={t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.key')}
+                placeholder={t('setting_index.operationSettings.otherSettings.CFWorkerImageUrl.key')}
                 disabled={loading}
               />
             </FormControl>

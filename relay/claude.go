@@ -195,7 +195,7 @@ func CountTokenMessages(request *claude.ClaudeRequest) (int, error) {
 			case "tool_use":
 				tokenNum += common.CountTokenInput(v.Input, request.Model)
 			case "tool_result":
-				// 不算了  就只算算他50吧
+				// 不算了  就只算他50吧
 				tokenNum += 50
 			}
 
