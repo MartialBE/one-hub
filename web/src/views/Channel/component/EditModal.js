@@ -38,6 +38,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'react-i18next';
 import useCustomizeT from 'hooks/useCustomizeT';
 
+import { PreCostType } from '../type/other';
+
 const pluginList = require('../type/Plugin.json');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -752,6 +754,43 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     </FormHelperText>
                   ) : (
                     <FormHelperText id="helper-tex-channel-test_model-label"> {customizeT(inputPrompt.test_model)} </FormHelperText>
+                  )}
+                </FormControl>
+              )}
+
+              {inputPrompt.pre_cost && (
+                <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
+                  <Select
+                    id="channel-pre_cost-label"
+                    label={customizeT(inputLabel.pre_cost)}
+                    value={values.pre_cost}
+                    name="pre_cost"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    disabled={hasTag}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200
+                        }
+                      }
+                    }}
+                  >
+                    {PreCostType.map((option) => {
+                      return (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  {touched.pre_cost && errors.pre_cost ? (
+                    <FormHelperText error id="helper-tex-channel-pre_cost-label">
+                      {errors.pre_cost}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-pre_cost-label"> {customizeT(inputPrompt.pre_cost)} </FormHelperText>
                   )}
                 </FormControl>
               )}

@@ -12,7 +12,8 @@ const defaultConfig = {
     groups: ['default'],
     plugin: {},
     tag: '',
-    only_chat: false
+    only_chat: false,
+    pre_cost: 1
   },
   inputLabel: {
     name: '渠道名称',
@@ -27,7 +28,8 @@ const defaultConfig = {
     groups: '用户组',
     only_chat: '仅支持聊天',
     tag: '标签',
-    provider_models_list: ''
+    provider_models_list: '',
+    pre_cost: '预计费选项'
   },
   prompt: {
     type: '请选择渠道类型',
@@ -44,7 +46,9 @@ const defaultConfig = {
     groups: '请选择该渠道所支持的用户组',
     only_chat: '如果选择了仅支持聊天，那么遇到有函数调用的请求会跳过该渠道',
     provider_models_list: '必须填写所有数据后才能获取模型列表',
-    tag: '你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道'
+    tag: '你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道',
+    pre_cost:
+      '这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。'
   },
   modelGroup: 'OpenAI'
 };

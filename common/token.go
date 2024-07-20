@@ -82,7 +82,12 @@ func GetTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
 	return len(tokenEncoder.Encode(text, nil, nil))
 }
 
-func CountTokenMessages(messages []types.ChatCompletionMessage, model string) int {
+func CountTokenMessages(messages []types.ChatCompletionMessage, model string, preCostType int) int {
+
+	if preCostType == config.PreContNotAll {
+		return 0
+	}
+
 	tokenEncoder := GetTokenEncoder(model)
 	// Reference:
 	// https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -111,6 +116,9 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 				case "text":
 					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
 				case "image_url":
+					if preCostType == config.PreCostNotImage {
+						continue
+					}
 					imageUrl, ok := m["image_url"].(map[string]any)
 					if ok {
 						url := imageUrl["url"].(string)
