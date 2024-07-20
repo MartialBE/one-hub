@@ -46,7 +46,10 @@ func RelaycClaudeOnly(c *gin.Context) {
 	originalModel := request.Model
 	request.Model = modelName
 
-	promptTokens, tonkeErr := CountTokenMessages(request)
+	channel := chatProvider.GetChannel()
+	originaPreCostType := channel.PreCost
+
+	promptTokens, tonkeErr := CountTokenMessages(request, originaPreCostType)
 	if tonkeErr != nil {
 		common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(tonkeErr))
 		return
@@ -58,7 +61,6 @@ func RelaycClaudeOnly(c *gin.Context) {
 		return
 	}
 
-	channel := chatProvider.GetChannel()
 	apiErr := errWithCode.ToOpenAiError()
 
 	go processChannelRelayError(c.Request.Context(), channel.Id, channel.Name, apiErr, channel.Type)
@@ -79,6 +81,15 @@ func RelaycClaudeOnly(c *gin.Context) {
 		request.Model = modelName
 		channel = chatProvider.GetChannel()
 		logger.LogError(c.Request.Context(), fmt.Sprintf("using channel #%d(%s) to retry (remain times %d)", channel.Id, channel.Name, i))
+
+		if originaPreCostType != channel.PreCost {
+			originaPreCostType = channel.PreCost
+			promptTokens, tonkeErr = CountTokenMessages(request, originaPreCostType)
+			if tonkeErr != nil {
+				common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(tonkeErr))
+				return
+			}
+		}
 
 		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
 		if errWithCode == nil {
@@ -164,7 +175,11 @@ func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, cache *
 	return
 }
 
-func CountTokenMessages(request *claude.ClaudeRequest) (int, error) {
+func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, error) {
+	if preCostType == config.PreContNotAll {
+		return 0, nil
+	}
+
 	tokenEncoder := common.GetTokenEncoder(request.Model)
 
 	tokenNum := 0
@@ -180,25 +195,34 @@ func CountTokenMessages(request *claude.ClaudeRequest) (int, error) {
 		switch v := message.Content.(type) {
 		case string:
 			tokenNum += common.GetTokenNum(tokenEncoder, v)
-		case claude.MessageContent:
-			switch v.Type {
-			case "text":
-				tokenNum += common.GetTokenNum(tokenEncoder, v.Text)
-			case "image":
-				imageData := fmt.Sprintf("data:image/%s;base64,%s", v.Source.MediaType, v.Source.Data)
-				width, height, err := image.GetImageSize(imageData)
-				if err != nil {
-					return 0, err
+		case []any:
+			for _, m := range v {
+				content := m.(map[string]any)
+				switch content["type"] {
+				case "text":
+					tokenNum += common.GetTokenNum(tokenEncoder, content["text"].(string))
+				case "image":
+					if preCostType == config.PreCostNotImage {
+						continue
+					}
+					imageSource, ok := content["source"].(map[string]any)
+					if !ok {
+						continue
+					}
+
+					width, height, err := image.GetImageSizeFromBase64(imageSource["data"].(string))
+					if err != nil {
+						return 0, err
+					}
+					tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
+
+				case "tool_use":
+					tokenNum += common.CountTokenInput(content["input"].(string), request.Model)
+				case "tool_result":
+					// 不算了  就只算他50吧
+					tokenNum += 50
 				}
-				tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
-
-			case "tool_use":
-				tokenNum += common.CountTokenInput(v.Input, request.Model)
-			case "tool_result":
-				// 不算了  就只算算他50吧
-				tokenNum += 50
 			}
-
 		}
 	}
 

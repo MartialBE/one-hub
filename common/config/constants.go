@@ -100,6 +100,9 @@ var RetryTimes = 0
 var DefaultChannelWeight = uint(1)
 var RetryCooldownSeconds = 5
 
+var CFWorkerImageUrl = ""
+var CFWorkerImageKey = ""
+
 var RootUserEmail = ""
 
 var IsMasterNode = true

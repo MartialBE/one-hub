@@ -1,6 +1,9 @@
 package claude
 
-import "one-api/types"
+import (
+	"one-api/types"
+	"strconv"
+)
 
 func StringErrorWrapper(err string, code string, statusCode int, localError bool) *ClaudeErrorWithStatusCode {
 	claudeError := ClaudeError{
@@ -23,11 +26,22 @@ func OpenaiErrToClaudeErr(err *types.OpenAIErrorWithStatusCode) *ClaudeErrorWith
 		return nil
 	}
 
+	var typeStr string
+
+	switch v := err.Code.(type) {
+	case string:
+		typeStr = v
+	case int:
+		typeStr = strconv.Itoa(v)
+	default:
+		typeStr = "unknown"
+	}
+
 	return &ClaudeErrorWithStatusCode{
 		LocalError: err.LocalError,
 		StatusCode: err.StatusCode,
 		ClaudeError: ClaudeError{
-			Type: err.Code.(string),
+			Type: typeStr,
 			ErrorInfo: ClaudeErrorInfo{
 				Type:    err.Type,
 				Message: err.Message,

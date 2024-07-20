@@ -448,7 +448,12 @@
           "label": "画像検出プロキシ",
           "placeholder": "チャット画像検出プロキシ設定、設定しないとサーバーのIPが漏洩する可能性があります"
         },
-        "saveButton": "その他の設定を保存"
+        "saveButton": "その他の設定を保存",
+        "CFWorkerImageUrl": {
+          "alert": "Cloudflare Workerのイメージプロキシアドレスはこちら https://github.com/MartialBE/get-image-by-cf とイメージ検出プロキシのどちらか一方のみを設定することで利用できます。\n一部のイメージ リンクは CF アクセスを拒否し、検出エラーを引き起こす可能性があることに注意してください。",
+          "key": "Cloudflare Worker イメージ プロキシ キー、設定されていない場合は無視してください",
+          "label": "Cloudflareワーカーイメージプロキシ"
+        }
       },
       "paymentSettings": {
         "title": "支払い設定",

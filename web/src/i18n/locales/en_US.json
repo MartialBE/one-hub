@@ -448,7 +448,12 @@
           "label": "Image Detection Proxy",
           "placeholder": "Chat image detection proxy settings, may leak server IP if not set"
         },
-        "saveButton": "Save Other Settings"
+        "saveButton": "Save Other Settings",
+        "CFWorkerImageUrl": {
+          "alert": "Here is the image proxy address of Cloudflare Worker. You can use it by deploying https://github.com/MartialBE/get-image-by-cf. You can set only one of it and the image detection proxy. \nNote that some image links may deny CF access and cause detection failure.",
+          "key": "Cloudflare Worker image proxy key, please ignore if not configured",
+          "label": "Cloudflare Worker Image Proxy"
+        }
       },
       "paymentSettings": {
         "title": "Payment Settings",
