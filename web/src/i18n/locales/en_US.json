@@ -256,6 +256,9 @@
     "unknownVersion": "Unknown Version",
     "welcomeBack": "Welcome Back"
   },
+  "sidebar": {
+    "totalQuota": "Total Value"
+  },
   "model_price": "Model Price",
   "modelpricePage": {
     "model": "Model Name",

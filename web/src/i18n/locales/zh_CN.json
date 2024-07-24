@@ -24,6 +24,9 @@
     "unknownVersion": "未知版本",
     "welcomeBack": "欢迎回来"
   },
+  "sidebar": {
+    "totalQuota": "总额度"
+  },
   "registerForm": {
     "enterEmail": "请输入邮箱",
     "turnstileError": "请稍后几秒重试，Turnstile 正在检查用户环境！",

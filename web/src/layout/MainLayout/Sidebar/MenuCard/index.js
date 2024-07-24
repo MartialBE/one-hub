@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import PropTypes from 'prop-types';
-// import { useSelector } from 'react-redux';
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
@@ -16,7 +14,8 @@ import {
   // ListItemIcon,
   Chip,
   Button,
-  Box
+  Box,
+  LinearProgress
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
@@ -42,15 +41,22 @@ const CardStyle = styled(Card)(({ theme }) => ({
   }
 }));
 
+// const ProgressLabel = styled(Typography)(({ theme }) => ({
+//   position: 'absolute',
+//   left: '50%',
+//   top: '50%',
+//   transform: 'translate(-50%, -50%)',
+//   color: theme.palette.primary.contrastText,
+//   fontWeight: 'bold',
+//   fontSize: '0.75rem'
+// }));
 
 // ==============================|| SIDEBAR MENU Card ||============================== //
 
 const MenuCard = () => {
   const theme = useTheme();
-  // const account = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  //实时获取用户信息
   const [userData, setUserData] = useState(null);
   const [balance, setBalance] = useState(0);
   const [usedQuota, setUsedQuota] = useState(0);
@@ -64,8 +70,8 @@ const MenuCard = () => {
         if (success) {
           setUserData(data);
           const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
-          setBalance((data.quota / quotaPerUnit).toFixed(2));
-          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(2));
+          setBalance((data.quota / quotaPerUnit).toFixed(3));
+          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(3));
           setRequestCount(data.request_count);
         }
       } catch (error) {
@@ -78,8 +84,12 @@ const MenuCard = () => {
 
   const getGroupLabel = (group) => {
     if (!group) return '未知';
-    return group === 'default' ? '普通用户' : group;
+    return group === 'default' ? '免费用户' : group;
   };
+
+  const totalQuota = parseFloat(balance) + parseFloat(usedQuota);
+  const progressValue = (parseFloat(usedQuota) / totalQuota) * 100;
+
   return (
     <CardStyle>
       <CardContent sx={{ p: 2 }}>
@@ -96,10 +106,11 @@ const MenuCard = () => {
                   border: 'none',
                   borderColor: theme.palette.primary.main,
                   background: '#cdd5df',
-                  marginRight: '12px'
+                  marginRight: '12px',
+                  cursor: 'pointer'
                 }}
                 onClick={() => navigate('/panel/profile')}
-              ></Avatar>
+              />
             </ListItemAvatar>
             <ListItemText
               sx={{ mt: 0 }}
@@ -111,7 +122,6 @@ const MenuCard = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',
-                    // gap: 1  // 添加一些间距
                   }}
                 >
                   <span>{userData ? userData.display_name : 'Loading...'}</span>
@@ -121,48 +131,74 @@ const MenuCard = () => {
                       size="small"
                       color="primary"
                       variant="outlined"
-                      sx={{ height: '20px', fontSize: '0.75rem' }}
+                      sx={{ height: '15px', fontSize: '0.75rem' }}
                     />
                   )}
                 </Typography>
-
-
               }
-              secondary={
-                <Box component="span">
-                  <Typography variant="caption" display="block" component="span">
-                    {t('dashboard_index.balance')}: ${balance}
-                  </Typography>
-                  <Typography variant="caption" display="block" component="span">
-                    {t('dashboard_index.used')}: ${usedQuota}
-                  </Typography>
-                  <Typography variant="caption" display="block" component="span">
-                    {t('dashboard_index.calls')}: {requestCount}
-                  </Typography>
-                </Box>
-              }
-              secondaryTypographyProps={{ sx: { mt: 1 } }}  // 增加 secondary 文本的顶部边距
+              // secondary={
+              //   // <Typography variant="caption" color={theme.palette.text.secondary}>
+              //   //   {t('dashboard_index.calls')}: {requestCount}
+              //   // </Typography>
+              // }
             />
           </ListItem>
-          {/* 新增的在线客服列表项 */}
-          <Button
-            variant="contained"
-            startIcon={<IconHeadset />}
-            fullWidth
-            sx={{
-              mt: 2,
-              backgroundColor: theme.palette.primary.light,
-              color: theme.palette.primary.main,
-              '&:hover': {
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-              }
-            }}
-            onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
-          >
-            在线客服
-          </Button>
         </List>
+        <Box sx={{ mt: 2, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, fontSize: '0.5rem' }}>
+            <Typography variant="body2" color="textSecondary" sx={{ flexGrow: 1 }}>
+              {t('sidebar.totalQuota')}: ${totalQuota}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {t('dashboard_index.calls')}: {requestCount}
+            </Typography>
+          </Box>
+          <Box sx={{ position: 'relative' }}>
+            <LinearProgress
+              variant="determinate"
+              value={progressValue}
+              sx={{
+                height: 20,
+                borderRadius: 5,
+                bgcolor: theme.palette.background.default,
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 5,
+                  bgcolor: theme.palette.success.dark,
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              component="div"
+              color="textSecondary"
+              sx={{
+                position: 'absolute',
+                right: theme.spacing(1),
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
+            >
+               {`${t('dashboard_index.used')}: $${usedQuota} / ${Math.round(progressValue)}%`}
+            </Typography>
+          </Box>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<IconHeadset />}
+          fullWidth
+          sx={{
+            mt: 2,
+            backgroundColor: theme.palette.primary.light,
+            color: theme.palette.primary.main,
+            '&:hover': {
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+            }
+          }}
+          onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
+        >
+          在线客服
+        </Button>
       </CardContent>
     </CardStyle>
   );
