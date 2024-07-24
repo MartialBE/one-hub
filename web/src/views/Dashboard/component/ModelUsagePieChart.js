@@ -58,20 +58,21 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
   const series = data.map(item => item.value);
 
   return (
-    <MainCard>
+    //调整饼图高度
+    <MainCard sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}> 
       <Typography variant="h3" sx={{ mb: 2 }}>{t('dashboard_index.7days_model_usage_pie')}</Typography>
       {isLoading ? (
         <Box sx={{ pt: 3, px: 2 }}>
           <Typography>Loading...</Typography>
         </Box>
       ) : data.length === 0 ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 350 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="h3" color="#697586">
             {t('dashboard_index.no_data_available')}
           </Typography>
         </Box>
       ) : (
-        <ReactApexChart options={options} series={series} type="pie" height={350} />
+        <ReactApexChart options={options} series={series} type="pie" />
       )}
     </MainCard>
   );
