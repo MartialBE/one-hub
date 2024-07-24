@@ -68,6 +68,7 @@ func UpdateChannelsTag(tag string, channel *Channel) error {
 			TestModel:    channel.TestModel,
 			OnlyChat:     channel.OnlyChat,
 			Plugin:       channel.Plugin,
+			PreCost:      channel.PreCost,
 		}).Error
 
 	if err != nil {

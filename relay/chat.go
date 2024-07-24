@@ -57,7 +57,8 @@ func (r *relayChat) IsStream() bool {
 }
 
 func (r *relayChat) getPromptTokens() (int, error) {
-	return common.CountTokenMessages(r.chatRequest.Messages, r.modelName), nil
+	channel := r.provider.GetChannel()
+	return common.CountTokenMessages(r.chatRequest.Messages, r.modelName, channel.PreCost), nil
 }
 
 func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {

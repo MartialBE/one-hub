@@ -88,6 +88,9 @@ func InitOptionMap() {
 	config.OptionMap["PaymentMinAmount"] = strconv.Itoa(config.PaymentMinAmount)
 	config.OptionMap["RechargeDiscount"] = common.RechargeDiscount2JSONString()
 
+	config.OptionMap["CFWorkerImageUrl"] = config.CFWorkerImageUrl
+	config.OptionMap["CFWorkerImageKey"] = config.CFWorkerImageKey
+
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -181,6 +184,8 @@ var optionStringMap = map[string]*string{
 	"LarkClientId":                &config.LarkClientId,
 	"LarkClientSecret":            &config.LarkClientSecret,
 	"ChatImageRequestProxy":       &config.ChatImageRequestProxy,
+	"CFWorkerImageUrl":            &config.CFWorkerImageUrl,
+	"CFWorkerImageKey":            &config.CFWorkerImageKey,
 }
 
 func updateOptionMap(key string, value string) (err error) {

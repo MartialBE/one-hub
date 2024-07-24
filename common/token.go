@@ -82,7 +82,12 @@ func GetTokenNum(tokenEncoder *tiktoken.Tiktoken, text string) int {
 	return len(tokenEncoder.Encode(text, nil, nil))
 }
 
-func CountTokenMessages(messages []types.ChatCompletionMessage, model string) int {
+func CountTokenMessages(messages []types.ChatCompletionMessage, model string, preCostType int) int {
+
+	if preCostType == config.PreContNotAll {
+		return 0
+	}
+
 	tokenEncoder := GetTokenEncoder(model)
 	// Reference:
 	// https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -111,20 +116,25 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 				case "text":
 					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
 				case "image_url":
+					if preCostType == config.PreCostNotImage {
+						continue
+					}
 					imageUrl, ok := m["image_url"].(map[string]any)
-					if ok {
-						url := imageUrl["url"].(string)
-						detail := ""
-						if imageUrl["detail"] != nil {
-							detail = imageUrl["detail"].(string)
-						}
-						imageTokens, err := countImageTokens(url, detail)
-						if err != nil {
-							//Due to the excessive length of the error information, only extract and record the most critical part.
-							logger.SysError("error counting image tokens: " + err.Error())
-						} else {
-							tokenNum += imageTokens
-						}
+					if !ok {
+						continue
+					}
+					url := imageUrl["url"].(string)
+					detail := ""
+					if imageUrl["detail"] != nil {
+						detail = imageUrl["detail"].(string)
+					}
+					countImageTokens := getCountImageFun(model)
+					imageTokens, err := countImageTokens(url, detail, model)
+					if err != nil {
+						//Due to the excessive length of the error information, only extract and record the most critical part.
+						logger.SysError("error counting image tokens: " + err.Error())
+					} else {
+						tokenNum += imageTokens
 					}
 				}
 			}
@@ -139,17 +149,54 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string) in
 	return tokenNum
 }
 
-const (
-	lowDetailCost         = 85
-	highDetailCostPerTile = 170
-	additionalCost        = 85
-)
+func getCountImageFun(model string) CountImageFun {
+	for prefix, fun := range CountImageFunMap {
+		if strings.HasPrefix(model, prefix) {
+			return fun
+		}
+	}
+	return CountImageFunMap["gpt-"]
+}
+
+type CountImageFun func(url, detail, modelName string) (int, error)
+
+var CountImageFunMap = map[string]CountImageFun{
+	"gpt-":    countOpenaiImageTokens,
+	"gemini-": countGeminiImageTokens,
+	"claude-": countClaudeImageTokens,
+	"glm-":    countGlmImageTokens,
+}
+
+type OpenAIImageCost struct {
+	Low        int
+	High       int
+	Additional int
+}
+
+var OpenAIImageCostMap = map[string]*OpenAIImageCost{
+	"general": {
+		Low:        85,
+		High:       170,
+		Additional: 85,
+	},
+	"gpt-4o-mini": {
+		Low:        2833,
+		High:       5667,
+		Additional: 2833,
+	},
+}
 
 // https://platform.openai.com/docs/guides/vision/calculating-costs
 // https://github.com/openai/openai-cookbook/blob/05e3f9be4c7a2ae7ecf029a7c32065b024730ebe/examples/How_to_count_tokens_with_tiktoken.ipynb
-func countImageTokens(url string, detail string) (_ int, err error) {
+func countOpenaiImageTokens(url, detail, modelName string) (_ int, err error) {
 	// var fetchSize = true
 	var width, height int
+	var openAIImageCost *OpenAIImageCost
+	if strings.HasPrefix(modelName, "gpt-4o-mini") {
+		openAIImageCost = OpenAIImageCostMap["gpt-4o-mini"]
+	} else {
+		openAIImageCost = OpenAIImageCostMap["general"]
+	}
 	// Reference: https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
 	// detail == "auto" is undocumented on how it works, it just said the model will use the auto setting which will look at the image input size and decide if it should use the low or high setting.
 	// According to the official guide, "low" disable the high-res model,
@@ -181,7 +228,7 @@ func countImageTokens(url string, detail string) (_ int, err error) {
 	}
 	switch detail {
 	case "low":
-		return lowDetailCost, nil
+		return openAIImageCost.Low, nil
 	case "high":
 		width, height, err = image.GetImageSize(url)
 		if err != nil {
@@ -198,11 +245,28 @@ func countImageTokens(url string, detail string) (_ int, err error) {
 			height = int(float64(height) * ratio)
 		}
 		numSquares := int(math.Ceil(float64(width)/512) * math.Ceil(float64(height)/512))
-		result := numSquares*highDetailCostPerTile + additionalCost
+		result := numSquares*openAIImageCost.High + openAIImageCost.Additional
 		return result, nil
 	default:
 		return 0, errors.New("invalid detail option")
 	}
+}
+
+func countGeminiImageTokens(_, _, _ string) (int, error) {
+	return 258, nil
+}
+
+func countClaudeImageTokens(url, _, _ string) (int, error) {
+	width, height, err := image.GetImageSize(url)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(math.Ceil(float64(width*height) / 750)), nil
+}
+
+func countGlmImageTokens(_, _, _ string) (int, error) {
+	return 1047, nil
 }
 
 func CountTokenInput(input any, model string) int {
