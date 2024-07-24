@@ -93,6 +93,16 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
           vertical: 3
         }
       },
+      stroke: {
+        width: 0  // 将线条宽度设置为 0，effectively 禁用了饼块之间的白线
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '0%',  // 可以调整这个值来改变饼图中心空洞的大小
+          }
+        }
+      },
       responsive: [{
         breakpoint: 490,
         options: {
