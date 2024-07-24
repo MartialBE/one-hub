@@ -1,80 +1,155 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
-import { useTheme } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
+import { gridSpacing } from 'store/constant';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+
+import { red, pink, purple, deepPurple, indigo, blue, lightBlue, cyan, teal, green, lightGreen, lime, yellow, amber, orange, deepOrange, brown, grey, blueGrey } from '@mui/material/colors';
 
 const ModelUsagePieChart = ({ isLoading, data }) => {
   const { t } = useTranslation();
-  const theme = useTheme();
+  // const theme = useTheme();
 
-  const options = {
-    chart: {
-      type: 'pie',
-    },
-    labels: data.map(item => item.name),
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
+  const chartData = {
+    options: {
+      chart: {
+        type: 'pie',
+        height: '100%',
+      },
+      labels: data.map(item => item.name),
+      colors: [
+        // theme.palette.primary.main,
+        // theme.palette.secondary.main,
+        // theme.palette.warning.main,
+        // theme.palette.error.main,
+        // theme.palette.info.main,
+        red[500],
+        pink[500],
+        purple[500],
+        deepPurple[500],
+        indigo[500],
+        blue[500],
+        lightBlue[500],
+        cyan[500],
+        teal[500],
+        green[500],
+        lightGreen[500],
+        lime[500],
+        yellow[500],
+        amber[500],
+        orange[500],
+        deepOrange[500],
+        brown[500],
+        grey[500],
+        blueGrey[500],
+        red[300],
+        pink[300],
+        purple[300],
+        deepPurple[300],
+        indigo[300],
+        blue[300],
+        lightBlue[300],
+        cyan[300],
+        teal[300],
+        green[300],
+        red[700],
+        pink[700],
+        purple[700],
+        deepPurple[700],
+        indigo[700],
+        blue[700],
+        lightBlue[700],
+        cyan[700],
+        teal[700],
+        green[700],
+        lightGreen[700],
+        lime[700],
+        yellow[700],
+        amber[700],
+        orange[700],
+        deepOrange[700],
+        brown[700],
+        grey[700],
+        blueGrey[700],
+      ],
+      legend: {
+        show: true,
+        fontSize: '14px',
+        position: 'bottom',
+        offsetY: 5,
+        labels: {
+          useSeriesColors: false,
         },
-        legend: {
-          position: 'bottom'
+        markers: {
+          width: 12,
+          height: 12,
+          radius: 5,
+        },
+        itemMargin: {
+          horizontal: 10,
+          vertical: 3
         }
-      }
-    }],
-    colors: [
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      theme.palette.warning.main,
-      theme.palette.error.main,
-      theme.palette.info.main,
-    ],
-    legend: {
-      show: true,
-      fontSize: '14px',
-    //   fontFamily: `'Roboto', sans-serif`,
-      position: 'bottom',
-      offsetX: 10,
-      offsetY: 10,
-      labels: {
-        useSeriesColors: false,
       },
-      markers: {
-        width: 16,
-        height: 16,
-        radius: 5,
-      },
-      itemMargin: {
-        horizontal: 15,
-        vertical: 8
-      }
+      responsive: [{
+        breakpoint: 490,
+        options: {
+          chart: {
+            height: 490
+          },
+          legend: {
+            position: 'bottom',
+            fontSize: '10px',
+          }
+        }
+      }],
     },
+    series: data.map(item => item.value)
   };
 
-  const series = data.map(item => item.value);
-
   return (
-    //调整饼图高度
-    <MainCard sx={{ height: '100%', minHeight: '350px', display: 'flex', flexDirection: 'column' }}> 
-      <Typography variant="h3" sx={{ mb: 2 }}>{t('dashboard_index.7days_model_usage_pie')}</Typography>
+    <>
       {isLoading ? (
-        <Box sx={{ pt: 3, px: 2 }}>
-          <Typography>Loading...</Typography>
-        </Box>
-      ) : data.length === 0 ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="h3" color="#697586">
-            {t('dashboard_index.no_data_available')}
-          </Typography>
-        </Box>
+        <MainCard>
+          <Box sx={{ pt: 3, px: 2 }}>
+            <Typography>Loading...</Typography>
+          </Box>
+        </MainCard>
       ) : (
-        <ReactApexChart options={options} series={series} type="pie" />
+        <MainCard sx={{ height: '100%' }}>
+          <Grid container spacing={gridSpacing}>
+            <Grid item xs={12}>
+              <Typography variant="h3" sx={{ mb: 2 }}>{t('dashboard_index.7days_model_usage_pie')}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              {data.length > 0 ? (
+                <ReactApexChart
+                  options={chartData.options}
+                  series={chartData.series}
+                  type="pie"
+                  height={500}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    height: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Typography variant="h3" color={'#697586'}>
+                    {t('dashboard_index.no_data_available')}
+                  </Typography>
+                </Box>
+              )}
+            </Grid>
+          </Grid>
+        </MainCard>
       )}
-    </MainCard>
+    </>
   );
 };
 
