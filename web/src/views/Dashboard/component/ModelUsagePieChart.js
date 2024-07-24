@@ -59,7 +59,7 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
 
   return (
     //调整饼图高度
-    <MainCard sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}> 
+    <MainCard sx={{ height: '100%', minHeight: '350px', display: 'flex', flexDirection: 'column' }}> 
       <Typography variant="h3" sx={{ mb: 2 }}>{t('dashboard_index.7days_model_usage_pie')}</Typography>
       {isLoading ? (
         <Box sx={{ pt: 3, px: 2 }}>
