@@ -70,8 +70,8 @@ const MenuCard = () => {
         if (success) {
           setUserData(data);
           const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
-          setBalance((data.quota / quotaPerUnit).toFixed(3));
-          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(3));
+          setBalance((data.quota / quotaPerUnit).toFixed(2));
+          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(2));
           setRequestCount(data.request_count);
         }
       } catch (error) {
