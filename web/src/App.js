@@ -23,15 +23,18 @@ import CopySnackbar from 'ui-component/Snackbar';
 // locales
 import i18n from 'i18n/i18n';
 
+
+
 // ==============================|| APP ||============================== //
 
 const App = () => {
   const dispatch = useDispatch();
   const customization = useSelector((state) => state.customization);
-  const storedLanguage = localStorage.getItem('appLanguage') || 'zh_CN';
-  i18n.changeLanguage(storedLanguage);
 
   useEffect(() => {
+    const storedLanguage = localStorage.getItem('appLanguage') || 'zh_CN';
+    i18n.changeLanguage(storedLanguage);
+
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       dispatch({ type: SET_THEME, theme: storedTheme });

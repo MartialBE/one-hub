@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from 'react';
 // import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
@@ -7,36 +8,22 @@ import {
   Avatar,
   Card,
   CardContent,
-  // Grid,
-  // LinearProgress,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Typography,
-  ListItemIcon
-  // linearProgressClasses
+  // ListItemIcon,
+  Chip,
+  Button,
+  Box
 } from '@mui/material';
-// import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { API } from 'utils/api';
 
-// assets
-// import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
-// styles
-// const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-//   height: 10,
-//   borderRadius: 30,
-//   [`&.${linearProgressClasses.colorPrimary}`]: {
-//     backgroundColor: '#fff'
-//   },
-//   [`& .${linearProgressClasses.bar}`]: {
-//     borderRadius: 5,
-//     backgroundColor: theme.palette.primary.main
-//   }
-// }));
 
 const CardStyle = styled(Card)(({ theme }) => ({
   background: theme.typography.menuChip.background,
@@ -55,44 +42,44 @@ const CardStyle = styled(Card)(({ theme }) => ({
   }
 }));
 
-// ==============================|| PROGRESS BAR WITH LABEL ||============================== //
-
-// function LinearProgressWithLabel({ value, ...others }) {
-//   const theme = useTheme();
-
-//   return (
-//     <Grid container direction="column" spacing={1} sx={{ mt: 1.5 }}>
-//       <Grid item>
-//         <Grid container justifyContent="space-between">
-//           <Grid item>
-//             <Typography variant="h6" sx={{ color: theme.palette.primary[800] }}>
-//               Progress
-//             </Typography>
-//           </Grid>
-//           <Grid item>
-//             <Typography variant="h6" color="inherit">{`${Math.round(value)}%`}</Typography>
-//           </Grid>
-//         </Grid>
-//       </Grid>
-//       <Grid item>
-//         <BorderLinearProgress variant="determinate" value={value} {...others} />
-//       </Grid>
-//     </Grid>
-//   );
-// }
-
-// LinearProgressWithLabel.propTypes = {
-//   value: PropTypes.number
-// };
 
 // ==============================|| SIDEBAR MENU Card ||============================== //
 
 const MenuCard = () => {
   const theme = useTheme();
-  const account = useSelector((state) => state.account);
+  // const account = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  //实时获取用户信息
+  const [userData, setUserData] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [usedQuota, setUsedQuota] = useState(0);
+  const [requestCount, setRequestCount] = useState(0);
 
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        let res = await API.get(`/api/user/self`);
+        const { success, data } = res.data;
+        if (success) {
+          setUserData(data);
+          const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
+          setBalance((data.quota / quotaPerUnit).toFixed(2));
+          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(2));
+          setRequestCount(data.request_count);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  const getGroupLabel = (group) => {
+    if (!group) return '未知';
+    return group === 'default' ? '普通用户' : group;
+  };
   return (
     <CardStyle>
       <CardContent sx={{ p: 2 }}>
@@ -117,32 +104,64 @@ const MenuCard = () => {
             <ListItemText
               sx={{ mt: 0 }}
               primary={
-                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[200] }}>
-                  {account.user?.username}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme.palette.primary[200],
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    // gap: 1  // 添加一些间距
+                  }}
+                >
+                  <span>{userData ? userData.display_name : 'Loading...'}</span>
+                  {userData && (
+                    <Chip
+                      label={getGroupLabel(userData.group)}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ height: '20px', fontSize: '0.75rem' }}
+                    />
+                  )}
                 </Typography>
+
+
               }
-              secondary={<Typography variant="caption"> {t('menu.welcomeBack')} </Typography>}
+              secondary={
+                <Box component="span">
+                  <Typography variant="caption" display="block" component="span">
+                    {t('dashboard_index.balance')}: ${balance}
+                  </Typography>
+                  <Typography variant="caption" display="block" component="span">
+                    {t('dashboard_index.used')}: ${usedQuota}
+                  </Typography>
+                  <Typography variant="caption" display="block" component="span">
+                    {t('dashboard_index.calls')}: {requestCount}
+                  </Typography>
+                </Box>
+              }
+              secondaryTypographyProps={{ sx: { mt: 1 } }}  // 增加 secondary 文本的顶部边距
             />
           </ListItem>
           {/* 新增的在线客服列表项 */}
-          <ListItem
-            button
-            alignItems="center"
-            sx={{ display: 'flex', justifyContent: 'center' }} // 设置ListItem为flex容器并居中内容
+          <Button
+            variant="contained"
+            startIcon={<IconHeadset />}
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: theme.palette.primary.light,
+              color: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+              }
+            }}
             onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
           >
-            <ListItemIcon sx={{ minWidth: 'auto', pr: 2 }}> {/* 调整间距 */}
-              <IconHeadset size={24} /> {/* 默认会使用主题颜色 */}
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography variant="subtitle1">
-                  在线客服
-                </Typography>
-              }
-              sx={{ textAlign: 'left' }} // 文字居中对齐
-            />
-          </ListItem>
+            在线客服
+          </Button>
         </List>
       </CardContent>
     </CardStyle>

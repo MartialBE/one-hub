@@ -54,7 +54,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
   }
 }));
 
-// ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
+// ===============================||仪表板 -总订单线图表卡 ||================================ //
 
 const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue }) => {
   const theme = useTheme();

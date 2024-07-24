@@ -13,6 +13,9 @@ i18n
     lng: 'zh-CN',
     interpolation: {
       escapeValue: false
+    },
+    react: {
+      useSuspense: false // 设置为 false 可以避免一些问题
     }
   });
 

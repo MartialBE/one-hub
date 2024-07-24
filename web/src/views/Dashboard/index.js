@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
-// import SupportModels from './component/SupportModels';
 import { generateLineChartOptions, getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
-import UserCard from 'ui-component/cards/UserCard';
+// import UserCard from 'ui-component/cards/UserCard';
 import { useTranslation } from 'react-i18next';
+import ModelUsagePieChart from './component/ModelUsagePieChart'; // 新增
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
@@ -16,8 +16,9 @@ const Dashboard = () => {
   const [requestChart, setRequestChart] = useState(null);
   const [quotaChart, setQuotaChart] = useState(null);
   const [tokenChart, setTokenChart] = useState(null);
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
   const { t } = useTranslation();
+  const [modelUsageData, setModelUsageData] = useState([]); // 新增
 
   const userDashboard = async () => {
     try {
@@ -30,6 +31,7 @@ const Dashboard = () => {
           setQuotaChart(getLineCardOption(lineData, 'Quota'));
           setTokenChart(getLineCardOption(lineData, 'PromptTokens'));
           setStatisticalData(getBarDataGroup(data));
+          setModelUsageData(getModelUsageData(data)); // 新增
         }
       } else {
         showError(message);
@@ -40,40 +42,14 @@ const Dashboard = () => {
     }
   };
 
-  const loadUser = async () => {
-    try {
-      let res = await API.get(`/api/user/self`);
-      const { success, message, data } = res.data;
-      if (success) {
-        setUsers(data);
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      return;
-    }
-  };
 
   useEffect(() => {
     userDashboard();
-    loadUser();
   }, []);
 
-  // 会员组颜色
-  let cardClass;
-  if (users?.group === "default" || !users?.group) {
-    cardClass = "default-group";
-  } else if (users?.group === "vip") {
-    cardClass = "vip-group";
-  } else if (users?.group === "svip") {
-    cardClass = "svip-group";
-  }
 
   return (
     <Grid container spacing={gridSpacing}>
-      {/* <Grid item xs={12}>
-        <SupportModels />
-      </Grid> */}
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={4} xs={12}>
@@ -109,46 +85,7 @@ const Dashboard = () => {
             <ApexCharts isLoading={isLoading} chartDatas={statisticalData} />
           </Grid>
           <Grid item lg={4} xs={12}>
-            <div className={cardClass}>
-              <UserCard>
-                <Grid container spacing={gridSpacing} justifyContent="center" alignItems="center" paddingTop={'20px'}>
-
-                  <Grid item xs={4}>
-                    <Typography variant="h4">Group:</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="h3">
-                      {users?.group
-                        ? users.group === "default"
-                          ? "普通用户"
-                          : users.group
-                        : "未知"}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={4}>
-                    <Typography variant="h4">{t('dashboard_index.balance')}:</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="h3">{users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')}</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography variant="h4">{t('dashboard_index.used')}:</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="h3">
-                    {users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')}
-                  </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography variant="h4">{t('dashboard_index.calls')}:</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="h3"> {users?.request_count || t('dashboard_index.unknown')}</Typography>
-                  </Grid>
-                </Grid>
-              </UserCard>
-            </div>
+            <ModelUsagePieChart isLoading={isLoading} data={modelUsageData} /> {/* 新增 */}
           </Grid>
 
         </Grid>
@@ -156,6 +93,23 @@ const Dashboard = () => {
     </Grid>
   );
 };
+
+// 新增函数来处理模型使用数据
+function getModelUsageData(data) {
+  const modelUsage = {};
+  data.forEach(item => {
+    if (!modelUsage[item.ModelName]) {
+      modelUsage[item.ModelName] = 0;
+    }
+    modelUsage[item.ModelName] += item.RequestCount;
+  });
+
+  return Object.entries(modelUsage).map(([name, count]) => ({
+    name,
+    value: count
+  }));
+}
+
 export default Dashboard;
 
 function getLineDataGroup(statisticalData) {

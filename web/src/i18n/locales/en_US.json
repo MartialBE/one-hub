@@ -215,7 +215,8 @@
     "today_requests": "Today's Requests",
     "today_tokens": "Today's Tokens",
     "unknown": "Unknown",
-    "used": "Used"
+    "used": "Used",
+    "7days_model_usage_pie": "Model Call Ratio Over the Last 7 Days"
   },
   "description": "All-in-one OpenAI interface\nIntegrates various API access methods\nOne-click deployment, ready to use",
   "footer": {

@@ -52,10 +52,12 @@
     "no_data_available": "暂无数据",
     "model_name": "模型名称",
     "other_models": "其他模型",
+    "7days_consumption": "7日总消费",
     "balance": "余额",
     "used": "已使用",
     "calls": "调用次数",
-    "unknown": "未知"
+    "unknown": "未知",
+    "7days_model_usage_pie": "近7日模型调用比例"
   },
   "analytics_index": {
     "startTime": "开始时间",
