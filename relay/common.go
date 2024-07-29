@@ -173,7 +173,7 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 				}
 			}
 
-			streamData := "data: [DONE]\n"
+			streamData := "data: [DONE]\n\n"
 			fmt.Fprint(w, streamData)
 			cache.SetResponse(streamData)
 			return false

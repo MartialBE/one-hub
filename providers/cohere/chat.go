@@ -156,10 +156,12 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *CohereRespon
 // 转换为OpenAI聊天流式请求体
 func (h *CohereStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
 	// 如果rawLine 前缀不为data:，则直接返回
-	if !strings.HasPrefix(string(*rawLine), "{") {
+	if !strings.HasPrefix(string(*rawLine), "data: ") {
 		*rawLine = nil
 		return
 	}
+
+	*rawLine = (*rawLine)[6:]
 
 	var cohereResponse CohereStreamResponse
 	err := json.Unmarshal(*rawLine, &cohereResponse)
