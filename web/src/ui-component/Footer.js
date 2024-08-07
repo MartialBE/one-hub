@@ -6,7 +6,8 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '0px' }}>
+    <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }}>
+          <div className="custom-footer" dangerouslySetInnerHTML={{ __html: siteInfo.footer_html }}></div>
     </Container>
   );
 };
