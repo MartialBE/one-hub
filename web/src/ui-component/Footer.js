@@ -1,6 +1,7 @@
 // material-ui
 import {  Container } from '@mui/material';
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 // ==============================|| FOOTER - AUTHENTICATION 2 & 3 ||============================== //
 
