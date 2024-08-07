@@ -5,6 +5,7 @@ import React from 'react';
 // ==============================|| FOOTER - AUTHENTICATION 2 & 3 ||============================== //
 
 const Footer = () => {
+  const siteInfo = useSelector((state) => state.siteInfo);
   return (
     <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }}>
           <div className="custom-footer" dangerouslySetInnerHTML={{ __html: siteInfo.footer_html }}></div>
