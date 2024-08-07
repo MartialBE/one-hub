@@ -119,6 +119,13 @@
     "output": 7.5
   },
   {
+    "model": "gpt-4o-2024-08-06",
+    "type": "tokens",
+    "channel_type": 1,
+    "input": 1.25,
+    "output": 5
+  },
+  {
     "model": "gpt-4o-mini",
     "type": "tokens",
     "channel_type": 1,
