@@ -7,6 +7,13 @@ session_secret: "" # 会话密钥，未设置则使用随机值。
 disable_token_encoders: false # 是否禁用 token 编码器计算tokens。启用后 内存占用可减少 40MB 左右，但是stream模式下tokens计算不准确
 trusted_header: "" # 可信头部，"CF-Connecting-IP" 用于 Cloudflare，"X-Appengine-Remote-Addr" 用于 Google App Engine，未设置则不使用。 可以解决一些代理问题，如获取用户真实IP
 
+logs:
+  filename: "one-hub.log" # 日志文件名
+  max_size: 100 # 日志文件最大大小，单位为 MB，默认为 100。
+  max_backups: 10 # 日志文件最大备份数量，默认为 10。
+  max_age: 7 # 日志文件最大保存天数，默认为 7。
+  compress: false # 是否启用日志压缩，默认为 false
+
 # 数据库设置
 sql_dsn: "" # 设置之后将使用指定数据库而非 SQLite，请使用 MySQL 或 PostgreSQL
 sqlite_path: "one-api.db" # sqlite 数据库文件路径

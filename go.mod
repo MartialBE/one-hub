@@ -42,6 +42,7 @@ require (
 	golang.org/x/image v0.18.0
 	google.golang.org/api v0.188.0
 	google.golang.org/grpc v1.64.1
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.5
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/driver/sqlite v1.5.5
