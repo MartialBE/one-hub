@@ -190,7 +190,7 @@ func SumUsedQuota(startTimestamp int64, endTimestamp int64, modelName string, us
 }
 
 func DeleteOldLog(targetTimestamp int64) (int64, error) {
-	result := DB.Where("created_at < ?", targetTimestamp).Delete(&Log{})
+	result := DB.Where("type = ? AND created_at < ?", LogTypeConsume, targetTimestamp).Delete(&Log{})
 	return result.RowsAffected, result.Error
 }
 
