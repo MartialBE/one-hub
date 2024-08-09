@@ -86,6 +86,7 @@ func registerMjRouterGroup(relayMjRouter *gin.RouterGroup) {
 		relayMjRouter.GET("/task/:id/image-seed", midjourney.RelayMidjourney)
 		relayMjRouter.POST("/task/list-by-condition", midjourney.RelayMidjourney)
 		relayMjRouter.POST("/insight-face/swap", midjourney.RelayMidjourney)
+		relayMjRouter.POST("/submit/upload-discord-images", midjourney.RelayMidjourney)
 	}
 }
 

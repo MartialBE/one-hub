@@ -5,13 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
+	"strings"
 	"time"
 )
 
@@ -53,6 +53,14 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 		}
 	}
 
+	if prompt, ok := mapResult["prompt"].(string); ok {
+		prompt = strings.Replace(prompt, "--fast", "", -1)
+		prompt = strings.Replace(prompt, "--relax", "", -1)
+		prompt = strings.Replace(prompt, "--turbo", "", -1)
+
+		mapResult["prompt"] = prompt
+	}
+
 	reqBody, err := json.Marshal(mapResult)
 	if err != nil {
 		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "marshal_request_body_failed", http.StatusInternalServerError), nullBytes, err
@@ -86,6 +94,8 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 	}
 	var midjResponse MidjourneyResponse
 
+	var midjourneyUploadsResponse MidjourneyUploadResponse
+
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "read_response_body_failed", statusCode), nullBytes, err
@@ -95,13 +105,15 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "close_response_body_failed", statusCode), responseBody, err
 	}
 	respStr := string(responseBody)
-	log.Printf("responseBody: %s", respStr)
 	if respStr == "" {
 		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "empty_response_body", statusCode), responseBody, nil
 	} else {
 		err = json.Unmarshal(responseBody, &midjResponse)
 		if err != nil {
-			return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "unmarshal_response_body_failed", statusCode), responseBody, err
+			err2 := json.Unmarshal(responseBody, &midjourneyUploadsResponse)
+			if err2 != nil {
+				return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "unmarshal_response_body_failed", statusCode), responseBody, err
+			}
 		}
 	}
 
