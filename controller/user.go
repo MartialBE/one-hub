@@ -231,13 +231,13 @@ func GetUser(c *gin.Context) {
 
 func GetUserDashboard(c *gin.Context) {
 	id := c.GetInt("id")
-	// 获取7天前 00:00:00 和 今天23:59:59  的秒时间戳
+
 	now := time.Now()
 	toDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	endOfDay := toDay.Add(time.Hour * 24).Add(-time.Second).Unix()
-	startOfDay := toDay.AddDate(0, 0, -7).Unix()
+	endOfDay := toDay.Add(-time.Second).Add(time.Hour * 24).Format("2006-01-02")
+	startOfDay := toDay.AddDate(0, 0, -7).Format("2006-01-02")
 
-	dashboards, err := model.GetUserModelExpensesByPeriod(id, int(startOfDay), int(endOfDay))
+	dashboards, err := model.GetUserModelStatisticsByPeriod(id, startOfDay, endOfDay)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,

@@ -144,12 +144,8 @@ func SetApiRouter(router *gin.Engine) {
 		analyticsRoute := apiRouter.Group("/analytics")
 		analyticsRoute.Use(middleware.AdminAuth())
 		{
-			analyticsRoute.GET("/user_statistics", controller.GetUserStatistics)
-			analyticsRoute.GET("/channel_statistics", controller.GetChannelStatistics)
-			analyticsRoute.GET("/redemption_statistics", controller.GetRedemptionStatistics)
-			analyticsRoute.GET("/users_period", controller.GetUserStatisticsByPeriod)
-			analyticsRoute.GET("/channel_period", controller.GetChannelExpensesByPeriod)
-			analyticsRoute.GET("/redemption_period", controller.GetRedemptionStatisticsByPeriod)
+			analyticsRoute.GET("/statistics", controller.GetStatisticsDetail)
+			analyticsRoute.GET("/period", controller.GetStatisticsByPeriod)
 		}
 
 		pricesRoute := apiRouter.Group("/prices")

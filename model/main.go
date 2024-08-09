@@ -108,7 +108,7 @@ func InitDB() (err error) {
 		}
 		logger.SysLog("database migration started")
 
-		migration(DB)
+		migrationBefore(DB)
 
 		err = db.AutoMigrate(&Channel{})
 		if err != nil {
@@ -166,6 +166,13 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
+		err = db.AutoMigrate(&Statistics{})
+		if err != nil {
+			return err
+		}
+
+		migrationAfter(DB)
+
 		logger.SysLog("database migrated")
 		err = createRootAccountIfNeed()
 		return err

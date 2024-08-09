@@ -111,3 +111,35 @@ func GetOrderList(params *SearchOrderParams) (*DataResult[Order], error) {
 
 	return PaginateAndOrder(db, &params.PaginationParams, &orders, allowedOrderFields)
 }
+
+type OrderStatistics struct {
+	Quota         int64   `json:"quota"`
+	Money         float64 `json:"money"`
+	OrderCurrency string  `json:"order_currency"`
+}
+
+func GetStatisticsOrder() (orderStatistics []*OrderStatistics, err error) {
+	err = DB.Model(&Order{}).Select("sum(quota) as quota, sum(order_amount) as money, order_currency").Where("status = ?", OrderStatusSuccess).Group("order_currency").Scan(&orderStatistics).Error
+	return orderStatistics, err
+}
+
+type OrderStatisticsGroup struct {
+	Date        string  `json:"date"`
+	OrderAmount float64 `json:"order_amount"`
+}
+
+func GetStatisticsOrderByPeriod(startTimestamp, endTimestamp int64) (orderStatistics []*OrderStatisticsGroup, err error) {
+	groupSelect := getTimestampGroupsSelect("created_at", "day", "date")
+
+	err = DB.Raw(`
+		SELECT `+groupSelect+`,
+		sum(order_amount) as order_amount
+		FROM orders
+		WHERE status= ?
+		AND created_at BETWEEN ? AND ?
+		GROUP BY date
+		ORDER BY date
+	`, OrderStatusSuccess, startTimestamp, endTimestamp).Scan(&orderStatistics).Error
+
+	return orderStatistics, err
+}
