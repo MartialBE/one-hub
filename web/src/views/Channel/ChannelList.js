@@ -175,7 +175,7 @@ export default function ChannelList() {
       if (success) {
         showSuccess(t('userPage.operationSuccess'));
         if (action === 'delete' || action === 'copy' || action == 'delete_tag') {
-          await handleRefresh();
+          await handleRefresh(false);
         }
       } else {
         showError(message);
@@ -188,11 +188,13 @@ export default function ChannelList() {
   };
 
   // 处理刷新
-  const handleRefresh = async () => {
-    setOrderBy('id');
-    setOrder('desc');
-    setToolBarValue(originalKeyword);
-    setSearchKeyword(originalKeyword);
+  const handleRefresh = async (reset) => {
+    if (reset) {
+      setOrderBy('id');
+      setOrder('desc');
+      setToolBarValue(originalKeyword);
+      setSearchKeyword(originalKeyword);
+    }
     setRefreshFlag(!refreshFlag);
   };
 
@@ -258,7 +260,7 @@ export default function ChannelList() {
   const handleOkModal = (status) => {
     if (status === true) {
       handleCloseModal();
-      handleRefresh();
+      handleRefresh(false);
     }
   };
 
@@ -348,7 +350,7 @@ export default function ChannelList() {
           <Container>
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-                <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+                <Button onClick={() => handleRefresh(true)} startIcon={<IconRefresh width={'18px'} />}>
                   {t('channel_index.refreshClearSearchConditions')}
                 </Button>
                 <Button onClick={searchChannels} startIcon={<IconSearch width={'18px'} />}>
@@ -372,7 +374,7 @@ export default function ChannelList() {
                 justifyContent="space-around"
                 alignItems="center"
               >
-                <IconButton onClick={handleRefresh} size="large">
+                <IconButton onClick={() => handleRefresh(true)} size="large">
                   <IconRefresh />
                 </IconButton>
                 <IconButton onClick={searchChannels} size="large">
