@@ -125,7 +125,8 @@
     "resultImage": "結果画像",
     "prompt": "Prompt",
     "promptEn": "PromptEn",
-    "failureReason": "失敗理由"
+    "failureReason": "失敗理由",
+    "timeConsuming": "時間がかかる"
   },
   "analytics": "分析",
   "analytics_index": {

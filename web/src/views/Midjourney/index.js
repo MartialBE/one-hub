@@ -203,6 +203,11 @@ export default function Log() {
                     disableSort: true
                   },
                   {
+                    id: 'time',
+                    label: t('midjourneyPage.timeConsuming'),
+                    disableSort: true
+                  },
+                  {
                     id: 'image_url',
                     label: t('midjourneyPage.resultImage'),
                     disableSort: true,

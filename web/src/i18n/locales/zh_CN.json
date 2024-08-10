@@ -278,6 +278,7 @@
     "submissionResult": "提交结果",
     "taskStatus": "任务状态",
     "progress": "进度",
+    "timeConsuming": "耗时",
     "resultImage": "结果图片",
     "prompt": "Prompt",
     "promptEn": "PromptEn",

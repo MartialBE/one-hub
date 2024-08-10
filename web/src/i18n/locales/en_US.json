@@ -125,7 +125,8 @@
     "resultImage": "Result Image",
     "prompt": "Prompt",
     "promptEn": "PromptEn",
-    "failureReason": "Failure Reason"
+    "failureReason": "Failure Reason",
+    "timeConsuming": "time consuming"
   },
   "analytics": "Analytics",
   "analytics_index": {
