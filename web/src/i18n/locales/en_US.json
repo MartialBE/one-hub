@@ -257,7 +257,8 @@
     "welcomeBack": "Welcome Back"
   },
   "sidebar": {
-    "totalQuota": "Total Value"
+    "totalQuota": "Total Value",
+    "remainingBalance": "Balance"
   },
   "model_price": "Model Price",
   "modelpricePage": {

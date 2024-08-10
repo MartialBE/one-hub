@@ -57,7 +57,7 @@ export default function UserCard({ children }) {
 
   const renderAvatar = (
     <Avatar
-      src='https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp'
+      src='https://webp-sh.czl.net/r2/2024/03/26/6602ae7c2066b.webp'
       sx={{
         zIndex: 11,
         width: 64,

@@ -90,7 +90,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src="https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp"
+            src="https://webp-sh.czl.net/r2/2024/03/26/6602ae7c2066b.webp"
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',

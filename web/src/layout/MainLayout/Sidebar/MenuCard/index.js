@@ -98,7 +98,7 @@ const MenuCard = () => {
             <ListItemAvatar sx={{ mt: 0 }}>
               <Avatar
                 variant="rounded"
-                src="https://cdn-img-r2.czl.net/2024/03/26/6602ae7c2066b.webp"
+                src="https://webp-sh.czl.net/r2/2024/03/26/6602ae7c2066b.webp"
                 sx={{
                   ...theme.typography.commonAvatar,
                   ...theme.typography.largeAvatar,
@@ -147,7 +147,7 @@ const MenuCard = () => {
         <Box sx={{ mt: 2, mb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, fontSize: '0.5rem' }}>
             <Typography variant="body2" color="textSecondary" sx={{ flexGrow: 1 }}>
-              {t('sidebar.totalQuota')}: ${totalQuota}
+              {t('sidebar.remainingBalance')}: ${balance}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               {t('dashboard_index.calls')}: {requestCount}

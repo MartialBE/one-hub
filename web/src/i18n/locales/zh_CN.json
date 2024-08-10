@@ -25,7 +25,8 @@
     "welcomeBack": "欢迎回来"
   },
   "sidebar": {
-    "totalQuota": "总额度"
+    "totalQuota": "总额度",
+    "remainingBalance": "可用额度"
   },
   "registerForm": {
     "enterEmail": "请输入邮箱",
