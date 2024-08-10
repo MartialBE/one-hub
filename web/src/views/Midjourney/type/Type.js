@@ -13,7 +13,8 @@ export const ACTION_TYPE = {
   ZOOM: { value: 'ZOOM', text: '变焦', color: 'secondary' },
   CUSTOM_ZOOM: { value: 'CUSTOM_ZOOM', text: '自定义变焦-提交', color: 'secondary' },
   MODAL: { value: 'MODAL', text: '窗口处理', color: 'secondary' },
-  SWAP_FACE: { value: 'SWAP_FACE', text: '换脸', color: 'secondary' }
+  SWAP_FACE: { value: 'SWAP_FACE', text: '换脸', color: 'secondary' },
+  UPLOAD: { value: 'UPLOAD', text: '上传文件', color: 'secondary' }
 };
 
 export const CODE_TYPE = {

@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 	"time"
 
 	"one-api/common/utils"
@@ -14,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 const (
@@ -25,14 +25,7 @@ const (
 	RequestIdKey = "X-Oneapi-Request-Id"
 )
 
-// const maxLogCount = 1000000
-
-// var logCount int
-var setupLogLock sync.Mutex
-var setupLogWorking bool
 var Logger *zap.Logger
-
-// var logLevel       zap.AtomicLevel
 
 var defaultLogDir = "./logs"
 
@@ -42,42 +35,49 @@ func SetupLogger() {
 		return
 	}
 
-	setupLogLock.Lock()
-	defer setupLogLock.Unlock()
+	writeSyncer := getLogWriter(logDir)
 
-	if setupLogWorking {
-		log.Println("setup log is already working")
-		return
-	}
-	setupLogWorking = true
-	defer func() { setupLogWorking = false }()
-
-	logPath := filepath.Join(logDir, fmt.Sprintf("oneapi-%s.log", time.Now().Format("20060102")))
-	fd, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal("failed to open log file: ", err)
-	}
-
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "time",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     zapcore.TimeEncoderOfLayout("2006/01/02 - 15:04:05"),
-		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
+	encoder := getEncoder()
 
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(fd)),
+		encoder,
+		writeSyncer,
 		zap.NewAtomicLevelAt(getLogLevel()),
 	)
-	Logger = zap.New(core)
+	Logger = zap.New(core, zap.AddCaller())
+}
+
+func getEncoder() zapcore.Encoder {
+	encodeConfig := zap.NewProductionEncoderConfig()
+
+	encodeConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006/01/02 - 15:04:05")
+	encodeConfig.TimeKey = "time"
+	encodeConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	encodeConfig.EncodeCaller = zapcore.ShortCallerEncoder
+
+	encodeConfig.EncodeDuration = zapcore.StringDurationEncoder
+
+	return zapcore.NewConsoleEncoder(encodeConfig)
+}
+
+func getLogWriter(logDir string) zapcore.WriteSyncer {
+	filename := utils.GetOrDefault("logs.filename", "one-hub.log")
+	logPath := filepath.Join(logDir, filename)
+
+	maxsize := utils.GetOrDefault("logs.max_size", 100)
+	maxAge := utils.GetOrDefault("logs.max_age", 7)
+	maxBackup := utils.GetOrDefault("logs.max_backup", 10)
+	compress := utils.GetOrDefault("logs.compress", false)
+
+	lumberJackLogger := &lumberjack.Logger{
+		Filename:   logPath,   // 文件位置
+		MaxSize:    maxsize,   // 进行切割之前,日志文件的最大大小(MB为单位)
+		MaxAge:     maxAge,    // 保留旧文件的最大天数
+		MaxBackups: maxBackup, // 保留旧文件的最大个数
+		Compress:   compress,  // 是否压缩/归档旧文件
+	}
+
+	return zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberJackLogger), zapcore.AddSync(os.Stderr))
 }
 
 func getLogLevel() zapcore.Level {

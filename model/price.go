@@ -350,6 +350,7 @@ func GetDefaultPrice() []*Price {
 		"mj_describe":       25,
 		"mj_upscale":        25,
 		"swap_face":         25,
+		"mj_upload":         0,
 	}
 
 	for model, mjPrice := range DefaultMJPrice {

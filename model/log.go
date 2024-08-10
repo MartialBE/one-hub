@@ -190,7 +190,7 @@ func SumUsedQuota(startTimestamp int64, endTimestamp int64, modelName string, us
 }
 
 func DeleteOldLog(targetTimestamp int64) (int64, error) {
-	result := DB.Where("created_at < ?", targetTimestamp).Delete(&Log{})
+	result := DB.Where("type = ? AND created_at < ?", LogTypeConsume, targetTimestamp).Delete(&Log{})
 	return result.RowsAffected, result.Error
 }
 
@@ -208,49 +208,7 @@ type LogStatisticGroupModel struct {
 	ModelName string `gorm:"column:model_name"`
 }
 
-func GetUserModelExpensesByPeriod(userId, startTimestamp, endTimestamp int) (LogStatistic []*LogStatisticGroupModel, err error) {
-	groupSelect := getTimestampGroupsSelect("created_at", "day", "date")
-
-	err = DB.Raw(`
-		SELECT `+groupSelect+`,
-		model_name, count(1) as request_count,
-		sum(quota) as quota,
-		sum(prompt_tokens) as prompt_tokens,
-		sum(completion_tokens) as completion_tokens
-		FROM logs
-		WHERE type=2
-		AND user_id= ?
-		AND created_at BETWEEN ? AND ?
-		GROUP BY date, model_name
-		ORDER BY date, model_name
-	`, userId, startTimestamp, endTimestamp).Scan(&LogStatistic).Error
-
-	return
-}
-
 type LogStatisticGroupChannel struct {
 	LogStatistic
 	Channel string `gorm:"column:channel"`
-}
-
-func GetChannelExpensesByPeriod(startTimestamp, endTimestamp int64) (LogStatistics []*LogStatisticGroupChannel, err error) {
-	groupSelect := getTimestampGroupsSelect("created_at", "day", "date")
-
-	err = DB.Raw(`
-		SELECT `+groupSelect+`,
-		count(1) as request_count,
-		sum(quota) as quota,
-		sum(prompt_tokens) as prompt_tokens,
-		sum(completion_tokens) as completion_tokens,
-		sum(request_time) as request_time,
-		channels.name as channel
-		FROM logs
-		JOIN channels ON logs.channel_id = channels.id
-		WHERE logs.type=2
-		AND logs.created_at BETWEEN ? AND ?
-		GROUP BY date, channels.id
-		ORDER BY date, channels.id
-	`, startTimestamp, endTimestamp).Scan(&LogStatistics).Error
-
-	return LogStatistics, err
 }

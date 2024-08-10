@@ -5,6 +5,7 @@ package midjourney
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -170,11 +171,14 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 		quotaInstance.Undo(c)
 		return &mjResp.Response
 	}
-	if mjResp.StatusCode == 200 && mjResp.Response.Code == 1 {
-		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1000, TotalTokens: 1000})
-	} else {
-		quotaInstance.Undo(c)
-	}
+
+	defer func(ctx context.Context) {
+		if mjResp.StatusCode == 200 && mjResp.Response.Code == 1 {
+			quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
+		} else {
+			quotaInstance.Undo(c)
+		}
+	}(c.Request.Context())
 
 	quota := int(quotaInstance.GetInputRatio() * 1000)
 
@@ -346,6 +350,8 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		midjRequest.Action = provider.MjActionShorten
 	} else if relayMode == provider.RelayModeMidjourneyBlend { //绘画任务，此类任务可重复
 		midjRequest.Action = provider.MjActionBlend
+	} else if relayMode == provider.RelayModeMidjourneyUpload { //绘画任务，此类任务可重复
+		midjRequest.Action = provider.MjActionUpload
 	} else if midjRequest.TaskId != "" { //放大、变换任务，此类任务，如果重复且已有结果，远端api会直接返回最终结果
 		mjId := ""
 		if relayMode == provider.RelayModeMidjourneyChange {
@@ -421,11 +427,14 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		return &midjResponseWithStatus.Response
 	}
 
-	if consumeQuota && midjResponseWithStatus.StatusCode == 200 {
-		quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
-	} else {
-		quotaInstance.Undo(c)
-	}
+	defer func(ctx context.Context) {
+		if consumeQuota && midjResponseWithStatus.StatusCode == 200 {
+			quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
+		} else {
+			quotaInstance.Undo(c)
+		}
+	}(c.Request.Context())
+
 	quota := int(quotaInstance.GetInputRatio() * 1000)
 
 	midjResponse := &midjResponseWithStatus.Response
@@ -485,6 +494,11 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 			newBody := strings.Replace(string(responseBody), `"code":21`, `"code":1`, -1)
 			responseBody = []byte(newBody)
 		}
+	}
+
+	if midjResponse.Code == 1 && midjRequest.Action == "UPLOAD" {
+		midjourneyTask.Progress = "100%"
+		midjourneyTask.Status = "SUCCESS"
 	}
 
 	err = midjourneyTask.Insert()

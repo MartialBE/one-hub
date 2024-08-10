@@ -21,6 +21,7 @@ const (
 	RelayModeMidjourneyModal
 	RelayModeMidjourneyShorten
 	RelayModeMidjourneySwapFace
+	RelayModeMidjourneyUpload
 )
 
 // Author: Calcium-Ion
@@ -48,4 +49,5 @@ const (
 	MjActionLowVariation  = "LOW_VARIATION"
 	MjActionPan           = "PAN"
 	MjActionSwapFace      = "SWAP_FACE"
+	MjActionUpload        = "UPLOAD"
 )
