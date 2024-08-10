@@ -297,7 +297,8 @@ const typeConfig = {
         'mj_custom_zoom',
         'mj_describe',
         'mj_upscale',
-        'swap_face'
+        'swap_face',
+        'mj_upload'
       ]
     },
     prompt: {

@@ -42,6 +42,8 @@ func GetMjRequestModel(relayMode int, midjRequest *mjProvider.MidjourneyRequest)
 			action = mjProvider.MjActionModal
 		case mjProvider.RelayModeMidjourneySwapFace:
 			action = mjProvider.MjActionSwapFace
+		case mjProvider.RelayModeMidjourneyUpload:
+			action = mjProvider.MjActionUpload
 		case mjProvider.RelayModeMidjourneySimpleChange:
 			params := ConvertSimpleChangeParams(midjRequest.Content)
 			if params == nil {

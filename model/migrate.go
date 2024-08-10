@@ -32,7 +32,7 @@ func removeKeyIndexMigration() *gormigrate.Migration {
 	}
 }
 
-func migration(db *gorm.DB) error {
+func migrationBefore(db *gorm.DB) error {
 	// 如果是第一次运行 直接跳过
 	if !db.Migrator().HasTable("channels") {
 		return nil
@@ -40,6 +40,26 @@ func migration(db *gorm.DB) error {
 
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		removeKeyIndexMigration(),
+	})
+	return m.Migrate()
+}
+
+func addStatistics() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202408100001",
+		Migrate: func(tx *gorm.DB) error {
+			go UpdateStatistics(StatisticsUpdateTypeALL)
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return nil
+		},
+	}
+}
+
+func migrationAfter(db *gorm.DB) error {
+	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
+		addStatistics(),
 	})
 	return m.Migrate()
 }

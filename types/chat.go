@@ -98,10 +98,14 @@ func (m ChatCompletionMessage) ParseContent() []ChatMessagePart {
 					Text: subStr,
 				})
 			} else if subObj, ok := contentMap["image_url"].(map[string]any); ok {
+				urlValue, ok := subObj["url"].(string)
+				if !ok {
+					continue
+				}
 				contentList = append(contentList, ChatMessagePart{
 					Type: ContentTypeImageURL,
 					ImageURL: &ChatMessageImageURL{
-						URL: subObj["url"].(string),
+						URL: urlValue,
 					},
 				})
 			} else if subObj, ok := contentMap["image"].(string); ok {
