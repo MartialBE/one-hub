@@ -16,10 +16,13 @@ type ZhipuRetrieval struct {
 }
 
 type ZhipuTool struct {
-	Type      string                        `json:"type"`
-	Function  *types.ChatCompletionFunction `json:"function,omitempty"`
-	WebSearch *ZhipuWebSearch               `json:"web_search,omitempty"`
-	Retrieval *ZhipuRetrieval               `json:"retrieval,omitempty"`
+	Type            string                        `json:"type"`
+	Function        *types.ChatCompletionFunction `json:"function,omitempty"`
+	WebSearch       *ZhipuWebSearch               `json:"web_search,omitempty"`
+	Retrieval       *ZhipuRetrieval               `json:"retrieval,omitempty"`
+	WebBrowser      any                           `json:"web_browser,omitempty"`
+	DrawingTool     any                           `json:"drawing_tool,omitempty"`
+	CodeInterpreter any                           `json:"code_interpreter,omitempty"`
 }
 type ZhipuRequest struct {
 	Model       string                        `json:"model"`
@@ -50,11 +53,194 @@ type ZhipuResponse struct {
 }
 
 type ZhipuStreamResponse struct {
-	ID      string                             `json:"id"`
-	Created int64                              `json:"created"`
-	Choices []types.ChatCompletionStreamChoice `json:"choices"`
-	Usage   *types.Usage                       `json:"usage,omitempty"`
+	ID      string        `json:"id"`
+	Created int64         `json:"created"`
+	Choices []ZhipuChoice `json:"choices"`
+	Usage   *types.Usage  `json:"usage,omitempty"`
 	ZhipuResponseError
+}
+
+func (z *ZhipuStreamResponse) ToOpenAIChoices() []types.ChatCompletionStreamChoice {
+	choices := make([]types.ChatCompletionStreamChoice, 0, len(z.Choices))
+
+	for _, choice := range z.Choices {
+		choices = append(choices, choice.ToOpenAIChoice())
+	}
+
+	return choices
+}
+
+func (z *ZhipuStreamResponse) IsFunction() bool {
+	if z.Choices == nil {
+		return false
+	}
+
+	choice := z.Choices[0]
+
+	return choice.IsFunction()
+}
+
+func (z *ZhipuStreamResponse) IsCodeInterpreter() bool {
+	if z.Choices == nil {
+		return false
+	}
+
+	choice := z.Choices[0]
+
+	if choice.Delta.ToolCalls == nil {
+		return false
+	}
+
+	toolCall := choice.Delta.ToolCalls[0]
+
+	return toolCall.Type == "code_interpreter" && toolCall.CodeInterpreter.Outputs == nil
+}
+
+type ZhipuChoice struct {
+	Index                int          `json:"index"`
+	Delta                ZhipuDelta   `json:"delta"`
+	FinishReason         string       `json:"finish_reason"`
+	ContentFilterResults any          `json:"content_filter_results,omitempty"`
+	Usage                *types.Usage `json:"usage,omitempty"`
+}
+
+func (z *ZhipuChoice) ToOpenAIChoice() types.ChatCompletionStreamChoice {
+	choice := types.ChatCompletionStreamChoice{
+		Index:                z.Index,
+		Delta:                z.Delta.ToOpenAIDelta(),
+		ContentFilterResults: z.ContentFilterResults,
+		Usage:                z.Usage,
+	}
+
+	if z.IsFunction() || z.FinishReason != "tool_calls" {
+		choice.FinishReason = z.FinishReason
+	}
+
+	return choice
+}
+
+func (z *ZhipuChoice) IsFunction() bool {
+	if z.Delta.ToolCalls == nil {
+		return false
+	}
+	toolCall := z.Delta.ToolCalls[0]
+
+	return toolCall.Type == "function"
+}
+
+type ZhipuDelta struct {
+	Content   string            `json:"content,omitempty"`
+	Role      string            `json:"role,omitempty"`
+	ToolCalls []*ZhipuToolCalls `json:"tool_calls,omitempty"`
+}
+
+func (z *ZhipuDelta) ToOpenAIDelta() types.ChatCompletionStreamChoiceDelta {
+	delta := types.ChatCompletionStreamChoiceDelta{
+		Role: z.Role,
+	}
+
+	content := z.Content
+	changeRole := false
+	if z.ToolCalls != nil {
+		toolCalls := make([]*types.ChatCompletionToolCalls, 0)
+		for _, toolCall := range z.ToolCalls {
+			switch toolCall.Type {
+			case "web_browser":
+				content += toolCall.WebBrowser.ToMarkdown()
+				changeRole = true
+			case "drawing_tool":
+				content += toolCall.DrawingTool.ToMarkdown()
+				changeRole = true
+			case "code_interpreter":
+				content += toolCall.CodeInterpreter.ToMarkdown()
+				changeRole = true
+			default:
+				toolCalls = append(toolCalls, &toolCall.ChatCompletionToolCalls)
+				delta.ToolCalls = toolCalls
+			}
+		}
+	}
+
+	if changeRole {
+		delta.Role = types.ChatMessageRoleAssistant
+	}
+
+	delta.Content = content
+	return delta
+}
+
+type ZhipuToolCalls struct {
+	types.ChatCompletionToolCalls
+	WebBrowser      *ZhipuPlugin[WebBrowserPlugin]      `json:"web_browser,omitempty"`
+	DrawingTool     *ZhipuPlugin[DrawingToolPlugin]     `json:"drawing_tool,omitempty"`
+	CodeInterpreter *ZhipuPlugin[CodeInterpreterPlugin] `json:"code_interpreter,omitempty"`
+}
+
+type PluginMD interface {
+	ToMarkdown() string
+}
+
+type ZhipuPlugin[T PluginMD] struct {
+	Input   string `json:"input,omitempty"`
+	Outputs []T    `json:"outputs,omitempty"`
+}
+
+func (z *ZhipuPlugin[T]) ToMarkdown() string {
+	if z.Outputs == nil {
+		return z.Input
+	}
+
+	markdown := "\n"
+
+	for _, output := range z.Outputs {
+		markdown += output.ToMarkdown()
+	}
+
+	return markdown
+}
+
+type WebBrowserPlugin struct {
+	Title   string `json:"title,omitempty"`
+	Link    string `json:"link,omitempty"`
+	Content string `json:"content,omitempty"`
+}
+
+func (z WebBrowserPlugin) ToMarkdown() string {
+	markdown := ""
+	markdown += "[" + z.Title + "](" + z.Link + ")\n"
+	markdown += z.Content + "\n\n"
+
+	return markdown
+}
+
+type DrawingToolPlugin struct {
+	Image string `json:"image,omitempty"`
+}
+
+func (z DrawingToolPlugin) ToMarkdown() string {
+	markdown := ""
+	markdown += "![" + z.Image + "](" + z.Image + ")\n\n"
+
+	return markdown
+}
+
+type CodeInterpreterPlugin struct {
+	Type string `json:"type,omitempty"`
+	File string `json:"file,omitempty"`
+	Logs string `json:"logs,omitempty"`
+}
+
+func (z CodeInterpreterPlugin) ToMarkdown() string {
+	markdown := ""
+
+	switch z.Type {
+	case "file":
+		markdown += "[结果文件](" + z.File + ")\n"
+	case "logs":
+		markdown += "```\n" + z.Logs + "\n```\n"
+	}
+
+	return markdown
 }
 
 func (z *ZhipuStreamResponse) GetResponseText() (responseText string) {
