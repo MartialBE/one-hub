@@ -4,16 +4,14 @@
 package controller
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"one-api/common"
 	"one-api/common/logger"
-	"one-api/common/requester"
 	"one-api/model"
+	"one-api/providers"
 	provider "one-api/providers/midjourney"
 	"sync"
 	"sync/atomic"
@@ -126,7 +124,19 @@ func UpdateMidjourneyTaskBulk() {
 				continue
 			}
 
-			err := MjTaskHandler(midjourneyChannel, taskIds, taskM)
+			providers := providers.GetProvider(midjourneyChannel, nil)
+			mjProvider, ok := providers.(*provider.MidjourneyProvider)
+			if !ok {
+				err := model.MjBulkUpdate(taskIds, map[string]any{
+					"fail_reason": fmt.Sprintf("获取供应商失败，请联系管理员，渠道ID：%d", channelId),
+					"status":      "FAILURE",
+					"progress":    "100%",
+				})
+				logger.LogError(ctx, fmt.Sprintf("get task error: provider not found, error: %v", err))
+				continue
+			}
+
+			err := MjTaskHandler(ctx, mjProvider, taskIds, taskM)
 			if err != nil {
 				logger.LogError(ctx, fmt.Sprintf("MjTaskHandler error: %v", err))
 			}
@@ -135,41 +145,11 @@ func UpdateMidjourneyTaskBulk() {
 	}
 }
 
-func MjTaskHandler(midjourneyChannel *model.Channel, taskIds []string, taskM map[string]*model.Midjourney) error {
-	requestUrl := fmt.Sprintf("%s/mj/task/list-by-condition", *midjourneyChannel.BaseURL)
+func MjTaskHandler(ctx context.Context, mjProvider *provider.MidjourneyProvider, taskIds []string, taskM map[string]*model.Midjourney) error {
 
-	body, _ := json.Marshal(map[string]any{
-		"ids": taskIds,
-	})
-	req, err := http.NewRequest("POST", requestUrl, bytes.NewBuffer(body))
+	responseItems, err := mjProvider.GetTaskListByCondition(taskIds)
 	if err != nil {
 		return fmt.Errorf("get task error: %v", err)
-	}
-	// 设置超时时间
-	timeout := time.Second * 5
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	// 使用带有超时的 context 创建新的请求
-	req = req.WithContext(ctx)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("mj-api-secret", midjourneyChannel.Key)
-	resp, err := requester.HTTPClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("get task do req error: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("get task status code: %d", resp.StatusCode)
-	}
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("get task parse body error: %v", err)
-	}
-	var responseItems []provider.MidjourneyDto
-	err = json.Unmarshal(responseBody, &responseItems)
-	if err != nil {
-		return fmt.Errorf("get task parse body error2: %v, body: %s", err, string(responseBody))
 	}
 
 	for _, responseItem := range responseItems {

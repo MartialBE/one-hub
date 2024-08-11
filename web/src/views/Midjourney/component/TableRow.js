@@ -86,6 +86,13 @@ export default function LogTableRow({ item, userIsAdmin }) {
     setMenuOpen(null);
   };
 
+  let request_time = 0;
+  let request_time_str = '';
+  if (item.finish_time > 0) {
+    request_time = (item.finish_time - item.start_time) / 1000;
+    request_time_str = request_time.toFixed(2) + ' 秒';
+  }
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -99,6 +106,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
         {userIsAdmin && <TableCell>{renderType(CODE_TYPE, item.code)}</TableCell>}
         {userIsAdmin && <TableCell>{renderType(STATUS_TYPE, item.status)}</TableCell>}
         <TableCell>{item.progress}</TableCell>
+        <TableCell>{request_time_str && <Label color={request_time > 60 ? 'error' : 'success'}> {request_time_str} </Label>}</TableCell>
         <TableCell>
           {item.image_url == '' ? (
             t('common.none')
