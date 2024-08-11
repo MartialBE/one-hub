@@ -1,4 +1,4 @@
-// assets
+// assets，面板左侧配置项
 import {
   IconDashboard,
   IconSitemap,
@@ -16,7 +16,7 @@ import {
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal,
-  IconList
+  // IconList
 } from '@tabler/icons-react';
 
 // constant
@@ -37,7 +37,7 @@ const icons = {
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal,
-  IconList
+  // IconList
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -114,14 +114,14 @@ const panel = {
     //   icon: icons.IconBrush,
     //   breadcrumbs: false
     // },
-    {
-      id: 'task',
-      title: '异步任务',
-      type: 'item',
-      url: '/panel/task',
-      icon: icons.IconList,
-      breadcrumbs: false
-    },
+    // {
+    //   id: 'task',
+    //   title: '异步任务',
+    //   type: 'item',
+    //   url: '/panel/task',
+    //   icon: icons.IconList,
+    //   breadcrumbs: false
+    // },
     {
       id: 'user',
       title: '用户',
