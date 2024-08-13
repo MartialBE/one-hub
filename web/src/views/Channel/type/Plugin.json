@@ -29,6 +29,42 @@
           "required": true
         }
       }
+    },
+    "web_browser": {
+      "name": "搜索工具",
+      "description": "使用搜索工具功能，仅glm-4-alltools有效",
+      "params": {
+        "enable": {
+          "name": "启用",
+          "description": "是否启用搜索工具",
+          "type": "bool",
+          "required": true
+        }
+      }
+    },
+    "drawing_tool": {
+      "name": "绘图工具",
+      "description": "使用绘图工具功能，仅glm-4-alltools有效",
+      "params": {
+        "enable": {
+          "name": "启用",
+          "description": "是否启用绘图工具",
+          "type": "bool",
+          "required": true
+        }
+      }
+    },
+    "code_interpreter": {
+      "name": "代码工具 ",
+      "description": "使用代码工具 功能，仅glm-4-alltools有效",
+      "params": {
+        "sandbox": {
+          "name": "沙盒模式",
+          "description": "auto 自动调用沙盒环境执行代码，none 不启用沙盒环境，必填",
+          "type": "string",
+          "required": false
+        }
+      }
     }
   },
   "17": {

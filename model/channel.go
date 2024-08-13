@@ -71,7 +71,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.Name != "" {
-		db = db.Where("name LIKE ?", params.Name+"%")
+		db = db.Where("name LIKE ?", "%"+params.Name+"%")
 	}
 
 	if params.Group != "" {

@@ -41,7 +41,8 @@
     "outputLabel": "Output",
     "quotaLabel": "Quota",
     "detailLabel": "Detail",
-    "searchLogsInfo": "Please check the recharge records and invitation records in the logs. For recharge records, select the type [Recharge] in the log; for invitation records, select [System] in the log."
+    "searchLogsInfo": "Please check the recharge records and invitation records in the logs. For recharge records, select the type [Recharge] in the log; for invitation records, select [System] in the log.",
+    "durationTooltip": "t/s: The number of output tokens divided by the total generation time, indicating the generation speed"
   },
   "tableToolBar": {
     "tokenName": "Token Name",
