@@ -151,6 +151,17 @@ func ClaudeAuth() func(c *gin.Context) {
 	}
 }
 
+func GeminiAuth() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		key := c.Request.Header.Get("x-goog-api-key")
+		if key == "" {
+			// 查询GET参数
+			key = c.Query("key")
+		}
+		tokenAuth(c, key)
+	}
+}
+
 func MjAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		key := c.Request.Header.Get("mj-api-secret")

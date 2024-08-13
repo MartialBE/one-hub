@@ -24,7 +24,12 @@ type GeminiStreamHandler struct {
 }
 
 func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	req, errWithCode := p.getChatRequest(geminiRequest)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -41,7 +46,12 @@ func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionReque
 }
 
 func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	req, errWithCode := p.getChatRequest(geminiRequest)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -63,23 +73,18 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerStream)
 }
 
-func (p *GeminiProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url := "generateContent"
-	if request.Stream {
+	if geminiRequest.Stream {
 		url = "streamGenerateContent?alt=sse"
 	}
 	// 获取请求地址
-	fullRequestURL := p.GetFullRequestURL(url, request.Model)
+	fullRequestURL := p.GetFullRequestURL(url, geminiRequest.Model)
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
-	if request.Stream {
+	if geminiRequest.Stream {
 		headers["Accept"] = "text/event-stream"
-	}
-
-	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
-	if errWithCode != nil {
-		return nil, errWithCode
 	}
 
 	p.pluginHandle(geminiRequest)
@@ -127,6 +132,12 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 	if functions != nil {
 		var geminiChatTools GeminiChatTools
 		for _, function := range functions {
+			if params, ok := function.Parameters.(map[string]interface{}); ok {
+				if properties, ok := params["properties"].(map[string]interface{}); ok && len(properties) == 0 {
+					function.Parameters = nil
+				}
+			}
+
 			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, *function)
 		}
 		geminiRequest.Tools = append(geminiRequest.Tools, geminiChatTools)
@@ -138,6 +149,8 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 	}
 
 	geminiRequest.Contents = geminiContent
+	geminiRequest.Stream = request.Stream
+	geminiRequest.Model = request.Model
 
 	return &geminiRequest, nil
 }

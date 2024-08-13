@@ -8,6 +8,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/common/utils"
+	"one-api/model"
 	"one-api/types"
 	"strings"
 )
@@ -15,9 +16,14 @@ import (
 type zhipuStreamHandler struct {
 	Usage   *types.Usage
 	Request *types.ChatCompletionRequest
+	IsCode  bool
 }
 
 func (p *ZhipuProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	if request.Model == "glm-4-alltools" {
+		return nil, common.ErrorWrapper(nil, "glm-4-alltools 只能stream模式下请求", http.StatusBadRequest)
+	}
+
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -188,6 +194,15 @@ func (p *ZhipuProvider) pluginHandle(request *ZhipuRequest) {
 
 	plugin := p.Channel.Plugin.Data()
 
+	if request.Model == "glm-4-alltools" {
+		glm4AlltoolsPlugin(request, plugin)
+		return
+	}
+
+	generalPlugin(request, plugin)
+}
+
+func generalPlugin(request *ZhipuRequest, plugin model.PluginType) {
 	// 检测是否开启了 retrieval 插件
 	if pRetrieval, ok := plugin["retrieval"]; ok {
 		if knowledgeId, ok := pRetrieval["knowledge_id"].(string); ok && knowledgeId != "" {
@@ -203,8 +218,6 @@ func (p *ZhipuProvider) pluginHandle(request *ZhipuRequest) {
 			}
 
 			request.Tools = append(request.Tools, retrieval)
-
-			// 如果开启了 retrieval 插件，web_search 无效
 			return
 		}
 	}
@@ -218,6 +231,43 @@ func (p *ZhipuProvider) pluginHandle(request *ZhipuRequest) {
 					Enable: true,
 				},
 			})
+		}
+	}
+}
+
+func glm4AlltoolsPlugin(request *ZhipuRequest, plugin model.PluginType) {
+	if pWeb, ok := plugin["web_browser"]; ok {
+		if enable, ok := pWeb["enable"].(bool); ok && enable {
+			request.Tools = append(request.Tools, ZhipuTool{
+				Type: "web_browser",
+				WebBrowser: &map[string]bool{
+					"enable": true,
+				},
+			})
+		}
+	}
+
+	if pDW, ok := plugin["drawing_tool"]; ok {
+		if enable, ok := pDW["enable"].(bool); ok && enable {
+			request.Tools = append(request.Tools, ZhipuTool{
+				Type: "drawing_tool",
+				DrawingTool: &map[string]bool{
+					"enable": true,
+				},
+			})
+		}
+	}
+
+	if pCode, ok := plugin["code_interpreter"]; ok {
+		if sandbox, ok := pCode["sandbox"].(string); ok && sandbox != "" {
+			codeInterpreter := ZhipuTool{
+				Type: "code_interpreter",
+				CodeInterpreter: &map[string]string{
+					"sandbox": sandbox,
+				},
+			}
+
+			request.Tools = append(request.Tools, codeInterpreter)
 		}
 	}
 }
@@ -262,18 +312,30 @@ func (h *zhipuStreamHandler) convertToOpenaiStream(zhipuResponse *ZhipuStreamRes
 		Model:   h.Request.Model,
 	}
 
-	if zhipuResponse.Choices[0].Delta.ToolCalls != nil {
-		choice := zhipuResponse.Choices[0]
+	if zhipuResponse.IsFunction() {
+		choice := zhipuResponse.Choices[0].ToOpenAIChoice()
 		choice.CheckChoice(h.Request)
 		choices := choice.ConvertOpenaiStream()
 		for _, choice := range choices {
 			chatCompletionCopy := streamResponse
 			chatCompletionCopy.Choices = []types.ChatCompletionStreamChoice{choice}
 			responseBody, _ := json.Marshal(chatCompletionCopy)
+
 			dataChan <- string(responseBody)
 		}
 	} else {
-		streamResponse.Choices = zhipuResponse.Choices
+		streamResponse.Choices = zhipuResponse.ToOpenAIChoices()
+
+		if !h.IsCode && zhipuResponse.IsCodeInterpreter() {
+			h.IsCode = true
+			streamResponse.Choices[0].Delta.Content = "```python\n\n" + streamResponse.Choices[0].Delta.Content
+		}
+
+		if h.IsCode && !zhipuResponse.IsCodeInterpreter() {
+			h.IsCode = false
+			streamResponse.Choices[0].Delta.Content = "\n```\n\n" + streamResponse.Choices[0].Delta.Content
+		}
+
 		responseBody, _ := json.Marshal(streamResponse)
 		dataChan <- string(responseBody)
 	}

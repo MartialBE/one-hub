@@ -50,20 +50,24 @@ func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 
 // 错误处理
 func errorHandle(geminiError *GeminiErrorResponse) *types.OpenAIError {
-	if geminiError.Error.Message == "" {
+	if geminiError.ErrorInfo == nil || geminiError.ErrorInfo.Message == "" {
 		return nil
 	}
 
-	if strings.Contains(geminiError.Error.Message, "Publisher Model") {
-		logger.SysError(fmt.Sprintf("Gemini Error: %s", geminiError.Error.Message))
-		geminiError.Error.Message = "上游错误，请联系管理员."
-	}
+	cleaningError(geminiError.ErrorInfo)
 
 	return &types.OpenAIError{
-		Message: geminiError.Error.Message,
+		Message: geminiError.ErrorInfo.Message,
 		Type:    "gemini_error",
-		Param:   geminiError.Error.Status,
-		Code:    geminiError.Error.Code,
+		Param:   geminiError.ErrorInfo.Status,
+		Code:    geminiError.ErrorInfo.Code,
+	}
+}
+
+func cleaningError(errorInfo *GeminiError) {
+	if strings.Contains(errorInfo.Message, "Publisher Model") || strings.Contains(errorInfo.Message, "api_key") {
+		logger.SysError(fmt.Sprintf("Gemini Error: %s", errorInfo.Message))
+		errorInfo.Message = "上游错误，请联系管理员."
 	}
 }
 

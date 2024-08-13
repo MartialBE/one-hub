@@ -13,17 +13,93 @@ func RelayPanicRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.SysError(fmt.Sprintf("panic detected: %v", err))
-				logger.SysError(fmt.Sprintf("stacktrace from panic: %s", string(debug.Stack())))
-				c.JSON(http.StatusInternalServerError, gin.H{
+				errorResponse := gin.H{
 					"error": gin.H{
 						"message": fmt.Sprintf("Panic detected, error: %v.", err),
-						"type":    "oapi_panic",
+						"type":    "czloapi_panic",
 					},
-				})
-				c.Abort()
+				}
+				handlePanic(c, err, errorResponse)
+			}
+		}()
+
+		c.Next()
+	}
+}
+
+func RelayCluadePanicRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorResponse := gin.H{
+					"type": "czloapi_panic",
+					"error": gin.H{
+						"type":    "czloapi_panic",
+						"message": fmt.Sprintf("Panic detected, error: %v.", err),
+					},
+				}
+				handlePanic(c, err, errorResponse)
 			}
 		}()
 		c.Next()
 	}
+}
+
+func RelayGeminiPanicRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorResponse := gin.H{
+					"error": gin.H{
+						"code":    500,
+						"status":  "czloapi_panic",
+						"message": fmt.Sprintf("Panic detected, error: %v.", err),
+					},
+				}
+				handlePanic(c, err, errorResponse)
+			}
+		}()
+		c.Next()
+	}
+}
+
+func RelayMJPanicRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorResponse := gin.H{
+					"error": gin.H{
+						"description": fmt.Sprintf("Panic detected, error: %v.", err),
+						"type":        "czloapi_panic",
+						"code":        500,
+					},
+				}
+				handlePanic(c, err, errorResponse)
+			}
+		}()
+
+		c.Next()
+	}
+}
+
+func RelaySunoPanicRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorResponse := gin.H{
+					"code":    "czloapi_panic",
+					"message": fmt.Sprintf("Panic detected, error: %v.", err),
+				}
+				handlePanic(c, err, errorResponse)
+			}
+		}()
+		c.Next()
+	}
+}
+
+func handlePanic(c *gin.Context, err interface{}, errorResponse gin.H) {
+	logger.SysError(fmt.Sprintf("panic detected: %v", err))
+	logger.SysError(fmt.Sprintf("stacktrace from panic: %s", string(debug.Stack())))
+	c.JSON(http.StatusInternalServerError, errorResponse)
+	c.Abort()
 }
