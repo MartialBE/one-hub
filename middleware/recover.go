@@ -16,7 +16,7 @@ func RelayPanicRecover() gin.HandlerFunc {
 				errorResponse := gin.H{
 					"error": gin.H{
 						"message": fmt.Sprintf("Panic detected, error: %v.", err),
-						"type":    "ohub_panic",
+						"type":    "czloapi_panic",
 					},
 				}
 				handlePanic(c, err, errorResponse)
@@ -32,10 +32,10 @@ func RelayCluadePanicRecover() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				errorResponse := gin.H{
-					"type": "one_hub_panic",
+					"type": "czloapi_panic",
 					"error": gin.H{
-						"type":    "one_hub_panic",
-						"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub.", err),
+						"type":    "czloapi_panic",
+						"message": fmt.Sprintf("Panic detected, error: %v.", err),
 					},
 				}
 				handlePanic(c, err, errorResponse)
@@ -52,8 +52,8 @@ func RelayGeminiPanicRecover() gin.HandlerFunc {
 				errorResponse := gin.H{
 					"error": gin.H{
 						"code":    500,
-						"status":  "one_hub_panic",
-						"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub.", err),
+						"status":  "czloapi_panic",
+						"message": fmt.Sprintf("Panic detected, error: %v.", err),
 					},
 				}
 				handlePanic(c, err, errorResponse)
@@ -69,8 +69,8 @@ func RelayMJPanicRecover() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				errorResponse := gin.H{
 					"error": gin.H{
-						"description": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub.", err),
-						"type":        "one_hub_panic",
+						"description": fmt.Sprintf("Panic detected, error: %v.", err),
+						"type":        "czloapi_panic",
 						"code":        500,
 					},
 				}
@@ -87,8 +87,8 @@ func RelaySunoPanicRecover() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				errorResponse := gin.H{
-					"code":    "one_hub_panic",
-					"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub.", err),
+					"code":    "czloapi_panic",
+					"message": fmt.Sprintf("Panic detected, error: %v.", err),
 				}
 				handlePanic(c, err, errorResponse)
 			}

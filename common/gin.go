@@ -59,7 +59,7 @@ func ErrorToOpenAIError(err error) *types.OpenAIError {
 	return &types.OpenAIError{
 		Code:    "system error",
 		Message: err.Error(),
-		Type:    "one_hub_error",
+		Type:    "czloapi_error",
 	}
 }
 
