@@ -1,6 +1,7 @@
 package model
 
 import (
+	"one-api/common/config"
 	"one-api/common/logger"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -33,6 +34,12 @@ func removeKeyIndexMigration() *gormigrate.Migration {
 }
 
 func migrationBefore(db *gorm.DB) error {
+	// 从库不执行
+	if !config.IsMasterNode {
+		logger.SysLog("从库不执行迁移前操作")
+		return nil
+	}
+
 	// 如果是第一次运行 直接跳过
 	if !db.Migrator().HasTable("channels") {
 		return nil
@@ -58,6 +65,11 @@ func addStatistics() *gormigrate.Migration {
 }
 
 func migrationAfter(db *gorm.DB) error {
+	// 从库不执行
+	if !config.IsMasterNode {
+		logger.SysLog("从库不执行迁移后操作")
+		return nil
+	}
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		addStatistics(),
 	})
