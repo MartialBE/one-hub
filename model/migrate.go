@@ -1,10 +1,13 @@
 package model
 
 import (
+	"encoding/json"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"strings"
 
 	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -64,6 +67,64 @@ func addStatistics() *gormigrate.Migration {
 	}
 }
 
+func changeChannelApiVersion() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202408190001",
+		Migrate: func(tx *gorm.DB) error {
+			plugin := `{"customize": {"1": "{version}/chat/completions", "2": "{version}/completions", "3": "{version}/embeddings", "4": "{version}/moderations", "5": "{version}/images/generations", "6": "{version}/images/edits", "7": "{version}/images/variations", "9": "{version}/audio/speech", "10": "{version}/audio/transcriptions", "11": "{version}/audio/translations"}}`
+
+			// 查询 channel 表中的type 为 8，且 other = disable 的数据,直接更新
+			var jsonMap map[string]map[string]interface{}
+			err := json.Unmarshal([]byte(strings.Replace(plugin, "{version}", "", -1)), &jsonMap)
+			if err != nil {
+				logger.SysLog("changeChannelApiVersion Failure: " + err.Error())
+				return err
+			}
+			disableApi := map[string]interface{}{
+				"other":  "",
+				"plugin": datatypes.NewJSONType(jsonMap),
+			}
+
+			err = tx.Model(&Channel{}).Where("type = ? AND other = ?", 8, "disable").Updates(disableApi).Error
+			if err != nil {
+				logger.SysLog("changeChannelApiVersion Failure: " + err.Error())
+				return err
+			}
+
+			// 查询 channel 表中的type 为 8，且 other != disable 并且不为空 的数据,直接更新
+			var channels []*Channel
+			err = tx.Model(&Channel{}).Where("type = ? AND other != ? AND other != ?", 8, "disable", "").Find(&channels).Error
+			if err != nil {
+				logger.SysLog("changeChannelApiVersion Failure: " + err.Error())
+				return err
+			}
+
+			for _, channel := range channels {
+				var jsonMap map[string]map[string]interface{}
+				err := json.Unmarshal([]byte(strings.Replace(plugin, "{version}", "/"+channel.Other, -1)), &jsonMap)
+				if err != nil {
+					logger.SysLog("changeChannelApiVersion Failure: " + err.Error())
+					return err
+				}
+				changeApi := map[string]interface{}{
+					"other":  "",
+					"plugin": datatypes.NewJSONType(jsonMap),
+				}
+				err = tx.Model(&Channel{}).Where("id = ?", channel.Id).Updates(changeApi).Error
+				if err != nil {
+					logger.SysLog("changeChannelApiVersion Failure: " + err.Error())
+					return err
+				}
+			}
+
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Rollback().Error
+		},
+	}
+}
+
 func migrationAfter(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -72,6 +133,7 @@ func migrationAfter(db *gorm.DB) error {
 	}
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		addStatistics(),
+		changeChannelApiVersion(),
 	})
 	return m.Migrate()
 }
