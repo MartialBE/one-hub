@@ -158,5 +158,74 @@
         }
       }
     }
+  },
+
+  "8": {
+    "customize": {
+      "name": "自定义参数",
+      "description": "你可以自定义每个请求的地址，空为默认值，disable为禁用该请求",
+      "params": {
+        "1": {
+          "name": "ChatCompletions地址",
+          "description": "默认为： /v1/chat/completions",
+          "type": "string",
+          "required": false
+        },
+        "2": {
+          "name": "Completion地址",
+          "description": "默认为： /v1/completions",
+          "type": "string",
+          "required": false
+        },
+        "3": {
+          "name": "Embeddings地址",
+          "description": "默认为： /v1/embeddings",
+          "type": "string",
+          "required": false
+        },
+        "4": {
+          "name": "moderations地址",
+          "description": "默认为： /v1/moderations",
+          "type": "string",
+          "required": false
+        },
+        "5": {
+          "name": "ImagesGenerations地址",
+          "description": "默认为： /v1/images/generations",
+          "type": "string",
+          "required": false
+        },
+        "6": {
+          "name": "ImagesEdit地址",
+          "description": "默认为： /v1/images/edits",
+          "type": "string",
+          "required": false
+        },
+        "7": {
+          "name": "ImagesVariations地址",
+          "description": "默认为： /v1/images/variations",
+          "type": "string",
+          "required": false
+        },
+        "9": {
+          "name": "AudioSpeech地址",
+          "description": "默认为： /v1/audio/speech",
+          "type": "string",
+          "required": false
+        },
+        "10": {
+          "name": "AudioTranscriptions地址",
+          "description": "默认为： /v1/audio/transcriptions",
+          "type": "string",
+          "required": false
+        },
+        "11": {
+          "name": "AudioTranslations地址",
+          "description": "默认为： /v1/audio/translations",
+          "type": "string",
+          "required": false
+        }
+      }
+    }
   }
 }

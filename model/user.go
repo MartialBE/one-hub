@@ -337,6 +337,12 @@ func ValidateAccessToken(token string) (user *User) {
 	return nil
 }
 
+func GetUserFields(id int, fields []string) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+	err := GetFieldsByID(&User{}, fields, id, &result)
+	return result, err
+}
+
 func GetUserQuota(id int) (quota int, err error) {
 	err = DB.Model(&User{}).Where("id = ?", id).Select("quota").Find(&quota).Error
 	return quota, err
