@@ -99,7 +99,7 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 	relay.getProvider().SetUsage(usage)
 
 	var quota *relay_util.Quota
-	quota, err = relay_util.NewQuota(relay.getContext(), relay.getModelName(), promptTokens)
+	quota, err = relay_util.NewQuota(relay.getContext(), relay.getOriginalModel(), promptTokens)
 	if err != nil {
 		done = true
 		return

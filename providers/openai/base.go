@@ -33,7 +33,7 @@ func (f OpenAIProviderFactory) Create(channel *model.Channel) base.ProviderInter
 // 创建 OpenAIProvider
 // https://platform.openai.com/docs/api-reference/introduction
 func CreateOpenAIProvider(channel *model.Channel, baseURL string) *OpenAIProvider {
-	openaiConfig := getOpenAIConfig(baseURL)
+	openaiConfig := getOpenAIConfig(baseURL, channel)
 
 	OpenAIProvider := &OpenAIProvider{
 		BaseProvider: base.BaseProvider{
@@ -52,8 +52,8 @@ func CreateOpenAIProvider(channel *model.Channel, baseURL string) *OpenAIProvide
 	return OpenAIProvider
 }
 
-func getOpenAIConfig(baseURL string) base.ProviderConfig {
-	return base.ProviderConfig{
+func getOpenAIConfig(baseURL string, channel *model.Channel) base.ProviderConfig {
+	providerConfig := base.ProviderConfig{
 		BaseURL:             baseURL,
 		Completions:         "/v1/completions",
 		ChatCompletions:     "/v1/chat/completions",
@@ -67,6 +67,19 @@ func getOpenAIConfig(baseURL string) base.ProviderConfig {
 		ImagesVariations:    "/v1/images/variations",
 		ModelList:           "/v1/models",
 	}
+
+	if channel.Type != config.ChannelTypeCustom || channel.Plugin == nil {
+		return providerConfig
+	}
+
+	customMapping, ok := channel.Plugin.Data()["customize"]
+	if !ok {
+		return providerConfig
+	}
+
+	providerConfig.SetAPIUri(customMapping)
+
+	return providerConfig
 }
 
 // 请求错误处理
@@ -109,16 +122,6 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 			requestURL = strings.TrimPrefix(requestURL, "/v1")
 			requestURL = fmt.Sprintf("/openai%s?api-version=%s", requestURL, apiVersion)
 		}
-
-	} else if p.Channel.Type == config.ChannelTypeCustom && p.Channel.Other != "" {
-		replaceValue := p.Channel.Other
-		if replaceValue == "disable" {
-			replaceValue = ""
-		} else {
-			replaceValue = "/" + replaceValue
-		}
-
-		requestURL = strings.Replace(requestURL, "/v1", replaceValue, 1)
 	}
 
 	if strings.HasPrefix(baseURL, "https://gateway.ai.cloudflare.com") {

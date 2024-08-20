@@ -41,7 +41,6 @@ func InitOptionMap() {
 	config.OptionMap["ApproximateTokenEnabled"] = strconv.FormatBool(config.ApproximateTokenEnabled)
 	config.OptionMap["LogConsumeEnabled"] = strconv.FormatBool(config.LogConsumeEnabled)
 	config.OptionMap["DisplayInCurrencyEnabled"] = strconv.FormatBool(config.DisplayInCurrencyEnabled)
-	config.OptionMap["DisplayTokenStatEnabled"] = strconv.FormatBool(config.DisplayTokenStatEnabled)
 	config.OptionMap["ChannelDisableThreshold"] = strconv.FormatFloat(config.ChannelDisableThreshold, 'f', -1, 64)
 	config.OptionMap["EmailDomainRestrictionEnabled"] = strconv.FormatBool(config.EmailDomainRestrictionEnabled)
 	config.OptionMap["EmailDomainWhitelist"] = strings.Join(config.EmailDomainWhitelist, ",")
@@ -157,7 +156,6 @@ var optionBoolMap = map[string]*bool{
 	"ApproximateTokenEnabled":        &config.ApproximateTokenEnabled,
 	"LogConsumeEnabled":              &config.LogConsumeEnabled,
 	"DisplayInCurrencyEnabled":       &config.DisplayInCurrencyEnabled,
-	"DisplayTokenStatEnabled":        &config.DisplayTokenStatEnabled,
 	"MjNotifyEnabled":                &config.MjNotifyEnabled,
 	"ChatCacheEnabled":               &config.ChatCacheEnabled,
 }
