@@ -8,7 +8,7 @@ import (
 )
 
 func (p *OpenAIProvider) CreateImageGenerations(request *types.ImageRequest) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
-	if !IsWithinRange(request.Model, request.N) {
+	if p.Channel.Type == config.ChannelTypeOpenAI && !IsWithinRange(request.Model, request.N) {
 		return nil, common.StringErrorWrapper("n_not_within_range", "n_not_within_range", http.StatusBadRequest)
 	}
 
