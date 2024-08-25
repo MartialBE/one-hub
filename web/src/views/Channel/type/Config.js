@@ -399,6 +399,16 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'VertexAI'
+  },
+  45: {
+    input: {
+      models: ['black-forest-labs/FLUX.1-dev', 'black-forest-labs/FLUX.1-schnell']
+    },
+    prompt: {
+      base_url: '',
+      test_model: ''
+    },
+    modelGroup: 'Siliconflow'
   }
 };
 

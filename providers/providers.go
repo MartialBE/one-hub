@@ -26,6 +26,7 @@ import (
 	"one-api/providers/ollama"
 	"one-api/providers/openai"
 	"one-api/providers/palm"
+	"one-api/providers/siliconflow"
 	"one-api/providers/stabilityAI"
 	"one-api/providers/suno"
 	"one-api/providers/tencent"
@@ -74,6 +75,8 @@ func init() {
 	providerFactories[config.ChannelTypeHunyuan] = hunyuan.HunyuanProviderFactory{}
 	providerFactories[config.ChannelTypeSuno] = suno.SunoProviderFactory{}
 	providerFactories[config.ChannelTypeVertexAI] = vertexai.VertexAIProviderFactory{}
+	// providerFactories[config.ChannelTypeIdeogram] = ideogram.IdeogramProviderFactory{}
+	providerFactories[config.ChannelTypeSiliconflow] = siliconflow.SiliconflowProviderFactory{}
 
 }
 

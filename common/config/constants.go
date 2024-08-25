@@ -189,6 +189,10 @@ const (
 	ChannelTypeHunyuan        = 40
 	ChannelTypeSuno           = 41
 	ChannelTypeVertexAI       = 42
+	ChannelTypeLLAMA          = 43
+	ChannelTypeIdeogram       = 44
+	ChannelTypeSiliconflow    = 45
+	ChannelTypeFlux           = 46
 )
 
 var ChannelBaseURLs = []string{
@@ -235,6 +239,10 @@ var ChannelBaseURLs = []string{
 	"https://hunyuan.tencentcloudapi.com", //40
 	"",                                    //41
 	"",                                    //42
+	"",                                    //43
+	"https://api.ideogram.ai",             //44
+	"https://api.siliconflow.cn",          //45
+	"",                                    //46
 }
 
 const (

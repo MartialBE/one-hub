@@ -194,6 +194,13 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: 'https://console.cloud.google.com/'
   },
+  45: {
+    key: 45,
+    text: 'Siliconflow',
+    value: 45,
+    color: 'orange',
+    url: 'https://siliconflow.cn/'
+  },
   24: {
     key: 24,
     text: 'Azure Speech',
