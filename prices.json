@@ -105,6 +105,13 @@
     "output": 15
   },
   {
+    "model": "chatgpt-4o-latest",
+    "type": "tokens",
+    "channel_type": 1,
+    "input": 2.5,
+    "output": 7.5
+  },
+  {
     "model": "gpt-4o",
     "type": "tokens",
     "channel_type": 1,
