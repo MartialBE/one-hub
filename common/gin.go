@@ -105,3 +105,30 @@ func APIRespondWithError(c *gin.Context, status int, err error) {
 		"message": err.Error(),
 	})
 }
+
+func StringRerankErrorWrapper(err string, code string, statusCode int) *types.RerankErrorWithStatusCode {
+	rerankError := types.RerankError{
+		Detail: err,
+	}
+	return &types.RerankErrorWithStatusCode{
+		RerankError: rerankError,
+		StatusCode:  statusCode,
+	}
+}
+
+func StringRerankErrorWrapperLocal(err string, code string, statusCode int) *types.RerankErrorWithStatusCode {
+	rerankError := StringRerankErrorWrapper(err, code, statusCode)
+	rerankError.LocalError = true
+	return rerankError
+
+}
+
+func OpenAIErrorToRerankError(err *types.OpenAIErrorWithStatusCode) *types.RerankErrorWithStatusCode {
+	return &types.RerankErrorWithStatusCode{
+		RerankError: types.RerankError{
+			Detail: err.Message,
+		},
+		StatusCode: err.StatusCode,
+		LocalError: err.LocalError,
+	}
+}

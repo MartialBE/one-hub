@@ -1,6 +1,8 @@
 package stabilityAI
 
-import "strings"
+import (
+	"strings"
+)
 
 type StabilityAIError struct {
 	Name    string   `json:"name,omitempty"`

@@ -42,6 +42,7 @@ func setOpenAIRouter(router *gin.Engine) {
 		relayV1Router.POST("/audio/translations", relay.Relay)
 		relayV1Router.POST("/audio/speech", relay.Relay)
 		relayV1Router.POST("/moderations", relay.Relay)
+		relayV1Router.POST("/rerank", relay.RelayRerank)
 
 		relayV1Router.Use(middleware.SpecifiedChannel())
 		{

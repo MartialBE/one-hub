@@ -193,6 +193,8 @@ const (
 	ChannelTypeIdeogram       = 44
 	ChannelTypeSiliconflow    = 45
 	ChannelTypeFlux           = 46
+	ChannelTypeJina           = 47
+	ChannelTypeRerank         = 48
 )
 
 var ChannelBaseURLs = []string{
@@ -243,6 +245,8 @@ var ChannelBaseURLs = []string{
 	"https://api.ideogram.ai",             //44
 	"https://api.siliconflow.cn",          //45
 	"",                                    //46
+	"https://api.jina.ai",                 //47
+	"",                                    //48
 }
 
 const (
@@ -259,6 +263,7 @@ const (
 	RelayModeAudioTranscription
 	RelayModeAudioTranslation
 	RelayModeSuno
+	RelayModeRerank
 )
 
 type ContextKey string

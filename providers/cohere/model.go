@@ -9,7 +9,8 @@ import (
 func (p *CohereProvider) GetModelList() ([]string, error) {
 	params := url.Values{}
 	params.Add("page_size", "1000")
-	params.Add("endpoint", "chat")
+	// params.Add("endpoint[]", "chat")
+	// params.Add("endpoint[]", "rerank")
 	queryString := params.Encode()
 
 	fullRequestURL := p.GetFullRequestURL(p.Config.ModelList) + "?" + queryString
@@ -28,7 +29,12 @@ func (p *CohereProvider) GetModelList() ([]string, error) {
 
 	var modelList []string
 	for _, model := range response.Models {
-		modelList = append(modelList, model.Name)
+		for _, endpoint := range model.Endpoints {
+			if endpoint == "chat" || endpoint == "rerank" {
+				modelList = append(modelList, model.Name)
+				break
+			}
+		}
 	}
 
 	return modelList, nil

@@ -38,5 +38,7 @@ func init() {
 		config.ChannelTypeFlux:         "Flux",
 		config.ChannelTypeIdeogram:     "Ideogram",
 		config.ChannelTypeSiliconflow:  "Siliconflow",
+		config.ChannelTypeJina:         "Jina",
+		config.ChannelTypeRerank:       "Rerank",
 	}
 }

@@ -1,5 +1,7 @@
 package siliconflow
 
+import "one-api/types"
+
 type ImageGenerations struct {
 	Prompt            string  `json:"prompt"`
 	ImageSize         string  `json:"image_size"`
@@ -27,4 +29,27 @@ type ImageImings struct {
 type SiliError struct {
 	Code    int    `json:"code,omitempty"`
 	Message string `json:"message,omitempty"`
+}
+
+type RerankRequest struct {
+	Model           string   `json:"model"`
+	Query           string   `json:"query"`
+	TopN            int      `json:"top_n"`
+	ReturnDocuments bool     `json:"return_documents"`
+	Documents       []string `json:"documents"`
+}
+
+type RerankResponse struct {
+	Id      string               `json:"id"`
+	Results []types.RerankResult `json:"results"`
+	Meta    *Meta                `json:"meta,omitempty"`
+}
+
+type Meta struct {
+	Tokens *Tokens `json:"tokens,omitempty"`
+}
+
+type Tokens struct {
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
 }

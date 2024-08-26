@@ -149,6 +149,23 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string, pr
 	return tokenNum
 }
 
+func CountTokenRerankMessages(messages types.RerankRequest, model string, preCostType int) int {
+	if preCostType == config.PreContNotAll {
+		return 0
+	}
+
+	tokenEncoder := GetTokenEncoder(model)
+	tokenNum := 0
+
+	tokenNum += GetTokenNum(tokenEncoder, messages.Query)
+
+	for _, document := range messages.Documents {
+		tokenNum += GetTokenNum(tokenEncoder, document)
+	}
+
+	return tokenNum
+}
+
 func getCountImageFun(model string) CountImageFun {
 	for prefix, fun := range CountImageFunMap {
 		if strings.HasPrefix(model, prefix) {

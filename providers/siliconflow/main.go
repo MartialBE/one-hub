@@ -38,6 +38,8 @@ func getConfig() base.ProviderConfig {
 		ChatCompletions:     "/v1/chat/completions",
 		Embeddings:          "/v1/embeddings",
 		AudioTranscriptions: "/v1/audio/transcriptions",
+		Rerank:              "/v1/rerank",
+		ModelList:           "/v1/models",
 	}
 }
 
@@ -77,7 +79,10 @@ func (p *SiliconflowProvider) GetRequestHeaders() (headers map[string]string) {
 func (p *SiliconflowProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
 
-	requestURL = fmt.Sprintf(requestURL, modelName)
+	if requestURL == p.Config.ImagesGenerations {
+
+		requestURL = fmt.Sprintf(requestURL, modelName)
+	}
 
 	return fmt.Sprintf("%s%s", baseURL, requestURL)
 }
