@@ -121,13 +121,13 @@ type CohereStreamResponse struct {
 }
 
 type RerankRequest struct {
-	Model           *string                       `json:"model,omitempty"`
-	Query           string                        `json:"query" url:"query"`
-	Documents       []*RerankRequestDocumentsItem `json:"documents,omitempty"`
-	TopN            *int                          `json:"top_n,omitempty"`
-	RankFields      []string                      `json:"rank_fields,omitempty"`
-	ReturnDocuments *bool                         `json:"return_documents,omitempty"`
-	MaxChunksPerDoc *int                          `json:"max_chunks_per_doc,omitempty"`
+	Model           string   `json:"model,omitempty"`
+	Query           string   `json:"query" url:"query"`
+	Documents       []string `json:"documents,omitempty"`
+	TopN            int      `json:"top_n,omitempty"`
+	RankFields      []string `json:"rank_fields,omitempty"`
+	ReturnDocuments bool     `json:"return_documents,omitempty"`
+	MaxChunksPerDoc *int     `json:"max_chunks_per_doc,omitempty"`
 }
 
 type RerankRequestDocumentsItem struct {

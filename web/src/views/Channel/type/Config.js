@@ -399,6 +399,28 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'VertexAI'
+  },
+  45: {
+    input: {
+      models: ['black-forest-labs/FLUX.1-dev', 'black-forest-labs/FLUX.1-schnell']
+    },
+    inputLabel: {
+      provider_models_list: '从Siliconflow获取模型列表'
+    },
+    prompt: {
+      base_url: '',
+      test_model: ''
+    },
+    modelGroup: 'Siliconflow'
+  },
+  47: {
+    input: {
+      models: ['jina-reranker-v2-base-multilingual']
+    },
+    prompt: {
+      test_model: ''
+    },
+    modelGroup: 'Jina'
   }
 };
 

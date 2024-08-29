@@ -118,3 +118,9 @@ type BalanceInterface interface {
 // 	// 响应处理函数
 // 	ResponseHandler(resp *http.Response) (OpenAIResponse any, errWithCode *types.OpenAIErrorWithStatusCode)
 // }
+
+// Rerank接口
+type RerankInterface interface {
+	ProviderInterface
+	CreateRerank(request *types.RerankRequest) (*types.RerankResponse, *types.OpenAIErrorWithStatusCode)
+}

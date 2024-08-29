@@ -18,6 +18,7 @@ import (
 	"one-api/providers/gemini"
 	"one-api/providers/groq"
 	"one-api/providers/hunyuan"
+	"one-api/providers/jina"
 	"one-api/providers/lingyi"
 	"one-api/providers/midjourney"
 	"one-api/providers/minimax"
@@ -26,6 +27,7 @@ import (
 	"one-api/providers/ollama"
 	"one-api/providers/openai"
 	"one-api/providers/palm"
+	"one-api/providers/siliconflow"
 	"one-api/providers/stabilityAI"
 	"one-api/providers/suno"
 	"one-api/providers/tencent"
@@ -46,35 +48,38 @@ var providerFactories = make(map[int]ProviderFactory)
 
 // 在程序启动时，添加所有的供应商工厂
 func init() {
-	providerFactories[config.ChannelTypeOpenAI] = openai.OpenAIProviderFactory{}
-	providerFactories[config.ChannelTypeAzure] = azure.AzureProviderFactory{}
-	providerFactories[config.ChannelTypeAli] = ali.AliProviderFactory{}
-	providerFactories[config.ChannelTypeTencent] = tencent.TencentProviderFactory{}
-	providerFactories[config.ChannelTypeBaidu] = baidu.BaiduProviderFactory{}
-	providerFactories[config.ChannelTypeAnthropic] = claude.ClaudeProviderFactory{}
-	providerFactories[config.ChannelTypePaLM] = palm.PalmProviderFactory{}
-	providerFactories[config.ChannelTypeZhipu] = zhipu.ZhipuProviderFactory{}
-	providerFactories[config.ChannelTypeXunfei] = xunfei.XunfeiProviderFactory{}
-	providerFactories[config.ChannelTypeAzureSpeech] = azurespeech.AzureSpeechProviderFactory{}
-	providerFactories[config.ChannelTypeGemini] = gemini.GeminiProviderFactory{}
-	providerFactories[config.ChannelTypeBaichuan] = baichuan.BaichuanProviderFactory{}
-	providerFactories[config.ChannelTypeMiniMax] = minimax.MiniMaxProviderFactory{}
-	providerFactories[config.ChannelTypeDeepseek] = deepseek.DeepseekProviderFactory{}
-	providerFactories[config.ChannelTypeMistral] = mistral.MistralProviderFactory{}
-	providerFactories[config.ChannelTypeGroq] = groq.GroqProviderFactory{}
-	providerFactories[config.ChannelTypeBedrock] = bedrock.BedrockProviderFactory{}
-	providerFactories[config.ChannelTypeMidjourney] = midjourney.MidjourneyProviderFactory{}
-	providerFactories[config.ChannelTypeCloudflareAI] = cloudflareAI.CloudflareAIProviderFactory{}
-	providerFactories[config.ChannelTypeCohere] = cohere.CohereProviderFactory{}
-	providerFactories[config.ChannelTypeStabilityAI] = stabilityAI.StabilityAIProviderFactory{}
-	providerFactories[config.ChannelTypeCoze] = coze.CozeProviderFactory{}
-	providerFactories[config.ChannelTypeOllama] = ollama.OllamaProviderFactory{}
-	providerFactories[config.ChannelTypeMoonshot] = moonshot.MoonshotProviderFactory{}
-	providerFactories[config.ChannelTypeLingyi] = lingyi.LingyiProviderFactory{}
-	providerFactories[config.ChannelTypeHunyuan] = hunyuan.HunyuanProviderFactory{}
-	providerFactories[config.ChannelTypeSuno] = suno.SunoProviderFactory{}
-	providerFactories[config.ChannelTypeVertexAI] = vertexai.VertexAIProviderFactory{}
-
+	providerFactories = map[int]ProviderFactory{
+		config.ChannelTypeOpenAI:       openai.OpenAIProviderFactory{},
+		config.ChannelTypeAzure:        azure.AzureProviderFactory{},
+		config.ChannelTypeAli:          ali.AliProviderFactory{},
+		config.ChannelTypeTencent:      tencent.TencentProviderFactory{},
+		config.ChannelTypeBaidu:        baidu.BaiduProviderFactory{},
+		config.ChannelTypeAnthropic:    claude.ClaudeProviderFactory{},
+		config.ChannelTypePaLM:         palm.PalmProviderFactory{},
+		config.ChannelTypeZhipu:        zhipu.ZhipuProviderFactory{},
+		config.ChannelTypeXunfei:       xunfei.XunfeiProviderFactory{},
+		config.ChannelTypeAzureSpeech:  azurespeech.AzureSpeechProviderFactory{},
+		config.ChannelTypeGemini:       gemini.GeminiProviderFactory{},
+		config.ChannelTypeBaichuan:     baichuan.BaichuanProviderFactory{},
+		config.ChannelTypeMiniMax:      minimax.MiniMaxProviderFactory{},
+		config.ChannelTypeDeepseek:     deepseek.DeepseekProviderFactory{},
+		config.ChannelTypeMistral:      mistral.MistralProviderFactory{},
+		config.ChannelTypeGroq:         groq.GroqProviderFactory{},
+		config.ChannelTypeBedrock:      bedrock.BedrockProviderFactory{},
+		config.ChannelTypeMidjourney:   midjourney.MidjourneyProviderFactory{},
+		config.ChannelTypeCloudflareAI: cloudflareAI.CloudflareAIProviderFactory{},
+		config.ChannelTypeCohere:       cohere.CohereProviderFactory{},
+		config.ChannelTypeStabilityAI:  stabilityAI.StabilityAIProviderFactory{},
+		config.ChannelTypeCoze:         coze.CozeProviderFactory{},
+		config.ChannelTypeOllama:       ollama.OllamaProviderFactory{},
+		config.ChannelTypeMoonshot:     moonshot.MoonshotProviderFactory{},
+		config.ChannelTypeLingyi:       lingyi.LingyiProviderFactory{},
+		config.ChannelTypeHunyuan:      hunyuan.HunyuanProviderFactory{},
+		config.ChannelTypeSuno:         suno.SunoProviderFactory{},
+		config.ChannelTypeVertexAI:     vertexai.VertexAIProviderFactory{},
+		config.ChannelTypeSiliconflow:  siliconflow.SiliconflowProviderFactory{},
+		config.ChannelTypeJina:         jina.JinaProviderFactory{},
+	}
 }
 
 // 获取供应商

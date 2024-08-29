@@ -28,6 +28,7 @@ type ProviderConfig struct {
 	ImagesEdit          string
 	ImagesVariations    string
 	ModelList           string
+	Rerank              string
 }
 
 func (pc *ProviderConfig) SetAPIUri(customMapping map[string]interface{}) {
@@ -170,6 +171,8 @@ func (p *BaseProvider) GetAPIUri(relayMode int) string {
 		return p.Config.ImagesEdit
 	case config.RelayModeImagesVariations:
 		return p.Config.ImagesVariations
+	case config.RelayModeRerank:
+		return p.Config.Rerank
 	default:
 		return ""
 	}
