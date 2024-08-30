@@ -462,6 +462,55 @@
     "output": 7.143
   },
   {
+    "model": "glm-4-plus",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 3.5714,
+    "output": 3.5714
+  },
+  {
+    "model": "glm-4-0520",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 7.1429,
+    "output": 7.1429
+  },
+  {
+    "model": "glm-4-air",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 0.0714,
+    "output": 0.0714
+  },
+  {
+    "model": "glm-4-airx",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 0.7143,
+    "output": 0.7143
+  },
+  {
+    "model": "glm-4-long",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 0.0714,
+    "output": 0.0714
+  },
+  {
+    "model": "glm-4-flash",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "glm-4-alltools",
+    "type": "tokens",
+    "channel_type": 16,
+    "input": 7.1429,
+    "output": 7.1429
+  },
+  {
     "model": "qwen-max",
     "type": "tokens",
     "channel_type": 17,
