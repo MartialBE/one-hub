@@ -693,25 +693,53 @@
     "output": 5.25
   },
   {
+    "model": "gemini-1.5-pro-exp-0827",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1.75,
+    "output": 5.25
+  },
+  {
+    "model": "gemini-1.5-pro-exp-0801",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 1.75,
+    "output": 5.25
+  },
+  {
     "model": "gemini-1.5-flash-latest",
     "type": "tokens",
     "channel_type": 25,
-    "input": 0.175,
-    "output": 0.265
+    "input": 0.0375,
+    "output": 0.15
   },
   {
     "model": "gemini-1.5-flash",
     "type": "tokens",
     "channel_type": 25,
-    "input": 0.175,
-    "output": 0.265
+    "input": 0.0375,
+    "output": 0.15
   },
   {
     "model": "gemini-1.5-flash-001",
     "type": "tokens",
     "channel_type": 25,
-    "input": 0.175,
-    "output": 0.265
+    "input": 0.0375,
+    "output": 0.15
+  },
+  {
+    "model": "gemini-1.5-flash-exp-0827",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 0.0375,
+    "output": 0.15
+  },
+  {
+    "model": "gemini-1.5-flash-8b-exp-0827",
+    "type": "tokens",
+    "channel_type": 25,
+    "input": 0.0375,
+    "output": 0.15
   },
   {
     "model": "gemini-ultra",
