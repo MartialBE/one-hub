@@ -184,10 +184,6 @@ func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, er
 
 	tokenNum := 0
 
-	if request.System != "" {
-		tokenNum += common.GetTokenNum(tokenEncoder, request.System)
-	}
-
 	tokensPerMessage := 4
 
 	for _, message := range request.Messages {

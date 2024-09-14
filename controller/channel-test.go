@@ -15,6 +15,7 @@ import (
 	providers_base "one-api/providers/base"
 	"one-api/types"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -22,8 +23,12 @@ import (
 )
 
 func testChannel(channel *model.Channel, testModel string) (err error, openaiErr *types.OpenAIErrorWithStatusCode) {
-	if channel.TestModel == "" {
+	if testModel == "" && channel.TestModel == "" {
 		return errors.New("请填写测速模型后再试"), nil
+	}
+
+	if testModel == "" {
+		testModel = channel.TestModel
 	}
 
 	// 创建一个 http.Request
@@ -36,25 +41,18 @@ func testChannel(channel *model.Channel, testModel string) (err error, openaiErr
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	request := buildTestRequest()
-
-	if testModel != "" {
-		request.Model = testModel
-	} else {
-		request.Model = channel.TestModel
-	}
 
 	provider := providers.GetProvider(channel, c)
 	if provider == nil {
 		return errors.New("channel not implemented"), nil
 	}
 
-	newModelName, err := provider.ModelMappingHandler(request.Model)
+	newModelName, err := provider.ModelMappingHandler(testModel)
 	if err != nil {
 		return err, nil
 	}
 
-	request.Model = newModelName
+	request := buildTestRequest(newModelName)
 
 	chatProvider, ok := provider.(providers_base.ChatInterface)
 	if !ok {
@@ -76,7 +74,7 @@ func testChannel(channel *model.Channel, testModel string) (err error, openaiErr
 	return nil, nil
 }
 
-func buildTestRequest() *types.ChatCompletionRequest {
+func buildTestRequest(modelName string) *types.ChatCompletionRequest {
 	testRequest := &types.ChatCompletionRequest{
 		Messages: []types.ChatCompletionMessage{
 			{
@@ -84,10 +82,16 @@ func buildTestRequest() *types.ChatCompletionRequest {
 				Content: "You just need to output 'hi' next.",
 			},
 		},
-		Model:     "",
-		MaxTokens: 2,
-		Stream:    false,
+		Model:  modelName,
+		Stream: false,
 	}
+
+	if strings.HasPrefix(modelName, "o1-") {
+		testRequest.MaxCompletionTokens = 2
+	} else {
+		testRequest.MaxTokens = 2
+	}
+
 	return testRequest
 }
 

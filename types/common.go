@@ -3,9 +3,10 @@ package types
 import "encoding/json"
 
 type Usage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens,omitempty"`
-	TotalTokens      int `json:"total_tokens"`
+	PromptTokens            int `json:"prompt_tokens"`
+	CompletionTokens        int `json:"completion_tokens,omitempty"`
+	TotalTokens             int `json:"total_tokens"`
+	CompletionTokensDetails any `json:"completion_tokens_details,omitempty"`
 }
 
 type OpenAIError struct {
