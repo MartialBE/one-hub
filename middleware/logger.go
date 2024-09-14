@@ -1,3 +1,20 @@
+package middleware
+
+import (
+	"one-api/common/logger"
+	"time"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetUpLogger(server *gin.Engine) {
+
+	server.Use(GinzapWithConfig())
+}
+
 func GinzapWithConfig() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -77,3 +94,4 @@ func GinzapWithConfig() gin.HandlerFunc {
 		}
 	}
 }
+
