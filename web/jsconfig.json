@@ -4,6 +4,6 @@
     "module": "commonjs",
     "baseUrl": "./src"
   },
-  "include": ["src/**/*", "public/serviceWorker.js"],
+  "include": ["src/**/*", "src/serviceWorker.js"],
   "exclude": ["node_modules"]
 }
