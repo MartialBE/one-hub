@@ -199,7 +199,6 @@ const TopupCard = () => {
       }
     });
   
-    console.log(amount, appliedDiscount);
   };
 
   //交易汇率计算

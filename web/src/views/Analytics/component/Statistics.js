@@ -81,7 +81,6 @@ export default function Overview() {
         rechargeData.OderContent += key + ': ' + orderMap[key] + ' ';
       }
 
-      console.log(rechargeData.OderContent);
     }
 
     rechargeData.total = renderQuota(rechargeData.total);
