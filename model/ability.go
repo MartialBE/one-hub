@@ -5,8 +5,6 @@ import (
 	"one-api/common/config"
 	"strings"
 
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -20,33 +18,24 @@ type Ability struct {
 }
 
 func (channel *Channel) AddAbilities() error {
-	models := strings.Split(channel.Models, ",")
-	group := channel.Group // 直接使用 channel.Group，不再分割
-
-	// 准备批量插入的值
-	var values []string
-	var args []interface{}
-
-	for _, model := range models {
-			values = append(values, "(?, ?, ?, ?, ?, ?)")
-			args = append(args, group, model, channel.Id, channel.Status == config.ChannelStatusEnabled, channel.Priority, channel.Weight)
+	models_ := strings.Split(channel.Models, ",")
+	groups_ := strings.Split(channel.Group, ",")
+	abilities := make([]Ability, 0, len(models_))
+	for _, model := range models_ {
+		for _, group := range groups_ {
+			ability := Ability{
+				Group:     group,
+				Model:     model,
+				ChannelId: channel.Id,
+				Enabled:   channel.Status == config.ChannelStatusEnabled,
+				Priority:  channel.Priority,
+				Weight:    channel.Weight,
+			}
+			abilities = append(abilities, ability)
+		}
 	}
-
-	// 构造 SQL 语句
-	sql := fmt.Sprintf(`
-			INSERT INTO abilities (`+"`group`"+`, model, channel_id, enabled, priority, weight)
-			VALUES %s
-			ON DUPLICATE KEY UPDATE
-			`+"`group`"+` = VALUES(`+"`group`"+`),
-			enabled = VALUES(enabled),
-			priority = VALUES(priority),
-			weight = VALUES(weight)
-	`, strings.Join(values, ","))
-
-	// 执行 SQL
-	return DB.Exec(sql, args...).Error
+	return DB.Create(&abilities).Error
 }
-
 
 
 func (channel *Channel) DeleteAbilities() error {
