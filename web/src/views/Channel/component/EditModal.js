@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTheme } from '@mui/material/styles';
 import { API } from 'utils/api';
-import { showError, showSuccess, trims } from 'utils/common';
+import { showError, showSuccess, trims, showInfo } from 'utils/common';
 import {
   Dialog,
   DialogTitle,
@@ -90,6 +90,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const [batchAdd, setBatchAdd] = useState(false);
   const [providerModelsLoad, setProviderModelsLoad] = useState(false);
   const [hasTag, setHasTag] = useState(false);
+  const [priceModelsLoad, setPriceModelsLoad] = useState(false);
+
+
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -179,6 +182,43 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     }
     setProviderModelsLoad(false);
   };
+
+  const getPriceModels = async (values, setFieldValue) => {
+    setPriceModelsLoad(true);
+    try {
+      const [providerModelsRes, pricesRes] = await Promise.all([
+        API.post(`/api/channel/provider_models_list`, { ...values, models: '' }),
+        API.get('/api/prices')
+      ]);
+  
+      const providerData = providerModelsRes.data.data;
+      const pricesData = pricesRes.data.data;
+  
+      if (Array.isArray(providerData) && Array.isArray(pricesData)) {
+        let pricedModels = new Set(pricesData.map(price => price.model));
+        let modelList = providerData
+          .filter(model => pricedModels.has(model))
+          .map(model => ({
+            id: model,
+            group: t('channel_edit.customModelTip')
+          }));
+  
+        if (modelList.length > 0) {
+          setFieldValue('models', modelList);
+          showSuccess(t('channel_edit.priceModelsSuccess', { count: modelList.length }));
+        } else {
+          showInfo(t('channel_edit.noPriceModelsFound'));
+        }
+      } else {
+        showError(t('channel_edit.invalidDataFormat'));
+      }
+    } catch (error) {
+      showError(error.message);
+    }
+    setPriceModelsLoad(false);
+  };
+  
+  
 
   const fetchModels = async () => {
     try {
@@ -638,6 +678,17 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       </LoadingButton>
                     </Tooltip>
                   )}
+                  <Tooltip title={t('channel_edit.getPriceModels')} placement="top">
+                    <LoadingButton
+                      loading={priceModelsLoad}
+                      disabled={hasTag}
+                      onClick={() => {
+                        getPriceModels(values, setFieldValue);
+                      }}
+                    >
+                      {t('channel_edit.getPriceModels')}
+                    </LoadingButton>
+                  </Tooltip>
                 </ButtonGroup>
               </Container>
               {!isTag && (

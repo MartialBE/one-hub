@@ -152,7 +152,11 @@
     "requiredModels": "模型 不能为空",
     "requiredGroup": "用户组 不能为空",
     "requiredBaseUrl": "渠道API地址 不能为空",
-    "validJson": "必须是有效的JSON字符串"
+    "validJson": "必须是有效的JSON字符串",
+    "getPriceModels": "从渠道获取已有价格模型",
+    "priceModelsSuccess": "成功获取 {{count}} 个已有价格模型",
+    "noPriceModelsFound": "没有找到匹配的已有价格模型",
+    "invalidDataFormat": "无效的数据格式"
   },
   "token_index": {
     "token": "Key",

@@ -764,7 +764,11 @@
     "requiredKey": "Key cannot be empty",
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
-    "validJson": "Must be a valid JSON string"
+    "validJson": "Must be a valid JSON string",
+    "getPriceModels": "Get Existing Priced Models from Channel",
+    "priceModelsSuccess": "Successfully retrieved {{count}} existing priced models",
+    "noPriceModelsFound": "No matching priced models found",
+    "invalidDataFormat": "Invalid data format"
   },
   "common": {
     "cancel": "Cancel",
