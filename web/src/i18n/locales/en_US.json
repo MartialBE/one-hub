@@ -767,6 +767,8 @@
     "validJson": "Must be a valid JSON string",
     "getPriceModels": "Get Existing Priced Models from Channel",
     "priceModelsSuccess": "Successfully retrieved {{count}} existing priced models",
+    "missingPriceModelsCopied": "{{count}} models are missing price information. These model names have been copied to the clipboard.",
+    "missingPriceModelsNoCopy": "{{count}} models are missing price information. Unable to copy to clipboard, please check browser permissions.",
     "noPriceModelsFound": "No matching priced models found",
     "invalidDataFormat": "Invalid data format"
   },

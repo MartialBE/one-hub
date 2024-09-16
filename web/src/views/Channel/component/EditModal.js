@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTheme } from '@mui/material/styles';
 import { API } from 'utils/api';
-import { showError, showSuccess, trims, showInfo } from 'utils/common';
+import { showError, showSuccess, trims, showInfo, showWarning } from 'utils/common';
 import {
   Dialog,
   DialogTitle,
@@ -203,9 +203,27 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
             group: t('channel_edit.customModelTip')
           }));
   
+        // 找出在渠道列表中存在但在价格列表中不存在的模型
+        let missingPriceModels = providerData.filter(model => !pricedModels.has(model));
+  
         if (modelList.length > 0) {
           setFieldValue('models', modelList);
           showSuccess(t('channel_edit.priceModelsSuccess', { count: modelList.length }));
+          
+          // 如果有缺失价格的模型，复制到剪贴板并显示提示
+          if (missingPriceModels.length > 0) {
+            const missingModelsText = missingPriceModels.join('\n');
+            navigator.clipboard.writeText(missingModelsText).then(() => {
+              showInfo(t('channel_edit.missingPriceModelsCopied', { 
+                count: missingPriceModels.length
+              }));
+            }).catch(err => {
+              console.error('Failed to copy missing models: ', err);
+              showWarning(t('channel_edit.missingPriceModelsNoCopy', { 
+                count: missingPriceModels.length
+              }));
+            });
+          }
         } else {
           showInfo(t('channel_edit.noPriceModelsFound'));
         }
@@ -217,6 +235,8 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     }
     setPriceModelsLoad(false);
   };
+  
+  
   
   
 

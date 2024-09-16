@@ -155,6 +155,8 @@
     "validJson": "必须是有效的JSON字符串",
     "getPriceModels": "从渠道获取已有价格模型",
     "priceModelsSuccess": "成功获取 {{count}} 个已有价格模型",
+    "missingPriceModelsCopied": "有 {{count}} 个模型缺少价格信息。这些模型名称已复制到剪贴板。",
+    "missingPriceModelsNoCopy": "有 {{count}} 个模型缺少价格信息。无法复制到剪贴板，请检查浏览器权限。",
     "noPriceModelsFound": "没有找到匹配的已有价格模型",
     "invalidDataFormat": "无效的数据格式"
   },
