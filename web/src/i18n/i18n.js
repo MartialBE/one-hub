@@ -9,7 +9,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'zh_CN',
-    debug: true,
+    debug: false,
     lng: 'zh-CN',
     interpolation: {
       escapeValue: false
