@@ -347,7 +347,7 @@
     "type": "tokens",
     "channel_type": 14,
     "input": 7.5,
-    "output": 22.5
+    "output": 37.5
   },
   {
     "model": "claude-3-sonnet-20240229",
