@@ -43,7 +43,6 @@ export function showError(error) {
         default:
           enqueueSnackbar('错误：' + error.message, getSnackbarOptions('ERROR'));
       }
-      return;
     }
   } else {
     enqueueSnackbar('错误：' + error, getSnackbarOptions('ERROR'));
@@ -122,8 +121,7 @@ export async function getOIDCEndpoint() {
   }
 }
 
-
-export async function onOIDCAuthClicked( openInNewTab = false) {
+export async function onOIDCAuthClicked(openInNewTab = false) {
   const url = await getOIDCEndpoint();
   if (!url) return;
   if (openInNewTab) {
@@ -257,7 +255,7 @@ export function trims(values) {
 }
 
 export function getChatLinks(filterShow = false) {
-  let links = [];
+  let links;
   let siteInfo = JSON.parse(localStorage.getItem('siteInfo'));
   let chatLinks = JSON.parse(siteInfo?.chat_links || '[]');
 

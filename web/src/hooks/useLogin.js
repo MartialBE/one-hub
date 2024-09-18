@@ -50,7 +50,6 @@ const useLogin = () => {
     }
   };
 
-
   const oidcLogin = async (code, state) => {
     try {
       const res = await API.get(`/api/oauth/oidc?code=${code}&state=${state}`);
@@ -72,7 +71,6 @@ const useLogin = () => {
       return { success: false, message: '' };
     }
   };
-
 
   const larkLogin = async (code, state) => {
     try {

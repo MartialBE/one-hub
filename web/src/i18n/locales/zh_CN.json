@@ -650,7 +650,7 @@
         "subTitle": "用以配置标准OIDC授权登录系统",
         "alert1": "主页链接填",
         "alert2": "，重定向 URL 填 ",
-        "clientId": "客户端ID（AppID）",
+        "clientId": "客户端ID（Client ID）",
         "clientIdPlaceholder": "请输入客户端ID",
         "clientSecret": "客户端密钥(Secret)",
         "clientSecretPlaceholder": "敏感信息不会发送到前端显示",
