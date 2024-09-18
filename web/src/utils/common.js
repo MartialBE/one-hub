@@ -107,6 +107,32 @@ export async function onGitHubOAuthClicked(github_client_id, openInNewTab = fals
   }
 }
 
+export async function getOIDCEndpoint() {
+  try {
+    const res = await API.get('/api/oauth/enpoint');
+    const { success, message, data } = res.data;
+    if (success) {
+      return data;
+    } else {
+      showError(message);
+      return '';
+    }
+  } catch (error) {
+    return '';
+  }
+}
+
+
+export async function onOIDCAuthClicked( openInNewTab = false) {
+  const url = await getOIDCEndpoint();
+  if (!url) return;
+  if (openInNewTab) {
+    window.open(url);
+  } else {
+    window.location.href = url;
+  }
+}
+
 export async function onLarkOAuthClicked(lark_client_id) {
   const state = await getOAuthState();
   if (!state) return;
