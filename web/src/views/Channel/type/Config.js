@@ -100,8 +100,41 @@ const typeConfig = {
   },
   15: {
     input: {
-      models: ['ERNIE-4.0', 'ERNIE-3.5-8K', 'ERNIE-Bot-8K', 'Embedding-V1'],
-      test_model: 'ERNIE-3.5-8K'
+      models: [
+        'ERNIE-4.0-Turbo-8K',
+        'ERNIE-4.0-8K-Latest',
+        'ERNIE-4.0-8K-0613',
+        'ERNIE-3.5-8K-0613',
+        'ERNIE-Bot-turbo',
+        'ERNIE-Lite-8K-0922',
+        'ERNIE-Lite-8K',
+        'ERNIE-Lite-8K-0308',
+        'ERNIE-3.5-8K',
+        'ERNIE-Bot',
+        'ERNIE-4.0-8K',
+        'ERNIE-4.0-8K-Preview',
+        'ERNIE-4.0-8K-Preview-0518',
+        'ERNIE-4.0-8K-0329',
+        'ERNIE-4.0-8K-0104',
+        'ERNIE-Bot-4',
+        'ERNIE-Bot-8k',
+        'ERNIE-3.5-128K',
+        'ERNIE-3.5-8K-preview',
+        'ERNIE-3.5-8K-0329',
+        'ERNIE-3.5-4K-0205',
+        'ERNIE-3.5-8K-0205',
+        'ERNIE-3.5-8K-1222',
+        'ERNIE-Speed',
+        'ERNIE-Speed-8K',
+        'ERNIE-Speed-128K',
+        'ERNIE-Tiny-8K',
+        'ERNIE-Function-8K',
+        'ERNIE-Character-8K',
+        'ERNIE-Character-Fiction-8K',
+        'ERNIE-Bot-turbo-AI',
+        'Embedding-V1'
+      ],
+      test_model: 'ERNIE-Speed'
     },
     prompt: {
       key: '按照如下格式输入：APIKey|SecretKey'
