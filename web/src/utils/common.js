@@ -108,7 +108,7 @@ export async function onGitHubOAuthClicked(github_client_id, openInNewTab = fals
 
 export async function getOIDCEndpoint() {
   try {
-    const res = await API.get('/api/oauth/enpoint');
+    const res = await API.get('/api/oauth/endpoint');
     const { success, message, data } = res.data;
     if (success) {
       return data;
