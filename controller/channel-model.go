@@ -50,9 +50,25 @@ func GetModelList(c *gin.Context) {
 		return
 	}
 
+	// 去除重复的模型名称
+	uniqueModels := removeDuplicates(modelList)
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    modelList,
+		"data":    uniqueModels,
 	})
+}
+
+// 辅助函数：去除切片中的重复元素
+func removeDuplicates(slice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range slice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
