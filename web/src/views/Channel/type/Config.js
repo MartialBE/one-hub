@@ -454,6 +454,17 @@ const typeConfig = {
       test_model: ''
     },
     modelGroup: 'Jina'
+  },
+  49: {
+    input: {
+      models: ['gpt-4o', 'gpt-4o-mini', 'text-embedding-3-large', 'text-embedding-3-small', 'Cohere-command-r-plus', 'Cohere-command-r'],
+      test_model: 'gpt-4o-mini'
+    },
+    prompt: {
+      key: '密钥信息请参考https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens',
+      base_url: 'https://models.inference.ai.azure.com'
+    },
+    modelGroup: 'Github'
   }
 };
 
