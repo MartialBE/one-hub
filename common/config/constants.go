@@ -202,58 +202,60 @@ const (
 	ChannelTypeFlux           = 46
 	ChannelTypeJina           = 47
 	ChannelTypeRerank         = 48
+	ChannelTypeGithub         = 49
 )
 
 var ChannelBaseURLs = []string{
-	"",                                    // 0
-	"https://api.openai.com",              // 1
-	"https://oa.api2d.net",                // 2
-	"",                                    // 3
-	"https://api.closeai-proxy.xyz",       // 4
-	"https://api.openai-sb.com",           // 5
-	"https://api.openaimax.com",           // 6
-	"https://api.ohmygpt.com",             // 7
-	"",                                    // 8
-	"https://api.caipacity.com",           // 9
-	"https://api.aiproxy.io",              // 10
-	"",                                    // 11
-	"https://api.api2gpt.com",             // 12
-	"https://api.aigc2d.com",              // 13
-	"https://api.anthropic.com",           // 14
-	"https://aip.baidubce.com",            // 15
-	"https://open.bigmodel.cn",            // 16
-	"https://dashscope.aliyuncs.com",      // 17
-	"",                                    // 18
-	"https://ai.360.cn",                   // 19
-	"https://openrouter.ai/api",           // 20
-	"https://api.aiproxy.io",              // 21
-	"https://fastgpt.run/api/openapi",     // 22
-	"https://hunyuan.cloud.tencent.com",   //23
-	"",                                    //24
-	"",                                    //25
-	"https://api.baichuan-ai.com",         //26
-	"https://api.minimax.chat/v1",         //27
-	"https://api.deepseek.com",            //28
-	"https://api.moonshot.cn",             //29
-	"https://api.mistral.ai",              //30
-	"https://api.groq.com/openai",         //31
-	"",                                    //32
-	"https://api.lingyiwanwu.com",         //33
-	"",                                    //34
-	"",                                    //35
-	"https://api.cohere.ai/v1",            //36
-	"https://api.stability.ai/v2beta",     //37
-	"https://api.coze.com/open_api",       //38
-	"",                                    //39
-	"https://hunyuan.tencentcloudapi.com", //40
-	"",                                    //41
-	"",                                    //42
-	"",                                    //43
-	"https://api.ideogram.ai",             //44
-	"https://api.siliconflow.cn",          //45
-	"",                                    //46
-	"https://api.jina.ai",                 //47
-	"",                                    //48
+	"",                                      // 0
+	"https://api.openai.com",                // 1
+	"https://oa.api2d.net",                  // 2
+	"",                                      // 3
+	"https://api.closeai-proxy.xyz",         // 4
+	"https://api.openai-sb.com",             // 5
+	"https://api.openaimax.com",             // 6
+	"https://api.ohmygpt.com",               // 7
+	"",                                      // 8
+	"https://api.caipacity.com",             // 9
+	"https://api.aiproxy.io",                // 10
+	"",                                      // 11
+	"https://api.api2gpt.com",               // 12
+	"https://api.aigc2d.com",                // 13
+	"https://api.anthropic.com",             // 14
+	"https://aip.baidubce.com",              // 15
+	"https://open.bigmodel.cn",              // 16
+	"https://dashscope.aliyuncs.com",        // 17
+	"",                                      // 18
+	"https://ai.360.cn",                     // 19
+	"https://openrouter.ai/api",             // 20
+	"https://api.aiproxy.io",                // 21
+	"https://fastgpt.run/api/openapi",       // 22
+	"https://hunyuan.cloud.tencent.com",     //23
+	"",                                      //24
+	"",                                      //25
+	"https://api.baichuan-ai.com",           //26
+	"https://api.minimax.chat/v1",           //27
+	"https://api.deepseek.com",              //28
+	"https://api.moonshot.cn",               //29
+	"https://api.mistral.ai",                //30
+	"https://api.groq.com/openai",           //31
+	"",                                      //32
+	"https://api.lingyiwanwu.com",           //33
+	"",                                      //34
+	"",                                      //35
+	"https://api.cohere.ai/v1",              //36
+	"https://api.stability.ai/v2beta",       //37
+	"https://api.coze.com/open_api",         //38
+	"",                                      //39
+	"https://hunyuan.tencentcloudapi.com",   //40
+	"",                                      //41
+	"",                                      //42
+	"",                                      //43
+	"https://api.ideogram.ai",               //44
+	"https://api.siliconflow.cn",            //45
+	"",                                      //46
+	"https://api.jina.ai",                   //47
+	"",                                      //48
+	"https://models.inference.ai.azure.com", //49
 }
 
 const (
