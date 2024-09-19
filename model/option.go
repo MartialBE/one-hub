@@ -57,7 +57,13 @@ func InitOptionMap() {
 	config.OptionMap["Logo"] = config.Logo
 	config.OptionMap["ServerAddress"] = ""
 	config.OptionMap["GitHubClientId"] = ""
-	config.OptionMap["GitHubClientSecret"] = ""
+
+	config.OptionMap["OIDCClientId"] = ""
+	config.OptionMap["OIDCClientSecret"] = ""
+	config.OptionMap["OIDCIssuer"] = ""
+	config.OptionMap["OIDCScopes"] = ""
+	config.OptionMap["OIDCUsernameClaims"] = ""
+
 	config.OptionMap["WeChatServerAddress"] = ""
 	config.OptionMap["WeChatServerToken"] = ""
 	config.OptionMap["WeChatAccountQRCodeImageURL"] = ""
@@ -146,6 +152,7 @@ var optionBoolMap = map[string]*bool{
 	"PasswordLoginEnabled":           &config.PasswordLoginEnabled,
 	"EmailVerificationEnabled":       &config.EmailVerificationEnabled,
 	"GitHubOAuthEnabled":             &config.GitHubOAuthEnabled,
+	"OIDCAuthEnabled":                &config.OIDCAuthEnabled,
 	"WeChatAuthEnabled":              &config.WeChatAuthEnabled,
 	"LarkAuthEnabled":                &config.LarkAuthEnabled,
 	"TurnstileCheckEnabled":          &config.TurnstileCheckEnabled,
@@ -168,6 +175,11 @@ var optionStringMap = map[string]*string{
 	"ServerAddress":               &config.ServerAddress,
 	"GitHubClientId":              &config.GitHubClientId,
 	"GitHubClientSecret":          &config.GitHubClientSecret,
+	"OIDCClientId":                &config.OIDCClientId,
+	"OIDCClientSecret":            &config.OIDCClientSecret,
+	"OIDCIssuer":                  &config.OIDCIssuer,
+	"OIDCScopes":                  &config.OIDCScopes,
+	"OIDCUsernameClaims":          &config.OIDCUsernameClaims,
 	"Footer":                      &config.Footer,
 	"SystemName":                  &config.SystemName,
 	"Logo":                        &config.Logo,

@@ -577,6 +577,7 @@
         "passwordRegister": "允许通过密码进行注册",
         "emailVerification": "通过密码注册时需要进行邮箱验证",
         "gitHubOAuth": "允许通过 GitHub 账户登录 & 注册",
+        "oidcAuth": "允许通过 OIDC 账户登录 & 注册",
         "weChatAuth": "允许通过微信登录 & 注册",
         "larkAuth": "允许通过飞书登录 & 注册",
         "registerEnabled": "允许新用户注册（此项为否时，新用户将无法以任何方式进行注册）",
@@ -644,6 +645,24 @@
         "appSecretPlaceholder": "敏感信息不会发送到前端显示",
         "saveButton": "保存飞书 OAuth 设置"
       },
+      "configureOIDCAuthorization": {
+        "title": "配置OIDC统一授权系统",
+        "subTitle": "用以配置标准OIDC授权登录系统",
+        "alert1": "主页链接填",
+        "alert2": "，重定向 URL 填 ",
+        "clientId": "客户端ID（Client ID）",
+        "clientIdPlaceholder": "请输入客户端ID",
+        "clientSecret": "客户端密钥(Secret)",
+        "clientSecretPlaceholder": "敏感信息不会发送到前端显示",
+        "issuer": "OIDC发行者(Issuer)",
+        "issuerPlaceholder": "请输入OIDC发行者",
+        "scopes": "权限范围（Scopes）",
+        "scopesPlaceholder": "请输入权限范围（用英文逗号分隔）,通常为'openid,email,profile'",
+        "usernameClaims": "用户名声明（Claims）",
+        "usernameClaimsPlaceholder": "请输入用户名声明(例如username)",
+        "saveButton": "保存OIDC设置"
+      },
+
       "configureTurnstile": {
         "title": "配置 Turnstile",
         "subTitle": "用以支持用户校验，",
@@ -723,10 +742,16 @@
     "githubError": "操作失败，重定向至登录界面中...",
     "githubCountError": "出现错误，第 {{count}} 次重试中...",
     "githubLogin": "GitHub 登录",
+
+    "oidcError": "操作失败，重定向至登录界面中...",
+    "oidcCountError": "出现错误，第 {{count}} 次重试中...",
+    "oidcLogin": "OIDC 登录",
+
     "larkLogin": "飞书 登录",
     "passwordRest": "密码重置确认",
     "useGithubLogin": "使用 Github 登录",
     "useWechatLogin": "使用 Wechat 登录",
+    "useOIDCLogin": "使用 OIDC 登录",
     "useLarkLogin": "使用飞书登录"
   },
   "description": "All in one 的 OpenAI 接口\n整合各种 API 访问方式\n一键部署，开箱即用",

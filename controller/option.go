@@ -51,6 +51,14 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case "OIDCAuthEnabled":
+		if option.Value == "true" && (config.OIDCClientId == "" || config.OIDCClientSecret == "" || config.OIDCIssuer == "" || config.OIDCScopes == "" || config.OIDCUsernameClaims == "") {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "无法启用 OIDC，请先填入OIDC信息！",
+			})
+			return
+		}
 	case "EmailDomainRestrictionEnabled":
 		if option.Value == "true" && len(config.EmailDomainWhitelist) == 0 {
 			c.JSON(http.StatusOK, gin.H{
