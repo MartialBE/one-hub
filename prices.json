@@ -1251,5 +1251,54 @@
     "channel_type": 38,
     "input": 0,
     "output": 0
+  },
+  {
+    "model": "gpt-4o",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "gpt-4o-mini",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "gpt-o1-mini",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "gpt-o1-preview",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "text-embedding-3-large",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "Cohere-command-r-plus",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
+  },
+  {
+    "model": "Cohere-command-r",
+    "type": "tokens",
+    "channel_type": 49,
+    "input": 0,
+    "output": 0
   }
 ]
