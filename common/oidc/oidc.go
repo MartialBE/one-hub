@@ -7,6 +7,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/logger"
 	"strings"
+	"sync"
 )
 
 type OIDCConfig struct {
@@ -16,14 +17,14 @@ type OIDCConfig struct {
 	LoginURL     func(state string) string
 }
 
-var OIDCConfigInstance *OIDCConfig
+var oidcConfigInstance *OIDCConfig
 
 // 初始化OIDC配置
 func InitOIDCConfig() error {
 	if !config.OIDCAuthEnabled {
 		return nil
 	}
-	logger.SysError("OIDC功能启用")
+	logger.SysLog("OIDC功能启用")
 	provider, err := oidc.NewProvider(context.Background(), config.OIDCIssuer)
 	if err != nil {
 		logger.SysError("OIDC配置错误, err:" + err.Error())
@@ -40,7 +41,7 @@ func InitOIDCConfig() error {
 
 	verifier := provider.Verifier(&oidc.Config{ClientID: oauth2Config.ClientID})
 
-	OIDCConfigInstance = &OIDCConfig{
+	oidcConfigInstance = &OIDCConfig{
 		Provider:     provider,
 		OAuth2Config: oauth2Config,
 		Verifier:     verifier,
@@ -50,4 +51,20 @@ func InitOIDCConfig() error {
 	}
 
 	return nil
+}
+
+// 确保线程安全
+var mu sync.Mutex
+
+// 获取 OIDCConfig 实例，如果未初始化则进行初始化
+func GetOIDCConfigInstance() (*OIDCConfig, error) {
+	mu.Lock()
+	defer mu.Unlock()
+	if oidcConfigInstance == nil {
+		err := InitOIDCConfig()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return oidcConfigInstance, nil
 }

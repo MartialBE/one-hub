@@ -15,11 +15,28 @@ import (
 )
 
 func OIDCEndpoint(c *gin.Context) {
+	if !config.OIDCAuthEnabled {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "管理员未开启通过OIDC登录",
+			"success": false,
+		})
+		return
+	}
+	oidcConfig, err := oidc.GetOIDCConfigInstance()
+	if err != nil {
+		logger.SysError("获取 OIDC 配置失败, err: " + err.Error())
+		c.JSON(http.StatusOK, gin.H{
+			"message": "获取 OIDC 配置失败",
+			"success": false,
+		})
+		return
+	}
+
 	session := sessions.Default(c)
 	state := utils.GetRandomString(12)
 	session.Set("oauth_state", state)
-	loginURL := oidc.OIDCConfigInstance.LoginURL(state)
-	err := session.Save()
+	loginURL := oidcConfig.LoginURL(state)
+	err = session.Save()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -51,18 +68,26 @@ func OIDCAuth(c *gin.Context) {
 		})
 		return
 	}
-
+	oidcConfig, err := oidc.GetOIDCConfigInstance()
+	if err != nil {
+		logger.SysError("获取 OIDC 配置失败, err: " + err.Error())
+		c.JSON(http.StatusOK, gin.H{
+			"message": "获取 OIDC 配置失败",
+			"success": false,
+		})
+		return
+	}
 	// 从请求中获取授权码
 	code := c.Query("code")
 	// 使用授权码换取ID Token
 	ctx := context.Background()
-	token, err := oidc.OIDCConfigInstance.OAuth2Config.Exchange(ctx, code)
+	token, err := oidcConfig.OAuth2Config.Exchange(ctx, code)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Failed to exchange token: %v", err)
 		return
 	}
 	// 验证ID Token
-	idToken, err := oidc.OIDCConfigInstance.Verifier.Verify(ctx, token.Extra("id_token").(string))
+	idToken, err := oidcConfig.Verifier.Verify(ctx, token.Extra("id_token").(string))
 	if err != nil {
 		c.String(http.StatusBadRequest, "Failed to verify ID token: %v", err)
 		return
