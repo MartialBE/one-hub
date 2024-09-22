@@ -28,14 +28,16 @@ import i18n from 'i18n/i18n';
 const App = () => {
   const dispatch = useDispatch();
   const customization = useSelector((state) => state.customization);
-  const storedLanguage = localStorage.getItem('appLanguage') || 'zh_CN';
-  i18n.changeLanguage(storedLanguage);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       dispatch({ type: SET_THEME, theme: storedTheme });
     }
+
+    // 将语言更改移到这里
+    const storedLanguage = localStorage.getItem('appLanguage') || 'zh_CN';
+    i18n.changeLanguage(storedLanguage);
   }, [dispatch]);
 
   return (

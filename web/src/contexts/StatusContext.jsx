@@ -26,10 +26,10 @@ const StatusProvider = ({ children }) => {
         localStorage.setItem('display_in_currency', data.display_in_currency);
         dispatch({ type: SET_SITE_INFO, payload: data });
         if (
-          data.version !== process.env.REACT_APP_VERSION &&
+          data.version !== import.meta.env.VITE_APP_VERSION &&
           data.version !== 'v0.0.0' &&
           data.version !== '' &&
-          process.env.REACT_APP_VERSION !== ''
+          import.meta.env.VITE_APP_VERSION !== ''
         ) {
           showNotice(t('common.unableServerTip', { version: data.version }));
         }

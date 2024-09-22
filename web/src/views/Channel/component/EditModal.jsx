@@ -40,7 +40,7 @@ import useCustomizeT from 'hooks/useCustomizeT';
 
 import { PreCostType } from '../type/other';
 
-const pluginList = require('../type/Plugin.json');
+import pluginList from '../type/Plugin.json';
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 

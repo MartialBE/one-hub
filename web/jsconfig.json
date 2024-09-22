@@ -4,6 +4,6 @@
     "module": "commonjs",
     "baseUrl": "./src"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vite.config.mjs"],
   "exclude": ["node_modules"]
 }

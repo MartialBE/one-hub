@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { StatusType } from './OrderTableRow';
 import { useTranslation } from 'react-i18next';
-require('dayjs/locale/zh-cn');
+import 'dayjs/locale/zh-cn';
 // ----------------------------------------------------------------------
 
 export default function OrderTableToolBar({ filterName, handleFilterName }) {

@@ -17,6 +17,7 @@
     "@mui/x-data-grid": "^6.19.4",
     "@mui/x-date-pickers": "^6.18.5",
     "@tabler/icons-react": "^2.46.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "apexcharts": "3.35.3",
     "axios": "^0.28.0",
     "dayjs": "^1.11.10",
@@ -40,19 +41,21 @@
     "react-redux": "^9.1.0",
     "react-router": "6.21.3",
     "react-router-dom": "6.21.3",
-    "react-scripts": "^5.0.1",
     "react-turnstile": "^1.1.2",
     "redux": "^5.0.1",
+    "vite": "^5.4.7",
+    "vite-jsconfig-paths": "^2.0.1",
+    "web-vitals": "^4.2.3",
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "dev": "vite",
+    "start": "vite preview",
+    "build": "vite build --outDir build",
     "i18n": "lobe-i18n",
-    "eject": "react-scripts eject",
-    "lint:fix": "eslint --fix \"./**/*.{js,jsx,ts,tsx}\"",
-    "fm:fix": "prettier --write \"./**/*.{js,jsx}\""
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
+    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "eslintConfig": {
     "extends": [

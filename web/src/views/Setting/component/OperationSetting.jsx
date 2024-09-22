@@ -10,7 +10,7 @@ import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
 import { LoadStatusContext } from 'contexts/StatusContext';
 import { useTranslation } from 'react-i18next';
-require('dayjs/locale/zh-cn');
+import 'dayjs/locale/zh-cn';
 
 const OperationSetting = () => {
   const { t } = useTranslation();

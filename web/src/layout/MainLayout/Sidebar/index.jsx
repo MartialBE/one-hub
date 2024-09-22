@@ -42,7 +42,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
           <MenuCard />
           <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
             <Chip
-              label={process.env.REACT_APP_VERSION || t('menu.unknownVersion')}
+              label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
               disabled
               chipcolor="secondary"
               size="small"
@@ -57,7 +57,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
           <MenuCard />
           <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
             <Chip
-              label={process.env.REACT_APP_VERSION || t('menu.unknownVersion')}
+              label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
               disabled
               chipcolor="secondary"
               size="small"

@@ -121,16 +121,16 @@ const OtherSetting = () => {
 
   const checkUpdate = async () => {
     try {
-      if (!process.env.REACT_APP_VERSION) {
+      if (!import.meta.env.VITE_APP_VERSION) {
         showError('无法获取当前版本号');
         return;
       }
 
       // 如果版本前缀是v开头的
-      if (process.env.REACT_APP_VERSION.startsWith('v')) {
+      if (import.meta.env.VITE_APP_VERSION.startsWith('v')) {
         const res = await API.get('https://api.github.com/repos/MartialBE/one-api/releases/latest');
         const { tag_name, body } = res.data;
-        if (tag_name === process.env.REACT_APP_VERSION) {
+        if (tag_name === import.meta.env.VITE_APP_VERSION) {
           showSuccess(`已是最新版本：${tag_name}`);
         } else {
           setUpdateData({
@@ -143,7 +143,7 @@ const OtherSetting = () => {
         const res = await API.get('https://api.github.com/repos/MartialBE/one-api/commits/main');
         const { sha, commit } = res.data;
         const newVersion = 'dev-' + sha.substr(0, 7);
-        if (newVersion === process.env.REACT_APP_VERSION) {
+        if (newVersion === import.meta.env.VITE_APP_VERSION) {
           showSuccess(`已是最新版本：${newVersion}`);
         } else {
           setUpdateData({
@@ -165,7 +165,7 @@ const OtherSetting = () => {
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
               <Typography variant="h6" gutterBottom>
-                {t('setting_index.otherSettings.generalSettings.currentVersion')}: {process.env.REACT_APP_VERSION}
+                {t('setting_index.otherSettings.generalSettings.currentVersion')}: {import.meta.env.VITE_APP_VERSION}
               </Typography>
               <Button variant="contained" onClick={checkUpdate}>
                 {t('setting_index.otherSettings.generalSettings.checkUpdate')}

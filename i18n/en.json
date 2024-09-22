@@ -951,7 +951,7 @@
   "无法获取当前版本号": "Unable to get the current version number",
   "已是最新版本：${tag_name}": "The latest version: ${tag_name}",
   "已是最新版本：${newVersion}": "The latest version: ${newVersion}",
-  "当前版本：{process.env.REACT_APP_VERSION}": "Current version: {process.env.REACT_APP_VERSION}",
+  "当前版本：{process.env.VITE_APP_VERSION}": "Current version: {process.env.VITE_APP_VERSION}",
   "公告": "Announcement",
   "在此输入新的公告内容，支持 Markdown & HTML 代码": "Enter the new announcement content here, supports Markdown & HTML code",
   "保存公告": "Save Announcement",

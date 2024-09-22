@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { OutlinedInput, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { PaymentType } from '../type/Config';
-require('dayjs/locale/zh-cn');
+import 'dayjs/locale/zh-cn';
 import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 
