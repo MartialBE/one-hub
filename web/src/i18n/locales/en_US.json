@@ -78,7 +78,10 @@
     "requiredKey": "Key cannot be empty",
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
-    "validJson": "Must be a valid JSON string"
+    "validJson": "Must be a valid JSON string",
+    "addModelMapping": "Add model mapping",
+    "modelMappingKey": "User request model",
+    "modelMappingValue": "Actual forwarding model"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -973,7 +976,7 @@
   "代理地址": "proxy address",
   "代码执行": "code execution",
   "位置/区域": "location/area",
-  "你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道": "You can add a label to your channel. After labeling, you can manage channels in batches through the label.",
+  "你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道，注意：设置标签后某些设置只能通过渠道标签修改，无法在渠道列表中修改。": "You can tag your channel. After tagging, you can manage channels in batches through tags. Note: after setting tags, some settings can only be modified through channel tags and cannot be changed in the channel list.",
   "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启": "When using the code execution function, the calculation of tokens is inaccurate after it is turned on. It is recommended that individuals use it to turn it on.",
   "使用网页搜索功能，对用户输入的内容进行搜索": "Use the web search function to search for content entered by the user",
   "其他参数": "Other parameters",
@@ -1029,7 +1032,7 @@
   "请输入插件参数，即 X-DashScope-Plugin 请求头的取值": "Please enter the plug-in parameters, that is, the value of the X-DashScope-Plugin request header",
   "请输入渠道对应的鉴权密钥": "Please enter the authentication key corresponding to the channel",
   "请输入版本号，例如：v1": "Please enter the version number, for example: v1",
-  "请输入要修改的模型映射关系，格式为：api请求模型ID:实际转发给渠道的模型ID，使用JSON数组表示，例如：{\"gpt-3.5-turbo-16k\": \"gpt-3.5-turbo-16k-0613\"}": "Please enter the model mapping relationship to be modified. The format is: api request model ID: the model ID actually forwarded to the channel, represented by a JSON array, for example: {\"gpt-3.5-turbo-16k\": \"gpt-3.5-turbo- \n16k-0613\"}",
+  "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。": "Model mapping relationship: for example, when user requests model A, the actual model forwarded to the channel is model B.",
   "请输入默认API版本，例如：2024-05-01-preview": "Please enter the default API version, for example: 2024-05-01-preview",
   "请选择渠道类型": "Please select channel type",
   "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的": "Please select the model supported by this channel. You can also enter the wildcard character * to match the model. For example: gpt-3.5*, which means that all models starting with gpt-3.5 are supported. The * sign can only be used in the last digit, and there must be characters in front of it. \n, for example: gpt-3.5* is correct, *gpt-3.5 is wrong",
@@ -1042,5 +1045,7 @@
   "默认 zh-CN-YunxiNeural": "Default zh-CN-YunxiNeural",
   "默认 zh-CN-YunxiNeural|boy": "Default zh-CN-YunxiNeural|boy",
   "默认 zh-CN-YunyangNeural": "Default zh-CN-YunyangNeural",
-  "默认 zh-CN-YunyeNeural": "Default zh-CN-YunyeNeural"
+  "默认 zh-CN-YunyeNeural": "Default zh-CN-YunyeNeural",
+  "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "Select the estimated cost option here for cost estimation. If you think that calculating images consumes too many resources, you can choose to disable image billing. However, please note: some channels do not return tokens under stream, which may result in incorrect token calculations.",
+  "预计费选项": "Estimated fee options"
 }
