@@ -7,7 +7,7 @@ const defaultConfig = {
     other: '',
     proxy: '',
     test_model: '',
-    model_mapping: '',
+    model_mapping: [],
     models: [],
     groups: ['default'],
     plugin: {},
@@ -41,12 +41,11 @@ const defaultConfig = {
     test_model: '用于测试使用的模型，为空时无法测速,如：gpt-3.5-turbo，仅支持chat模型',
     models:
       '请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的',
-    model_mapping:
-      '请输入要修改的模型映射关系，格式为：api请求模型ID:实际转发给渠道的模型ID，使用JSON数组表示，例如：{"gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k-0613"}',
+    model_mapping: '模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。',
     groups: '请选择该渠道所支持的用户组',
     only_chat: '如果选择了仅支持聊天，那么遇到有函数调用的请求会跳过该渠道',
     provider_models_list: '必须填写所有数据后才能获取模型列表',
-    tag: '你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道',
+    tag: '你可以为你的渠道打一个标签，打完标签后，可以通过标签进行批量管理渠道，注意：设置标签后某些设置只能通过渠道标签修改，无法在渠道列表中修改。',
     pre_cost:
       '这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。'
   },
@@ -100,8 +99,41 @@ const typeConfig = {
   },
   15: {
     input: {
-      models: ['ERNIE-4.0', 'ERNIE-3.5-8K', 'ERNIE-Bot-8K', 'Embedding-V1'],
-      test_model: 'ERNIE-3.5-8K'
+      models: [
+        'ERNIE-4.0-Turbo-8K',
+        'ERNIE-4.0-8K-Latest',
+        'ERNIE-4.0-8K-0613',
+        'ERNIE-3.5-8K-0613',
+        'ERNIE-Bot-turbo',
+        'ERNIE-Lite-8K-0922',
+        'ERNIE-Lite-8K',
+        'ERNIE-Lite-8K-0308',
+        'ERNIE-3.5-8K',
+        'ERNIE-Bot',
+        'ERNIE-4.0-8K',
+        'ERNIE-4.0-8K-Preview',
+        'ERNIE-4.0-8K-Preview-0518',
+        'ERNIE-4.0-8K-0329',
+        'ERNIE-4.0-8K-0104',
+        'ERNIE-Bot-4',
+        'ERNIE-Bot-8k',
+        'ERNIE-3.5-128K',
+        'ERNIE-3.5-8K-preview',
+        'ERNIE-3.5-8K-0329',
+        'ERNIE-3.5-4K-0205',
+        'ERNIE-3.5-8K-0205',
+        'ERNIE-3.5-8K-1222',
+        'ERNIE-Speed',
+        'ERNIE-Speed-8K',
+        'ERNIE-Speed-128K',
+        'ERNIE-Tiny-8K',
+        'ERNIE-Function-8K',
+        'ERNIE-Character-8K',
+        'ERNIE-Character-Fiction-8K',
+        'ERNIE-Bot-turbo-AI',
+        'Embedding-V1'
+      ],
+      test_model: 'ERNIE-Speed'
     },
     prompt: {
       key: '按照如下格式输入：APIKey|SecretKey'
@@ -421,6 +453,17 @@ const typeConfig = {
       test_model: ''
     },
     modelGroup: 'Jina'
+  },
+  49: {
+    input: {
+      models: ['gpt-4o', 'gpt-4o-mini', 'text-embedding-3-large', 'text-embedding-3-small', 'Cohere-command-r-plus', 'Cohere-command-r'],
+      test_model: 'gpt-4o-mini'
+    },
+    prompt: {
+      key: '密钥信息请参考https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens',
+      base_url: 'https://models.inference.ai.azure.com'
+    },
+    modelGroup: 'Github'
   }
 };
 

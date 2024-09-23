@@ -1,6 +1,6 @@
 import { useEffect, useCallback, createContext } from 'react';
 import { API } from 'utils/api';
-import { showError } from 'utils/common';
+import { showNotice, showError } from 'utils/common';
 import { SET_SITE_INFO } from 'store/actions';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,14 @@ const StatusProvider = ({ children }) => {
         localStorage.setItem('quota_per_unit', data.quota_per_unit);
         localStorage.setItem('display_in_currency', data.display_in_currency);
         dispatch({ type: SET_SITE_INFO, payload: data });
+        if (
+          data.version !== import.meta.env.VITE_APP_VERSION &&
+          data.version !== 'v0.0.0' &&
+          data.version !== '' &&
+          import.meta.env.VITE_APP_VERSION !== ''
+        ) {
+          showNotice(t('common.unableServerTip', { version: data.version }));
+        }
         if (data.system_name) {
           system_name = data.system_name;
         }

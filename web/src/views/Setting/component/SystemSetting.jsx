@@ -37,6 +37,12 @@ const SystemSetting = () => {
     LarkAuthEnabled: '',
     LarkClientId: '',
     LarkClientSecret: '',
+    OIDCAuthEnabled: '',
+    OIDCClientId: '',
+    OIDCClientSecret: '',
+    OIDCIssuer: '',
+    OIDCScopes: '',
+    OIDCUsernameClaims: '',
     Notice: '',
     SMTPServer: '',
     SMTPPort: '',
@@ -99,6 +105,7 @@ const SystemSetting = () => {
       case 'GitHubOAuthEnabled':
       case 'WeChatAuthEnabled':
       case 'LarkAuthEnabled':
+      case 'OIDCAuthEnabled':
       case 'TurnstileCheckEnabled':
       case 'EmailDomainRestrictionEnabled':
       case 'RegisterEnabled':
@@ -149,6 +156,11 @@ const SystemSetting = () => {
       name === 'ServerAddress' ||
       name === 'GitHubClientId' ||
       name === 'GitHubClientSecret' ||
+      name === 'OIDCClientId' ||
+      name === 'OIDCClientSecret' ||
+      name === 'OIDCIssuer' ||
+      name === 'OIDCScopes' ||
+      name === 'OIDCUsernameClaims' ||
       name === 'WeChatServerAddress' ||
       name === 'WeChatServerToken' ||
       name === 'WeChatAccountQRCodeImageURL' ||
@@ -209,6 +221,29 @@ const SystemSetting = () => {
     }
     if (originInputs['GitHubClientSecret'] !== inputs.GitHubClientSecret && inputs.GitHubClientSecret !== '') {
       await updateOption('GitHubClientSecret', inputs.GitHubClientSecret);
+    }
+  };
+
+  const submitOIDCOAuth = async () => {
+    // 检查并更新 OIDCClientId
+    if (originInputs['OIDCClientId'] !== inputs.OIDCClientId) {
+      await updateOption('OIDCClientId', inputs.OIDCClientId);
+    }
+    // 检查并更新 OIDCClientSecret
+    if (originInputs['OIDCClientSecret'] !== inputs.OIDCClientSecret && inputs.OIDCClientSecret !== '') {
+      await updateOption('OIDCClientSecret', inputs.OIDCClientSecret);
+    }
+    // 检查并更新 OIDCIssuer
+    if (originInputs['OIDCIssuer'] !== inputs.OIDCIssuer) {
+      await updateOption('OIDCIssuer', inputs.OIDCIssuer);
+    }
+    // 检查并更新 OIDCScopes
+    if (originInputs['OIDCScopes'] !== inputs.OIDCScopes) {
+      await updateOption('OIDCScopes', inputs.OIDCScopes);
+    }
+    // 检查并更新 OIDCUsernameClaims
+    if (originInputs['OIDCUsernameClaims'] !== inputs.OIDCUsernameClaims) {
+      await updateOption('OIDCUsernameClaims', inputs.OIDCUsernameClaims);
     }
   };
 
@@ -307,6 +342,12 @@ const SystemSetting = () => {
               <FormControlLabel
                 label={t('setting_index.systemSettings.configureLoginRegister.larkAuth')}
                 control={<Checkbox checked={inputs.LarkAuthEnabled === 'true'} onChange={handleInputChange} name="LarkAuthEnabled" />}
+              />
+            </Grid>
+            <Grid xs={12} md={3}>
+              <FormControlLabel
+                label={t('setting_index.systemSettings.configureLoginRegister.oidcAuth')}
+                control={<Checkbox checked={inputs.OIDCAuthEnabled === 'true'} onChange={handleInputChange} name="OIDCAuthEnabled" />}
               />
             </Grid>
             <Grid xs={12} md={3}>
@@ -702,6 +743,106 @@ const SystemSetting = () => {
             <Grid xs={12}>
               <Button variant="contained" onClick={submitTurnstile}>
                 {t('setting_index.systemSettings.configureTurnstile.saveButton')}
+              </Button>
+            </Grid>
+          </Grid>
+        </SubCard>
+
+        <SubCard
+          title={t('setting_index.systemSettings.configureOIDCAuthorization.title')}
+          subTitle={
+            <span>
+              {t('setting_index.systemSettings.configureOIDCAuthorization.subTitle')}
+            </span>
+          }
+        >
+          <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
+            <Grid xs={12}>
+              <Alert severity="info" sx={{ wordWrap: 'break-word' }}>
+                {t('setting_index.systemSettings.configureOIDCAuthorization.alert1')} <b>{inputs.ServerAddress}</b>
+                {t('setting_index.systemSettings.configureOIDCAuthorization.alert2')} <b>{`${inputs.ServerAddress}/oauth/oidc`}</b>
+              </Alert>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="OIDCClientId">{t('setting_index.systemSettings.configureOIDCAuthorization.clientId')}</InputLabel>
+                <OutlinedInput
+                  id="OIDCClientId"
+                  name="OIDCClientId"
+                  value={inputs.OIDCClientId || ''}
+                  onChange={handleInputChange}
+                  label={t('setting_index.systemSettings.configureOIDCAuthorization.clientId')}
+                  placeholder={t('setting_index.systemSettings.configureOIDCAuthorization.clientIdPlaceholder')}
+                  disabled={loading}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="OIDCClientSecret">{t('setting_index.systemSettings.configureOIDCAuthorization.clientSecret')}</InputLabel>
+                <OutlinedInput
+                  id="OIDCClientSecret"
+                  name="OIDCClientSecret"
+                  value={inputs.OIDCClientSecret || ''}
+                  onChange={handleInputChange}
+                  label={t('setting_index.systemSettings.configureOIDCAuthorization.clientSecret')}
+                  placeholder={t('setting_index.systemSettings.configureOIDCAuthorization.clientSecretPlaceholder')}
+                  disabled={loading}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="OIDCIssuer">{t('setting_index.systemSettings.configureOIDCAuthorization.issuer')}</InputLabel>
+                <OutlinedInput
+                  id="OIDCIssuer"
+                  name="OIDCIssuer"
+                  value={inputs.OIDCIssuer || ''}
+                  onChange={handleInputChange}
+                  label={t('setting_index.systemSettings.configureOIDCAuthorization.issuer')}
+                  placeholder={t('setting_index.systemSettings.configureOIDCAuthorization.issuerPlaceholder')}
+                  disabled={loading}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="OIDCScopes">{t('setting_index.systemSettings.configureOIDCAuthorization.scopes')}</InputLabel>
+                <OutlinedInput
+                  id="OIDCScopes"
+                  name="OIDCScopes"
+                  value={inputs.OIDCScopes || ''}
+                  onChange={handleInputChange}
+                  label={t('setting_index.systemSettings.configureOIDCAuthorization.scopes')}
+                  placeholder={t('setting_index.systemSettings.configureOIDCAuthorization.scopesPlaceholder')}
+                  disabled={loading}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="OIDCUsernameClaims">{t('setting_index.systemSettings.configureOIDCAuthorization.usernameClaims')}</InputLabel>
+                <OutlinedInput
+                  id="OIDCUsernameClaims"
+                  name="OIDCUsernameClaims"
+                  value={inputs.OIDCUsernameClaims || ''}
+                  onChange={handleInputChange}
+                  label={t('setting_index.systemSettings.configureOIDCAuthorization.usernameClaims')}
+                  placeholder={t('setting_index.systemSettings.configureOIDCAuthorization.usernameClaimsPlaceholder')}
+                  disabled={loading}
+                />
+              </FormControl>
+            </Grid>
+
+
+            <Grid xs={12}>
+              <Button variant="contained" onClick={submitOIDCOAuth}>
+                {t('setting_index.systemSettings.configureOIDCAuthorization.saveButton')}
               </Button>
             </Grid>
           </Grid>

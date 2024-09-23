@@ -7,8 +7,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import LogType from '../type/LogType';
 import { useTranslation } from 'react-i18next';
+import 'dayjs/locale/zh-cn';
 
-require('dayjs/locale/zh-cn');
 // ----------------------------------------------------------------------
 
 export default function TableToolBar({ filterName, handleFilterName, userIsAdmin }) {

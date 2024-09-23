@@ -40,7 +40,7 @@ jobs:
         run: |
           cd web
           yarn install
-          yarn run build
+          VITE_APP_VERSION=$VERSION yarn run build
           cd ..
       - name: 设置Go环境
         uses: actions/setup-go@v3

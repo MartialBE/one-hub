@@ -26,7 +26,7 @@ import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
 import EmailModal from './component/EmailModal';
 import Turnstile from 'react-turnstile';
-import { ReactComponent as Lark } from 'assets/images/icons/lark.svg';
+import LarkIcon from 'assets/images/icons/lark.svg';
 import { useTheme } from '@mui/material/styles';
 
 const validationSchema = Yup.object().shape({
@@ -166,7 +166,7 @@ export default function Profile() {
               )}
               {status.lark_login && (
                 <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
-                  <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || t('profilePage.notBound')}
+                  <SvgIcon component={LarkIcon} inheritViewBox="0 0 24 24" /> {inputs.lark_id || t('profilePage.notBound')}
                 </Label>
               )}
             </Stack>

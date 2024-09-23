@@ -6,11 +6,19 @@ import {
   InputLabel,
   OutlinedInput,
   Button,
+  Alert,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  Divider,
+  Typography
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { showError, showSuccess } from 'utils/common'; //,
 import { API } from 'utils/api';
+import { marked } from 'marked';
 import { LoadStatusContext } from 'contexts/StatusContext';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +33,11 @@ const OtherSetting = () => {
     HomePageContent: ''
   });
   let [loading, setLoading] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateData, setUpdateData] = useState({
+    tag_name: '',
+    content: ''
+  });
   const loadStatus = useContext(LoadStatusContext);
 
   const getOptions = async () => {
@@ -102,13 +115,62 @@ const OtherSetting = () => {
     await updateOption(key, inputs[key]);
   };
 
+  const openGitHubRelease = () => {
+    window.location = 'https://github.com/MartialBE/one-hub/releases/latest';
+  };
 
+  const checkUpdate = async () => {
+    try {
+      if (!import.meta.env.VITE_APP_VERSION) {
+        showError('无法获取当前版本号');
+        return;
+      }
+
+      // 如果版本前缀是v开头的
+      if (import.meta.env.VITE_APP_VERSION.startsWith('v')) {
+        const res = await API.get('https://api.github.com/repos/MartialBE/one-api/releases/latest');
+        const { tag_name, body } = res.data;
+        if (tag_name === import.meta.env.VITE_APP_VERSION) {
+          showSuccess(`已是最新版本：${tag_name}`);
+        } else {
+          setUpdateData({
+            tag_name: tag_name,
+            content: marked.parse(body)
+          });
+          setShowUpdateModal(true);
+        }
+      } else {
+        const res = await API.get('https://api.github.com/repos/MartialBE/one-api/commits/main');
+        const { sha, commit } = res.data;
+        const newVersion = 'dev-' + sha.substr(0, 7);
+        if (newVersion === import.meta.env.VITE_APP_VERSION) {
+          showSuccess(`已是最新版本：${newVersion}`);
+        } else {
+          setUpdateData({
+            tag_name: newVersion,
+            content: marked.parse(commit.message)
+          });
+          setShowUpdateModal(true);
+        }
+      }
+    } catch (error) {
+      return;
+    }
+  };
 
   return (
     <>
       <Stack spacing={2}>
         <SubCard title={t('setting_index.otherSettings.generalSettings.title')}>
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
+            <Grid xs={12}>
+              <Typography variant="h6" gutterBottom>
+                {t('setting_index.otherSettings.generalSettings.currentVersion')}: {import.meta.env.VITE_APP_VERSION}
+              </Typography>
+              <Button variant="contained" onClick={checkUpdate}>
+                {t('setting_index.otherSettings.generalSettings.checkUpdate')}
+              </Button>
+            </Grid>
             <Grid xs={12}>
               <FormControl fullWidth>
                 <TextField
@@ -212,6 +274,9 @@ const OtherSetting = () => {
               </Button>
             </Grid>
             <Grid xs={12}>
+              <Alert severity="warning">{t('setting_index.otherSettings.customSettings.copyrightWarning')}</Alert>
+            </Grid>
+            <Grid xs={12}>
               <FormControl fullWidth>
                 <TextField
                   multiline
@@ -234,6 +299,27 @@ const OtherSetting = () => {
           </Grid>
         </SubCard>
       </Stack>
+      <Dialog open={showUpdateModal} onClose={() => setShowUpdateModal(false)} fullWidth maxWidth={'md'}>
+        <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
+          {t('setting_index.otherSettings.updateDialog.newVersion')}: {updateData.tag_name}
+        </DialogTitle>
+        <Divider />
+        <DialogContent>
+          {' '}
+          <div dangerouslySetInnerHTML={{ __html: updateData.content }}></div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowUpdateModal(false)}>{t('setting_index.otherSettings.updateDialog.close')}</Button>
+          <Button
+            onClick={async () => {
+              setShowUpdateModal(false);
+              openGitHubRelease();
+            }}
+          >
+            {t('setting_index.otherSettings.updateDialog.viewGitHub')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-require('dayjs/locale/zh-cn');
+import 'dayjs/locale/zh-cn';
 
 export default class DateRangePicker extends React.Component {
   state = {
