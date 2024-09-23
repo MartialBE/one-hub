@@ -148,7 +148,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const getProviderModels = async (values, setFieldValue) => {
     setProviderModelsLoad(true);
     try {
-      const res = await API.post(`/api/channel/provider_models_list`, { ...values, models: '' });
+      const res = await API.post(`/api/channel/provider_models_list`, { ...values, models: '', model_mapping: '' });
       const { success, message, data } = res.data;
       if (success && data) {
         let uniqueModels = Array.from(new Set(data));
