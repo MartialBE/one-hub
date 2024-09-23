@@ -6,7 +6,7 @@ import { Box, Chip, Drawer, Stack, useMediaQuery } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView } from 'react-device-detect';
 
 // project imports
 import MenuList from './MenuList';
@@ -40,32 +40,8 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
         >
           <MenuList />
           <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-            <Chip
-              label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
-              disabled
-              chipcolor="secondary"
-              size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
         </PerfectScrollbar>
       </BrowserView>
-      <MobileView>
-        <Box sx={{ px: 2 }}>
-          <MenuList />
-          <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-            <Chip
-              label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
-              disabled
-              chipcolor="secondary"
-              size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
-        </Box>
-      </MobileView>
     </>
   );
 
