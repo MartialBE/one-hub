@@ -215,6 +215,13 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: 'https://portal.azure.com/'
   },
+  49: {
+    key: 49,
+    text: 'Github',
+    value: 49,
+    color: 'default',
+    url: 'https://github.com/marketplace/models'
+  },
   8: {
     key: 8,
     text: '自定义渠道',

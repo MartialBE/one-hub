@@ -66,23 +66,62 @@ func errorHandle(baiduError *BaiduError) *types.OpenAIError {
 	}
 }
 
+var modelNameMap = map[string]string{
+	"ERNIE-4.0-Turbo-8K":           "ernie-4.0-turbo-8k",
+	"ERNIE-4.0-8K-Latest":          "ernie-4.0-8k-latest",
+	"ERNIE-4.0-8K-0613":            "ernie-4.0-8k-0613",
+	"ERNIE-3.5-8K-0613":            "ernie-3.5-8k-0613",
+	"ERNIE-Bot-turbo":              "eb-instant",
+	"ERNIE-Lite-8K-0922":           "eb-instant",
+	"ERNIE-Lite-8K":                "ernie-lite-8k",
+	"ERNIE-Lite-8K-0308":           "ernie-lite-8k",
+	"ERNIE-3.5-8K":                 "completions",
+	"ERNIE-Bot":                    "completions",
+	"ERNIE-4.0-8K":                 "completions_pro",
+	"ERNIE-4.0-8K-Preview":         "ernie-4.0-8k-preview",
+	"ERNIE-4.0-8K-Preview-0518":    "completions_adv_pro",
+	"ERNIE-4.0-8K-0329":            "ernie-4.0-8k-0329",
+	"ERNIE-4.0-8K-0104":            "ernie-4.0-8k-0104",
+	"ERNIE-Bot-4":                  "completions_pro",
+	"ERNIE-Bot-8k":                 "ernie_bot_8k",
+	"ERNIE-3.5-128K":               "ernie-3.5-128k",
+	"ERNIE-3.5-8K-preview":         "ernie-3.5-8k-preview",
+	"ERNIE-3.5-8K-0329":            "ernie-3.5-8k-0329",
+	"ERNIE-3.5-4K-0205":            "ernie-3.5-4k-0205",
+	"ERNIE-3.5-8K-0205":            "ernie-3.5-8k-0205",
+	"ERNIE-3.5-8K-1222":            "ernie-3.5-8k-1222",
+	"ERNIE Speed":                  "ernie_speed",
+	"ERNIE-Speed":                  "ernie_speed",
+	"ERNIE-Speed-8K":               "ernie_speed",
+	"ERNIE-Speed-128K":             "ernie-speed-128k",
+	"ERNIE Speed-AppBuilder":       "ai_apaas",
+	"ERNIE-Tiny-8K":                "ernie-tiny-8k",
+	"ERNIE-Function-8K":            "ernie-func-8k",
+	"ERNIE-Character-8K":           "ernie-char-8k",
+	"ERNIE-Character-Fiction-8K":   "ernie-char-fiction-8k",
+	"ERNIE-Bot-turbo-AI":           "ai_apaas",
+	"EB-turbo-AppBuilder":          "ai_apaas",
+	"BLOOMZ-7B":                    "bloomz_7b1",
+	"Llama-2-7b-chat":              "llama_2_7b",
+	"Llama-2-13b-chat":             "llama_2_13b",
+	"Llama-2-70b-chat":             "llama_2_70b",
+	"Qianfan-Chinese-Llama-2-7B":   "qianfan_chinese_llama_2_7b",
+	"Qianfan-Chinese-Llama-2-13B":  "qianfan_chinese_llama_2_13b",
+	"Qianfan-Chinese-Llama-2-70B":  "qianfan_chinese_llama_2_70b",
+	"Meta-Llama-3-8B":              "llama_3_8b",
+	"Meta-Llama-3-70B":             "llama_3_70b",
+	"Qianfan-BLOOMZ-7B-compressed": "qianfan_bloomz_7b_compressed",
+	"ChatGLM2-6B-32K":              "chatglm2_6b_32k",
+	"AquilaChat-7B":                "aquilachat_7b",
+	"XuanYuan-70B-Chat-4bit":       "xuanyuan_70b_chat",
+	"ChatLaw":                      "chatlaw",
+	"Yi-34B-Chat":                  "yi_34b_chat",
+	"Mixtral-8x7B-Instruct":        "mixtral_8x7b_instruct",
+	"Gemma-7B-it":                  "gemma_7b_it",
+}
+
 // 获取完整请求 URL
 func (p *BaiduProvider) GetFullRequestURL(requestURL string, modelName string) string {
-	var modelNameMap = map[string]string{
-		"ERNIE-Bot":          "completions",
-		"ERNIE-Bot-turbo":    "eb-instant",
-		"ERNIE-Bot-4":        "completions_pro",
-		"BLOOMZ-7B":          "bloomz_7b1",
-		"Embedding-V1":       "embedding-v1",
-		"ERNIE-4.0":          "completions_pro",
-		"ERNIE-3.5-8K":       "completions",
-		"ERNIE-Speed":        "ernie_speed",
-		"ERNIE-Speed-128K":   "ernie-speed-128k",
-		"ERNIE-Lite-8K":      "eb-instant",
-		"ERNIE-Tiny-8K":      "ernie-tiny-8k",
-		"ERNIE-Functions-8K": "ernie-func-8k",
-	}
-
 	if modelNameConvert, ok := modelNameMap[modelName]; ok {
 		modelName = modelNameConvert
 	}

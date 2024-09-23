@@ -9,6 +9,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/notify"
+	"one-api/common/oidc"
 	"one-api/common/redis"
 	"one-api/common/requester"
 	"one-api/common/storage"
@@ -51,6 +52,8 @@ func main() {
 	cache.InitCacheManager()
 	// Initialize options
 	model.InitOptionMap()
+	// Initialize oidc
+	oidc.InitOIDCConfig()
 	relay_util.NewPricing()
 	initMemoryCache()
 	initSync()

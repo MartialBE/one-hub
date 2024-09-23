@@ -12,6 +12,7 @@ const config = {
     footer_html: '',
     github_client_id: '',
     github_oauth: false,
+    oidc_auth: false,
     logo: '',
     quota_per_unit: 500000,
     server_address: '',

@@ -72,4 +72,3 @@ func removeDuplicates(slice []string) []string {
 	}
 	return list
 }
-

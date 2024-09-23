@@ -28,7 +28,7 @@ import { showSuccess, showError } from 'utils/common'; //renderQuotaWithPrompt,
 import { API } from 'utils/api';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-require('dayjs/locale/zh-cn');
+import 'dayjs/locale/zh-cn';
 
 
 let quotaPerUnit = parseFloat(localStorage.getItem('quota_per_unit'));

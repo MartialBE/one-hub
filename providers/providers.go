@@ -16,6 +16,7 @@ import (
 	"one-api/providers/coze"
 	"one-api/providers/deepseek"
 	"one-api/providers/gemini"
+	"one-api/providers/github"
 	"one-api/providers/groq"
 	"one-api/providers/hunyuan"
 	"one-api/providers/jina"
@@ -79,6 +80,7 @@ func init() {
 		config.ChannelTypeVertexAI:     vertexai.VertexAIProviderFactory{},
 		config.ChannelTypeSiliconflow:  siliconflow.SiliconflowProviderFactory{},
 		config.ChannelTypeJina:         jina.JinaProviderFactory{},
+		config.ChannelTypeGithub:       github.GithubProviderFactory{},
 	}
 }
 

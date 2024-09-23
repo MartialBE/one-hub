@@ -264,7 +264,10 @@ func (user *User) FillUserByUsername() error {
 	if user.Username == "" {
 		return errors.New("username 为空！")
 	}
-	DB.Where(User{Username: user.Username}).First(user)
+	err := DB.Where(User{Username: user.Username}).First(user)
+	if err != nil {
+		return err.Error
+	}
 	return nil
 }
 

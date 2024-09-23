@@ -4,6 +4,6 @@
     "module": "commonjs",
     "baseUrl": "./src"
   },
-  "include": ["src/**/*", "src/serviceWorker.js"],
+  "include": ["src/**/*", "vite.config.mjs"],
   "exclude": ["node_modules"]
 }

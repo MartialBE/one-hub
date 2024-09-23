@@ -4,7 +4,9 @@ import { store } from 'store/index';
 import { LOGIN } from 'store/actions';
 
 export const API = axios.create({
-  baseURL: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER : '/'
+  // ... 其他代码 ...
+
+  baseURL: import.meta.env.VITE_APP_SERVER || '/'
 });
 
 API.interceptors.response.use(
