@@ -149,7 +149,10 @@
     "validJson": "必须是有效的JSON字符串",
     "modelMappingKey": "用户请求模型",
     "modelMappingValue": "实际转发模型",
-    "addModelMapping": "添加模型映射"
+    "addModelMapping": "添加模型映射",
+    "modelHeaderKey": "自定义Header Key",
+    "modelHeaderValue": "自定义Header Value",
+    "addModelHeader": "添加自定义Header"
   },
   "token_index": {
     "token": "令牌",
