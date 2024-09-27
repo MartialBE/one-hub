@@ -3,6 +3,7 @@ package payment
 import (
 	"one-api/payment/gateway/alipay"
 	"one-api/payment/gateway/epay"
+	"one-api/payment/gateway/stripe"
 	"one-api/payment/gateway/wxpay"
 	"one-api/payment/types"
 
@@ -21,4 +22,5 @@ func init() {
 	Gateways["epay"] = &epay.Epay{}
 	Gateways["alipay"] = &alipay.Alipay{}
 	Gateways["wxpay"] = &wxpay.WeChatPay{}
+	Gateways["stripe"] = &stripe.Stripe{}
 }

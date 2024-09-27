@@ -12,6 +12,7 @@ require (
 	github.com/aws/smithy-go v1.20.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/coocood/freecache v1.2.4
+	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/eko/gocache/lib/v4 v4.1.6
 	github.com/eko/gocache/store/freecache/v4 v4.2.2
 	github.com/eko/gocache/store/redis/v4 v4.2.2
@@ -35,11 +36,14 @@ require (
 	github.com/smartwalle/alipay/v3 v3.2.21
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
+	github.com/stripe/stripe-go/v72 v72.122.0
+	github.com/stripe/stripe-go/v79 v79.12.0
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.18
 	github.com/wneessen/go-mail v0.4.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/image v0.18.0
+	golang.org/x/oauth2 v0.23.0
 	google.golang.org/api v0.188.0
 	google.golang.org/grpc v1.64.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -56,7 +60,6 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
-	github.com/coreos/go-oidc v2.2.1+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
@@ -98,7 +101,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
-	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
