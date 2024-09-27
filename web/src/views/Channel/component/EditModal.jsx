@@ -40,6 +40,7 @@ import useCustomizeT from 'hooks/useCustomizeT';
 
 import { PreCostType } from '../type/other';
 import ModelMappingInput from './ModelMappingInput';
+import ModelHeadersInput from './ModelHeadersInput';
 
 import pluginList from '../type/Plugin.json';
 
@@ -64,7 +65,8 @@ const getValidationSchema = (t) =>
       then: Yup.string().required(t('channel_edit.requiredBaseUrl')), // base_url 是必需的
       otherwise: Yup.string() // 在其他情况下，base_url 可以是任意字符串
     }),
-    model_mapping: Yup.array()
+    model_mapping: Yup.array(),
+    model_headers: Yup.array()
   });
 
 const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {
@@ -148,7 +150,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const getProviderModels = async (values, setFieldValue) => {
     setProviderModelsLoad(true);
     try {
-      const res = await API.post(`/api/channel/provider_models_list`, { ...values, models: '', model_mapping: '' });
+      const res = await API.post(`/api/channel/provider_models_list`, { ...values, models: '', model_mapping: '', model_headers: '' });
       const { success, message, data } = res.data;
       if (success && data) {
         let uniqueModels = Array.from(new Set(data));
@@ -230,6 +232,30 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
         values.model_mapping = JSON.stringify(cleanedMapping, null, 2);
       } catch (error) {
         showError('Error parsing model_mapping:' + error.message);
+      }
+    }
+    let modelHeadersKey = [];
+
+    if (values.model_headers) {
+      try {
+        const modelHeader = values.model_headers.reduce((acc, item) => {
+          if (item.key && item.value) {
+            acc[item.key] = item.value;
+          }
+          return acc;
+        }, {});
+        const cleanedHeader = {};
+
+        for (const [key, value] of Object.entries(modelHeader)) {
+          if (key && value && !(key in cleanedHeader)) {
+            cleanedHeader[key] = value;
+            modelHeadersKey.push(key);
+          }
+        }
+
+        values.model_headers = JSON.stringify(cleanedHeader, null, 2);
+      } catch (error) {
+        showError('Error parsing model_headers:' + error.message);
       }
     }
 
@@ -331,6 +357,16 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 value
               }))
             : [];
+        // if (data.model_headers) {
+          data.model_headers =
+          data.model_headers !== ''
+            ? Object.entries(JSON.parse(data.model_headers)).map(([key, value], index) => ({
+                index,
+                key,
+                value
+              }))
+            : [];
+        // }
 
         data.base_url = data.base_url ?? '';
         data.is_edit = true;
@@ -733,6 +769,29 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     </FormHelperText>
                   ) : (
                     <FormHelperText id="helper-tex-channel-model_mapping-label">{customizeT(inputPrompt.model_mapping)}</FormHelperText>
+                  )}
+                </FormControl>
+              )}
+              {inputPrompt.model_headers && (
+                <FormControl
+                  fullWidth
+                  error={Boolean(touched.model_headers && errors.model_headers)}
+                  sx={{ ...theme.typography.otherInput }}
+                >
+                  <ModelHeadersInput
+                    value={values.model_headers}
+                    onChange={(newValue) => {
+                      setFieldValue('model_headers', newValue);
+                    }}
+                    disabled={hasTag}
+                    error={Boolean(touched.model_headers && errors.model_headers)}
+                  />
+                  {touched.model_headers && errors.model_headers ? (
+                    <FormHelperText error id="helper-tex-channel-model_headers-label">
+                      {errors.model_headers}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-model_headers-label">{customizeT(inputPrompt.model_headers)}</FormHelperText>
                   )}
                 </FormControl>
               )}

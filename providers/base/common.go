@@ -94,19 +94,22 @@ func (p *BaseProvider) GetFullRequestURL(requestURL string, _ string) string {
 // 获取请求头
 func (p *BaseProvider) CommonRequestHeaders(headers map[string]string) {
 	if p.Context != nil {
-		// 遍历 p.Context.Request.Header 中的所有头部
-		for key, values := range p.Context.Request.Header {
-			// 如果有多个值，只取第一个
-			if len(values) > 0 {
-				headers[key] = p.Context.Request.Header.Get(key)
-			}
-		}
 		headers["Content-Type"] = p.Context.Request.Header.Get("Content-Type")
 		headers["Accept"] = p.Context.Request.Header.Get("Accept")
 	}
 
 	if headers["Content-Type"] == "" {
 		headers["Content-Type"] = "application/json"
+	}
+	// 自定义header
+	if p.Channel.ModelHeaders != nil {
+		var customHeaders map[string]string
+		err := json.Unmarshal([]byte(*p.Channel.ModelHeaders), &customHeaders)
+		if err == nil {
+			for key, value := range customHeaders {
+				headers[key] = value
+			}
+		}
 	}
 }
 

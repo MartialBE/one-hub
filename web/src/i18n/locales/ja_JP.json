@@ -80,7 +80,10 @@
     "validJson": "有効な JSON 文字列である必要があります",
     "addModelMapping": "モデルマッピングの追加",
     "modelMappingKey": "ユーザーリクエストモデル",
-    "modelMappingValue": "実際の転送モデル"
+    "modelMappingValue": "実際の転送モデル",
+    "modelHeaderKey":"カスタムヘッダーキー",
+    "modelHeaderValue":"カスタムヘッダー値",
+    "addModelHeader":"カスタムヘッダーを追加"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
