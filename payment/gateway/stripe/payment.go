@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"one-api/model"
 	"one-api/payment/types"
 	"strconv"
 
 	sysconfig "one-api/common/config"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stripe/stripe-go/v72/webhook"
 	"github.com/stripe/stripe-go/v79"
 	"github.com/stripe/stripe-go/v79/client"
+	"github.com/stripe/stripe-go/v79/webhook"
+	"github.com/stripe/stripe-go/v79/webhookendpoint"
 )
 
 // Stripe 结构体实现支付接口
@@ -74,6 +76,76 @@ func (e *Stripe) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 	}
 
 	return payRequest, nil
+}
+
+func (e *Stripe) CreatedPay(notifyURL string, gatewayConfig *model.Payment) error {
+	eventName := "checkout.session.completed"
+	var stripeConfig StripeConfig
+	err := json.Unmarshal([]byte(gatewayConfig.Config), &stripeConfig)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return err
+	}
+	stripe.Key = stripeConfig.SecretKey
+	params := &stripe.WebhookEndpointListParams{}
+	params.Limit = stripe.Int64(100)
+	i := webhookendpoint.List(params)
+
+	var existingWebhook *stripe.WebhookEndpoint
+	for i.Next() {
+		webhook := i.WebhookEndpoint()
+		if webhook.URL == notifyURL && contains(webhook.EnabledEvents, eventName) {
+			existingWebhook = webhook
+			break
+		}
+	}
+
+	if err := i.Err(); err != nil {
+		return fmt.Errorf("error listing webhooks: %v", err)
+	}
+	// 如果不存在匹配的 Webhook，则创建新的
+	var wh *stripe.WebhookEndpoint
+
+	if existingWebhook == nil {
+		createParams := &stripe.WebhookEndpointParams{
+			URL: stripe.String(notifyURL),
+			EnabledEvents: []*string{
+				stripe.String(eventName),
+			},
+		}
+		newWebhook, err := webhookendpoint.New(createParams)
+		if err != nil {
+			return fmt.Errorf("error creating webhook: %v", err)
+		}
+		wh = newWebhook
+		fmt.Printf("Created new webhook: %s\n", newWebhook.ID)
+	} else {
+		fmt.Printf("Webhook already exists: %s\n", existingWebhook.ID)
+		wh = existingWebhook
+	}
+
+	stripeConfig.WebhookSecret = wh.Secret
+	config, err := json.Marshal(stripeConfig)
+	if err != nil {
+		return fmt.Errorf("error creating webhook: %v", err)
+	}
+
+	gatewayConfig.Config = string(config)
+	err = gatewayConfig.Update(true)
+	if err != nil {
+		return fmt.Errorf("error creating webhook: %v", err)
+	}
+	return nil
+}
+
+// 辅助函数来检查字符串切片中是否包含特定字符串
+func contains(slice []string, str string) bool {
+	for _, v := range slice {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
 
 // HandleCallback 处理支付回调
