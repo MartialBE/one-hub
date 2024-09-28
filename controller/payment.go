@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"one-api/common"
 	"one-api/model"
+	paymentService "one-api/payment"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -61,15 +63,31 @@ func AddPayment(c *gin.Context) {
 		return
 	}
 
-	err = payment.Insert()
-	if err != nil {
-		common.APIRespondWithError(c, http.StatusOK, err)
+	if err := payment.Insert(); err != nil {
+		common.APIRespondWithError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	ps, err := paymentService.NewPaymentService(payment.UUID)
+	if err != nil {
+		if deleteErr := payment.Delete(); deleteErr != nil {
+			log.Printf("Failed to delete payment after service creation error: %v", deleteErr)
+		}
+		common.APIRespondWithError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := ps.CreatedPay(); err != nil {
+		if deleteErr := payment.Delete(); deleteErr != nil {
+			log.Printf("Failed to delete payment after creation error: %v", deleteErr)
+		}
+		common.APIRespondWithError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
 		"success": true,
-		"message": "",
+		"message": "Payment added successfully",
 		"data":    payment,
 	})
 }

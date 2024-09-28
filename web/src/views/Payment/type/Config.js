@@ -164,7 +164,7 @@ const PaymentConfig = {
     },
     webhook_secret: {
       name: 'WebHookSecret',
-      description: '回调验证密钥',
+      description: '回调验证密钥，不用填写，创建网关后会自动在stripe后台创建webhook并获取webhook密钥',
       type: 'text',
       value: ''
     },

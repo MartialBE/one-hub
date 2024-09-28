@@ -1,0 +1,16 @@
+appname: "one-api"
+
+debug: true
+
+output: one-api
+
+# 添加环境变量设置
+env:
+  - CGO_ENABLED=0
+
+build_args:
+  - -ldflags
+  - "-s -w -X 'one-api/common.Version=Dev-0'"
+
+excluded_paths:
+  - web
