@@ -90,6 +90,6 @@ func getEpayConfig(gatewayConfig string) (*EpayConfig, error) {
 
 	return &epayConfig, nil
 }
-func (e *Epay) CreatedPay(notifyURL string, gatewayConfig *model.Payment) error {
+func (e *Epay) CreatedPay(_ string, _ *model.Payment) error {
 	return nil
 }

@@ -44,13 +44,14 @@ func (s *PaymentService) CreatedPay() error {
 	return s.gateway.CreatedPay(notifyURL, s.Payment)
 }
 
-func (s *PaymentService) Pay(tradeNo string, amount float64, currency model.CurrencyType) (*types.PayRequest, error) {
+func (s *PaymentService) Pay(tradeNo string, amount float64, user *model.User) (*types.PayRequest, error) {
 	config := &types.PayConfig{
 		Money:     amount,
 		TradeNo:   tradeNo,
 		NotifyURL: s.getNotifyURL(),
 		ReturnURL: s.getReturnURL(),
-		Currency:  currency,
+		Currency:  s.Payment.Currency,
+		User:      user,
 	}
 	payRequest, err := s.gateway.Pay(config, s.Payment.Config)
 	if err != nil {

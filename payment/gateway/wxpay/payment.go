@@ -125,6 +125,6 @@ func getWeChatConfig(gatewayConfig string) (*WeChatConfig, error) {
 	return &wechatConfig, nil
 }
 
-func (w *WeChatPay) CreatedPay(notifyURL string, gatewayConfig *model.Payment) error {
+func (w *WeChatPay) CreatedPay(_ string, _ *model.Payment) error {
 	return nil
 }

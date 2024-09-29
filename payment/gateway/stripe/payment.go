@@ -42,7 +42,7 @@ func (e *Stripe) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 		currency = stripe.String("CNY")
 	}
 
-	result, err := sc.CheckoutSessions.New(&stripe.CheckoutSessionParams{
+	params := &stripe.CheckoutSessionParams{
 		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
 		SuccessURL:        stripe.String(config.ReturnURL),
 		ClientReferenceID: stripe.String(config.TradeNo),
@@ -59,7 +59,16 @@ func (e *Stripe) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 				Quantity: stripe.Int64(1),
 			},
 		},
-	})
+		Metadata: map[string]string{
+			"user_id": fmt.Sprintf("%d", config.User.Id),
+		},
+	}
+
+	if config.User.Email != "" {
+		params.CustomerEmail = stripe.String(config.User.Email)
+	}
+
+	result, err := sc.CheckoutSessions.New(params)
 	if err != nil {
 		return nil, err
 	}

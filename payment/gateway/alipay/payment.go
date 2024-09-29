@@ -103,6 +103,6 @@ func getAlipayConfig(gatewayConfig string) (*AlipayConfig, error) {
 	return &alipayConfig, nil
 }
 
-func (a *Alipay) CreatedPay(notifyURL string, gatewayConfig *model.Payment) error {
+func (a *Alipay) CreatedPay(_ string, _ *model.Payment) error {
 	return nil
 }
