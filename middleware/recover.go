@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common/logger"
+	"one-api/metrics"
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ func RelayPanicRecover() gin.HandlerFunc {
 					},
 				}
 				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("openai")
 			}
 		}()
 
@@ -39,6 +41,7 @@ func RelayCluadePanicRecover() gin.HandlerFunc {
 					},
 				}
 				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("claude")
 			}
 		}()
 		c.Next()
@@ -57,6 +60,7 @@ func RelayGeminiPanicRecover() gin.HandlerFunc {
 					},
 				}
 				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("gemini")
 			}
 		}()
 		c.Next()
@@ -75,6 +79,7 @@ func RelayMJPanicRecover() gin.HandlerFunc {
 					},
 				}
 				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("MJ")
 			}
 		}()
 
@@ -91,6 +96,7 @@ func RelaySunoPanicRecover() gin.HandlerFunc {
 					"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub.", err),
 				}
 				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("suno")
 			}
 		}()
 		c.Next()

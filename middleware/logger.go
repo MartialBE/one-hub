@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"one-api/common/logger"
+	"one-api/metrics"
 	"time"
 
 	"go.uber.org/zap"
@@ -51,5 +52,6 @@ func GinzapWithConfig() gin.HandlerFunc {
 		} else {
 			logger.Logger.Info("GIN request", fields...)
 		}
+		metrics.RecordHttp(c, latency)
 	}
 }

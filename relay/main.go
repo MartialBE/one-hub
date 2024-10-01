@@ -6,6 +6,7 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"one-api/metrics"
 	"one-api/model"
 	"one-api/relay/relay_util"
 	"one-api/types"
@@ -45,6 +46,7 @@ func Relay(c *gin.Context) {
 
 	apiErr, done := RelayHandler(relay)
 	if apiErr == nil {
+		metrics.RecordProvider(c, 200)
 		return
 	}
 
