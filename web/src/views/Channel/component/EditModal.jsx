@@ -180,32 +180,33 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
       const [providerModelsRes, pricesRes] = await Promise.all([
         API.post(`/api/channel/provider_models_list`, { 
           ...values, 
-          models: '',
-          model_mapping: JSON.stringify(values.model_mapping || {})
+          models: '', 
+          model_mapping: '', 
+          model_headers: '' 
         }),
         API.get('/api/prices')
       ]);
   
-      const providerData = providerModelsRes.data.data; // 直接使用 data 数组
+      const { success: providerSuccess, message: providerMessage, data: providerData } = providerModelsRes.data;
       const pricesData = pricesRes.data.data;
   
-      if (Array.isArray(providerData) && Array.isArray(pricesData)) {
+      if (providerSuccess && Array.isArray(providerData) && Array.isArray(pricesData)) {
         let pricedModels = new Set(pricesData.map(price => price.model));
-        let modelList = providerData
+        let uniqueModels = Array.from(new Set(providerData));
+        
+        let modelList = uniqueModels
           .filter(model => pricedModels.has(model))
           .map(model => ({
             id: model,
             group: t('channel_edit.customModelTip')
           }));
   
-        // 找出在渠道列表中存在但在价格列表中不存在的模型
-        let missingPriceModels = providerData.filter(model => !pricedModels.has(model));
+        let missingPriceModels = uniqueModels.filter(model => !pricedModels.has(model));
   
         if (modelList.length > 0) {
           setFieldValue('models', modelList);
           showSuccess(t('channel_edit.priceModelsSuccess', { count: modelList.length }));
           
-          // 如果有缺失价格的模型，复制到剪贴板并显示提示
           if (missingPriceModels.length > 0) {
             const missingModelsText = missingPriceModels.join('\n');
             navigator.clipboard.writeText(missingModelsText).then(() => {
@@ -223,16 +224,13 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
           showInfo(t('channel_edit.noPriceModelsFound'));
         }
       } else {
-        showError(t('channel_edit.invalidDataFormat'));
+        showError(providerMessage || t('channel_edit.invalidDataFormat'));
       }
     } catch (error) {
       showError(error.message);
     }
     setPriceModelsLoad(false);
   };
-  
-  
-  
   
   
 
