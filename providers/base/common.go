@@ -101,6 +101,16 @@ func (p *BaseProvider) CommonRequestHeaders(headers map[string]string) {
 	if headers["Content-Type"] == "" {
 		headers["Content-Type"] = "application/json"
 	}
+	// 自定义header
+	if p.Channel.ModelHeaders != nil {
+		var customHeaders map[string]string
+		err := json.Unmarshal([]byte(*p.Channel.ModelHeaders), &customHeaders)
+		if err == nil {
+			for key, value := range customHeaders {
+				headers[key] = value
+			}
+		}
+	}
 }
 
 func (p *BaseProvider) GetUsage() *types.Usage {

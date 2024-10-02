@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"one-api/model"
+	"one-api/payment/types"
+
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay/v3"
-	"one-api/payment/types"
 )
 
 type Alipay struct{}
@@ -99,4 +101,8 @@ func getAlipayConfig(gatewayConfig string) (*AlipayConfig, error) {
 	}
 
 	return &alipayConfig, nil
+}
+
+func (a *Alipay) CreatedPay(_ string, _ *model.Payment) error {
+	return nil
 }

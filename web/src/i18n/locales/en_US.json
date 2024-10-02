@@ -81,7 +81,10 @@
     "validJson": "Must be a valid JSON string",
     "addModelMapping": "Add model mapping",
     "modelMappingKey": "User request model",
-    "modelMappingValue": "Actual forwarding model"
+    "modelMappingValue": "Actual forwarding model",
+    "modelHeaderKey": "Custom Header Key",
+    "modelHeaderValue": "Custom Header Value",
+    "addModelHeader": "Add Custom Header"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",

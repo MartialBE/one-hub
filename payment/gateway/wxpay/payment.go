@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"one-api/model"
+	"one-api/payment/types"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/auth/verifiers"
@@ -13,9 +18,6 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments"
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
-	"log"
-	"net/http"
-	"one-api/payment/types"
 )
 
 type WeChatPay struct{}
@@ -121,4 +123,8 @@ func getWeChatConfig(gatewayConfig string) (*WeChatConfig, error) {
 	}
 
 	return &wechatConfig, nil
+}
+
+func (w *WeChatPay) CreatedPay(_ string, _ *model.Payment) error {
+	return nil
 }

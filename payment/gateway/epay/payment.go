@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"one-api/model"
 	"one-api/payment/types"
 	"strconv"
 
@@ -88,4 +89,7 @@ func getEpayConfig(gatewayConfig string) (*EpayConfig, error) {
 	}
 
 	return &epayConfig, nil
+}
+func (e *Epay) CreatedPay(_ string, _ *model.Payment) error {
+	return nil
 }

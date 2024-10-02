@@ -14,6 +14,7 @@ func InitStorage() {
 	InitImgurStorage()
 	InitSMStorage()
 	InitALIOSSStorage()
+	InitS3Storage()
 }
 
 func InitALIOSSStorage() {
@@ -57,4 +58,30 @@ func InitImgurStorage() {
 
 	imgurUpload := drives.NewImgurUpload(imgurClientId)
 	AddStorageDrive(imgurUpload)
+}
+
+func InitS3Storage() {
+	endpoint := viper.GetString("storage.s3.endpoint")
+	if endpoint == "" {
+		return
+	}
+	accessKeyId := viper.GetString("storage.s3.accessKeyId")
+	if accessKeyId == "" {
+		return
+	}
+	accessKeySecret := viper.GetString("storage.s3.accessKeySecret")
+	if accessKeySecret == "" {
+		return
+	}
+	bucketName := viper.GetString("storage.s3.bucketName")
+	if bucketName == "" {
+		return
+	}
+	cdnurl := viper.GetString("storage.s3.cdnurl")
+	if cdnurl == "" {
+		cdnurl = endpoint
+	}
+
+	s3Upload := drives.NewS3Upload(endpoint, accessKeyId, accessKeySecret, bucketName, cdnurl)
+	AddStorageDrive(s3Upload)
 }
