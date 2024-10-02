@@ -178,11 +178,15 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     setPriceModelsLoad(true);
     try {
       const [providerModelsRes, pricesRes] = await Promise.all([
-        API.post(`/api/channel/provider_models_list`, { ...values, models: '' }),
+        API.post(`/api/channel/provider_models_list`, { 
+          ...values, 
+          models: '',
+          model_mapping: JSON.stringify(values.model_mapping || {})
+        }),
         API.get('/api/prices')
       ]);
   
-      const providerData = providerModelsRes.data.data;
+      const providerData = providerModelsRes.data.data; // 直接使用 data 数组
       const pricesData = pricesRes.data.data;
   
       if (Array.isArray(providerData) && Array.isArray(pricesData)) {
@@ -226,6 +230,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     }
     setPriceModelsLoad(false);
   };
+  
   
   
   
