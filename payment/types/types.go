@@ -1,11 +1,15 @@
 package types
 
+import "one-api/model"
+
 // 支付网关的通用配置
 type PayConfig struct {
-	NotifyURL string  `json:"notify_url"`
-	ReturnURL string  `json:"return_url"`
-	TradeNo   string  `json:"trade_no"`
-	Money     float64 `json:"money"`
+	NotifyURL string             `json:"notify_url"`
+	ReturnURL string             `json:"return_url"`
+	TradeNo   string             `json:"trade_no"`
+	Money     float64            `json:"money"`
+	Currency  model.CurrencyType `json:"currency"`
+	User      *model.User        `json:"user"`
 }
 
 // 请求支付时的数据结构

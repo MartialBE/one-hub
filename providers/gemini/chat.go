@@ -241,7 +241,7 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 	}
 
 	// 和ExecutableCode的tokens共用，所以跳过
-	if geminiResponse.UsageMetadata == nil || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
+	if geminiResponse.UsageMetadata == nil || len(geminiResponse.Candidates) == 0 || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
 		return
 	}
 

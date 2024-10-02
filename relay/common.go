@@ -13,6 +13,7 @@ import (
 	"one-api/common/requester"
 	"one-api/common/utils"
 	"one-api/controller"
+	"one-api/metrics"
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
@@ -63,6 +64,7 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 		return
 	}
 	c.Set("channel_id", channel.Id)
+	c.Set("channel_type", channel.Type)
 
 	provider = providers.GetProvider(channel, c)
 	if provider == nil {
@@ -263,15 +265,18 @@ func responseCache(c *gin.Context, response string, isStream bool) {
 func shouldRetry(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channelType int) bool {
 	channelId := c.GetInt("specific_channel_id")
 	ignore := c.GetBool("specific_channel_id_ignore")
-	if channelId > 0 && !ignore {
-		return false
-	}
 
 	if apiErr == nil {
 		return false
 	}
 
+	metrics.RecordProvider(c, apiErr.StatusCode)
+
 	if apiErr.LocalError {
+		return false
+	}
+
+	if channelId > 0 && !ignore {
 		return false
 	}
 
