@@ -98,6 +98,13 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	quota := 0
 	promptTokens := usage.PromptTokens
 	completionTokens := usage.CompletionTokens
+	hitsCache := false
+
+	if usage.PromptTokensDetails != nil ||
+		usage.PromptTokensDetails.CachedTokens > 0 {
+		promptTokens -= int(math.Ceil(float64(usage.PromptTokensDetails.CachedTokens) / 2))
+		hitsCache = true
+	}
 
 	if q.price.Type == model.TimesPriceType {
 		quota = int(1000 * q.inputRatio)
@@ -145,8 +152,12 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		}
 	}
 
+	if hitsCache {
+		modelRatioStr += fmt.Sprintf("- 缓存tokens: %d", usage.PromptTokensDetails.CachedTokens)
+	}
+
 	logContent := fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
-	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
+	model.RecordConsumeLog(ctx, q.userId, q.channelId, usage.PromptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)
 
