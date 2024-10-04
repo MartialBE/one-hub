@@ -100,7 +100,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	completionTokens := usage.CompletionTokens
 	hitsCache := false
 
-	if usage.PromptTokensDetails != nil ||
+	if usage.PromptTokensDetails != nil &&
 		usage.PromptTokensDetails.CachedTokens > 0 {
 		promptTokens -= int(math.Ceil(float64(usage.PromptTokensDetails.CachedTokens) / 2))
 		hitsCache = true
