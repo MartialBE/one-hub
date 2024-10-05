@@ -94,16 +94,16 @@ func (q *Quota) preQuotaConsumption() *types.OpenAIErrorWithStatusCode {
 	return nil
 }
 
-func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, ctx context.Context) error {
+func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, isStream bool, ctx context.Context) error {
 	quota := 0
 	promptTokens := usage.PromptTokens
 	completionTokens := usage.CompletionTokens
-	hitsCache := false
+	hitsCache := 0
 
 	if usage.PromptTokensDetails != nil &&
 		usage.PromptTokensDetails.CachedTokens > 0 {
 		promptTokens -= int(math.Ceil(float64(usage.PromptTokensDetails.CachedTokens) / 2))
-		hitsCache = true
+		hitsCache = usage.PromptTokensDetails.CachedTokens
 	}
 
 	if q.price.Type == model.TimesPriceType {
@@ -132,32 +132,20 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		return errors.New("error consuming token remain quota: " + err.Error())
 	}
 
-	requestTime := 0
-	requestStartTimeValue := ctx.Value("requestStartTime")
-	if requestStartTimeValue != nil {
-		requestStartTime, ok := requestStartTimeValue.(time.Time)
-		if ok {
-			requestTime = int(time.Since(requestStartTime).Milliseconds())
-		}
-	}
-	var modelRatioStr string
-	if q.price.Type == model.TimesPriceType {
-		modelRatioStr = fmt.Sprintf("$%s/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
-	} else {
-		// 如果输入费率和输出费率一样，则只显示一个费率
-		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("$%s/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
-		} else {
-			modelRatioStr = fmt.Sprintf("$%s/1k (输入) | $%s/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
-		}
-	}
-
-	if hitsCache {
-		modelRatioStr += fmt.Sprintf("- 缓存tokens: %d", usage.PromptTokensDetails.CachedTokens)
-	}
-
-	logContent := fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
-	model.RecordConsumeLog(ctx, q.userId, q.channelId, usage.PromptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime)
+	model.RecordConsumeLog(
+		ctx,
+		q.userId,
+		q.channelId,
+		usage.PromptTokens,
+		completionTokens,
+		q.modelName,
+		tokenName,
+		quota,
+		q.getLogContent(),
+		getRequestTime(ctx),
+		isStream,
+		q.GetLogMeta(hitsCache),
+	)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)
 
@@ -177,11 +165,11 @@ func (q *Quota) Undo(c *gin.Context) {
 	}
 }
 
-func (q *Quota) Consume(c *gin.Context, usage *types.Usage) {
+func (q *Quota) Consume(c *gin.Context, usage *types.Usage, isStream bool) {
 	tokenName := c.GetString("token_name")
 	// 如果没有报错，则消费配额
 	go func(ctx context.Context) {
-		err := q.completedQuotaConsumption(usage, tokenName, ctx)
+		err := q.completedQuotaConsumption(usage, tokenName, isStream, ctx)
 		if err != nil {
 			logger.LogError(ctx, err.Error())
 		}
@@ -190,4 +178,44 @@ func (q *Quota) Consume(c *gin.Context, usage *types.Usage) {
 
 func (q *Quota) GetInputRatio() float64 {
 	return q.inputRatio
+}
+
+func (q *Quota) GetLogMeta(cachedTokens int) map[string]any {
+	return map[string]any{
+		"price_type":   q.price.Type,
+		"group_ratio":  q.groupRatio,
+		"input_ratio":  q.price.GetInput(),
+		"output_ratio": q.price.GetOutput(),
+
+		"cached_tokens": cachedTokens,
+	}
+}
+
+func getRequestTime(ctx context.Context) int {
+	requestTime := 0
+	requestStartTimeValue := ctx.Value("requestStartTime")
+	if requestStartTimeValue != nil {
+		requestStartTime, ok := requestStartTimeValue.(time.Time)
+		if ok {
+			requestTime = int(time.Since(requestStartTime).Milliseconds())
+		}
+	}
+	return requestTime
+}
+
+func (q *Quota) getLogContent() string {
+	modelRatioStr := ""
+
+	if q.price.Type == model.TimesPriceType {
+		modelRatioStr = fmt.Sprintf("$%s/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
+	} else {
+		// 如果输入费率和输出费率一样，则只显示一个费率
+		if q.price.GetInput() == q.price.GetOutput() {
+			modelRatioStr = fmt.Sprintf("$%s/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
+		} else {
+			modelRatioStr = fmt.Sprintf("$%s/1k (输入) | $%s/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
+		}
+	}
+
+	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 }

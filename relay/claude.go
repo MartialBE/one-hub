@@ -131,7 +131,7 @@ func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.Cl
 		return
 	}
 
-	quota.Consume(c, usage)
+	quota.Consume(c, usage, request.Stream)
 	if usage.CompletionTokens > 0 {
 		go cache.StoreCache(c.GetInt("channel_id"), usage.PromptTokens, usage.CompletionTokens, originalModel)
 	}

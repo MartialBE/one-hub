@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 
-import { TableRow, TableCell, Stack } from '@mui/material';
+import Badge from '@mui/material/Badge';
+
+import { TableRow, TableCell, Stack, Tooltip } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
@@ -86,21 +88,16 @@ export default function LogTableRow({ item, userIsAdmin }) {
           )}
         </TableCell>
         <TableCell>{renderType(item.type)}</TableCell>
-        <TableCell>
-          {item.model_name && (
-            <Label color="primary" variant="outlined">
-              {item.model_name}
-            </Label>
-          )}
-        </TableCell>
+        <TableCell>{viewModelName(item.model_name, item.is_stream)}</TableCell>
+
         <TableCell>
           <Stack direction="row" spacing={1}>
             <Label color={requestTimeLabelOptions(item.request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Label>
             {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
           </Stack>
         </TableCell>
-        <TableCell>{item.prompt_tokens || '0'}</TableCell>
-        <TableCell>{item.completion_tokens || '0'}</TableCell>
+        <TableCell>{viewInput(item.prompt_tokens, item?.metadata?.cached_tokens)}</TableCell>
+        <TableCell>{item.completion_tokens || ''}</TableCell>
         <TableCell>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>
         <TableCell>{item.content}</TableCell>
       </TableRow>
@@ -112,3 +109,53 @@ LogTableRow.propTypes = {
   item: PropTypes.object,
   userIsAdmin: PropTypes.bool
 };
+
+function viewModelName(model_name, isStream) {
+  if (!model_name) {
+    return '';
+  }
+
+  if (isStream) {
+    return (
+      <Badge
+        badgeContent="Stream"
+        color="primary"
+        sx={{
+          '& .MuiBadge-badge': {
+            fontSize: '0.55rem',
+            height: '16px',
+            minWidth: '16px',
+            padding: '0 4px',
+            top: '-3px'
+          }
+        }}
+      >
+        <Label color="primary" variant="outlined">
+          {model_name}
+        </Label>
+      </Badge>
+    );
+  }
+
+  return (
+    <Label color="primary" variant="outlined">
+      {model_name}
+    </Label>
+  );
+}
+
+function viewInput(input, cache) {
+  if (!input) {
+    return '';
+  }
+
+  if (cache) {
+    return (
+      <Tooltip title="Input tokens/Cache tokens" placement="top">
+        {input} / {cache}
+      </Tooltip>
+    );
+  }
+
+  return input;
+}

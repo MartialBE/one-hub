@@ -7,6 +7,7 @@ import (
 	"one-api/common/logger"
 	"one-api/common/utils"
 
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +25,9 @@ type Log struct {
 	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
 	ChannelId        int    `json:"channel_id" gorm:"index"`
 	RequestTime      int    `json:"request_time" gorm:"default:0"`
+	IsStream         bool   `json:"is_stream" gorm:"default:false"`
+
+	Metadata datatypes.JSONType[map[string]any] `json:"metadata" gorm:"type:json"`
 
 	Channel *Channel `json:"channel" gorm:"foreignKey:Id;references:ChannelId"`
 }
@@ -53,7 +57,19 @@ func RecordLog(userId int, logType int, content string) {
 	}
 }
 
-func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int) {
+func RecordConsumeLog(
+	ctx context.Context,
+	userId int,
+	channelId int,
+	promptTokens int,
+	completionTokens int,
+	modelName string,
+	tokenName string,
+	quota int,
+	content string,
+	requestTime int,
+	isStream bool,
+	metadata map[string]any) {
 	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, tokenName=%s, quota=%d, content=%s", userId, channelId, promptTokens, completionTokens, modelName, tokenName, quota, content))
 	if !config.LogConsumeEnabled {
 		return
@@ -71,7 +87,13 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 		Quota:            quota,
 		ChannelId:        channelId,
 		RequestTime:      requestTime,
+		IsStream:         isStream,
 	}
+
+	if metadata != nil {
+		log.Metadata = datatypes.NewJSONType(metadata)
+	}
+
 	err := DB.Create(log).Error
 	if err != nil {
 		logger.LogError(ctx, "failed to record log: "+err.Error())
