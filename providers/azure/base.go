@@ -19,8 +19,9 @@ func (f AzureProviderFactory) Create(channel *model.Channel) base.ProviderInterf
 				Channel:   channel,
 				Requester: requester.NewHTTPRequester(*channel.Proxy, openai.RequestErrorHandle),
 			},
-			IsAzure:       true,
-			BalanceAction: false,
+			IsAzure:              true,
+			BalanceAction:        false,
+			SupportStreamOptions: true,
 		},
 	}
 }
