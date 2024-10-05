@@ -13,10 +13,16 @@ import (
 	"github.com/eko/gocache/lib/v4/store"
 	freecache_store "github.com/eko/gocache/store/freecache/v4"
 	redis_store "github.com/eko/gocache/store/redis/v4"
+	"golang.org/x/sync/singleflight"
 )
 
-var kvCache *marshaler.Marshaler
-var ctx = context.Background()
+var (
+	kvCache       *marshaler.Marshaler
+	ctx           = context.Background()
+	sfGroup       singleflight.Group
+	CacheTimeout  = 500 * time.Millisecond
+	CacheNotFound = errors.New("cache not found")
+)
 
 func InitCacheManager() {
 	var client *cacheM.Cache[any]
@@ -36,7 +42,7 @@ func GetCache[T any](key string) (T, error) {
 	_, err := kvCache.Get(ctx, key, &val)
 	if err != nil {
 		if errors.Is(err, store.NotFound{}) {
-			return val, nil
+			return *new(T), CacheNotFound
 		}
 		return *new(T), err
 	}
@@ -49,4 +55,39 @@ func SetCache(key string, value any, expiration time.Duration) error {
 
 func DeleteCache(key string) error {
 	return kvCache.Delete(ctx, key)
+}
+
+func GetOrSetCache[T any](key string, expiration time.Duration, fn func() (T, error), timeout time.Duration) (T, error) {
+	v, err := GetCache[T](key)
+	if err == nil {
+		return v, nil
+	}
+
+	if !errors.Is(err, CacheNotFound) {
+		return *new(T), err
+	}
+
+	result := sfGroup.DoChan(key, func() (interface{}, error) {
+		v, err := fn()
+		if err != nil {
+			return nil, err
+		}
+
+		SetCache(key, v, expiration)
+
+		return v, nil
+	})
+
+	t := time.After(timeout)
+
+	select {
+	case r := <-result:
+		v, ok := r.Val.(T)
+		if !ok {
+			return *new(T), errors.New("类型断言失败")
+		}
+		return v, r.Err
+	case <-t:
+		return *new(T), errors.New("超时")
+	}
 }

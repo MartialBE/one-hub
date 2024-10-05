@@ -1,9 +1,8 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
-	"one-api/common"
+	"one-api/common/cache"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/redis"
@@ -16,50 +15,38 @@ var (
 )
 
 func CacheGetTokenByKey(key string) (*Token, error) {
-	keyCol := "`key`"
-	if common.UsingPostgreSQL {
-		keyCol = `"key"`
-	}
-	var token Token
 	if !config.RedisEnabled {
-		err := DB.Where(keyCol+" = ?", key).First(&token).Error
-		return &token, err
+		return GetTokenByKey(key)
 	}
-	tokenObjectString, err := redis.RedisGet(fmt.Sprintf("token:%s", key))
-	if err != nil {
-		err := DB.Where(keyCol+" = ?", key).First(&token).Error
-		if err != nil {
-			return nil, err
-		}
-		jsonBytes, err := json.Marshal(token)
-		if err != nil {
-			return nil, err
-		}
-		err = redis.RedisSet(fmt.Sprintf("token:%s", key), string(jsonBytes), time.Duration(TokenCacheSeconds)*time.Second)
-		if err != nil {
-			logger.SysError("Redis set token error: " + err.Error())
-		}
-		return &token, nil
-	}
-	err = json.Unmarshal([]byte(tokenObjectString), &token)
-	return &token, err
+
+	token, err := cache.GetOrSetCache(
+		fmt.Sprintf("token:%s", key),
+		time.Duration(TokenCacheSeconds)*time.Second,
+		func() (*Token, error) {
+			return GetTokenByKey(key)
+		},
+		cache.CacheTimeout)
+
+	return token, err
 }
 
 func CacheGetUserGroup(id int) (group string, err error) {
 	if !config.RedisEnabled {
 		return GetUserGroup(id)
 	}
-	group, err = redis.RedisGet(fmt.Sprintf("user_group:%d", id))
-	if err != nil {
-		group, err = GetUserGroup(id)
-		if err != nil {
-			return "", err
-		}
-		err = redis.RedisSet(fmt.Sprintf("user_group:%d", id), group, time.Duration(TokenCacheSeconds)*time.Second)
-		if err != nil {
-			logger.SysError("Redis set user group error: " + err.Error())
-		}
-	}
+
+	group, err = cache.GetOrSetCache(
+		fmt.Sprintf("user_group:%d", id),
+		time.Duration(TokenCacheSeconds)*time.Second,
+		func() (string, error) {
+			groupId, err := GetUserGroup(id)
+			if err != nil {
+				return "", err
+			}
+			return groupId, nil
+		},
+		cache.CacheTimeout)
+
 	return group, err
 }
 
@@ -107,22 +94,39 @@ func CacheIsUserEnabled(userId int) (bool, error) {
 	if !config.RedisEnabled {
 		return IsUserEnabled(userId)
 	}
-	enabled, err := redis.RedisGet(fmt.Sprintf("user_enabled:%d", userId))
-	if err == nil {
-		return enabled == "1", nil
+
+	enabled, err := cache.GetOrSetCache(
+		fmt.Sprintf("user_enabled:%d", userId),
+		time.Duration(TokenCacheSeconds)*time.Second,
+		func() (bool, error) {
+			enabled, err := IsUserEnabled(userId)
+			if err != nil {
+				return false, err
+			}
+			return enabled, nil
+		},
+		cache.CacheTimeout)
+
+	return enabled, err
+}
+
+func CacheGetUsername(id int) (username string, err error) {
+	if !config.RedisEnabled {
+		return GetUsernameById(id), nil
 	}
 
-	userEnabled, err := IsUserEnabled(userId)
-	if err != nil {
-		return false, err
-	}
-	enabled = "0"
-	if userEnabled {
-		enabled = "1"
-	}
-	err = redis.RedisSet(fmt.Sprintf("user_enabled:%d", userId), enabled, time.Duration(TokenCacheSeconds)*time.Second)
-	if err != nil {
-		logger.SysError("Redis set user enabled error: " + err.Error())
-	}
-	return userEnabled, err
+	username, err = cache.GetOrSetCache(
+		fmt.Sprintf("user_name:%d", id),
+		time.Duration(TokenCacheSeconds)*time.Second,
+		func() (string, error) {
+			username := GetUsernameById(id)
+			if username == "" {
+				return "", fmt.Errorf("user %d not found", id)
+			}
+
+			return username, nil
+		},
+		cache.CacheTimeout)
+
+	return username, err
 }

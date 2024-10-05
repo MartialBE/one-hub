@@ -44,9 +44,11 @@ func RecordLog(userId int, logType int, content string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
+	username, _ := CacheGetUsername(userId)
+
 	log := &Log{
 		UserId:    userId,
-		Username:  GetUsernameById(userId),
+		Username:  username,
 		CreatedAt: utils.GetTimestamp(),
 		Type:      logType,
 		Content:   content,
@@ -74,9 +76,12 @@ func RecordConsumeLog(
 	if !config.LogConsumeEnabled {
 		return
 	}
+
+	username, _ := CacheGetUsername(userId)
+
 	log := &Log{
 		UserId:           userId,
-		Username:         GetUsernameById(userId),
+		Username:         username,
 		CreatedAt:        utils.GetTimestamp(),
 		Type:             LogTypeConsume,
 		Content:          content,
