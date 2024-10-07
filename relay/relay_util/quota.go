@@ -217,5 +217,6 @@ func (q *Quota) getLogContent() string {
 		}
 	}
 
-	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	// return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	return modelRatioStr
 }
