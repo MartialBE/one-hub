@@ -114,7 +114,7 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 		return
 	}
 
-	quota.Consume(relay.getContext(), usage)
+	quota.Consume(relay.getContext(), usage, relay.IsStream())
 	if usage.CompletionTokens > 0 {
 		cacheProps := relay.GetChatCache()
 		go cacheProps.StoreCache(relay.getContext().GetInt("channel_id"), usage.PromptTokens, usage.CompletionTokens, relay.getModelName())
@@ -138,5 +138,5 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 		}
 	}
 
-	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime)
+	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime, isStream, nil)
 }
