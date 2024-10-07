@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/redis"
@@ -119,6 +120,18 @@ func GetTokenByName(name string, userId int) (*Token, error) {
 	token := Token{Name: name}
 	var err error = nil
 	err = DB.First(&token, "user_id = ? and name = ?", userId, name).Error
+	return &token, err
+}
+
+func GetTokenByKey(key string) (*Token, error) {
+	keyCol := "`key`"
+	if common.UsingPostgreSQL {
+		keyCol = `"key"`
+	}
+
+	var token Token
+
+	err := DB.Where(keyCol+" = ?", key).First(&token).Error
 	return &token, err
 }
 

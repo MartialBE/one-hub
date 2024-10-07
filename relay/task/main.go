@@ -88,7 +88,7 @@ func RelayTaskSubmit(c *gin.Context) {
 }
 
 func CompletedTask(quotaInstance *relay_util.Quota, taskAdaptor base.TaskInterface, c *gin.Context) {
-	quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
+	quotaInstance.Consume(c, &types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1}, false)
 
 	task := taskAdaptor.GetTask()
 	task.Quota = int(quotaInstance.GetInputRatio() * 1000)
