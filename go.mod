@@ -33,7 +33,7 @@ require (
 	github.com/pkoukk/tiktoken-go v0.1.7
 	github.com/prometheus/client_golang v1.20.4
 	github.com/redis/go-redis/v9 v9.5.4
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.47.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/smartwalle/alipay/v3 v3.2.21
 	github.com/spf13/viper v1.18.2
@@ -45,6 +45,7 @@ require (
 	golang.org/x/crypto v0.25.0
 	golang.org/x/image v0.18.0
 	golang.org/x/oauth2 v0.23.0
+	golang.org/x/sync v0.7.0
 	google.golang.org/api v0.188.0
 	google.golang.org/grpc v1.64.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -105,7 +106,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
-	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240708141625-4ad9e859172b // indirect
