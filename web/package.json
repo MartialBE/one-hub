@@ -13,7 +13,7 @@
     "@mui/lab": "^5.0.0-alpha.163",
     "@mui/material": "^5.15.7",
     "@mui/system": "^5.15.7",
-    "@mui/utils": "^5.15.7",
+    "@mui/utils": "^6.1.2",
     "@mui/x-data-grid": "^6.19.5",
     "@mui/x-date-pickers": "^7.19.0",
     "@tabler/icons-react": "^2.46.0",
