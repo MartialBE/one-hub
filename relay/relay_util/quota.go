@@ -207,15 +207,38 @@ func (q *Quota) getLogContent() string {
 	modelRatioStr := ""
 
 	if q.price.Type == model.TimesPriceType {
-		modelRatioStr = fmt.Sprintf("$%s/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
-	} else {
-		// 如果输入费率和输出费率一样，则只显示一个费率
-		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("$%s/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
+		price := q.price.FetchInputCurrencyPrice(model.DollarRate)
+		if price == "0" {
+			modelRatioStr = "免费"
 		} else {
-			modelRatioStr = fmt.Sprintf("$%s/1k (输入) | $%s/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
+			modelRatioStr = fmt.Sprintf("$%s/次", price)
+		}
+	} else {
+		inputPrice := q.price.FetchInputCurrencyPrice(model.DollarRate)
+		outputPrice := q.price.FetchOutputCurrencyPrice(model.DollarRate)
+
+		if inputPrice == "0" && outputPrice == "0" {
+			modelRatioStr = "免费"
+		} else if q.price.GetInput() == q.price.GetOutput() {
+			if inputPrice == "0" {
+				modelRatioStr = "免费"
+			} else {
+				modelRatioStr = fmt.Sprintf("$%s/1k", inputPrice)
+			}
+		} else {
+			var inputStr, outputStr string
+			if inputPrice == "0" {
+				inputStr = "免费"
+			} else {
+				inputStr = fmt.Sprintf("$%s/1k", inputPrice)
+			}
+			if outputPrice == "0" {
+				outputStr = "免费"
+			} else {
+				outputStr = fmt.Sprintf("$%s/1k", outputPrice)
+			}
+			modelRatioStr = fmt.Sprintf("%s (输入) | %s (输出)", inputStr, outputStr)
 		}
 	}
-
-	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	 return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 }
