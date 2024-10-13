@@ -5,7 +5,6 @@ import { useTheme } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -394,43 +393,41 @@ export default function ChannelList() {
           </Container>
         </Toolbar>
         {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer>
-            <Table sx={{ minWidth: 800 }}>
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'collapse', label: '', disableSort: true, width: '50px' },
-                  { id: 'id', label: 'ID', disableSort: false, width: '80px' },
-                  { id: 'name', label: t('channel_index.name'), disableSort: false },
-                  { id: 'group', label: t('channel_index.group'), disableSort: true },
-                  { id: 'tag', label: t('channel_index.tags'), disableSort: true },
-                  { id: 'type', label: t('channel_index.type'), disableSort: false },
-                  { id: 'status', label: t('channel_index.status'), disableSort: false },
-                  { id: 'response_time', label: t('channel_index.responseTime'), disableSort: false },
-                  // { id: 'balance', label: '余额', disableSort: false },
-                  { id: 'used', label: t('channel_index.usedBalance'), disableSort: true },
-                  { id: 'priority', label: t('channel_index.priority'), disableSort: false, width: '80px' },
-                  { id: 'weight', label: t('channel_index.weight'), disableSort: false, width: '80px' },
-                  { id: 'action', label: t('channel_index.actions'), disableSort: true }
-                ]}
-              />
-              <TableBody>
-                {channels.map((row) => (
-                  <ChannelTableRow
-                    item={row}
-                    manageChannel={manageChannel}
-                    key={row.id}
-                    handleOpenModal={handleOpenModal}
-                    setModalChannelId={setEditChannelId}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
+        <TableContainer>
+          <Table sx={{ minWidth: 800 }}>
+            <KeywordTableHead
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleSort}
+              headLabel={[
+                { id: 'collapse', label: '', disableSort: true, width: '50px' },
+                { id: 'id', label: 'ID', disableSort: false, width: '80px' },
+                { id: 'name', label: t('channel_index.name'), disableSort: false },
+                { id: 'group', label: t('channel_index.group'), disableSort: true },
+                { id: 'tag', label: t('channel_index.tags'), disableSort: true },
+                { id: 'type', label: t('channel_index.type'), disableSort: false },
+                { id: 'status', label: t('channel_index.status'), disableSort: false },
+                { id: 'response_time', label: t('channel_index.responseTime'), disableSort: false },
+                // { id: 'balance', label: '余额', disableSort: false },
+                { id: 'used', label: t('channel_index.usedBalance'), disableSort: true },
+                { id: 'priority', label: t('channel_index.priority'), disableSort: false, width: '80px' },
+                { id: 'weight', label: t('channel_index.weight'), disableSort: false, width: '80px' },
+                { id: 'action', label: t('channel_index.actions'), disableSort: true }
+              ]}
+            />
+            <TableBody>
+              {channels.map((row) => (
+                <ChannelTableRow
+                  item={row}
+                  manageChannel={manageChannel}
+                  key={row.id}
+                  handleOpenModal={handleOpenModal}
+                  setModalChannelId={setEditChannelId}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
         <TablePagination
           page={page}
           component="div"
