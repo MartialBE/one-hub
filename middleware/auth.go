@@ -117,7 +117,7 @@ func tokenAuth(c *gin.Context, key string) {
 		if model.IsAdmin(token.UserId) {
 			if strings.HasPrefix(parts[1], "!") {
 				channelId := utils.String2Int(parts[1][1:])
-				c.Set("skip_channel_id", channelId)
+				c.Set("skip_channel_ids", []int{channelId})
 			} else {
 				channelId := utils.String2Int(parts[1])
 				if channelId == 0 {
@@ -139,7 +139,22 @@ func tokenAuth(c *gin.Context, key string) {
 
 func OpenaiAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		isWebSocket := c.GetHeader("Upgrade") == "websocket"
 		key := c.Request.Header.Get("Authorization")
+
+		if isWebSocket && key == "" {
+			protocols := c.Request.Header["Sec-Websocket-Protocol"]
+			if len(protocols) > 0 {
+				protocolList := strings.Split(protocols[0], ",")
+				for _, protocol := range protocolList {
+					protocol = strings.TrimSpace(protocol)
+					if strings.HasPrefix(protocol, "openai-insecure-api-key.") {
+						key = strings.TrimPrefix(protocol, "openai-insecure-api-key.")
+						break
+					}
+				}
+			}
+		}
 		tokenAuth(c, key)
 	}
 }

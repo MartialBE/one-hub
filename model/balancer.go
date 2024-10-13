@@ -26,9 +26,9 @@ type ChannelsChooser struct {
 
 type ChannelsFilterFunc func(channelId int, choice *ChannelChoice) bool
 
-func FilterChannelId(skipChannelId int) ChannelsFilterFunc {
-	return func(channelId int, choice *ChannelChoice) bool {
-		return skipChannelId > 0 && channelId == skipChannelId
+func FilterChannelId(skipChannelIds []int) ChannelsFilterFunc {
+	return func(channelId int, _ *ChannelChoice) bool {
+		return utils.Contains(channelId, skipChannelIds)
 	}
 }
 

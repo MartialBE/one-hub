@@ -273,6 +273,7 @@ const (
 	RelayModeAudioTranslation
 	RelayModeSuno
 	RelayModeRerank
+	RelayModeChatRealtime
 )
 
 type ContextKey string

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"fmt"
 	"one-api/common/cache"
 	"one-api/common/config"
@@ -11,7 +12,13 @@ import (
 )
 
 var (
-	TokenCacheSeconds = 0
+	TokenCacheSeconds           = 0
+	UserGroupCacheKey           = "user_group:%d"
+	UsernameCacheKey            = "user_name:%d"
+	UserQuotaCacheKey           = "user_quota:%d"
+	UserEnabledCacheKey         = "user_enabled:%d"
+	UserRealtimeQuotaKey        = "user_realtime_quota:%d"
+	UserRealtimeQuotaExpiration = 24 * time.Hour
 )
 
 func CacheGetTokenByKey(key string) (*Token, error) {
@@ -36,7 +43,7 @@ func CacheGetUserGroup(id int) (group string, err error) {
 	}
 
 	group, err = cache.GetOrSetCache(
-		fmt.Sprintf("user_group:%d", id),
+		fmt.Sprintf(UserGroupCacheKey, id),
 		time.Duration(TokenCacheSeconds)*time.Second,
 		func() (string, error) {
 			groupId, err := GetUserGroup(id)
@@ -54,13 +61,13 @@ func CacheGetUserQuota(id int) (quota int, err error) {
 	if !config.RedisEnabled {
 		return GetUserQuota(id)
 	}
-	quotaString, err := redis.RedisGet(fmt.Sprintf("user_quota:%d", id))
+	quotaString, err := redis.RedisGet(fmt.Sprintf(UserQuotaCacheKey, id))
 	if err != nil {
 		quota, err = GetUserQuota(id)
 		if err != nil {
 			return 0, err
 		}
-		err = redis.RedisSet(fmt.Sprintf("user_quota:%d", id), fmt.Sprintf("%d", quota), time.Duration(TokenCacheSeconds)*time.Second)
+		err = redis.RedisSet(fmt.Sprintf(UserQuotaCacheKey, id), fmt.Sprintf("%d", quota), time.Duration(TokenCacheSeconds)*time.Second)
 		if err != nil {
 			logger.SysError("Redis set user quota error: " + err.Error())
 		}
@@ -78,7 +85,7 @@ func CacheUpdateUserQuota(id int) error {
 	if err != nil {
 		return err
 	}
-	err = redis.RedisSet(fmt.Sprintf("user_quota:%d", id), fmt.Sprintf("%d", quota), time.Duration(TokenCacheSeconds)*time.Second)
+	err = redis.RedisSet(fmt.Sprintf(UserQuotaCacheKey, id), fmt.Sprintf("%d", quota), time.Duration(TokenCacheSeconds)*time.Second)
 	return err
 }
 
@@ -86,7 +93,7 @@ func CacheDecreaseUserQuota(id int, quota int) error {
 	if !config.RedisEnabled {
 		return nil
 	}
-	err := redis.RedisDecrease(fmt.Sprintf("user_quota:%d", id), int64(quota))
+	err := redis.RedisDecrease(fmt.Sprintf(UserQuotaCacheKey, id), int64(quota))
 	return err
 }
 
@@ -96,7 +103,7 @@ func CacheIsUserEnabled(userId int) (bool, error) {
 	}
 
 	enabled, err := cache.GetOrSetCache(
-		fmt.Sprintf("user_enabled:%d", userId),
+		fmt.Sprintf(UserEnabledCacheKey, userId),
 		time.Duration(TokenCacheSeconds)*time.Second,
 		func() (bool, error) {
 			enabled, err := IsUserEnabled(userId)
@@ -116,7 +123,7 @@ func CacheGetUsername(id int) (username string, err error) {
 	}
 
 	username, err = cache.GetOrSetCache(
-		fmt.Sprintf("user_name:%d", id),
+		fmt.Sprintf(UsernameCacheKey, id),
 		time.Duration(TokenCacheSeconds)*time.Second,
 		func() (string, error) {
 			username := GetUsernameById(id)
@@ -129,4 +136,53 @@ func CacheGetUsername(id int) (username string, err error) {
 		cache.CacheTimeout)
 
 	return username, err
+}
+
+func CacheDecreaseUserRealtimeQuota(id int, quota int) (int64, error) {
+	if !config.RedisEnabled {
+		return 0, nil
+	}
+	return CacheUpdateUserRealtimeQuota(id, -quota)
+}
+
+func CacheIncreaseUserRealtimeQuota(id int, quota int) (int64, error) {
+	if !config.RedisEnabled {
+		return 0, nil
+	}
+	return CacheUpdateUserRealtimeQuota(id, quota)
+}
+
+var (
+	updateQuotaScript = redis.NewScript(`
+		local key = KEYS[1]
+		local increment = tonumber(ARGV[1])
+		local expiration = tonumber(ARGV[2])
+
+		local exists = redis.call("EXISTS", key)
+		if exists == 0 then
+			if increment < 0 then
+				return 0
+			end
+			redis.call("SET", key, "0", "EX", expiration)
+		end
+
+		local newValue = redis.call("INCRBY", key, increment)
+		redis.call("EXPIRE", key, expiration)
+
+		return newValue
+	`)
+)
+
+func CacheUpdateUserRealtimeQuota(id int, quota int) (int64, error) {
+	if !config.RedisEnabled {
+		return 0, nil
+	}
+	key := fmt.Sprintf(UserRealtimeQuotaKey, id)
+
+	newValue, err := updateQuotaScript.Run(context.Background(), redis.GetRedisClient(), []string{key}, quota, int(UserRealtimeQuotaExpiration.Seconds())).Int64()
+	if err != nil {
+		return 0, fmt.Errorf("更新用户配额失败: %w", err)
+	}
+
+	return newValue, nil
 }

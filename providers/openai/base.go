@@ -66,6 +66,7 @@ func getOpenAIConfig(baseURL string, channel *model.Channel) base.ProviderConfig
 		ImagesEdit:          "/v1/images/edits",
 		ImagesVariations:    "/v1/images/variations",
 		ModelList:           "/v1/models",
+		ChatRealtime:        "/v1/realtime",
 	}
 
 	if channel.Type != config.ChannelTypeCustom || channel.Plugin == nil {
@@ -104,6 +105,18 @@ func ErrorHandle(openaiError *types.OpenAIErrorResponse) *types.OpenAIError {
 // 获取完整请求 URL
 func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
+
+	if strings.HasPrefix(modelName, "gpt-4o-realtime") {
+		baseURL = strings.Replace(baseURL, "https://", "wss://", 1)
+		if p.IsAzure {
+			// wss://my-eastus2-openai-resource.openai.azure.com/openai/realtime?api-version=2024-10-01-preview&deployment=gpt-4o-realtime-preview-1001
+			requestURL = fmt.Sprintf("/openai/%s?api-version=%s&deployment=%s", requestURL, p.Channel.Other, modelName)
+		} else {
+			requestURL += fmt.Sprintf("?model=%s", modelName)
+		}
+
+		return fmt.Sprintf("%s%s", baseURL, requestURL)
+	}
 
 	if p.IsAzure {
 		apiVersion := p.Channel.Other

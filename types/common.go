@@ -8,6 +8,8 @@ type Usage struct {
 	TotalTokens             int                      `json:"total_tokens"`
 	PromptTokensDetails     *PromptTokensDetails     `json:"prompt_tokens_details,omitempty"`
 	CompletionTokensDetails *CompletionTokensDetails `json:"completion_tokens_details,omitempty"`
+
+	SysTokensDetails SysTokensDetails `json:"-"`
 }
 
 type PromptTokensDetails struct {
@@ -18,6 +20,14 @@ type PromptTokensDetails struct {
 type CompletionTokensDetails struct {
 	AudioTokens     int `json:"audio_tokens,omitempty"`
 	ReasoningTokens int `json:"reasoning_tokens,omitempty"`
+}
+
+type SysTokensDetails struct {
+	CachedTokens      int `json:"cached_tokens,omitempty"`
+	InputAudioTokens  int `json:"input_audio_tokens,omitempty"`
+	InputTextTokens   int `json:"input_text_tokens,omitempty"`
+	OutputAudioTokens int `json:"output_audio_tokens,omitempty"`
+	OutputTextTokens  int `json:"output_text_tokens,omitempty"`
 }
 
 type OpenAIError struct {

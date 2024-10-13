@@ -52,6 +52,8 @@ func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		response.Usage.TotalTokens = response.Usage.PromptTokens + response.Usage.CompletionTokens
 	}
 
+	handleUsage(response.Usage)
+
 	*p.Usage = *response.Usage
 
 	return &response.ChatCompletionResponse, nil
@@ -122,24 +124,34 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 		return
 	}
 
-	if len(openaiResponse.Choices) == 0 {
-		if openaiResponse.Usage != nil {
-			*h.Usage = *openaiResponse.Usage
+	if openaiResponse.Usage != nil {
+		handleUsage(openaiResponse.Usage)
+
+		*h.Usage = *openaiResponse.Usage
+		if len(openaiResponse.Choices) == 0 {
+			*rawLine = nil
+			return
 		}
-		*rawLine = nil
-		return
+	} else {
+		if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Usage != nil {
+			handleUsage(openaiResponse.Choices[0].Usage)
+
+			*h.Usage = *openaiResponse.Choices[0].Usage
+		} else {
+			if h.Usage.TotalTokens == 0 {
+				h.Usage.TotalTokens = h.Usage.PromptTokens
+			}
+			countTokenText := common.CountTokenText(openaiResponse.GetResponseText(), h.ModelName)
+			h.Usage.CompletionTokens += countTokenText
+			h.Usage.TotalTokens += countTokenText
+		}
 	}
 
 	dataChan <- string(*rawLine)
+}
 
-	if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Usage != nil {
-		*h.Usage = *openaiResponse.Choices[0].Usage
-	} else {
-		if h.Usage.TotalTokens == 0 {
-			h.Usage.TotalTokens = h.Usage.PromptTokens
-		}
-		countTokenText := common.CountTokenText(openaiResponse.GetResponseText(), h.ModelName)
-		h.Usage.CompletionTokens += countTokenText
-		h.Usage.TotalTokens += countTokenText
+func handleUsage(usage *types.Usage) {
+	if usage.PromptTokensDetails != nil && usage.PromptTokensDetails.CachedTokens > 0 {
+		usage.SysTokensDetails.CachedTokens = usage.PromptTokensDetails.CachedTokens
 	}
 }
