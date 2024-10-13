@@ -150,6 +150,9 @@
     "modelMappingKey": "用户请求模型",
     "modelMappingValue": "实际转发模型",
     "addModelMapping": "添加模型映射",
+    "addModelMappingByJson": "添加模型映射(JSON)",
+    "jsonInputLabel": "JSON对象，key为请求模型，value为实际转发模型",
+    "invalidJson": "无效的JSON",
     "modelHeaderKey": "自定义Header Key",
     "modelHeaderValue": "自定义Header Value",
     "addModelHeader": "添加自定义Header"

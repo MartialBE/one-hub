@@ -83,7 +83,10 @@
     "modelMappingValue": "実際の転送モデル",
     "modelHeaderKey": "カスタムヘッダーキー",
     "modelHeaderValue": "カスタムヘッダー値",
-    "addModelHeader": "カスタムヘッダーを追加"
+    "addModelHeader": "カスタムヘッダーを追加",
+    "addModelMappingByJson": "モデルマッピング（JSON）の追加",
+    "invalidJson": "無効なJSON",
+    "jsonInputLabel": "JSONオブジェクト、キーはリクエストモデルであり、値は実際の転送モデルです。"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
