@@ -2,12 +2,13 @@ package oidc
 
 import (
 	"context"
-	"github.com/coreos/go-oidc"
-	"golang.org/x/oauth2"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"strings"
 	"sync"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 type OIDCConfig struct {
