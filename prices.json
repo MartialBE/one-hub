@@ -175,6 +175,20 @@
     "output": 0.3
   },
   {
+    "model": "gpt-4o-realtime-preview",
+    "type": "tokens",
+    "channel_type": 1,
+    "input": 2.5,
+    "output": 100
+  },
+  {
+    "model": "gpt-4o-realtime-preview-2024-10-01",
+    "type": "tokens",
+    "channel_type": 1,
+    "input": 2.5,
+    "output": 100
+  },
+  {
     "model": "gpt-4-0125-preview",
     "type": "tokens",
     "channel_type": 1,
