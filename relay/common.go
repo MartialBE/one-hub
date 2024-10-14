@@ -106,14 +106,15 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("group")
-	skipChannelId := c.GetInt("skip_channel_id")
 	skipOnlyChat := c.GetBool("skip_only_chat")
 	var filters []model.ChannelsFilterFunc
 	if skipOnlyChat {
 		filters = append(filters, model.FilterOnlyChat())
 	}
-	if skipChannelId > 0 {
-		filters = append(filters, model.FilterChannelId(skipChannelId))
+
+	skipChannelIds, ok := utils.GetGinValue[[]int](c, "skip_channel_ids")
+	if ok {
+		filters = append(filters, model.FilterChannelId(skipChannelIds))
 	}
 
 	channel, err := model.ChannelGroup.Next(group, modelName, filters...)

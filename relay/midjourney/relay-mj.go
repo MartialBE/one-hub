@@ -556,8 +556,12 @@ func getMjRequestPath(path string) string {
 
 func getQuota(c *gin.Context, action string) (*relay_util.Quota, *types.OpenAIErrorWithStatusCode) {
 	modelName := CoverActionToModelName(action)
+	quota := relay_util.NewQuota(c, modelName, 1000)
+	if err := quota.PreQuotaConsumption(); err != nil {
+		return nil, err
+	}
 
-	return relay_util.NewQuota(c, modelName, 1000)
+	return quota, nil
 }
 
 func getMJProviderWithRequest(c *gin.Context, relayMode int, request *provider.MidjourneyRequest) (*provider.MidjourneyProvider, *provider.MidjourneyResponse) {

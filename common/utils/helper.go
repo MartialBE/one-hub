@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/snowflake"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 )
@@ -176,6 +177,10 @@ func GetRandomString(length int) string {
 	return string(key)
 }
 
+func GetRandomInt(length int) int {
+	return rand.Intn(int(math.Pow10(length)))
+}
+
 func GetTimestamp() int64 {
 	return time.Now().Unix()
 }
@@ -322,4 +327,18 @@ func GetUnixTime() int64 {
 
 func NumClamp(value, minVal, maxVal float64) float64 {
 	return math.Max(minVal, math.Min(maxVal, value))
+}
+
+func GetGinValue[T any](c *gin.Context, key string) (T, bool) {
+	value, exists := c.Get(key)
+	if !exists {
+		var zeroValue T
+		return zeroValue, false
+	}
+	if v, ok := value.(T); ok {
+		return v, true
+	}
+
+	var zeroValue T
+	return zeroValue, false
 }

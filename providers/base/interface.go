@@ -7,6 +7,7 @@ import (
 	"one-api/types"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type Requestable interface {
@@ -123,4 +124,9 @@ type BalanceInterface interface {
 type RerankInterface interface {
 	ProviderInterface
 	CreateRerank(request *types.RerankRequest) (*types.RerankResponse, *types.OpenAIErrorWithStatusCode)
+}
+
+type RealtimeInterface interface {
+	ProviderInterface
+	CreateChatRealtime(modelName string) (*websocket.Conn, requester.MessageHandler, *types.OpenAIErrorWithStatusCode)
 }

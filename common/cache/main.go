@@ -20,7 +20,7 @@ var (
 	kvCache       *marshaler.Marshaler
 	ctx           = context.Background()
 	sfGroup       singleflight.Group
-	CacheTimeout  = 500 * time.Millisecond
+	CacheTimeout  = 1 * time.Second
 	CacheNotFound = errors.New("cache not found")
 )
 

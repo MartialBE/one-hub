@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 
+import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 
-import { TableRow, TableCell, Stack, Tooltip } from '@mui/material';
+import { TableRow, TableCell, Stack, Tooltip, Typography } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
 import LogType from '../type/LogType';
+import { useTranslation } from 'react-i18next';
 
 function renderType(type) {
   const typeOption = LogType[type];
@@ -58,6 +60,7 @@ function requestTSLabelOptions(request_ts) {
 }
 
 export default function LogTableRow({ item, userIsAdmin }) {
+  const { t } = useTranslation();
   let request_time = item.request_time / 1000;
   let request_time_str = request_time.toFixed(2) + ' 秒';
   let request_ts = 0;
@@ -96,7 +99,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
             {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
           </Stack>
         </TableCell>
-        <TableCell>{viewInput(item.prompt_tokens, item?.metadata?.cached_tokens)}</TableCell>
+        <TableCell>{viewInput(item, t)}</TableCell>
         <TableCell>{item.completion_tokens || ''}</TableCell>
         <TableCell>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>
         <TableCell>{item.content}</TableCell>
@@ -144,18 +147,69 @@ function viewModelName(model_name, isStream) {
   );
 }
 
-function viewInput(input, cache) {
-  if (!input) {
-    return '';
+const MetadataTypography = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  color: theme.palette.grey[300],
+  '&:not(:last-child)': {
+    marginBottom: theme.spacing(0.5)
+  }
+}));
+
+function viewInput(item, t) {
+  const { prompt_tokens, completion_tokens, metadata } = item;
+
+  if (!prompt_tokens) return '';
+  if (!metadata) return prompt_tokens;
+
+  let totalInputTokens = prompt_tokens;
+  let totalOutputTokens = completion_tokens;
+
+  let show = false;
+
+  const tooltipContent = [
+    { key: 'input_text_tokens', label: t('logPage.inputTextTokens'), rate: 1 },
+    { key: 'output_text_tokens', label: t('logPage.outputTextTokens'), rate: 1 },
+    { key: 'input_audio_tokens', label: t('logPage.inputAudioTokens'), rate: 20 },
+    { key: 'output_audio_tokens', label: t('logPage.outputAudioTokens'), rate: 10 },
+    { key: 'cached_tokens', label: t('logPage.cachedTokens'), rate: 0.5 }
+  ]
+    .filter(({ key }) => metadata[key] > 0)
+    .map(({ key, label, rate }) => {
+      const tokens = Math.ceil(metadata[key] * rate);
+      if (key === 'input_audio_tokens' || key === 'cached_tokens') {
+        totalInputTokens += tokens - metadata[key];
+        show = true;
+      } else if (key === 'output_audio_tokens') {
+        totalOutputTokens += tokens - metadata[key];
+        show = true;
+      }
+
+      return <MetadataTypography key={key}>{`${label}: ${metadata[key]} * ${rate} = ${tokens}`}</MetadataTypography>;
+    });
+
+  if (!show) {
+    return prompt_tokens;
   }
 
-  if (cache) {
-    return (
-      <Tooltip title="Input tokens/Cache tokens" placement="top">
-        {input} / {cache}
+  return (
+    <Badge variant="dot" color="primary">
+      <Tooltip
+        title={
+          <>
+            {tooltipContent}
+            <MetadataTypography>
+              {t('logPage.totalInputTokens')}: {totalInputTokens}
+            </MetadataTypography>
+            <MetadataTypography>
+              {t('logPage.totalOutputTokens')}: {totalOutputTokens}
+            </MetadataTypography>
+          </>
+        }
+        placement="top"
+        arrow
+      >
+        <span style={{ cursor: 'help' }}>{prompt_tokens}</span>
       </Tooltip>
-    );
-  }
-
-  return input;
+    </Badge>
+  );
 }

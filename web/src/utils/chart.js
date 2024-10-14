@@ -227,15 +227,19 @@ export function generateBarChartOptions(xaxis, data, unit = '', decimal = 0) {
 
 // 格式化数值
 export function renderChartNumber(number, decimal = 2) {
-  number = number.toFixed(decimal);
-  if (number === Number(0).toFixed(decimal)) {
-    return 0;
+  number = Number(number);
+
+  if (isNaN(number)) {
+    return '0';
   }
 
-  // 如果大于1000，显示为k
-  if (number >= 1000) {
+  if (Math.abs(number) < Number.EPSILON) {
+    return '0';
+  }
+
+  if (Math.abs(number) >= 1000) {
     return (number / 1000).toFixed(1) + 'k';
   }
 
-  return number;
+  return number.toFixed(decimal);
 }
