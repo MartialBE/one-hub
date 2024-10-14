@@ -1,0 +1,95 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GOPROXY: 'https://goproxy.cn,direct'
+  GOSUMDB: sum.golang.google.cn
+  ROOT_DIR: $(pwd)
+  BUILD_DIR: $(pwd)/_output
+  BIN_DIR: $(pwd)/_output/one-hub
+  VERSION_PKG: one-api/common/config
+  BUILD_VERSION: $(git describe --tags || echo "dev")
+  BUILD_DATE: $(date +%Y%m%d)
+  GIT_BRANCH: $(git branch -r --contains | head -1 | sed -E -e "s%(HEAD ->|origin|upstream)/?%%g" | xargs)
+  GIT_COMMIT: $(git rev-parse --short HEAD || echo "abcdefgh")
+  BUILD_RELEASE: "{{.BUILD_VERSION}}-{{.BUILD_DATE}}-{{.GIT_COMMIT}}"
+  IMAGE: "ttl.sh/one-hub:{{.BUILD_RELEASE}}"
+  LOCAL_OS: $(go version | awk '{print $NF}')
+  GOOS: $(go env GOOS)
+  GOARCH: $(go env GOARCH)
+  LDFLAGS: "-w -s \
+    -extldflags '-static' \
+    -X '{{.VERSION_PKG}}.Version={{.BUILD_VERSION}}' \
+    -X '{{.VERSION_PKG}}.BuildTime={{.BUILD_DATE}}' \
+    -X '{{.VERSION_PKG}}.Commit={{.GIT_COMMIT}}'"
+
+tasks:
+  web:
+    desc: build web
+    cmds:
+      - hack/scripts/genui.sh {{.BUILD_VERSION}}
+    status:
+      - test -f web/build/index.html
+
+  gomod:
+    desc: update go mod
+    cmds:
+      - go mod tidy
+
+  gofmt:
+    cmds:
+      - go install golang.org/x/tools/cmd/goimports@latest
+      - gofmt -s -w .
+      - goimports -w .
+
+  golint:
+    cmds:
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - golangci-lint run -v ./...
+
+  lint:
+    cmds:
+      - task: gofmt
+      - task: golint
+
+  fmt:
+    cmds:
+      - task: gomod
+      - task: gofmt
+      - task: golint
+
+  clean:
+    desc: clean
+    run: once
+    cmds:
+      - rm -rf web/build
+      - rm -rf {{.BUILD_DIR}}
+
+  run:
+    desc: run
+    deps:
+      - build
+    cmds:
+      - "{{.BIN_DIR}}"
+
+  build:
+    desc: build binary
+    deps:
+      - gomod
+      - web
+    cmds:
+      - go build -o {{.BIN_DIR}} -ldflags "{{.LDFLAGS}}"
+
+  docker:
+    desc: build docker image
+    deps:
+      - gomod
+      - web
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o {{.BIN_DIR}} -ldflags "{{.LDFLAGS}}"
+      - docker buildx build --pull --push --platform linux/amd64 -t "{{.IMAGE}}" .
+
+  default:
+    cmds:
+      - task: build
