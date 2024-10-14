@@ -277,7 +277,7 @@ func (q *Quota) getLogContent() string {
 		modelRatioStr += "| 音频输入 20 倍，音频输出 10 倍"
 	}
 
-	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	return modelRatioStr
 }
 
 // 通过 token 数获取消费配额
