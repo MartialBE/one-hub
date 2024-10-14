@@ -74,3 +74,11 @@ func RedisDecrease(key string, value int64) error {
 	ctx := context.Background()
 	return RDB.DecrBy(ctx, key, value).Err()
 }
+
+func NewScript(script string) *redis.Script {
+	return redis.NewScript(script)
+}
+
+func GetRedisClient() *redis.Client {
+	return RDB
+}

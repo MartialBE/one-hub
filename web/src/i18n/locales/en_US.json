@@ -84,7 +84,10 @@
     "modelMappingValue": "Actual forwarding model",
     "modelHeaderKey": "Custom Header Key",
     "modelHeaderValue": "Custom Header Value",
-    "addModelHeader": "Add Custom Header"
+    "addModelHeader": "Add Custom Header",
+    "addModelMappingByJson": "Add model mapping (JSON)",
+    "invalidJson": "Invalid JSON",
+    "jsonInputLabel": "JSON object, where the key is the request model and the value is the actual forwarding model."
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -254,7 +257,14 @@
     "title": "Logs",
     "tokenLabel": "Token",
     "typeLabel": "Type",
-    "userLabel": "User"
+    "userLabel": "User",
+    "cachedTokens": "Cache Tokens",
+    "outputAudioTokens": "Output audio tokens",
+    "inputAudioTokens": "Input audio tokens",
+    "inputTextTokens": "Input text tokens",
+    "outputTextTokens": "Output text tokens",
+    "totalInputTokens": "Total input tokens",
+    "totalOutputTokens": "Total output tokens"
   },
   "login": {
     "codeRequired": "verification code must be filled",
@@ -1055,5 +1065,6 @@
   "默认 zh-CN-YunyangNeural": "Default zh-CN-YunyangNeural",
   "默认 zh-CN-YunyeNeural": "Default zh-CN-YunyeNeural",
   "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "Select the estimated cost option here for cost estimation. If you think that calculating images consumes too many resources, you can choose to disable image billing. However, please note: some channels do not return tokens under stream, which may result in incorrect token calculations.",
-  "预计费选项": "Estimated fee options"
+  "预计费选项": "Estimated fee options",
+  "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1"
 }

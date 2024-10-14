@@ -162,6 +162,9 @@
     "modelMappingKey": "用户请求模型",
     "modelMappingValue": "实际转发模型",
     "addModelMapping": "添加模型映射",
+    "addModelMappingByJson": "添加模型映射(JSON)",
+    "jsonInputLabel": "JSON对象，key为请求模型，value为实际转发模型",
+    "invalidJson": "无效的JSON",
     "modelHeaderKey": "自定义Header Key",
     "modelHeaderValue": "自定义Header Value",
     "addModelHeader": "添加自定义Header"
@@ -213,7 +216,14 @@
     "outputLabel": "输出",
     "quotaLabel": "额度",
     "detailLabel": "详情",
-    "searchLogsInfo": "充值记录以及邀请记录请在日志中查询。充值记录请在日志中选择类型【充值】查询；邀请记录请在日志中选择【系统】查询"
+    "searchLogsInfo": "充值记录以及邀请记录请在日志中查询。充值记录请在日志中选择类型【充值】查询；邀请记录请在日志中选择【系统】查询",
+    "inputTextTokens": "输入文本Tokens",
+    "outputTextTokens": "输出文本Tokens",
+    "inputAudioTokens": "输入音频Tokens",
+    "outputAudioTokens": "输出音频Tokens",
+    "cachedTokens": "缓存Tokens",
+    "totalInputTokens": "计算输入Tokens",
+    "totalOutputTokens": "计算输出Tokens"
   },
   "redemptionPage": {
     "pageTitle": "兑换",

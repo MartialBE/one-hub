@@ -36,6 +36,7 @@ func getAzureConfig() base.ProviderConfig {
 		AudioTranscriptions: "/audio/transcriptions",
 		AudioTranslations:   "/audio/translations",
 		ImagesGenerations:   "/images/generations",
+		ChatRealtime:        "/realtime",
 	}
 }
 

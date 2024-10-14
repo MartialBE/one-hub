@@ -4,7 +4,6 @@ import { showError, trims, showSuccess } from 'utils/common';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import Toolbar from '@mui/material/Toolbar';
@@ -179,36 +178,34 @@ export default function ChannelTag() {
           }}
         ></Toolbar>
         {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer>
-            <Table sx={{ minWidth: 800 }}>
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'collapse', label: '', disableSort: true, width: '50px' },
-                  { id: 'Tag', label: t('channel_index.tags'), disableSort: false },
-                  { id: 'type', label: t('channel_index.supplier'), disableSort: false },
-                  { id: 'group', label: t('channel_index.group'), disableSort: true, width: '80px' },
-                  { id: 'models', label: t('channel_index.model'), disableSort: false },
-                  { id: 'action', label: t('channel_index.actions'), disableSort: true }
-                ]}
-              />
-              <TableBody>
-                {channelTags.map((row) => (
-                  <TagTableRow
-                    item={row}
-                    manageChannel={manageChannel}
-                    key={'TagTableRow-' + row.tag}
-                    handleOpenModal={handleOpenModal}
-                    setModalChannelId={setEditChannelId}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
+        <TableContainer>
+          <Table sx={{ minWidth: 800 }}>
+            <KeywordTableHead
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleSort}
+              headLabel={[
+                { id: 'collapse', label: '', disableSort: true, width: '50px' },
+                { id: 'Tag', label: t('channel_index.tags'), disableSort: false },
+                { id: 'type', label: t('channel_index.supplier'), disableSort: false },
+                { id: 'group', label: t('channel_index.group'), disableSort: true, width: '80px' },
+                { id: 'models', label: t('channel_index.model'), disableSort: false },
+                { id: 'action', label: t('channel_index.actions'), disableSort: true }
+              ]}
+            />
+            <TableBody>
+              {channelTags.map((row) => (
+                <TagTableRow
+                  item={row}
+                  manageChannel={manageChannel}
+                  key={'TagTableRow-' + row.tag}
+                  handleOpenModal={handleOpenModal}
+                  setModalChannelId={setEditChannelId}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
         <TablePagination
           page={page}
           component="div"

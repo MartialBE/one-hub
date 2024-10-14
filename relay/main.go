@@ -6,6 +6,7 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"one-api/common/utils"
 	"one-api/metrics"
 	"one-api/model"
 	"one-api/relay/relay_util"
@@ -60,8 +61,13 @@ func Relay(c *gin.Context) {
 	}
 
 	for i := retryTimes; i > 0; i-- {
+<<<<<<< HEAD
 		// 冻结渠道
 		model.ChannelGroup.Cooldowns(channel.Id)
+=======
+		// 冻结通道
+		shouldCooldowns(c, apiErr, channel.Id)
+>>>>>>> 3e1ccaff7ee747495cb9861539a7dbeea6933bc4
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue
 		}
@@ -100,9 +106,14 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 
 	relay.getProvider().SetUsage(usage)
 
+<<<<<<< HEAD
 	var quota *relay_util.Quota
 	quota, err = relay_util.NewQuota(relay.getContext(), relay.getOriginalModel(), promptTokens)
 	if err != nil {
+=======
+	quota := relay_util.NewQuota(relay.getContext(), relay.getModelName(), promptTokens)
+	if err = quota.PreQuotaConsumption(); err != nil {
+>>>>>>> 3e1ccaff7ee747495cb9861539a7dbeea6933bc4
 		done = true
 		return
 	}
@@ -139,4 +150,20 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 	}
 
 	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime, isStream, nil)
+}
+
+func shouldCooldowns(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channelId int) {
+	// 如果是频率限制，冻结通道
+	if apiErr.StatusCode == http.StatusTooManyRequests {
+		model.ChannelGroup.Cooldowns(channelId)
+	}
+
+	skipChannelIds, ok := utils.GetGinValue[[]int](c, "skip_channel_ids")
+	if !ok {
+		skipChannelIds = make([]int, 0)
+	}
+
+	skipChannelIds = append(skipChannelIds, channelId)
+
+	c.Set("skip_channel_ids", skipChannelIds)
 }

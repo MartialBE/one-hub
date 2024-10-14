@@ -118,9 +118,8 @@ func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.Cl
 	}
 	chatProvider.SetUsage(usage)
 
-	var quota *relay_util.Quota
-	quota, err := relay_util.NewQuota(c, request.Model, promptTokens)
-	if err != nil {
+	quota := relay_util.NewQuota(c, request.Model, promptTokens)
+	if err := quota.PreQuotaConsumption(); err != nil {
 		return claude.OpenaiErrToClaudeErr(err), true
 	}
 

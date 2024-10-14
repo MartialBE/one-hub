@@ -143,9 +143,8 @@ func RelayGeminiHandler(c *gin.Context, promptTokens int, chatProvider gemini.Ge
 	}
 	chatProvider.SetUsage(usage)
 
-	var quota *relay_util.Quota
-	quota, err := relay_util.NewQuota(c, request.Model, promptTokens)
-	if err != nil {
+	quota := relay_util.NewQuota(c, request.Model, promptTokens)
+	if err := quota.PreQuotaConsumption(); err != nil {
 		return gemini.OpenaiErrToGeminiErr(err), true
 	}
 
