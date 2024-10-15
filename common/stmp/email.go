@@ -1,6 +1,8 @@
 package stmp
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"one-api/common"
 	"one-api/common/config"
@@ -9,6 +11,10 @@ import (
 
 	"github.com/wneessen/go-mail"
 )
+
+var SendResetError = &mail.SendError{
+	Reason: mail.ErrSMTPReset,
+}
 
 type StmpConfig struct {
 	Host     string
@@ -46,7 +52,8 @@ func (s *StmpConfig) Send(to, subject, body string) error {
 		mail.WithPort(s.Port),
 		mail.WithUsername(s.Username),
 		mail.WithPassword(s.Password),
-		mail.WithSMTPAuth(mail.SMTPAuthPlain))
+		mail.WithSMTPAuth(mail.SMTPAuthPlain),
+	)
 
 	if err != nil {
 		return err
@@ -60,7 +67,7 @@ func (s *StmpConfig) Send(to, subject, body string) error {
 		client.SetSMTPAuth(mail.SMTPAuthLogin)
 	}
 
-	if err := client.DialAndSend(message); err != nil {
+	if err := DialAndSend(client, message); err != nil {
 		return err
 	}
 
@@ -168,4 +175,20 @@ func SendQuotaWarningCodeEmail(userName, email string, quota int, noMoreQuota bo
 	content := fmt.Sprintf(contentTemp, userName, subject, quota, topUpLink, topUpLink)
 
 	return stmp.Render(email, subject, content)
+}
+
+func DialAndSend(c *mail.Client, messages ...*mail.Msg) error {
+	ctx := context.Background()
+	if err := c.DialWithContext(ctx); err != nil {
+		return fmt.Errorf("dial failed: %w", err)
+	}
+	defer c.Close()
+
+	if err := c.Send(messages...); err != nil {
+		if errors.Is(err, SendResetError) {
+			return nil
+		}
+		return fmt.Errorf("send failed: %w", err)
+	}
+	return nil
 }
