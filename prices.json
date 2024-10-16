@@ -1022,6 +1022,69 @@
     "output": 0.4286
   },
   {
+    "model": "yi-lightning",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.0707,
+    "output": 0.0707
+  },
+  {
+    "model": "yi-large",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 1.4286,
+    "output": 1.4286
+  },
+  {
+    "model": "yi-medium",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.1786,
+    "output": 0.1786
+  },
+  {
+    "model": "yi-vision",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.4286,
+    "output": 0.4286
+  },
+  {
+    "model": "yi-medium-200k",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.8571,
+    "output": 0.8571
+  },
+  {
+    "model": "yi-spark",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.0714,
+    "output": 0.0714
+  },
+  {
+    "model": "yi-large-rag",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 1.7857,
+    "output": 1.7857
+  },
+  {
+    "model": "yi-large-fc",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 1.4286,
+    "output": 1.4286
+  },
+  {
+    "model": "yi-large-turbo",
+    "type": "tokens",
+    "channel_type": 33,
+    "input": 0.8571,
+    "output": 0.8571
+  },
+  {
     "model": "mj_blend",
     "type": "times",
     "channel_type": 34,
