@@ -1061,5 +1061,7 @@
   "默认 zh-CN-YunyeNeural": "デフォルトのzh-CN-YunyeNeural",
   "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "こちらでは料金予測オプションを選択し、費用の見積もりに使用します。画像計算がリソースを多く消費すると感じた場合は、画像計算を無効にすることができます。ただし、注意してください：一部のチャネルはstream下ではトークンを返さないため、入力トークンが誤って計算される可能性があります。",
   "预计费选项": "見積オプション",
-  "Please enter the version number, for example: v3[1]": ""
+  "Please enter the version number, for example: v3[1]": "",
+  "operation": "オペレーション",
+  "paySetting": "支払い設定"
 }

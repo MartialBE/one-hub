@@ -13,6 +13,8 @@
   "payment": "支付",
   "setting": "设置",
   "task": "异步任务",
+  "operation": "运营",
+  "paySetting": "支付设置",
   "menu": {
     "home": "首页",
     "about": "关于",

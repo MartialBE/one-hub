@@ -1061,5 +1061,7 @@
   "默认 zh-CN-YunyeNeural": "Default zh-CN-YunyeNeural",
   "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "Select the estimated cost option here for cost estimation. If you think that calculating images consumes too many resources, you can choose to disable image billing. However, please note: some channels do not return tokens under stream, which may result in incorrect token calculations.",
   "预计费选项": "Estimated fee options",
-  "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1"
+  "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1",
+  "operation": "Operation",
+  "paySetting": "Payment settings"
 }
