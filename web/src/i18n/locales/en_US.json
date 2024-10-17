@@ -195,7 +195,9 @@
     "unableServer": "Unable to connect to the server properly!",
     "unableServerTip": "New version available: {{version}}, please use the shortcut key Shift F5 to refresh the page",
     "unknown": "unknown",
-    "verificationCode": "Verification code"
+    "verificationCode": "Verification code",
+    "execute": "Would you like to execute {{title}}?",
+    "executeConfirm": "execute"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {

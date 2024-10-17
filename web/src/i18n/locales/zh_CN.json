@@ -839,7 +839,9 @@
     "enable": "已启用",
     "disable": "已禁用",
     "expired": "已过期",
-    "exhaust": "已耗尽"
+    "exhaust": "已耗尽",
+    "execute": "是否执行 {{title}}?",
+    "executeConfirm": "执行"
   },
   "channel_row": {
     "priorityTip": "优先级不能小于 0",

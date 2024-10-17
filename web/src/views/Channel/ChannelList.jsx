@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { showError, showSuccess, showInfo, trims } from 'utils/common';
 
 import { useTheme } from '@mui/material/styles';
@@ -22,6 +22,9 @@ import { ITEMS_PER_PAGE } from 'constants';
 import TableToolBar from './component/TableToolBar';
 import BatchModal from './component/BatchModal';
 import { useTranslation } from 'react-i18next';
+
+import { useBoolean } from 'hooks/use-boolean';
+import ConfirmDialog from 'ui-component/confirm-dialog';
 
 const originalKeyword = {
   type: 0,
@@ -75,6 +78,10 @@ export default function ChannelList() {
   const [channels, setChannels] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [tags, setTags] = useState([]);
+
+  const confirm = useBoolean();
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmConfirm, setConfirmConfirm] = useState(() => {});
 
   const [groupOptions, setGroupOptions] = useState([]);
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
@@ -196,6 +203,15 @@ export default function ChannelList() {
     }
     setRefreshFlag(!refreshFlag);
   };
+
+  const handlePopoverOpen = useCallback(
+    (title, onConfirm) => {
+      setConfirmTitle(title);
+      setConfirmConfirm(() => onConfirm);
+      confirm.onTrue();
+    },
+    [confirm]
+  );
 
   // 处理测试所有启用渠道
   const testAllChannels = async () => {
@@ -355,13 +371,22 @@ export default function ChannelList() {
                 <Button onClick={searchChannels} startIcon={<IconSearch width={'18px'} />}>
                   {t('channel_index.search')}
                 </Button>
-                <Button onClick={testAllChannels} startIcon={<IconBrandSpeedtest width={'18px'} />}>
+                <Button
+                  onClick={() => handlePopoverOpen(t('channel_index.testAllChannels'), testAllChannels)}
+                  startIcon={<IconBrandSpeedtest width={'18px'} />}
+                >
                   {t('channel_index.testAllChannels')}
                 </Button>
-                <Button onClick={updateAllChannelsBalance} startIcon={<IconCoinYuan width={'18px'} />}>
+                <Button
+                  onClick={() => handlePopoverOpen(t('channel_index.updateEnabledBalance'), updateAllChannelsBalance)}
+                  startIcon={<IconCoinYuan width={'18px'} />}
+                >
                   {t('channel_index.updateEnabledBalance')}
                 </Button>
-                <Button onClick={deleteAllDisabledChannels} startIcon={<IconTrash width={'18px'} />}>
+                <Button
+                  onClick={() => handlePopoverOpen(t('channel_index.deleteDisabledChannels'), deleteAllDisabledChannels)}
+                  startIcon={<IconTrash width={'18px'} />}
+                >
                   {t('channel_index.deleteDisabledChannels')}
                 </Button>
               </ButtonGroup>
@@ -379,13 +404,19 @@ export default function ChannelList() {
                 <IconButton onClick={searchChannels} size="large">
                   <IconSearch />
                 </IconButton>
-                <IconButton onClick={testAllChannels} size="large">
+                <IconButton onClick={() => handlePopoverOpen(t('channel_index.testAllChannels'), testAllChannels)} size="large">
                   <IconBrandSpeedtest />
                 </IconButton>
-                <IconButton onClick={updateAllChannelsBalance} size="large">
+                <IconButton
+                  onClick={() => handlePopoverOpen(t('channel_index.updateEnabledBalance'), updateAllChannelsBalance)}
+                  size="large"
+                >
                   <IconCoinYuan />
                 </IconButton>
-                <IconButton onClick={deleteAllDisabledChannels} size="large">
+                <IconButton
+                  onClick={() => handlePopoverOpen(t('channel_index.deleteDisabledChannels'), deleteAllDisabledChannels)}
+                  size="large"
+                >
                   <IconTrash />
                 </IconButton>
               </Stack>
@@ -442,6 +473,24 @@ export default function ChannelList() {
       </Card>
       <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} />
       <BatchModal open={openBatchModal} setOpen={setOpenBatchModal} />
+
+      <ConfirmDialog
+        open={confirm.value}
+        onClose={confirm.onFalse}
+        title={confirmTitle}
+        content={t('common.execute', { title: confirmTitle })}
+        action={
+          <Button
+            variant="contained"
+            onClick={() => {
+              confirmConfirm();
+              confirm.onFalse();
+            }}
+          >
+            {t('common.executeConfirm')}
+          </Button>
+        }
+      />
     </>
   );
 }
