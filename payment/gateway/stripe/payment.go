@@ -121,6 +121,7 @@ func (e *Stripe) CreatedPay(notifyURL string, gatewayConfig *model.Payment) erro
 			EnabledEvents: []*string{
 				stripe.String(eventName),
 			},
+			APIVersion: stripe.String("2024-09-30.acacia"),
 		}
 		newWebhook, err := webhookendpoint.New(createParams)
 		if err != nil {
