@@ -11,10 +11,10 @@ import (
 	sysconfig "one-api/common/config"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stripe/stripe-go/v79"
-	"github.com/stripe/stripe-go/v79/client"
-	"github.com/stripe/stripe-go/v79/webhook"
-	"github.com/stripe/stripe-go/v79/webhookendpoint"
+	"github.com/stripe/stripe-go/v80"
+	"github.com/stripe/stripe-go/v80/client"
+	"github.com/stripe/stripe-go/v80/webhook"
+	"github.com/stripe/stripe-go/v80/webhookendpoint"
 )
 
 // Stripe 结构体实现支付接口
