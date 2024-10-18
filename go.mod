@@ -38,7 +38,7 @@ require (
 	github.com/smartwalle/alipay/v3 v3.2.23
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
-	github.com/stripe/stripe-go/v79 v79.12.0
+	github.com/stripe/stripe-go/v80 v80.2.0
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.20
 	github.com/wneessen/go-mail v0.5.0
 	go.uber.org/zap v1.27.0

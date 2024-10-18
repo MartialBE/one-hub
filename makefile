@@ -8,7 +8,7 @@ all: one-api
 
 web: $(WEBDIR)/build
 
-$(WEBDIR)/build: 
+$(WEBDIR)/build:
 	cd $(WEBDIR) && yarn install && VITE_APP_VERSION=$(VERSION) yarn run build
 
 one-api: web

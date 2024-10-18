@@ -36,7 +36,8 @@ type Channel struct {
 	OnlyChat           bool    `json:"only_chat" form:"only_chat" gorm:"default:false"`
 	PreCost            int     `json:"pre_cost" form:"pre_cost" gorm:"default:1"`
 
-	Plugin *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`
+	Plugin    *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`
+	DeletedAt gorm.DeletedAt                  `json:"-" gorm:"index"`
 }
 
 type PluginType map[string]map[string]interface{}
