@@ -28,7 +28,7 @@ const icons = {
 
 const Setting = {
   id: 'setting',
-  title: 'setting',
+  title: 'Setting',
   type: 'group',
   children: [
     {

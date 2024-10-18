@@ -60,12 +60,12 @@ jobs:
           go mod download
           go build -ldflags "-s -w -extldflags '-static'" -o one-api-amd64
 
-      - name: 构建后端 (arm64)
-        run: |
-          sudo rm /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update
-          sudo apt-get install gcc-aarch64-linux-gnu
-          CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -extldflags '-static'" -o one-api-arm64
+      # - name: 构建后端 (arm64)
+      #   run: |
+      #     sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+      #     sudo apt-get update
+      #     sudo apt-get install gcc-aarch64-linux-gnu
+      #     CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -extldflags '-static'" -o one-api-arm64
       - name: 设置QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -93,7 +93,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64 #,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

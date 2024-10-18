@@ -12,11 +12,9 @@ import {
   IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
-  // IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal,
-  // IconList
 } from '@tabler/icons-react';
 
 // constant
@@ -33,11 +31,9 @@ const icons = {
   IconChartHistogram,
   IconBrandTelegram,
   IconReceipt2,
-  // IconBrush,
   IconBrandGithubCopilot,
   IconBallFootball,
   IconBrandPaypal,
-  // IconList
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -106,22 +102,6 @@ const panel = {
       icon: icons.IconCreditCard,
       breadcrumbs: false
     },
-    // {
-    //   id: 'midjourney',
-    //   title: 'Midjourney',
-    //   type: 'item',
-    //   url: '/panel/midjourney',
-    //   icon: icons.IconBrush,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: 'task',
-    //   title: '异步任务',
-    //   type: 'item',
-    //   url: '/panel/task',
-    //   icon: icons.IconList,
-    //   breadcrumbs: false
-    // },
     {
       id: 'user',
       title: '用户',
