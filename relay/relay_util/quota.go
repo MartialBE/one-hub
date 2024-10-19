@@ -11,7 +11,6 @@ import (
 	"one-api/common/logger"
 	"one-api/model"
 	"one-api/types"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -202,21 +201,23 @@ func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 	}
 
 	if usage != nil {
-		sysTokens := usage.SysTokensDetails
-		if sysTokens.CachedTokens != 0 {
-			meta["cached_tokens"] = sysTokens.CachedTokens
+		promptDetails := usage.PromptTokensDetails
+		completionDetails := usage.CompletionTokensDetails
+
+		if promptDetails.CachedTokens != 0 {
+			meta["cached_tokens"] = promptDetails.CachedTokens
 		}
-		if sysTokens.InputAudioTokens != 0 {
-			meta["input_audio_tokens"] = sysTokens.InputAudioTokens
+		if promptDetails.AudioTokens != 0 {
+			meta["input_audio_tokens"] = promptDetails.AudioTokens
 		}
-		if sysTokens.InputTextTokens != 0 {
-			meta["input_text_tokens"] = sysTokens.InputTextTokens
+		if promptDetails.TextTokens != 0 {
+			meta["input_text_tokens"] = promptDetails.TextTokens
 		}
-		if sysTokens.OutputAudioTokens != 0 {
-			meta["output_audio_tokens"] = sysTokens.OutputAudioTokens
+		if completionDetails.AudioTokens != 0 {
+			meta["output_audio_tokens"] = completionDetails.AudioTokens
 		}
-		if sysTokens.OutputTextTokens != 0 {
-			meta["output_text_tokens"] = sysTokens.OutputTextTokens
+		if completionDetails.TextTokens != 0 {
+			meta["output_text_tokens"] = completionDetails.TextTokens
 		}
 	}
 
@@ -249,10 +250,6 @@ func (q *Quota) getLogContent() string {
 		}
 	}
 
-	if strings.HasPrefix(q.modelName, "gpt-4o-realtime") {
-		modelRatioStr += "| 音频输入 20 倍，音频输出 10 倍"
-	}
-
 	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
 }
 
@@ -281,18 +278,22 @@ func (q *Quota) GetTotalQuota(promptTokens, completionTokens int) (quota int) {
 func (q *Quota) getComputeTokensByUsage(usage *types.Usage) (promptTokens, completionTokens int) {
 	promptTokens = usage.PromptTokens
 	completionTokens = usage.CompletionTokens
-	details := usage.SysTokensDetails
+	completionDetails := usage.CompletionTokensDetails
+	promptDetails := usage.PromptTokensDetails
 
-	if details.CachedTokens > 0 {
-		promptTokens -= details.CachedTokens / 2
+	if promptDetails.CachedTokens > 0 {
+		cachedTokensRatio := q.price.GetExtraRatio("cached_tokens_ratio")
+		promptTokens -= int(float64(promptDetails.CachedTokens) * cachedTokensRatio)
 	}
 
-	if details.InputAudioTokens > 0 {
-		promptTokens += details.InputAudioTokens * 19
+	if promptDetails.AudioTokens > 0 {
+		inputAudioTokensRatio := q.price.GetExtraRatio("input_audio_tokens_ratio") - 1
+		promptTokens += int(float64(promptDetails.AudioTokens) * inputAudioTokensRatio)
 	}
 
-	if details.OutputAudioTokens > 0 {
-		completionTokens += details.OutputAudioTokens * 9
+	if completionDetails.AudioTokens > 0 {
+		outputAudioTokensRatio := q.price.GetExtraRatio("output_audio_tokens_ratio") - 1
+		completionTokens += int(float64(completionDetails.AudioTokens) * outputAudioTokensRatio)
 	}
 
 	return
@@ -301,18 +302,22 @@ func (q *Quota) getComputeTokensByUsage(usage *types.Usage) (promptTokens, compl
 func (q *Quota) getComputeTokensByUsageEvent(usage *types.UsageEvent) (promptTokens, completionTokens int) {
 	promptTokens = usage.InputTokens
 	completionTokens = usage.OutputTokens
+	inputDetails := usage.InputTokenDetails
 
-	if inputDetails := usage.InputTokenDetails; inputDetails != nil {
-		if inputDetails.CachedTokens > 0 {
-			promptTokens -= inputDetails.CachedTokens / 2
-		}
-		if inputDetails.AudioTokens > 0 {
-			promptTokens += inputDetails.AudioTokens * 19
-		}
+	if inputDetails.CachedTokens > 0 {
+		cachedTokensRatio := q.price.GetExtraRatio("cached_tokens_ratio")
+		promptTokens -= int(float64(inputDetails.CachedTokens) * cachedTokensRatio)
+	}
+	if inputDetails.AudioTokens > 0 {
+		inputAudioTokensRatio := q.price.GetExtraRatio("input_audio_tokens_ratio") - 1
+		promptTokens += int(float64(inputDetails.AudioTokens) * inputAudioTokensRatio)
 	}
 
-	if outputDetails := usage.OutputTokenDetails; outputDetails != nil && outputDetails.AudioTokens > 0 {
-		completionTokens += outputDetails.AudioTokens * 9
+	outputDetails := usage.OutputTokenDetails
+
+	if outputDetails.AudioTokens > 0 {
+		outputAudioTokensRatio := q.price.GetExtraRatio("output_audio_tokens_ratio") - 1
+		completionTokens += int(float64(outputDetails.AudioTokens) * outputAudioTokensRatio)
 	}
 
 	return

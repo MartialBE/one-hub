@@ -11,6 +11,7 @@ import (
 	"one-api/common/utils"
 	providersBase "one-api/providers/base"
 	"one-api/types"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +42,10 @@ func (r *relayChat) setRequest() error {
 
 	if !r.chatRequest.Stream && r.chatRequest.StreamOptions != nil {
 		return errors.New("the 'stream_options' parameter is only allowed when 'stream' is enabled")
+	}
+
+	if strings.HasPrefix(r.chatRequest.Model, "gpt-4o-audio") && r.chatRequest.Stream {
+		return errors.New("gpt-4o-audio-preview does not support stream")
 	}
 
 	r.originalModel = r.chatRequest.Model

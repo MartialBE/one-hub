@@ -52,8 +52,6 @@ func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		response.Usage.TotalTokens = response.Usage.PromptTokens + response.Usage.CompletionTokens
 	}
 
-	handleUsage(response.Usage)
-
 	*p.Usage = *response.Usage
 
 	return &response.ChatCompletionResponse, nil
@@ -125,8 +123,6 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 	}
 
 	if openaiResponse.Usage != nil {
-		handleUsage(openaiResponse.Usage)
-
 		*h.Usage = *openaiResponse.Usage
 		if len(openaiResponse.Choices) == 0 {
 			*rawLine = nil
@@ -134,8 +130,6 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 		}
 	} else {
 		if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Usage != nil {
-			handleUsage(openaiResponse.Choices[0].Usage)
-
 			*h.Usage = *openaiResponse.Choices[0].Usage
 		} else {
 			if h.Usage.TotalTokens == 0 {
@@ -148,10 +142,4 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 	}
 
 	dataChan <- string(*rawLine)
-}
-
-func handleUsage(usage *types.Usage) {
-	if usage.PromptTokensDetails != nil && usage.PromptTokensDetails.CachedTokens > 0 {
-		usage.SysTokensDetails.CachedTokens = usage.PromptTokensDetails.CachedTokens
-	}
 }
