@@ -165,12 +165,14 @@ function viewInput(item, t) {
   let totalOutputTokens = completion_tokens;
 
   let show = false;
+  const inputAudioTokensRatio = metadata?.input_audio_tokens_ratio || 20;
+  const outputAudioTokensRatio = metadata?.output_audio_tokens_ratio || 10;
 
   const tooltipContent = [
     { key: 'input_text_tokens', label: t('logPage.inputTextTokens'), rate: 1 },
     { key: 'output_text_tokens', label: t('logPage.outputTextTokens'), rate: 1 },
-    { key: 'input_audio_tokens', label: t('logPage.inputAudioTokens'), rate: 20 },
-    { key: 'output_audio_tokens', label: t('logPage.outputAudioTokens'), rate: 10 },
+    { key: 'input_audio_tokens', label: t('logPage.inputAudioTokens'), rate: inputAudioTokensRatio },
+    { key: 'output_audio_tokens', label: t('logPage.outputAudioTokens'), rate: outputAudioTokensRatio },
     { key: 'cached_tokens', label: t('logPage.cachedTokens'), rate: 0.5 }
   ]
     .filter(({ key }) => metadata[key] > 0)

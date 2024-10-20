@@ -139,8 +139,15 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *BaiduChatReque
 		Stream:          request.Stream,
 		TopP:            request.TopP,
 		PenaltyScore:    request.FrequencyPenalty,
-		Stop:            request.Stop,
 		MaxOutputTokens: request.MaxTokens,
+	}
+
+	if request.Stop != nil {
+		if stop, ok := request.Stop.(string); ok {
+			baiduChatRequest.Stop = []string{stop}
+		} else if stop, ok := request.Stop.([]string); ok {
+			baiduChatRequest.Stop = stop
+		}
 	}
 
 	if request.ResponseFormat != nil {
