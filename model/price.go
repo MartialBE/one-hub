@@ -2,17 +2,20 @@ package model
 
 import (
 	"one-api/common/config"
+	"strings"
 
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
 const (
-	TokensPriceType = "tokens"
-	TimesPriceType  = "times"
-	DefaultPrice    = 30.0
-	DollarRate      = 0.002
-	RMBRate         = 0.014
+	TokensPriceType    = "tokens"
+	TimesPriceType     = "times"
+	DefaultPrice       = 30.0
+	DollarRate         = 0.002
+	RMBRate            = 0.014
+	DefaultCacheRatios = 0.5
+	DefaultAudioRatio  = 40
 )
 
 type Price struct {
@@ -21,6 +24,8 @@ type Price struct {
 	ChannelType int     `json:"channel_type" gorm:"default:0" binding:"gte=0"`
 	Input       float64 `json:"input" gorm:"default:0" binding:"gte=0"`
 	Output      float64 `json:"output" gorm:"default:0" binding:"gte=0"`
+
+	ExtraRatios map[string]float64 `json:"extra_ratios,omitempty" gorm:"-"`
 }
 
 func GetAllPrices() ([]*Price, error) {
@@ -28,7 +33,29 @@ func GetAllPrices() ([]*Price, error) {
 	if err := DB.Find(&prices).Error; err != nil {
 		return nil, err
 	}
+
+	for _, price := range prices {
+		price.ExtraRatios = getExtraRatioMap(price.Model)
+	}
+
 	return prices, nil
+}
+
+func getExtraRatioMap(modelName string) map[string]float64 {
+	if !strings.HasPrefix(modelName, "gpt-4o-realtime") && !strings.HasPrefix(modelName, "gpt-4o-audio") {
+		return nil
+	}
+
+	extraRatios := make(map[string]float64)
+	if strings.HasPrefix(modelName, "gpt-4o-realtime") {
+		extraRatios["input_audio_tokens_ratio"] = 20
+		extraRatios["output_audio_tokens_ratio"] = 10
+	} else {
+		extraRatios["input_audio_tokens_ratio"] = 40
+		extraRatios["output_audio_tokens_ratio"] = 20
+	}
+
+	return extraRatios
 }
 
 func (price *Price) Update(modelName string) error {
@@ -60,6 +87,23 @@ func (price *Price) GetOutput() float64 {
 	}
 
 	return price.Output
+}
+
+func (price *Price) GetExtraRatio(key string) float64 {
+	if key == "cached_tokens_ratio" {
+		return DefaultCacheRatios
+	}
+
+	// 目前只有 音频，如果为空说明有问题，返回最大的一个倍率
+	if price.ExtraRatios == nil {
+		return DefaultAudioRatio
+	}
+
+	if ratio, ok := price.ExtraRatios[key]; ok {
+		return ratio
+	}
+
+	return DefaultAudioRatio
 }
 
 func (price *Price) FetchInputCurrencyPrice(rate float64) string {

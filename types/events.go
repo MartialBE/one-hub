@@ -68,36 +68,20 @@ type ResponseEvent struct {
 }
 
 type UsageEvent struct {
-	InputTokens        int                 `json:"input_tokens"`
-	OutputTokens       int                 `json:"output_tokens"`
-	TotalTokens        int                 `json:"total_tokens"`
-	InputTokenDetails  *InputTokenDetails  `json:"input_token_details,omitempty"`
-	OutputTokenDetails *OutputTokenDetails `json:"output_token_details,omitempty"`
+	InputTokens        int                     `json:"input_tokens"`
+	OutputTokens       int                     `json:"output_tokens"`
+	TotalTokens        int                     `json:"total_tokens"`
+	InputTokenDetails  PromptTokensDetails     `json:"input_token_details,omitempty"`
+	OutputTokenDetails CompletionTokensDetails `json:"output_token_details,omitempty"`
 }
 
 func (u *UsageEvent) ToChatUsage() *Usage {
-	inputTokenDetails := u.InputTokenDetails
-	if inputTokenDetails == nil {
-		inputTokenDetails = &InputTokenDetails{}
-	}
-
-	outputTokenDetails := u.OutputTokenDetails
-	if outputTokenDetails == nil {
-		outputTokenDetails = &OutputTokenDetails{}
-	}
-
 	return &Usage{
-		PromptTokens:     u.InputTokens,
-		CompletionTokens: u.OutputTokens,
-		TotalTokens:      u.TotalTokens,
-
-		SysTokensDetails: SysTokensDetails{
-			InputAudioTokens:  inputTokenDetails.AudioTokens,
-			InputTextTokens:   inputTokenDetails.TextTokens,
-			CachedTokens:      inputTokenDetails.CachedTokens,
-			OutputAudioTokens: outputTokenDetails.AudioTokens,
-			OutputTextTokens:  outputTokenDetails.TextTokens,
-		},
+		PromptTokens:            u.InputTokens,
+		CompletionTokens:        u.OutputTokens,
+		TotalTokens:             u.TotalTokens,
+		PromptTokensDetails:     u.InputTokenDetails,
+		CompletionTokensDetails: u.OutputTokenDetails,
 	}
 }
 
@@ -110,43 +94,6 @@ func (u *UsageEvent) Merge(other *UsageEvent) {
 	u.OutputTokens += other.OutputTokens
 	u.TotalTokens += other.TotalTokens
 
-	if u.InputTokenDetails == nil {
-		u.InputTokenDetails = &InputTokenDetails{}
-	}
-	if u.OutputTokenDetails == nil {
-		u.OutputTokenDetails = &OutputTokenDetails{}
-	}
-
-	u.InputTokenDetails.Merge(other.InputTokenDetails)
-	u.OutputTokenDetails.Merge(other.OutputTokenDetails)
-}
-
-type InputTokenDetails struct {
-	AudioTokens  int `json:"audio_tokens"`
-	CachedTokens int `json:"cached_tokens"`
-	TextTokens   int `json:"text_tokens"`
-}
-
-func (i *InputTokenDetails) Merge(other *InputTokenDetails) {
-	if other == nil {
-		return
-	}
-
-	i.AudioTokens += other.AudioTokens
-	i.CachedTokens += other.CachedTokens
-	i.TextTokens += other.TextTokens
-}
-
-type OutputTokenDetails struct {
-	AudioTokens int `json:"audio_tokens"`
-	TextTokens  int `json:"text_tokens"`
-}
-
-func (o *OutputTokenDetails) Merge(other *OutputTokenDetails) {
-	if other == nil {
-		return
-	}
-
-	o.AudioTokens += other.AudioTokens
-	o.TextTokens += other.TextTokens
+	u.InputTokenDetails.Merge(&other.InputTokenDetails)
+	u.OutputTokenDetails.Merge(&other.OutputTokenDetails)
 }
