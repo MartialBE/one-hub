@@ -25,7 +25,8 @@ import {
   Switch,
   FormControlLabel,
   Typography,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -403,6 +404,14 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId]);
 
+  const handleModelTagClick = (modelId) => {
+    navigator.clipboard.writeText(modelId).then(() => {
+      showSuccess('模型名称已复制');
+    }).catch((error) => {
+      showError('复制失败: ' + error.message);
+    });
+  };
+
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
@@ -661,6 +670,15 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       {option.id}
                     </li>
                   )}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        label={option.id}
+                        {...getTagProps({ index })}
+                        onClick={() => handleModelTagClick(option.id)}
+                      />
+                    ))
+                  }
                 />
                 {errors.models ? (
                   <FormHelperText error id="helper-tex-channel-models-label">
