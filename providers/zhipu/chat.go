@@ -127,13 +127,18 @@ func (p *ZhipuProvider) convertFromChatOpenai(request *types.ChatCompletionReque
 	}
 
 	zhipuRequest := &ZhipuRequest{
-		Model:       request.Model,
-		Messages:    request.Messages,
-		Stream:      request.Stream,
-		Temperature: utils.NumClamp(request.Temperature, 0.01, 0.99),
-		TopP:        utils.NumClamp(request.TopP, 0.01, 0.99),
-		MaxTokens:   request.MaxTokens,
-		ToolChoice:  request.ToolChoice,
+		Model:      request.Model,
+		Messages:   request.Messages,
+		Stream:     request.Stream,
+		MaxTokens:  request.MaxTokens,
+		ToolChoice: request.ToolChoice,
+	}
+
+	if request.Temperature != nil {
+		zhipuRequest.Temperature = utils.NumClamp(*request.Temperature, 0.01, 0.99)
+	}
+	if request.TopP != nil {
+		zhipuRequest.TopP = utils.NumClamp(*request.TopP, 0.01, 0.99)
 	}
 
 	if request.Stop != nil {

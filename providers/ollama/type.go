@@ -15,10 +15,10 @@ type ChatRequest struct {
 }
 
 type Option struct {
-	Temperature float64 `json:"temperature,omitempty"`
-	Seed        *int    `json:"seed,omitempty"`
-	TopP        float64 `json:"top_p,omitempty"`
-	TopK        int     `json:"top_k,omitempty"`
+	Temperature *float64 `json:"temperature,omitempty"`
+	Seed        *int     `json:"seed,omitempty"`
+	TopP        *float64 `json:"top_p,omitempty"`
+	TopK        *int     `json:"top_k,omitempty"`
 }
 
 type ChatResponse struct {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/providers/openai"
 	"one-api/types"
 )
@@ -88,8 +89,8 @@ func (p *GroqProvider) getChatRequestBody(request *types.ChatCompletionRequest) 
 		request.ResponseFormat = nil
 	}
 
-	if request.N > 1 {
-		request.N = 1
+	if request.N != nil && *request.N > 1 {
+		request.N = utils.GetPointer(1)
 	}
 
 }

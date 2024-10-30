@@ -21,11 +21,11 @@ type XunfeiChatPayload struct {
 }
 
 type XunfeiParameterChat struct {
-	Domain      string  `json:"domain,omitempty"`
-	Temperature float64 `json:"temperature,omitempty"`
-	TopK        int     `json:"top_k,omitempty"`
-	MaxTokens   int     `json:"max_tokens,omitempty"`
-	Auditing    bool    `json:"auditing,omitempty"`
+	Domain      string   `json:"domain,omitempty"`
+	Temperature *float64 `json:"temperature,omitempty"`
+	TopK        *int     `json:"top_k,omitempty"`
+	MaxTokens   int      `json:"max_tokens,omitempty"`
+	Auditing    bool     `json:"auditing,omitempty"`
 }
 
 type XunfeiChatRequestParameter struct {

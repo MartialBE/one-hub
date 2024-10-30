@@ -342,3 +342,7 @@ func GetGinValue[T any](c *gin.Context, key string) (T, bool) {
 	var zeroValue T
 	return zeroValue, false
 }
+
+func GetPointer[T any](val T) *T {
+	return &val
+}
