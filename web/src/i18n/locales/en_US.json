@@ -197,7 +197,8 @@
     "unknown": "unknown",
     "verificationCode": "Verification code",
     "execute": "Would you like to execute {{title}}?",
-    "executeConfirm": "execute"
+    "executeConfirm": "execute",
+    "deleteConfirm": "Delete {{title}}?"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -265,7 +266,8 @@
     "inputTextTokens": "Input text tokens",
     "outputTextTokens": "Output text tokens",
     "totalInputTokens": "Total input tokens",
-    "totalOutputTokens": "Total output tokens"
+    "totalOutputTokens": "Total output tokens",
+    "groupLabel": "group"
   },
   "login": {
     "codeRequired": "verification code must be filled",
@@ -903,7 +905,8 @@
     "token": "Token",
     "unlimited": "Unlimited",
     "unlimitedQuota": "Unlimited Quota",
-    "usedQuota": "Used Quota"
+    "usedQuota": "Used Quota",
+    "userGroup": "group"
   },
   "topup": "Top-up",
   "topupCard": {
@@ -1065,5 +1068,18 @@
   "预计费选项": "Estimated fee options",
   "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1",
   "operation": "Operation",
-  "paySetting": "Payment settings"
+  "paySetting": "Payment settings",
+  "userGroup": {
+    "create": "Create new group",
+    "enable": "Enable or not",
+    "id": "ID",
+    "name": "Name",
+    "nameTip": "Name for users",
+    "public": "Is it public?",
+    "ratio": "magnification",
+    "symbol": "Identification",
+    "symbolTip": "The label is used to distinguish user groups, please use English and do not repeat.",
+    "title": "User grouping"
+  },
+  "user_group": "User grouping"
 }

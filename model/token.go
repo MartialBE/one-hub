@@ -14,18 +14,20 @@ import (
 )
 
 type Token struct {
-	Id             int    `json:"id"`
-	UserId         int    `json:"user_id"`
-	Key            string `json:"key" gorm:"type:char(48);uniqueIndex"`
-	Status         int    `json:"status" gorm:"default:1"`
-	Name           string `json:"name" gorm:"index" `
-	CreatedTime    int64  `json:"created_time" gorm:"bigint"`
-	AccessedTime   int64  `json:"accessed_time" gorm:"bigint"`
-	ExpiredTime    int64  `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
-	RemainQuota    int    `json:"remain_quota" gorm:"default:0"`
-	UnlimitedQuota bool   `json:"unlimited_quota" gorm:"default:false"`
-	UsedQuota      int    `json:"used_quota" gorm:"default:0"` // used quota
-	ChatCache      bool   `json:"chat_cache" gorm:"default:false"`
+	Id             int            `json:"id"`
+	UserId         int            `json:"user_id"`
+	Key            string         `json:"key" gorm:"type:char(48);uniqueIndex"`
+	Status         int            `json:"status" gorm:"default:1"`
+	Name           string         `json:"name" gorm:"index" `
+	CreatedTime    int64          `json:"created_time" gorm:"bigint"`
+	AccessedTime   int64          `json:"accessed_time" gorm:"bigint"`
+	ExpiredTime    int64          `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
+	RemainQuota    int            `json:"remain_quota" gorm:"default:0"`
+	UnlimitedQuota bool           `json:"unlimited_quota" gorm:"default:false"`
+	UsedQuota      int            `json:"used_quota" gorm:"default:0"` // used quota
+	ChatCache      bool           `json:"chat_cache" gorm:"default:false"`
+	Group          string         `json:"group" gorm:"default:''"`
+	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
 var allowedTokenOrderFields = map[string]bool{
@@ -150,10 +152,10 @@ func (token *Token) Update() error {
 		token.ChatCache = false
 	}
 
-	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "chat_cache").Updates(token).Error
+	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "chat_cache", "group").Updates(token).Error
 	// 防止Redis缓存不生效，直接删除
 	if err == nil && config.RedisEnabled {
-		redis.RedisDel(fmt.Sprintf("token:%s", token.Key))
+		redis.RedisDel(fmt.Sprintf(UserTokensKey, token.Key))
 	}
 
 	return err
@@ -179,7 +181,14 @@ func DeleteTokenById(id int, userId int) (err error) {
 	if err != nil {
 		return err
 	}
-	return token.Delete()
+	err = token.Delete()
+
+	if err == nil && config.RedisEnabled {
+		redis.RedisDel(fmt.Sprintf(UserTokensKey, token.Key))
+	}
+
+	return err
+
 }
 
 func IncreaseTokenQuota(id int, quota int) (err error) {

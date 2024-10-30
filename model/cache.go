@@ -14,6 +14,7 @@ import (
 var (
 	TokenCacheSeconds           = 0
 	UserGroupCacheKey           = "user_group:%d"
+	UserTokensKey               = "token:%s"
 	UsernameCacheKey            = "user_name:%d"
 	UserQuotaCacheKey           = "user_quota:%d"
 	UserEnabledCacheKey         = "user_enabled:%d"
@@ -27,7 +28,7 @@ func CacheGetTokenByKey(key string) (*Token, error) {
 	}
 
 	token, err := cache.GetOrSetCache(
-		fmt.Sprintf("token:%s", key),
+		fmt.Sprintf(UserTokensKey, key),
 		time.Duration(TokenCacheSeconds)*time.Second,
 		func() (*Token, error) {
 			return GetTokenByKey(key)

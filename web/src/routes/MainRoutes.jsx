@@ -21,6 +21,7 @@ const ModelPrice = Loadable(lazy(() => import('views/ModelPrice')));
 const Playground = Loadable(lazy(() => import('views/Playground')));
 const Payment = Loadable(lazy(() => import('views/Payment')));
 const Task = Loadable(lazy(() => import('views/Task')));
+const UserGroup = Loadable(lazy(() => import('views/UserGroup')));
 
 // dashboard routing
 const Dashboard = Loadable(lazy(() => import('views/Dashboard')));
@@ -106,6 +107,10 @@ const MainRoutes = {
     {
       path: 'task',
       element: <Task />
+    },
+    {
+      path: 'user_group',
+      element: <UserGroup />
     }
   ]
 };

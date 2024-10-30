@@ -196,7 +196,8 @@
     "unknown": "未知",
     "verificationCode": "検証コード",
     "execute": "{{title}}を実行しますか？",
-    "executeConfirm": "実行"
+    "executeConfirm": "実行",
+    "deleteConfirm": "{{title}}を削除しますか？"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -264,7 +265,8 @@
     "inputTextTokens": "Input text tokens",
     "outputTextTokens": "Output text tokens",
     "totalInputTokens": "Total input tokens",
-    "totalOutputTokens": "Total output tokens"
+    "totalOutputTokens": "Total output tokens",
+    "groupLabel": "グループ"
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",
@@ -902,7 +904,8 @@
     "token": "トークン",
     "unlimited": "制限なし",
     "unlimitedQuota": "無制限のクォータ",
-    "usedQuota": "使用済みクォータ"
+    "usedQuota": "使用済みクォータ",
+    "userGroup": "グループ"
   },
   "topup": "トップアップ",
   "topupCard": {
@@ -1065,5 +1068,18 @@
   "预计费选项": "見積オプション",
   "Please enter the version number, for example: v3[1]": "",
   "operation": "オペレーション",
-  "paySetting": "支払い設定"
+  "paySetting": "支払い設定",
+  "userGroup": {
+    "create": "新しいグループを作成",
+    "enable": "有効にします",
+    "id": "ID\n\nID",
+    "name": "名前",
+    "nameTip": "ユーザーに表示する名前",
+    "public": "公開されていますか？",
+    "ratio": "倍率 -> 倍率",
+    "symbol": "識別",
+    "symbolTip": "ユーザーグループを区別するための識別子を使用してください。英語で入力し、重複しないようにしてください。",
+    "title": "ユーザーグループ"
+  },
+  "user_group": "ユーザーグループ"
 }

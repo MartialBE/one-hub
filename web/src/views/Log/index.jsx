@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { showError, trims } from 'utils/common';
 
 import Table from '@mui/material/Table';
@@ -20,6 +20,7 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { UserContext } from 'contexts/UserContext';
 
 export default function Log() {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ export default function Log() {
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
   const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const { userGroup } = useContext(UserContext);
 
   const [logs, setLogs] = useState([]);
   const userIsAdmin = isAdmin();
@@ -180,6 +182,11 @@ export default function Log() {
                     hide: !userIsAdmin
                   },
                   {
+                    id: 'group',
+                    label: t('logPage.groupLabel'),
+                    disableSort: false
+                  },
+                  {
                     id: 'token_name',
                     label: t('logPage.tokenLabel'),
                     disableSort: false
@@ -224,7 +231,7 @@ export default function Log() {
               />
               <TableBody>
                 {logs.map((row, index) => (
-                  <LogTableRow item={row} key={`${row.id}_${index}`} userIsAdmin={userIsAdmin} />
+                  <LogTableRow item={row} key={`${row.id}_${index}`} userIsAdmin={userIsAdmin} userGroup={userGroup} />
                 ))}
               </TableBody>
             </Table>

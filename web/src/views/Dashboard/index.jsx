@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Grid, Typography } from '@mui/material';
+import { useEffect, useState, useContext } from 'react';
+import { Grid, Typography, Box } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
@@ -9,6 +9,8 @@ import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
 import UserCard from 'ui-component/cards/UserCard';
 import { useTranslation } from 'react-i18next';
+import { UserContext } from 'contexts/UserContext';
+import Label from 'ui-component/Label';
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
@@ -18,6 +20,7 @@ const Dashboard = () => {
   const [tokenChart, setTokenChart] = useState(null);
   const [users, setUsers] = useState([]);
   const { t } = useTranslation();
+  const { userGroup } = useContext(UserContext);
 
   const userDashboard = async () => {
     try {
@@ -100,28 +103,67 @@ const Dashboard = () => {
           </Grid>
           <Grid item lg={4} xs={12}>
             <UserCard>
-              <Grid container spacing={gridSpacing} justifyContent="center" alignItems="center" paddingTop={'20px'}>
-                <Grid item xs={4}>
-                  <Typography variant="h4">{t('dashboard_index.balance')}:</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="h3">{users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')}</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant="h4">{t('dashboard_index.used')}:</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="h3">
-                    {users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')}
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant="h4">{t('dashboard_index.calls')}:</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="h3"> {users?.request_count || t('dashboard_index.unknown')}</Typography>
-                </Grid>
-              </Grid>
+              <Box
+                sx={{
+                  pt: 4,
+                  pb: 4,
+                  px: 3,
+                  textAlign: 'center'
+                }}
+              >
+                <Typography variant="h4" sx={{ mb: 0.5 }}>
+                  {users.username}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  {users.email}
+                </Typography>
+
+                <Label color={'primary'} variant="outlined" sx={{ mb: 3 }}>
+                  {userGroup?.[users.group]?.name || users.group}
+                </Label>
+
+                {/* 统计信息区域 */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2.5
+                  }}
+                >
+                  {[
+                    {
+                      label: t('dashboard_index.balance'),
+                      value: users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')
+                    },
+                    {
+                      label: t('dashboard_index.used'),
+                      value: users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')
+                    },
+                    { label: t('dashboard_index.calls'), value: users?.request_count || t('dashboard_index.unknown') }
+                  ].map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        px: 2,
+                        py: 1.5,
+                        borderRadius: 2,
+                        bgcolor: 'rgba(145, 158, 171, 0.08)',
+                        '&:hover': {
+                          bgcolor: 'rgba(145, 158, 171, 0.12)'
+                        }
+                      }}
+                    >
+                      <Typography variant="body2">{item.label}</Typography>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        {item.value}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
             </UserCard>
           </Grid>
         </Grid>

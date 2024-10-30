@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
-import { showError, showSuccess, trims } from 'utils/common';
+import { useState, useEffect } from 'react';
+import { showError, showSuccess } from 'utils/common';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,23 +7,20 @@ import TableContainer from '@mui/material/TableContainer';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
-import Alert from '@mui/material/Alert';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 
-import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
-import TokensTableRow from './component/TableRow';
+import { Button, Card, Stack, Container, Typography } from '@mui/material';
+import UserGroupTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
-import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
+import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
-import { useSelector } from 'react-redux';
-import { ITEMS_PER_PAGE } from 'constants';
-import { useTranslation } from 'react-i18next';
-import { UserContext } from 'contexts/UserContext';
 
-export default function Token() {
+import { useTranslation } from 'react-i18next';
+// ----------------------------------------------------------------------
+export default function UserGroup() {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
@@ -31,15 +28,11 @@ export default function Token() {
   const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [tokens, setTokens] = useState([]);
+  const [userGroup, setUserGroup] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const { userGroup, loadUserGroup } = useContext(UserContext);
-  const [userGroupOptions, setUserGroupOptions] = useState([]);
 
   const [openModal, setOpenModal] = useState(false);
-  const [editTokenId, setEditTokenId] = useState(0);
-  const siteInfo = useSelector((state) => state.siteInfo);
+  const [editUserId, setEditUserId] = useState(0);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -58,32 +51,23 @@ export default function Token() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const searchTokens = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    setPage(0);
-    setSearchKeyword(formData.get('keyword'));
-  };
-
-  const fetchData = async (page, rowsPerPage, keyword, order, orderBy) => {
+  const fetchData = async (page, rowsPerPage, order, orderBy) => {
     setSearching(true);
-    keyword = trims(keyword);
     try {
       if (orderBy) {
         orderBy = order === 'desc' ? '-' + orderBy : orderBy;
       }
-      const res = await API.get(`/api/token/`, {
+      const res = await API.get(`/api/user_group/`, {
         params: {
           page: page + 1,
           size: rowsPerPage,
-          keyword: keyword,
           order: orderBy
         }
       });
       const { success, message, data } = res.data;
       if (success) {
         setListCount(data.total_count);
-        setTokens(data.data);
+        setUserGroup(data.data);
       } else {
         showError(message);
       }
@@ -101,26 +85,11 @@ export default function Token() {
   };
 
   useEffect(() => {
-    fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
-  }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
+    fetchData(page, rowsPerPage, order, orderBy);
+  }, [page, rowsPerPage, order, orderBy, refreshFlag]);
 
-  useEffect(() => {
-    loadUserGroup();
-  }, [loadUserGroup]);
-
-  useEffect(() => {
-    let options = [];
-    Object.values(userGroup).forEach((item) => {
-      if (item.public) {
-        options.push({ label: `${item.name} (倍率：${item.ratio})`, value: item.symbol });
-      }
-    });
-    setUserGroupOptions(options);
-  }, [userGroup]);
-
-  const manageToken = async (id, action, value) => {
-    const url = '/api/token/';
-    let data = { id };
+  const manageUserGroup = async (id, action) => {
+    const url = '/api/user_group/';
     let res;
     try {
       switch (action) {
@@ -128,18 +97,16 @@ export default function Token() {
           res = await API.delete(url + id);
           break;
         case 'status':
-          res = await API.put(url + `?status_only=true`, {
-            ...data,
-            status: value
-          });
+          res = await API.put(`${url}enable/${id}`);
           break;
+        default:
+          return false;
       }
+
       const { success, message } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
-        if (action === 'delete') {
-          await handleRefresh();
-        }
+        showSuccess(t('userPage.operationSuccess'));
+        await handleRefresh();
       } else {
         showError(message);
       }
@@ -150,14 +117,14 @@ export default function Token() {
     }
   };
 
-  const handleOpenModal = (tokenId) => {
-    setEditTokenId(tokenId);
+  const handleOpenModal = (userId) => {
+    setEditUserId(userId);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setEditTokenId(0);
+    setEditUserId(0);
   };
 
   const handleOkModal = (status) => {
@@ -170,30 +137,13 @@ export default function Token() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('token_index.token')}</Typography>
+        <Typography variant="h4">{t('userGroup.title')}</Typography>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            handleOpenModal(0);
-          }}
-          startIcon={<IconPlus />}
-        >
-          {t('token_index.createToken')}
+        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+          {t('userGroup.create')}
         </Button>
       </Stack>
-      <Stack mb={5}>
-        <Alert severity="info">
-          {t('token_index.replaceApiAddress1')}
-          <b>{siteInfo.server_address}</b>
-          {t('token_index.replaceApiAddress2')}
-        </Alert>
-      </Stack>
       <Card>
-        <Box component="form" onSubmit={searchTokens} noValidate>
-          <TableToolBar placeholder={t('token_index.searchTokenName')} />
-        </Box>
         <Toolbar
           sx={{
             textAlign: 'right',
@@ -206,7 +156,7 @@ export default function Token() {
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                {t('token_index.refresh')}
+                {t('userPage.refresh')}
               </Button>
             </ButtonGroup>
           </Container>
@@ -220,25 +170,24 @@ export default function Token() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
-                  { id: 'name', label: t('token_index.name'), disableSort: false },
-                  { id: 'group', label: t('token_index.userGroup'), disableSort: false },
-                  { id: 'status', label: t('token_index.status'), disableSort: false },
-                  { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
-                  { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
-                  { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
-                  { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
-                  { id: 'action', label: t('token_index.actions'), disableSort: true }
+                  { id: 'id', label: t('userGroup.id'), disableSort: false },
+                  { id: 'symbol', label: t('userGroup.symbol'), disableSort: false },
+                  { id: 'name', label: t('userGroup.name'), disableSort: false },
+                  { id: 'ratio', label: t('userGroup.ratio'), disableSort: false },
+                  { id: 'public', label: t('userGroup.public'), disableSort: false },
+                  { id: 'enable', label: t('userGroup.enable'), disableSort: false },
+
+                  { id: 'action', label: t('userPage.action'), disableSort: true }
                 ]}
               />
               <TableBody>
-                {tokens.map((row) => (
-                  <TokensTableRow
+                {userGroup.map((row) => (
+                  <UserGroupTableRow
                     item={row}
-                    manageToken={manageToken}
+                    manageUserGroup={manageUserGroup}
                     key={row.id}
                     handleOpenModal={handleOpenModal}
-                    setModalTokenId={setEditTokenId}
-                    userGroup={userGroup}
+                    setModalUserGroupId={setEditUserId}
                   />
                 ))}
               </TableBody>
@@ -257,13 +206,7 @@ export default function Token() {
           showLastButton
         />
       </Card>
-      <EditeModal
-        open={openModal}
-        onCancel={handleCloseModal}
-        onOk={handleOkModal}
-        tokenId={editTokenId}
-        userGroupOptions={userGroupOptions}
-      />
+      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} userGroupId={editUserId} />
     </>
   );
 }

@@ -7,6 +7,7 @@
   "redemption": "兑换",
   "topup": "充值",
   "user": "用户",
+  "user_group": "用户分组",
   "profile": "个人设置",
   "pricing": "模型价格",
   "model_price": "可用模型",
@@ -187,6 +188,7 @@
     "quota": "额度",
     "unlimitedQuota": "无限额度",
     "enableCache": "是否开启缓存(开启后，将会缓存聊天记录，以减少消费)",
+    "userGroup": "分组",
     "cancel": "取消",
     "submit": "提交"
   },
@@ -196,6 +198,7 @@
     "searchButton": "搜索",
     "timeLabel": "时间",
     "channelLabel": "渠道",
+    "groupLabel": "分组",
     "userLabel": "用户",
     "tokenLabel": "令牌",
     "typeLabel": "类型",
@@ -841,7 +844,8 @@
     "expired": "已过期",
     "exhaust": "已耗尽",
     "execute": "是否执行 {{title}}?",
-    "executeConfirm": "执行"
+    "executeConfirm": "执行",
+    "deleteConfirm": "是否删除 {{title}}?"
   },
   "channel_row": {
     "priorityTip": "优先级不能小于 0",
@@ -1067,5 +1071,17 @@
     "response": "响应体"
   },
   "预计费选项": "预计费选项",
-  "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。"
+  "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。",
+  "userGroup": {
+    "title": "用户分组",
+    "create": "新建分组",
+    "id": "ID",
+    "symbol": "标识",
+    "name": "名称",
+    "ratio": "倍率",
+    "public": "是否公开",
+    "enable": "是否启用",
+    "symbolTip": "标识用于区分用户组,请使用英文，不可重复",
+    "nameTip": "给用户看的名称"
+  }
 }

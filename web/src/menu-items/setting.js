@@ -3,6 +3,7 @@ import {
   IconBasket,
   IconKey,
   IconUser,
+  IconUsers,
   IconUserScan,
   IconReceipt2,
   IconSettingsCog,
@@ -23,7 +24,8 @@ const icons = {
   IconBrandTelegram,
   IconCoin,
   IconBrandPaypal,
-  IconCoins
+  IconCoins,
+  IconUsers
 };
 
 const Setting = {
@@ -56,6 +58,15 @@ const Setting = {
       icon: icons.IconBasket,
       isAdmin: true,
       children: [
+        {
+          id: 'user_group',
+          title: '用户分组',
+          type: 'item',
+          url: '/panel/user_group',
+          icon: icons.IconUsers,
+          breadcrumbs: false,
+          isAdmin: true
+        },
         {
           id: 'pricing',
           title: '模型价格',
