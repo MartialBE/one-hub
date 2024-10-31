@@ -6,8 +6,8 @@ type MiniMaxChatRequest struct {
 	Model            string                          `json:"model"`
 	Stream           bool                            `json:"stream,omitempty"`
 	TokensToGenerate int                             `json:"tokens_to_generate,omitempty"`
-	Temperature      float64                         `json:"temperature,omitempty"`
-	TopP             float64                         `json:"top_p,omitempty"`
+	Temperature      *float64                        `json:"temperature,omitempty"`
+	TopP             *float64                        `json:"top_p,omitempty"`
 	Messages         []MiniMaxChatMessage            `json:"messages"`
 	BotSetting       []MiniMaxBotSetting             `json:"bot_setting,omitempty"`
 	ReplyConstraints ReplyConstraints                `json:"reply_constraints,omitempty"`

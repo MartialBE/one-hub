@@ -8,10 +8,10 @@ import (
 type MistralChatCompletionRequest struct {
 	Model       string                        `json:"model" binding:"required"`
 	Messages    []types.ChatCompletionMessage `json:"messages" binding:"required"`
-	Temperature float64                       `json:"temperature,omitempty"` // 0-1
+	Temperature *float64                      `json:"temperature,omitempty"` // 0-1
 	MaxTokens   int                           `json:"max_tokens,omitempty"`
-	TopP        float64                       `json:"top_p,omitempty"` // 0-1
-	N           int                           `json:"n,omitempty"`
+	TopP        *float64                      `json:"top_p,omitempty"` // 0-1
+	N           *int                          `json:"n,omitempty"`
 	Stream      bool                          `json:"stream,omitempty"`
 	Tools       []*types.ChatCompletionTool   `json:"tools,omitempty"`
 	ToolChoice  string                        `json:"tool_choice,omitempty"`

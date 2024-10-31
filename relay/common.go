@@ -105,7 +105,7 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 }
 
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
-	group := c.GetString("group")
+	group := c.GetString("token_group")
 	skipOnlyChat := c.GetBool("skip_only_chat")
 	var filters []model.ChannelsFilterFunc
 	if skipOnlyChat {

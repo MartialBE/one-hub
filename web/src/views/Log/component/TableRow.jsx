@@ -59,7 +59,7 @@ function requestTSLabelOptions(request_ts) {
   return color;
 }
 
-export default function LogTableRow({ item, userIsAdmin }) {
+export default function LogTableRow({ item, userIsAdmin, userGroup }) {
   const { t } = useTranslation();
   let request_time = item.request_time / 1000;
   let request_time_str = request_time.toFixed(2) + ' 秒';
@@ -83,6 +83,16 @@ export default function LogTableRow({ item, userIsAdmin }) {
             </Label>
           </TableCell>
         )}
+
+        <TableCell>
+          {item?.metadata?.group_name ? (
+            <Label color="default" variant="soft">
+              {userGroup[item.metadata.group_name]?.name || '跟随用户'}
+            </Label>
+          ) : (
+            ''
+          )}
+        </TableCell>
         <TableCell>
           {item.token_name && (
             <Label color="default" variant="soft">
@@ -110,7 +120,8 @@ export default function LogTableRow({ item, userIsAdmin }) {
 
 LogTableRow.propTypes = {
   item: PropTypes.object,
-  userIsAdmin: PropTypes.bool
+  userIsAdmin: PropTypes.bool,
+  userGroup: PropTypes.object
 };
 
 function viewModelName(model_name, isStream) {

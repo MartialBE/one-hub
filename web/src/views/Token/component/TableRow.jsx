@@ -20,6 +20,7 @@ import {
 
 import TableSwitch from 'ui-component/Switch';
 import { renderQuota, timestamp2string, copy } from 'utils/common';
+import Label from 'ui-component/Label';
 
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +52,7 @@ function statusInfo(t, status) {
   }
 }
 
-export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId }) {
+export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId, userGroup }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [menuItems, setMenuItems] = useState(null);
@@ -119,6 +120,9 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     <>
       <TableRow tabIndex={item.id}>
         <TableCell>{item.name}</TableCell>
+        <TableCell>
+          <Label color={userGroup[item.group]?.color}>{userGroup[item.group]?.name || '跟随用户'}</Label>
+        </TableCell>
 
         <TableCell>
           <Tooltip
@@ -197,5 +201,6 @@ TokensTableRow.propTypes = {
   item: PropTypes.object,
   manageToken: PropTypes.func,
   handleOpenModal: PropTypes.func,
-  setModalTokenId: PropTypes.func
+  setModalTokenId: PropTypes.func,
+  userGroup: PropTypes.object
 };
