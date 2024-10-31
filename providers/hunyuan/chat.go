@@ -120,8 +120,8 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *ChatCompletion
 		Model:       request.Model,
 		Messages:    messages,
 		Stream:      request.Stream,
-		TopP:        &request.TopP,
-		Temperature: &request.Temperature,
+		TopP:        request.TopP,
+		Temperature: request.Temperature,
 	}
 }
 

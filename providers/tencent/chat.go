@@ -138,15 +138,21 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *TencentChatReq
 	if request.Stream {
 		stream = 1
 	}
-	return &TencentChatRequest{
-		Timestamp:   utils.GetTimestamp(),
-		Expired:     utils.GetTimestamp() + 24*60*60,
-		QueryID:     utils.GetUUID(),
-		Temperature: request.Temperature,
-		TopP:        request.TopP,
-		Stream:      stream,
-		Messages:    messages,
+	tencentRequest := &TencentChatRequest{
+		Timestamp: utils.GetTimestamp(),
+		Expired:   utils.GetTimestamp() + 24*60*60,
+		QueryID:   utils.GetUUID(),
+		Stream:    stream,
+		Messages:  messages,
 	}
+
+	if request.Temperature != nil {
+		tencentRequest.Temperature = *request.Temperature
+	}
+	if request.TopP != nil {
+		tencentRequest.TopP = *request.TopP
+	}
+	return tencentRequest
 }
 
 // 转换为OpenAI聊天流式请求体

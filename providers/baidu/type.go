@@ -20,9 +20,9 @@ type BaiduMessage struct {
 type BaiduChatRequest struct {
 	Messages        []BaiduMessage                  `json:"messages"`
 	Functions       []*types.ChatCompletionFunction `json:"functions,omitempty"`
-	Temperature     float64                         `json:"temperature,omitempty"`
-	TopP            float64                         `json:"top_p,omitempty"`
-	PenaltyScore    float64                         `json:"penalty_score,omitempty"`
+	Temperature     *float64                        `json:"temperature,omitempty"`
+	TopP            *float64                        `json:"top_p,omitempty"`
+	PenaltyScore    *float64                        `json:"penalty_score,omitempty"`
 	Stream          bool                            `json:"stream"`
 	System          string                          `json:"system,omitempty"`
 	Stop            []string                        `json:"stop,omitempty"`

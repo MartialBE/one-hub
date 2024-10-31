@@ -125,6 +125,67 @@ func changeChannelApiVersion() *gormigrate.Migration {
 	}
 }
 
+func initUserGroup() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202410300001",
+		Migrate: func(tx *gorm.DB) error {
+			userGroups := map[string]*UserGroup{
+				"default": {
+					Symbol: "default",
+					Name:   "默认分组",
+					Ratio:  1,
+					Public: true,
+				},
+				"vip": {
+					Symbol: "vip",
+					Name:   "vip分组",
+					Ratio:  1,
+					Public: false,
+				},
+				"svip": {
+					Symbol: "svip",
+					Name:   "svip分组",
+					Ratio:  1,
+					Public: false,
+				},
+			}
+			option, err := GetOption("GroupRatio")
+			if err == nil && option.Value != "" {
+				oldGroup := make(map[string]float64)
+				err = json.Unmarshal([]byte(option.Value), &oldGroup)
+				if err != nil {
+					return err
+				}
+
+				for k, v := range oldGroup {
+					isPublic := false
+					if k == "default" {
+						isPublic = true
+					}
+					userGroups[k] = &UserGroup{
+						Symbol: k,
+						Name:   k,
+						Ratio:  v,
+						Public: isPublic,
+					}
+				}
+			}
+
+			for k, v := range userGroups {
+				err := tx.Where("symbol = ?", k).FirstOrCreate(v).Error
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Rollback().Error
+		},
+	}
+}
+
 func migrationAfter(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -134,6 +195,7 @@ func migrationAfter(db *gorm.DB) error {
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		addStatistics(),
 		changeChannelApiVersion(),
+		initUserGroup(),
 	})
 	return m.Migrate()
 }

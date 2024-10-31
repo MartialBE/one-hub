@@ -156,3 +156,8 @@ func GetFieldsByID(model interface{}, fieldNames []string, id int, result interf
 	err := DB.Model(model).Where("id = ?", id).Select(fieldNames).Find(result).Error
 	return err
 }
+
+func UpdateFieldsByID(model interface{}, id int, fields map[string]interface{}) error {
+	err := DB.Model(model).Where("id = ?", id).Updates(fields).Error
+	return err
+}

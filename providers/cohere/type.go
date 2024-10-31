@@ -23,15 +23,15 @@ type CohereRequest struct {
 	ConversationId    string                          `json:"conversation_id,omitempty"`
 	PromptTruncation  string                          `json:"prompt_truncation,omitempty"`
 	Connectors        []CohereConnector               `json:"connectors,omitempty"`
-	Temperature       float64                         `json:"temperature,omitempty"`
+	Temperature       *float64                        `json:"temperature,omitempty"`
 	MaxTokens         int                             `json:"max_tokens,omitempty"`
 	MaxInputTokens    int                             `json:"max_input_tokens,omitempty"`
-	K                 int                             `json:"k,omitempty"`
-	P                 float64                         `json:"p,omitempty"`
+	K                 *int                            `json:"k,omitempty"`
+	P                 *float64                        `json:"p,omitempty"`
 	Seed              *int                            `json:"seed,omitempty"`
 	StopSequences     any                             `json:"stop_sequences,omitempty"`
-	FrequencyPenalty  float64                         `json:"frequency_penalty,omitempty"`
-	PresencePenalty   float64                         `json:"presence_penalty,omitempty"`
+	FrequencyPenalty  *float64                        `json:"frequency_penalty,omitempty"`
+	PresencePenalty   *float64                        `json:"presence_penalty,omitempty"`
 	Tools             []*types.ChatCompletionFunction `json:"tools,omitempty"`
 	ToolResults       any                             `json:"tool_results,omitempty"`
 	SearchQueriesOnly *bool                           `json:"search_queries_only,omitempty"`

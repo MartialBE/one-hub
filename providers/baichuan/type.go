@@ -15,9 +15,9 @@ type BaichuanChatRequest struct {
 	Model             string                `json:"model"`
 	Messages          []BaichuanMessage     `json:"messages"`
 	Stream            bool                  `json:"stream,omitempty"`
-	Temperature       float64               `json:"temperature,omitempty"`
-	TopP              float64               `json:"top_p,omitempty"`
-	TopK              int                   `json:"top_k,omitempty"`
+	Temperature       *float64              `json:"temperature,omitempty"`
+	TopP              *float64              `json:"top_p,omitempty"`
+	TopK              *int                  `json:"top_k,omitempty"`
 	WithSearchEnhance bool                  `json:"with_search_enhance,omitempty"`
 	KnowledgeBase     BaichuanKnowledgeBase `json:"knowledge_base,omitempty"`
 }

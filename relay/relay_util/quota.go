@@ -20,6 +20,7 @@ type Quota struct {
 	modelName        string
 	promptTokens     int
 	price            model.Price
+	groupName        string
 	groupRatio       float64
 	inputRatio       float64
 	outputRatio      float64
@@ -42,7 +43,8 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) *Quota {
 	}
 
 	quota.price = *PricingInstance.GetPrice(quota.modelName)
-	quota.groupRatio = common.GetGroupRatio(c.GetString("group"))
+	quota.groupRatio = c.GetFloat64("group_ratio")
+	quota.groupName = c.GetString("token_group")
 	quota.inputRatio = quota.price.GetInput() * quota.groupRatio
 	quota.outputRatio = quota.price.GetOutput() * quota.groupRatio
 
@@ -194,6 +196,7 @@ func (q *Quota) GetInputRatio() float64 {
 
 func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 	meta := map[string]any{
+		"group_name":   q.groupName,
 		"price_type":   q.price.Type,
 		"group_ratio":  q.groupRatio,
 		"input_ratio":  q.inputRatio,

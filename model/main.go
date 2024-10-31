@@ -25,6 +25,7 @@ func SetupDB() {
 		logger.FatalLog("failed to initialize database: " + err.Error())
 	}
 	ChannelGroup.Load()
+	GlobalUserGroupRatio.Load()
 	config.RootUserEmail = GetRootUserEmail()
 
 	if viper.GetBool("batch_update_enabled") {
@@ -167,6 +168,11 @@ func InitDB() (err error) {
 			return err
 		}
 		err = db.AutoMigrate(&Statistics{})
+		if err != nil {
+			return err
+		}
+
+		err = db.AutoMigrate(&UserGroup{})
 		if err != nil {
 			return err
 		}

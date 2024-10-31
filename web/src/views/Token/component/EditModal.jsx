@@ -18,7 +18,9 @@ import {
   // InputAdornment,
   Switch,
   FormControlLabel,
-  FormHelperText
+  FormHelperText,
+  Select,
+  MenuItem
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -47,10 +49,11 @@ const originInputs = {
   remain_quota: 0,
   expired_time: -1,
   unlimited_quota: true,
-  chat_cache: false
+  chat_cache: false,
+  group: ''
 };
 
-const EditModal = ({ open, tokenId, onCancel, onOk }) => {
+const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
@@ -245,6 +248,25 @@ const EditModal = ({ open, tokenId, onCancel, onOk }) => {
                   />
                 )}
               </FormControl>
+              <FormControl fullWidth>
+                <InputLabel>{t('token_index.userGroup')}</InputLabel>
+                <Select
+                  label={t('token_index.userGroup')}
+                  name="group"
+                  value={values.group || '-1'}
+                  onChange={(e) => {
+                    const value = e.target.value === '-1' ? '' : e.target.value;
+                    setFieldValue('group', value);
+                  }}
+                >
+                  <MenuItem value="-1">跟随用户分组</MenuItem>
+                  {userGroupOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <DialogActions>
                 <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
@@ -265,5 +287,6 @@ EditModal.propTypes = {
   open: PropTypes.bool,
   tokenId: PropTypes.number,
   onCancel: PropTypes.func,
-  onOk: PropTypes.func
+  onOk: PropTypes.func,
+  userGroupOptions: PropTypes.array
 };
