@@ -92,6 +92,10 @@ const Playground = () => {
         <Typography align="center">{isLoading ? 'Loading...' : 'No playground available'}</Typography>
       </SubCard>
     );
+  } else if (chatLinks.length === 1) {
+    return (
+      <iframe title="playground" src={iframeSrc} style={{ width: '100%', height: '85vh', border: 'none' }} />
+    );
   } else {
     return (
       <Card>
