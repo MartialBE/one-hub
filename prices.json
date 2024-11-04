@@ -371,6 +371,20 @@
     "output": 0.625
   },
   {
+    "model": "claude-3-5-haiku-20241022",
+    "type": "tokens",
+    "channel_type": 14,
+    "input": 0.5,
+    "output": 2.5
+  },
+  {
+    "model": "claude-3-5-haiku-latest",
+    "type": "tokens",
+    "channel_type": 14,
+    "input": 0.5,
+    "output": 2.5
+  },
+  {
     "model": "claude-3-opus-20240229",
     "type": "tokens",
     "channel_type": 14,
