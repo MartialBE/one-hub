@@ -586,7 +586,9 @@ const OperationSetting = () => {
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <FormControl fullWidth>
-              <Alert severity="info">{t('setting_index.operationSettings.paymentSettings.alert')}</Alert>
+              <Alert severity="info">
+                <div dangerouslySetInnerHTML={{ __html: t('setting_index.operationSettings.paymentSettings.alert') }} />
+              </Alert>
             </FormControl>
             <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
               <FormControl fullWidth>
@@ -618,7 +620,9 @@ const OperationSetting = () => {
             </Stack>
           </Stack>
           <Stack spacing={2}>
-            <Alert severity="info">{t('setting_index.operationSettings.paymentSettings.discountInfo')}</Alert>
+            <Alert severity="info">
+              <div dangerouslySetInnerHTML={{ __html: t('setting_index.operationSettings.paymentSettings.discountInfo') }} />
+            </Alert>
             <FormControl fullWidth>
               <TextField
                 multiline
