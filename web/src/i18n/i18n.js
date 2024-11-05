@@ -9,8 +9,8 @@ i18n
   .init({
     resources,
     fallbackLng: 'zh_CN',
-    debug: true,
-    lng: 'zh-CN',
+    debug: false,
+    lng: 'zh_CN',
     interpolation: {
       escapeValue: false
     }
