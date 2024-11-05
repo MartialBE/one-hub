@@ -50,3 +50,25 @@ func ErrorToGeminiErr(err error) *GeminiErrorResponse {
 		},
 	}
 }
+
+func ConvertRole(roleName string) string {
+	switch roleName {
+	case types.ChatMessageRoleFunction, types.ChatMessageRoleTool:
+		return types.ChatMessageRoleFunction
+	case types.ChatMessageRoleAssistant:
+		return "model"
+	default:
+		return types.ChatMessageRoleUser
+	}
+}
+
+func ConvertFinishReason(reason string) string {
+	switch reason {
+	case "STOP":
+		return types.FinishReasonStop
+	case "MAX_TOKENS":
+		return types.FinishReasonLength
+	default:
+		return types.FinishReasonContentFilter
+	}
+}

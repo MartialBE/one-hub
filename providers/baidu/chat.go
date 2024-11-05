@@ -7,6 +7,7 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
@@ -134,12 +135,16 @@ func (p *BaiduProvider) convertToChatOpenai(response *BaiduChatResponse, request
 func convertFromChatOpenai(request *types.ChatCompletionRequest) *BaiduChatRequest {
 	request.ClearEmptyMessages()
 	baiduChatRequest := &BaiduChatRequest{
-		Messages:        make([]BaiduMessage, 0, len(request.Messages)),
-		Temperature:     request.Temperature,
-		Stream:          request.Stream,
-		TopP:            request.TopP,
-		PenaltyScore:    request.FrequencyPenalty,
+		Messages:    make([]BaiduMessage, 0, len(request.Messages)),
+		Temperature: request.Temperature,
+		Stream:      request.Stream,
+		TopP:        request.TopP,
+		// PenaltyScore:    request.FrequencyPenalty,
 		MaxOutputTokens: request.MaxTokens,
+	}
+
+	if request.FrequencyPenalty != nil {
+		baiduChatRequest.PenaltyScore = utils.GetPointer(utils.NumClamp(*request.FrequencyPenalty, 1, 2))
 	}
 
 	if request.Stop != nil {
