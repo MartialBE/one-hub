@@ -34,10 +34,6 @@ const App = () => {
     if (storedTheme) {
       dispatch({ type: SET_THEME, theme: storedTheme });
     }
-
-    // 将语言更改移到这里
-    const storedLanguage = localStorage.getItem('appLanguage') || 'zh_CN';
-    i18n.changeLanguage(storedLanguage);
   }, [dispatch]);
 
   return (
@@ -51,13 +47,13 @@ const App = () => {
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             Components={{ copy: CopySnackbar }}
           >
-            <I18nextProvider i18n={i18n}>
-              <UserProvider>
-                <StatusProvider>
+            <StatusProvider>
+              <I18nextProvider i18n={i18n}>
+                <UserProvider>
                   <Routes />
-                </StatusProvider>
-              </UserProvider>
-            </I18nextProvider>
+                </UserProvider>
+              </I18nextProvider>
+            </StatusProvider>
           </SnackbarProvider>
         </NavigationScroll>
       </ThemeProvider>

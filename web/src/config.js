@@ -18,6 +18,7 @@ const config = {
     server_address: '',
     start_time: 0,
     system_name: 'One Hub',
+    language: 'zh_CN',
     top_up_link: '',
     turnstile_check: false,
     turnstile_site_key: '',
