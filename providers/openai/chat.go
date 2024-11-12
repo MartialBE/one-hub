@@ -41,7 +41,7 @@ func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		return nil, errWithCode
 	}
 
-	if response.Usage == nil {
+	if response.Usage == nil || response.Usage.CompletionTokens == 0 {
 		response.Usage = &types.Usage{
 			PromptTokens:     p.Usage.PromptTokens,
 			CompletionTokens: 0,
@@ -123,14 +123,19 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 	}
 
 	if openaiResponse.Usage != nil {
-		*h.Usage = *openaiResponse.Usage
+		if openaiResponse.Usage.CompletionTokens > 0 {
+			*h.Usage = *openaiResponse.Usage
+		}
+
 		if len(openaiResponse.Choices) == 0 {
 			*rawLine = nil
 			return
 		}
 	} else {
 		if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Usage != nil {
-			*h.Usage = *openaiResponse.Choices[0].Usage
+			if openaiResponse.Choices[0].Usage.CompletionTokens > 0 {
+				*h.Usage = *openaiResponse.Choices[0].Usage
+			}
 		} else {
 			if h.Usage.TotalTokens == 0 {
 				h.Usage.TotalTokens = h.Usage.PromptTokens

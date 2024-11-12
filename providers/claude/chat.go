@@ -319,7 +319,13 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 	openaiResponse.Usage.TotalTokens = promptTokens + completionTokens
 
 	usage := provider.GetUsage()
-	*usage = *openaiResponse.Usage
+	isOk := ClaudeUsageToOpenaiUsage(&response.Usage, usage)
+	if !isOk {
+		usage.CompletionTokens = ClaudeOutputUsage(response)
+		usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	}
+
+	openaiResponse.Usage = usage
 
 	return openaiResponse, nil
 }
