@@ -10,7 +10,7 @@ i18n
     resources,
     fallbackLng: 'zh_CN',
     debug: false,
-    lng: 'zh-CN',
+    lng: 'zh_CN',
     interpolation: {
       escapeValue: false
     },

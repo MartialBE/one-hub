@@ -422,7 +422,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               }))
             : [];
         // if (data.model_headers) {
-          data.model_headers =
+        data.model_headers =
           data.model_headers !== ''
             ? Object.entries(JSON.parse(data.model_headers)).map(([key, value], index) => ({
                 index,
@@ -468,11 +468,14 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   }, [channelId]);
 
   const handleModelTagClick = (modelId) => {
-    navigator.clipboard.writeText(modelId).then(() => {
-      showSuccess('模型名称已复制');
-    }).catch((error) => {
-      showError('复制失败: ' + error.message);
-    });
+    navigator.clipboard
+      .writeText(modelId)
+      .then(() => {
+        showSuccess('模型名称已复制');
+      })
+      .catch((error) => {
+        showError('复制失败: ' + error.message);
+      });
   };
 
   return (
@@ -735,11 +738,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   )}
                   renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                      <Chip
-                        label={option.id}
-                        {...getTagProps({ index })}
-                        onClick={() => handleModelTagClick(option.id)}
-                      />
+                      <Chip key={index} label={option.id} {...getTagProps({ index })} onClick={() => handleModelTagClick(option.id)} />
                     ))
                   }
                 />

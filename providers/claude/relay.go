@@ -29,7 +29,13 @@ func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeRespon
 		return nil, OpenaiErrToClaudeErr(errWithCode)
 	}
 
-	ClaudeUsageToOpenaiUsage(&claudeResponse.Usage, p.GetUsage())
+	usage := p.GetUsage()
+
+	isOk := ClaudeUsageToOpenaiUsage(&claudeResponse.Usage, usage)
+	if !isOk {
+		usage.CompletionTokens = ClaudeOutputUsage(claudeResponse)
+		usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	}
 
 	return claudeResponse, nil
 }

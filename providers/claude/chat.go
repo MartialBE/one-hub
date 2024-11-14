@@ -125,10 +125,11 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	}
 
 	var prevUserMessage bool
+	systemMessage := ""
 
 	for _, msg := range request.Messages {
-		if msg.Role == "system" && claudeRequest.System == "" {
-			claudeRequest.System = msg.StringContent()
+		if msg.Role == "system" {
+			systemMessage += msg.StringContent()
 			continue
 		}
 		messageContent, err := convertMessageContent(&msg)
@@ -153,6 +154,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 			}
 			claudeRequest.Messages = append(claudeRequest.Messages, *messageContent)
 		}
+	}
+
+	if systemMessage != "" {
+		claudeRequest.System = systemMessage
 	}
 
 	for _, tool := range request.Tools {
@@ -314,7 +319,13 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 	openaiResponse.Usage.TotalTokens = promptTokens + completionTokens
 
 	usage := provider.GetUsage()
-	*usage = *openaiResponse.Usage
+	isOk := ClaudeUsageToOpenaiUsage(&response.Usage, usage)
+	if !isOk {
+		usage.CompletionTokens = ClaudeOutputUsage(response)
+		usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	}
+
+	openaiResponse.Usage = usage
 
 	return openaiResponse, nil
 }

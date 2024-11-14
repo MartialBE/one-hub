@@ -4,6 +4,7 @@ import { showNotice, showError } from 'utils/common';
 import { SET_SITE_INFO } from 'store/actions';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 export const LoadStatusContext = createContext();
 
@@ -21,6 +22,10 @@ const StatusProvider = ({ children }) => {
         if (!data.chat_link) {
           delete data.chat_link;
         }
+        // 设置系统默认语言
+        const storedLanguage = localStorage.getItem('appLanguage') || data.language || 'zh_CN';
+        localStorage.setItem('default_language', storedLanguage);
+        i18n.changeLanguage(storedLanguage);
         localStorage.setItem('siteInfo', JSON.stringify(data));
         localStorage.setItem('quota_per_unit', data.quota_per_unit);
         localStorage.setItem('display_in_currency', data.display_in_currency);
