@@ -33,6 +33,7 @@ func GetStatus(c *gin.Context) {
 			"lark_client_id":      config.LarkClientId,
 			"system_name":         config.SystemName,
 			"logo":                config.Logo,
+			"language":            config.Language,
 			"footer_html":         config.Footer,
 			"wechat_qrcode":       config.WeChatAccountQRCodeImageURL,
 			"wechat_login":        config.WeChatAuthEnabled,
