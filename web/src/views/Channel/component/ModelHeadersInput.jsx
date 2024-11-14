@@ -59,7 +59,7 @@ const ModelHeaderInput = ({ value, onChange, disabled, error }) => {
               onChange={(e) => handleChange(index, 'key', e.target.value)}
               disabled={disabled}
               error={error}
-              sx={{ mr: 1 }}
+              sx={{ mr: 1, flex: 1 }}
             />
             <TextField
               label={t('channel_edit.modelHeaderValue')}
@@ -67,7 +67,7 @@ const ModelHeaderInput = ({ value, onChange, disabled, error }) => {
               onChange={(e) => handleChange(index, 'value', e.target.value)}
               disabled={disabled}
               error={error}
-              sx={{ mr: 1 }}
+              sx={{ mr: 1, flex: 1 }}
             />
             <ListItemSecondaryAction>
               <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(index)} disabled={disabled}>
