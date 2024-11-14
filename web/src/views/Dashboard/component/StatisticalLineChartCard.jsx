@@ -10,55 +10,122 @@ import Chart from 'react-apexcharts';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
-import { useTranslation } from 'react-i18next';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-  ...theme.typography.CardWrapper,
-  color: '#fff',
+  borderRadius: '16px',
+  border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+  boxShadow: theme.palette.mode === 'dark' ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
   overflow: 'hidden',
-  position: 'relative',
-  '&>div': {
-    position: 'relative',
-    zIndex: 5
-  },
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    width: 210,
-    height: 210,
-    background: theme.palette.primary[800],
-    borderRadius: '50%',
-    zIndex: 1,
-    top: -85,
-    right: -95,
-    [theme.breakpoints.down('sm')]: {
-      top: -105,
-      right: -140
-    }
-  },
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    zIndex: 1,
-    width: 210,
-    height: 210,
-    background: theme.palette.primary[800],
-    borderRadius: '50%',
-    top: -125,
-    right: -15,
-    opacity: 0.5,
-    [theme.breakpoints.down('sm')]: {
-      top: -155,
-      right: -70
-    }
-  }
+  height: '100px'
 }));
+
+const getChartOptions = (theme, type = 'default') => {
+  const getChartColor = () => {
+    switch (type) {
+      case 'request':
+        return '#60A5FA'; // 浅蓝色
+      case 'quota':
+        return '#FBBF24'; // 黄色
+      case 'token':
+        return '#F87171'; // 红色
+      default:
+        return '#60A5FA';
+    }
+  };
+
+  return {
+    chart: {
+      type: 'line',
+      toolbar: {
+        show: false
+      },
+      sparkline: {
+        enabled: true
+      },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800
+      }
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2,
+      lineCap: 'round'
+    },
+    grid: {
+      show: false
+    },
+    xaxis: {
+      type: 'category',
+      labels: {
+        show: false
+      }
+    },
+    yaxis: {
+      show: false,
+      padding: {
+        top: 2,
+        bottom: 2
+      }
+    },
+    colors: [getChartColor()],
+    tooltip: {
+      enabled: true,
+      theme: theme.palette.mode,
+      style: {
+        fontSize: '12px',
+        fontFamily: theme.typography.fontFamily
+      },
+      x: {
+        show: true,
+        format: 'yyyy-MM-dd'
+      },
+      y: {
+        title: {
+          formatter: () => ''
+        }
+      },
+      marker: {
+        show: false
+      }
+    },
+    markers: {
+      size: 0,
+      hover: {
+        size: 3,
+        sizeOffset: 1
+      }
+    }
+  };
+};
 
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
-const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue }) => {
+const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, type = 'default' }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
+
+  const customChartData = chartData
+    ? {
+        ...chartData,
+        options: {
+          ...getChartOptions(theme, type),
+          chart: {
+            ...getChartOptions(theme, type).chart,
+            sparkline: {
+              enabled: true
+            },
+            parentHeightOffset: 0,
+            toolbar: {
+              show: false
+            },
+            padding: {
+              right: 15
+            }
+          }
+        }
+      }
+    : null;
 
   return (
     <>
@@ -66,47 +133,47 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue }) =
         <SkeletonTotalOrderCard />
       ) : (
         <CardWrapper border={false} content={false}>
-          <Box sx={{ p: 2.25 }}>
-            <Grid container direction="column">
-              <Grid item sx={{ mb: 0.75 }}>
-                <Grid container alignItems="center">
-                  <Grid item xs={6}>
-                    <Grid container alignItems="center">
-                      <Grid item>
-                        <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                          {todayValue || '0'}
-                        </Typography>
-                      </Grid>
-                      <Grid item></Grid>
-                      <Grid item xs={12}>
-                        <Typography
-                          sx={{
-                            fontSize: '1rem',
-                            fontWeight: 500,
-                            color: theme.palette.primary[200]
-                          }}
-                        >
-                          {title}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={6}>
-                    {chartData ? (
-                      <Chart {...chartData} />
-                    ) : (
-                      <Typography
-                        sx={{
-                          fontSize: '1rem',
-                          fontWeight: 500,
-                          color: theme.palette.primary[200]
-                        }}
-                      >
-                        {t('dashboard_index.no_data')}
-                      </Typography>
-                    )}
-                  </Grid>
-                </Grid>
+          <Box
+            sx={{
+              p: 2.5,
+              height: '100%'
+            }}
+          >
+            <Grid container alignItems="center" spacing={2} sx={{ height: '100%' }}>
+              <Grid item xs>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontSize: '24px',
+                    fontWeight: 500,
+                    color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.87)',
+                    mb: 0.5
+                  }}
+                >
+                  {todayValue || '0'}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: '13px',
+                    color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
+                  }}
+                >
+                  {title}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Box
+                  sx={{
+                    height: '60px',
+                    position: 'relative',
+                    mr: 1
+                  }}
+                >
+                  {customChartData && <Chart {...customChartData} height="100%" width="100%" />}
+                </Box>
               </Grid>
             </Grid>
           </Box>
@@ -120,7 +187,8 @@ StatisticalLineChartCard.propTypes = {
   isLoading: PropTypes.bool,
   title: PropTypes.string,
   chartData: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  todayValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  todayValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  type: PropTypes.string
 };
 
 export default StatisticalLineChartCard;
