@@ -95,7 +95,7 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
               onChange={(e) => handleChange(index, 'key', e.target.value)}
               disabled={disabled}
               error={error}
-              sx={{ mr: 1 }}
+              sx={{ mr: 1, flex: 1 }}
             />
             <TextField
               label={t('channel_edit.modelMappingValue')}
@@ -103,7 +103,7 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
               onChange={(e) => handleChange(index, 'value', e.target.value)}
               disabled={disabled}
               error={error}
-              sx={{ mr: 1 }}
+              sx={{ mr: 1, flex: 1 }}
             />
             <ListItemSecondaryAction>
               <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(index)} disabled={disabled}>
@@ -121,7 +121,7 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
         {t('channel_edit.addModelMappingByJson')}
       </Button>
 
-      <Dialog open={openJsonDialog} onClose={handleCloseJsonDialog} maxWidth={'md'}>
+      <Dialog open={openJsonDialog} onClose={handleCloseJsonDialog} fullWidth maxWidth={'md'}>
         <DialogTitle>{t('channel_edit.addModelMappingByJson')}</DialogTitle>
         <DialogContent>
           <TextField

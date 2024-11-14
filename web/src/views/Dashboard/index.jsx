@@ -3,7 +3,7 @@ import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
-import { generateLineChartOptions, getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
+import { getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
 import { showError, calculateQuota, renderNumber } from 'utils/common';
 // import UserCard from 'ui-component/cards/UserCard';
@@ -56,6 +56,7 @@ const Dashboard = () => {
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_requests')}
+              type="request"
               chartData={requestChart?.chartData}
               todayValue={requestChart?.todayValue}
             />
@@ -64,6 +65,7 @@ const Dashboard = () => {
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_consumption')}
+              type="quota"
               chartData={quotaChart?.chartData}
               todayValue={quotaChart?.todayValue}
             />
@@ -72,6 +74,7 @@ const Dashboard = () => {
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_tokens')}
+              type="token"
               chartData={tokenChart?.chartData}
               todayValue={tokenChart?.todayValue}
             />
@@ -177,38 +180,46 @@ function getLineCardOption(lineDataGroup, field) {
   const lastItem = lineDataGroup.length - 1;
   let lineData = lineDataGroup.map((item, index) => {
     let tmp = {
-      date: item.date,
-      value: item[field]
+      x: item.date,
+      y: item[field]
     };
     switch (field) {
       case 'Quota':
-        tmp.value = calculateQuota(item.Quota, 3);
+        tmp.y = calculateQuota(item.Quota, 3);
         break;
       case 'PromptTokens':
-        tmp.value += item.CompletionTokens;
+        tmp.y += item.CompletionTokens;
         break;
     }
 
     if (index == lastItem) {
-      todayValue = tmp.value;
+      todayValue = tmp.y;
     }
     return tmp;
   });
 
   switch (field) {
     case 'RequestCount':
-      chartData = generateLineChartOptions(lineData, '次');
+      // chartData = generateLineChartOptions(lineData, '次');
       todayValue = renderNumber(todayValue);
       break;
     case 'Quota':
-      chartData = generateLineChartOptions(lineData, '美元');
+      // chartData = generateLineChartOptions(lineData, '美元');
       todayValue = '$' + renderNumber(todayValue);
       break;
     case 'PromptTokens':
-      chartData = generateLineChartOptions(lineData, '');
+      // chartData = generateLineChartOptions(lineData, '');
       todayValue = renderNumber(todayValue);
       break;
   }
+
+  chartData = {
+    series: [
+      {
+        data: lineData
+      }
+    ]
+  };
 
   return { chartData: chartData, todayValue: todayValue };
 }

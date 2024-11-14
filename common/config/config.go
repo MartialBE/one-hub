@@ -12,7 +12,7 @@ import (
 func InitConf() {
 	defaultConfig()
 	setEnv()
-
+	Language = viper.GetString("language")
 	IsMasterNode = viper.GetString("node_type") != "slave"
 	RequestInterval = time.Duration(viper.GetInt("polling_interval")) * time.Second
 	SessionSecret = utils.GetOrDefault("session_secret", SessionSecret)
@@ -35,4 +35,5 @@ func defaultConfig() {
 	viper.SetDefault("global.web_rate_limit", 100)
 	viper.SetDefault("connect_timeout", 5)
 	viper.SetDefault("auto_price_updates", true)
+	viper.SetDefault("language", "zh_CN")
 }
