@@ -10,6 +10,7 @@ import (
 	"one-api/common/image"
 	"one-api/common/logger"
 	"one-api/common/requester"
+	"one-api/metrics"
 	"one-api/model"
 	"one-api/providers/claude"
 	"one-api/relay/relay_util"
@@ -58,6 +59,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
 
 	if errWithCode == nil {
+		metrics.RecordProvider(c, 200)
 		return
 	}
 
@@ -93,6 +95,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 
 		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
 		if errWithCode == nil {
+			metrics.RecordProvider(c, 200)
 			return
 		}
 
