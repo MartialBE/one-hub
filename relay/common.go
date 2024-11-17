@@ -19,6 +19,7 @@ import (
 	providersBase "one-api/providers/base"
 	"one-api/relay/relay_util"
 	"one-api/types"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -323,10 +324,31 @@ func processChannelRelayError(ctx context.Context, channelId int, channelName st
 	}
 }
 
+var (
+	requestIdRegex = regexp.MustCompile(`\(request id: [^\)]+\)`)
+	quotaKeywords  = []string{"余额", "额度", "quota", "无可用渠道", "令牌"}
+)
+
 func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
+	statusCode := err.StatusCode
+	// 如果message中已经包含 request id: 则不再添加
+	if strings.Contains(err.Message, "(request id:") {
+		err.Message = requestIdRegex.ReplaceAllString(err.Message, "")
+	}
+
 	requestId := c.GetString(logger.RequestIdKey)
 	err.OpenAIError.Message = utils.MessageWithRequestId(err.OpenAIError.Message, requestId)
-	c.JSON(err.StatusCode, gin.H{
+
+	switch err.OpenAIError.Type {
+	case "new_api_error", "one_api_error", "shell_api_error":
+		err.OpenAIError.Type = "system_error"
+		if utils.ContainsString(err.Message, quotaKeywords) {
+			err.Message = "上游负载已饱和，请稍后再试"
+			statusCode = http.StatusTooManyRequests
+		}
+	}
+
+	c.JSON(statusCode, gin.H{
 		"error": err.OpenAIError,
 	})
 }
