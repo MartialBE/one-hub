@@ -64,7 +64,7 @@ export default function UserGroupTableRow({ item, manageUserGroup, handleOpenMod
         <TableCell>{item.symbol}</TableCell>
         <TableCell>{item.name}</TableCell>
         <TableCell>{item.ratio}</TableCell>
-
+        <TableCell>{item.api_rate}</TableCell>
         <TableCell>
           <Label variant="outlined" color={item.public ? 'primary' : 'error'}>
             {item.public ? '是' : '否'}

@@ -1079,7 +1079,9 @@
     "ratio": "magnification",
     "symbol": "Identification",
     "symbolTip": "The label is used to distinguish user groups, please use English and do not repeat.",
-    "title": "User grouping"
+    "title": "User grouping",
+    "apiRate": "API rate",
+    "apiRateTip": "The number of requests allowed per minute. When the rate is less than 60, use a counter limiter; when the rate is greater than or equal to 60, use a token bucket limiter. This setting is only effective when Redis is enabled."
   },
   "user_group": "User grouping"
 }

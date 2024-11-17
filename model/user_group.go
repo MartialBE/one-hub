@@ -1,14 +1,17 @@
 package model
 
-import "sync"
+import (
+	"one-api/common/limit"
+	"sync"
+)
 
 type UserGroup struct {
-	Id     int     `json:"id"`
-	Symbol string  `json:"symbol" gorm:"type:varchar(50);uniqueIndex"`
-	Name   string  `json:"name" gorm:"type:varchar(50)"`
-	Ratio  float64 `json:"ratio" gorm:"type:decimal(10,2); default:1"` // 倍率
-	// APIRate   int     `json:"api_rate" gorm:"default:0"`
-	Public bool `json:"public" form:"public" gorm:"default:false"` // 是否为公开分组，如果是，则可以被用户在令牌中选择
+	Id      int     `json:"id"`
+	Symbol  string  `json:"symbol" gorm:"type:varchar(50);uniqueIndex"`
+	Name    string  `json:"name" gorm:"type:varchar(50)"`
+	Ratio   float64 `json:"ratio" gorm:"type:decimal(10,2); default:1"` // 倍率
+	APIRate int     `json:"api_rate" gorm:"default:600"`                // 每分组允许的请求数
+	Public  bool    `json:"public" form:"public" gorm:"default:false"`  // 是否为公开分组，如果是，则可以被用户在令牌中选择
 	// Promotion bool  `json:"promotion" form:"promotion" gorm:"default:false"` // 是否是自动升级用户组， 如果是则用户充值金额满足条件自动升级
 	// Min       int   `json:"min" form:"min" gorm:"default:0"`                 // 晋级条件最小值
 	// Max       int   `json:"max" form:"max" gorm:"default:0"`                 // 晋级条件最大值
@@ -68,7 +71,7 @@ func (c *UserGroup) Create() error {
 }
 
 func (c *UserGroup) Update() error {
-	err := DB.Select("name", "ratio", "public").Updates(c).Error
+	err := DB.Select("name", "ratio", "public", "api_rate").Updates(c).Error
 	if err == nil {
 		GlobalUserGroupRatio.Load()
 	}
@@ -95,7 +98,8 @@ func ChangeUserGroupEnable(id int, enable bool) error {
 
 type UserGroupRatio struct {
 	sync.RWMutex
-	UserGroup map[string]*UserGroup
+	UserGroup  map[string]*UserGroup
+	APILimiter map[string]limit.RateLimiter
 }
 
 var GlobalUserGroupRatio = UserGroupRatio{}
@@ -107,15 +111,18 @@ func (cgrm *UserGroupRatio) Load() {
 	}
 
 	newUserGroups := make(map[string]*UserGroup, len(userGroups))
+	newAPILimiter := make(map[string]limit.RateLimiter, len(userGroups))
 
 	for _, userGroup := range userGroups {
 		newUserGroups[userGroup.Symbol] = userGroup
+		newAPILimiter[userGroup.Symbol] = limit.NewAPILimiter(userGroup.APIRate)
 	}
 
 	cgrm.Lock()
 	defer cgrm.Unlock()
 
 	cgrm.UserGroup = newUserGroups
+	cgrm.APILimiter = newAPILimiter
 }
 
 func (cgrm *UserGroupRatio) GetBySymbol(symbol string) *UserGroup {
@@ -147,4 +154,25 @@ func (cgrm *UserGroupRatio) GetAll() map[string]*UserGroup {
 	defer cgrm.RUnlock()
 
 	return cgrm.UserGroup
+}
+
+func (cgrm *UserGroupRatio) GetAPIRate(symbol string) int {
+	userGroup := cgrm.GetBySymbol(symbol)
+	if userGroup == nil {
+		return 0
+	}
+
+	return userGroup.APIRate
+}
+
+func (cgrm *UserGroupRatio) GetAPILimiter(symbol string) limit.RateLimiter {
+	cgrm.RLock()
+	defer cgrm.RUnlock()
+
+	limiter, ok := cgrm.APILimiter[symbol]
+	if !ok {
+		return nil
+	}
+
+	return limiter
 }
