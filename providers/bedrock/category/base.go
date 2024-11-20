@@ -21,16 +21,12 @@ type Category struct {
 func GetCategory(modelName string) (*Category, error) {
 	modelName = GetModelName(modelName)
 	// 获取provider
-	parts := strings.Split(modelName, ".")
-	var provider string
+	provider := ""
 
-	// 如果为cross-region取指针下标1为供应商标记
-	if len(parts) > 2 {
-		provider = parts[1]
-	} else {
-		// 否则保持原有逻辑,取第一个点前的内容
-		provider = parts[0]
+	if strings.Contains(modelName, "anthropic") {
+		provider = "anthropic"
 	}
+
 	if category, exists := CategoryMap[provider]; exists {
 		category.ModelName = modelName
 		return &category, nil
