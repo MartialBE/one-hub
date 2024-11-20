@@ -6,7 +6,6 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
-	"one-api/model"
 	providersBase "one-api/providers/base"
 	"one-api/types"
 
@@ -55,7 +54,7 @@ func RelayRerank(c *gin.Context) {
 
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
-		model.ChannelGroup.Cooldowns(channel.Id)
+		shouldCooldowns(c, channel, apiErr)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue
 		}

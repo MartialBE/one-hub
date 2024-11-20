@@ -11,7 +11,6 @@ import (
 	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/metrics"
-	"one-api/model"
 	"one-api/providers/claude"
 	"one-api/relay/relay_util"
 	"one-api/types"
@@ -75,7 +74,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
-		model.ChannelGroup.Cooldowns(channel.Id)
+		shouldCooldowns(c, channel, apiErr)
 		chatProvider, modelName, fail := GetClaudeChatInterface(c, originalModel)
 		if fail != nil {
 			continue

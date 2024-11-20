@@ -62,7 +62,7 @@ func Relay(c *gin.Context) {
 
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
-		shouldCooldowns(c, apiErr, channel.Id)
+		shouldCooldowns(c, channel, apiErr)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 			continue
 		}
@@ -142,10 +142,13 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime, isStream, nil)
 }
 
-func shouldCooldowns(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channelId int) {
+func shouldCooldowns(c *gin.Context, channel *model.Channel, apiErr *types.OpenAIErrorWithStatusCode) {
+	modelName := c.GetString("new_model")
+	channelId := channel.Id
+
 	// 如果是频率限制，冻结通道
 	if apiErr.StatusCode == http.StatusTooManyRequests {
-		model.ChannelGroup.Cooldowns(channelId)
+		model.ChannelGroup.SetCooldowns(channelId, modelName)
 	}
 
 	skipChannelIds, ok := utils.GetGinValue[[]int](c, "skip_channel_ids")

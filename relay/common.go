@@ -80,6 +80,8 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 		return
 	}
 
+	c.Set("new_model", newModelName)
+
 	return
 }
 
