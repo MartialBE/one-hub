@@ -9,6 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
+import { Icon } from '@iconify/react';
 
 import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
 import UsersTableRow from './component/TableRow';
@@ -16,7 +17,6 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 
 import { useTranslation } from 'react-i18next';
@@ -153,7 +153,12 @@ export default function Users() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">{t('userPage.users')}</Typography>
 
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
+          onClick={() => handleOpenModal(0)}
+        >
           {t('userPage.createUser')}
         </Button>
       </Stack>
@@ -172,7 +177,7 @@ export default function Users() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('userPage.refresh')}
               </Button>
             </ButtonGroup>

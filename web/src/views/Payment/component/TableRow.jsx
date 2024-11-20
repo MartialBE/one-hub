@@ -16,7 +16,7 @@ import {
   TextField
 } from '@mui/material';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { timestamp2string, showError } from 'utils/common';
 import { PaymentType } from '../type/Config';
 import TableSwitch from 'ui-component/Switch';
@@ -99,7 +99,7 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
         <TableCell>{timestamp2string(item.created_at)}</TableCell>
         <TableCell>
           <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-            <IconDotsVertical />
+            <Icon icon="solar:menu-dots-circle-bold-duotone" />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -121,12 +121,12 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
             setModalPaymentId(item.id);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
 
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

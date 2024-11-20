@@ -16,7 +16,7 @@ import TokensTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import EditeModal from './component/EditModal';
 import { useSelector } from 'react-redux';
 import { ITEMS_PER_PAGE } from 'constants';
@@ -178,7 +178,7 @@ export default function Token() {
           onClick={() => {
             handleOpenModal(0);
           }}
-          startIcon={<IconPlus />}
+          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
         >
           {t('token_index.createToken')}
         </Button>
@@ -205,7 +205,7 @@ export default function Token() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('token_index.refresh')}
               </Button>
             </ButtonGroup>

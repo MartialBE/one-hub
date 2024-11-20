@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase, Menu, MenuItem } from '@mui/material';
-import { IconLanguageHiragana } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import i18nList from 'i18n/i18nList';
 import useI18n from 'hooks/useI18n';
 
@@ -43,14 +43,18 @@ export default function I18nButton() {
             ...theme.typography.menuButton,
             transition: 'all .2s ease-in-out',
             borderColor: theme.typography.menuChip.background,
+            borderRadius: '50%',
+            background: 'transparent',
+            // color: 'inherit',
             '&[aria-controls="menu-list-grow"],&:hover': {
-              background: `${theme.palette.primary.main}!important`,
-              color: theme.palette.primary.light
+              boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+              background: 'transparent !important'
+              // color: theme.palette.primary.main
             }
           }}
           color="inherit"
         >
-          <IconLanguageHiragana stroke={1.5} size="1.3rem" />
+          <Icon icon="mingcute:translate-2-fill" width="1.3rem" />
         </Avatar>
       </ButtonBase>
       <Menu

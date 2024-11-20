@@ -16,7 +16,7 @@ import {
   Stack
 } from '@mui/material';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
 export default function TelegramTableRow({ item, manageAction, handleOpenModal, setModalId }) {
   const [open, setOpen] = useState(null);
@@ -58,7 +58,7 @@ export default function TelegramTableRow({ item, manageAction, handleOpenModal, 
         <TableCell>
           <Stack direction="row" spacing={1}>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <IconDotsVertical />
+              <Icon icon="solar:menu-dots-circle-bold-duotone" />
             </IconButton>
           </Stack>
         </TableCell>
@@ -81,11 +81,11 @@ export default function TelegramTableRow({ item, manageAction, handleOpenModal, 
             setModalId(item.id);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           编辑
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           删除
         </MenuItem>
       </Popover>

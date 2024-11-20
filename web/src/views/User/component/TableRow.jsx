@@ -20,7 +20,7 @@ import {
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 import { renderQuota, renderNumber, timestamp2string } from 'utils/common';
-import { IconDotsVertical, IconEdit, IconTrash, IconUser, IconBrandWechat, IconBrandGithub, IconMail } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 
@@ -111,13 +111,13 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
         <TableCell>
           <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center">
             <Tooltip title={item.wechat_id ? item.wechat_id : t('profilePage.notBound')} placement="top">
-              <IconBrandWechat color={item.wechat_id ? theme.palette.success.dark : theme.palette.grey[400]} />
+              <Icon icon="ri:wechat-fill" color={item.wechat_id ? theme.palette.success.dark : theme.palette.grey[400]} />
             </Tooltip>
             <Tooltip title={item.github_id ? item.github_id : t('profilePage.notBound')} placement="top">
-              <IconBrandGithub color={item.github_id ? theme.palette.grey[900] : theme.palette.grey[400]} />
+              <Icon icon="ri:github-fill" color={item.github_id ? theme.palette.grey[900] : theme.palette.grey[400]} />
             </Tooltip>
             <Tooltip title={item.email ? item.email : t('profilePage.notBound')} placement="top">
-              <IconMail color={item.email ? theme.palette.grey[900] : theme.palette.grey[400]} />
+              <Icon icon="ri:mail-fill" color={item.email ? theme.palette.grey[900] : theme.palette.grey[400]} />
             </Tooltip>
           </Stack>
         </TableCell>
@@ -128,7 +128,7 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
         </TableCell>
         <TableCell>
           <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-            <IconDotsVertical />
+            <Icon icon="solar:menu-dots-circle-bold-duotone" />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -150,7 +150,7 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
               manageUser(item.username, 'role', item.role === 1 ? true : false);
             }}
           >
-            <IconUser style={{ marginRight: '16px' }} />
+            <Icon icon="solar:user-bold-duotone" style={{ marginRight: '16px' }} />
             {item.role === 1 ? t('userPage.setAdmin') : t('userPage.cancelAdmin')}
           </MenuItem>
         )}
@@ -162,11 +162,11 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
             setModalUserId(item.id);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

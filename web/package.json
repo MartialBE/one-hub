@@ -8,6 +8,7 @@
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@iconify/react": "^5.0.2",
     "@lobehub/i18n-cli": "^1.18.1",
     "@mui/icons-material": "^5.15.7",
     "@mui/lab": "^5.0.0-alpha.163",

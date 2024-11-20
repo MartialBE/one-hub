@@ -19,7 +19,7 @@ import {
   Button
 } from '@mui/material';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { ValueFormatter, priceType } from './util';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -74,7 +74,7 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
 
         <TableCell onClick={(event) => event.stopPropagation()}>
           <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-            <IconDotsVertical />
+            <Icon icon="solar:menu-dots-circle-bold-duotone" />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -122,11 +122,11 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
             handleOpenModal(item);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

@@ -17,7 +17,7 @@ import TableToolBar from './component/TableToolBar';
 import EditeModal from './component/EditModal';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconSearch, IconPlus } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
 export default function Gateway() {
   const { t } = useTranslation();
@@ -169,7 +169,12 @@ export default function Gateway() {
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">{t('paymentGatewayPage.title')}</Typography>
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
+          onClick={() => handleOpenModal(0)}
+        >
           {t('paymentGatewayPage.createPayment')}
         </Button>
       </Stack>
@@ -188,10 +193,10 @@ export default function Gateway() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('paymentGatewayPage.refreshClear')}
               </Button>
-              <Button onClick={search} startIcon={<IconSearch width={'18px'} />}>
+              <Button onClick={search} startIcon={<Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />}>
                 {t('paymentGatewayPage.search')}
               </Button>
             </ButtonGroup>

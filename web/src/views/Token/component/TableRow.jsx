@@ -23,7 +23,8 @@ import TableSwitch from 'ui-component/Switch';
 import { renderQuota, timestamp2string, copy, getChatLinks, replaceChatPlaceholders } from 'utils/common';
 import Label from 'ui-component/Label';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
+import { IconCaretDownFilled } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 function createMenu(menuItems) {
   return (
@@ -105,7 +106,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
   const actionItems = createMenu([
     {
       text: t('common.edit'),
-      icon: <IconEdit style={{ marginRight: '16px' }} />,
+      icon: <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />,
       onClick: () => {
         handleCloseMenu();
         handleOpenModal();
@@ -115,7 +116,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
     },
     {
       text: t('common.delete'),
-      icon: <IconTrash style={{ marginRight: '16px' }} />,
+      icon: <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />,
       onClick: handleDeleteOpen,
       color: 'error.main'
     }
@@ -219,7 +220,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               </Button>
             </ButtonGroup>
             <IconButton onClick={(e) => handleOpenMenu(e, 'action')} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <IconDotsVertical />
+              <Icon icon="solar:menu-dots-circle-bold-duotone" width={20} />
             </IconButton>
           </Stack>
         </TableCell>

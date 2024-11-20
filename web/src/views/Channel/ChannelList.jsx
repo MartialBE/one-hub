@@ -16,7 +16,6 @@ import { Button, IconButton, Card, Box, Stack, Container, Typography, Divider } 
 import ChannelTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import { IconRefresh, IconTrash, IconPlus, IconMenu2, IconBrandSpeedtest, IconCoinYuan, IconSearch } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { ITEMS_PER_PAGE } from 'constants';
 import TableToolBar from './component/TableToolBar';
@@ -25,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useBoolean } from 'hooks/use-boolean';
 import ConfirmDialog from 'ui-component/confirm-dialog';
+import { Icon } from '@iconify/react';
 
 const originalKeyword = {
   type: 0,
@@ -327,10 +327,10 @@ export default function ChannelList() {
         <Typography variant="h4">{t('channel_index.channel')}</Typography>
 
         <ButtonGroup variant="contained" aria-label="outlined small primary button group">
-          <Button color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+          <Button color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />} onClick={() => handleOpenModal(0)}>
             {t('channel_index.newChannel')}
           </Button>
-          <Button color="primary" startIcon={<IconMenu2 />} onClick={() => setOpenBatchModal(true)}>
+          <Button color="primary" startIcon={<Icon icon="solar:menu-dots-bold-duotone" />} onClick={() => setOpenBatchModal(true)}>
             {t('channel_index.batchProcessing')}
           </Button>
         </ButtonGroup>
@@ -365,27 +365,27 @@ export default function ChannelList() {
           <Container>
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-                <Button onClick={() => handleRefresh(true)} startIcon={<IconRefresh width={'18px'} />}>
+                <Button onClick={() => handleRefresh(true)} startIcon={<Icon icon="solar:refresh-circle-bold-duotone" width={18} />}>
                   {t('channel_index.refreshClearSearchConditions')}
                 </Button>
-                <Button onClick={searchChannels} startIcon={<IconSearch width={'18px'} />}>
+                <Button onClick={searchChannels} startIcon={<Icon icon="solar:magnifer-bold-duotone" width={18} />}>
                   {t('channel_index.search')}
                 </Button>
                 <Button
                   onClick={() => handlePopoverOpen(t('channel_index.testAllChannels'), testAllChannels)}
-                  startIcon={<IconBrandSpeedtest width={'18px'} />}
+                  startIcon={<Icon icon="solar:test-tube-bold-duotone" width={18} />}
                 >
                   {t('channel_index.testAllChannels')}
                 </Button>
                 <Button
                   onClick={() => handlePopoverOpen(t('channel_index.updateEnabledBalance'), updateAllChannelsBalance)}
-                  startIcon={<IconCoinYuan width={'18px'} />}
+                  startIcon={<Icon icon="solar:dollar-minimalistic-bold-duotone" width={18} />}
                 >
                   {t('channel_index.updateEnabledBalance')}
                 </Button>
                 <Button
                   onClick={() => handlePopoverOpen(t('channel_index.deleteDisabledChannels'), deleteAllDisabledChannels)}
-                  startIcon={<IconTrash width={'18px'} />}
+                  startIcon={<Icon icon="solar:trash-bin-trash-bold-duotone" width={18} />}
                 >
                   {t('channel_index.deleteDisabledChannels')}
                 </Button>
@@ -393,31 +393,31 @@ export default function ChannelList() {
             ) : (
               <Stack
                 direction="row"
-                spacing={1}
+                spacing={0.5}
                 divider={<Divider orientation="vertical" flexItem />}
                 justifyContent="space-around"
                 alignItems="center"
               >
                 <IconButton onClick={() => handleRefresh(true)} size="large">
-                  <IconRefresh />
+                  <Icon width={20} icon="solar:refresh-circle-bold-duotone" />
                 </IconButton>
                 <IconButton onClick={searchChannels} size="large">
-                  <IconSearch />
+                  <Icon width={20} icon="solar:magnifer-bold-duotone" />
                 </IconButton>
                 <IconButton onClick={() => handlePopoverOpen(t('channel_index.testAllChannels'), testAllChannels)} size="large">
-                  <IconBrandSpeedtest />
+                  <Icon width={20} icon="solar:test-tube-bold-duotone" />
                 </IconButton>
                 <IconButton
                   onClick={() => handlePopoverOpen(t('channel_index.updateEnabledBalance'), updateAllChannelsBalance)}
                   size="large"
                 >
-                  <IconCoinYuan />
+                  <Icon width={20} icon="solar:dollar-minimalistic-bold-duotone" />
                 </IconButton>
                 <IconButton
                   onClick={() => handlePopoverOpen(t('channel_index.deleteDisabledChannels'), deleteAllDisabledChannels)}
                   size="large"
                 >
-                  <IconTrash />
+                  <Icon width={20} icon="solar:trash-bin-trash-bold-duotone" />
                 </IconButton>
               </Stack>
             )}

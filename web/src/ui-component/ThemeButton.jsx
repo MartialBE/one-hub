@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SET_THEME } from 'store/actions';
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
-import { IconSun, IconMoon } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
 export default function ThemeButton() {
   const dispatch = useDispatch();
@@ -29,11 +29,15 @@ export default function ThemeButton() {
             ...theme.typography.mediumAvatar,
             ...theme.typography.menuButton,
             transition: 'all .2s ease-in-out',
-            borderColor: theme.typography.menuChip.background,
-            // backgroundColor: theme.typography.menuChip.background,
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            // color: 'inherit',
+            borderRadius: '50%',
             '&[aria-controls="menu-list-grow"],&:hover': {
-              background: `${theme.palette.primary.main}!important`,
-              color: theme.palette.primary.light
+              boxShadow: '0 0 10px rgba(0,0,0,0.2)',
+              backgroundColor: 'transparent',
+              borderRadius: '50%'
             }
           }}
           onClick={() => {
@@ -43,7 +47,11 @@ export default function ThemeButton() {
           }}
           color="inherit"
         >
-          {defaultTheme === 'light' ? <IconSun stroke={1.5} size="1.3rem" /> : <IconMoon stroke={1.5} size="1.3rem" />}
+          {defaultTheme === 'light' ? (
+            <Icon icon="solar:sun-2-bold-duotone" width="1.3rem" />
+          ) : (
+            <Icon icon="solar:moon-bold-duotone" width="1.3rem" />
+          )}
         </Avatar>
       </ButtonBase>
     </Box>

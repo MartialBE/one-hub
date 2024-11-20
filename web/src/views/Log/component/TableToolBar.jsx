@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-import { IconUser, IconKey, IconBrandGithubCopilot, IconSitemap } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -33,7 +33,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             placeholder={t('tableToolBar.tokenName')}
             startAdornment={
               <InputAdornment position="start">
-                <IconKey stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:key-bold-duotone" width="20" color={grey500} />
               </InputAdornment>
             }
           />
@@ -52,7 +52,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             placeholder={t('tableToolBar.modelName')}
             startAdornment={
               <InputAdornment position="start">
-                <IconBrandGithubCopilot stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:box-minimalistic-bold-duotone" width="20" color={grey500} />
               </InputAdornment>
             }
           />
@@ -149,7 +149,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
               placeholder={t('tableToolBar.channelId')}
               startAdornment={
                 <InputAdornment position="start">
-                  <IconSitemap stroke={1.5} size="20px" color={grey500} />
+                  <Icon icon="ph:open-ai-logo-duotone" width="20" color={grey500} />
                 </InputAdornment>
               }
             />
@@ -169,7 +169,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
               placeholder={t('tableToolBar.username')}
               startAdornment={
                 <InputAdornment position="start">
-                  <IconUser stroke={1.5} size="20px" color={grey500} />
+                  <Icon icon="solar:user-bold-duotone" width="20" color={grey500} />
                 </InputAdornment>
               }
             />
