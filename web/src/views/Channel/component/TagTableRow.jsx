@@ -27,8 +27,8 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import GroupLabel from './GroupLabel';
 import ChannelTable from './ChannelTable';
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react';
 
 export default function TagTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const { t } = useTranslation();
@@ -95,7 +95,7 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
         <TableCell>
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <IconDotsVertical />
+              <Icon icon="solar:menu-dots-circle-bold-duotone" />
             </IconButton>
           </Stack>
         </TableCell>
@@ -137,12 +137,12 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
             setModalChannelId(item.tag);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
 
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

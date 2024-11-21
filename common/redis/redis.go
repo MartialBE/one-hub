@@ -12,6 +12,8 @@ import (
 
 var RDB *redis.Client
 
+const Nil = redis.Nil
+
 // InitRedisClient This function is called after init()
 func InitRedisClient() (err error) {
 	redisConn := viper.GetString("redis_conn_string")
@@ -81,4 +83,8 @@ func NewScript(script string) *redis.Script {
 
 func GetRedisClient() *redis.Client {
 	return RDB
+}
+
+func ScriptRunCtx(ctx context.Context, script *redis.Script, keys []string, args ...interface{}) (interface{}, error) {
+	return script.Run(ctx, RDB, keys, args...).Result()
 }

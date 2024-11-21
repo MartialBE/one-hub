@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab, Box, Card, Alert, Stack, Button } from '@mui/material';
-import { IconTag, IconTags } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import Single from './single';
 import Multiple from './multiple';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ import AdminContainer from 'ui-component/AdminContainer';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
 import { CheckUpdates } from './component/CheckUpdates';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { useTranslation } from 'react-i18next';
 
@@ -215,10 +214,10 @@ const Pricing = () => {
         </Alert>
       )}
       <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={5} spacing={2}>
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenaddModal(0)}>
+        <Button variant="contained" color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />}>
           {t('pricingPage.newButton')}
         </Button>
-        <Button variant="contained" onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+        <Button variant="contained" onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" />}>
           {t('pricingPage.refreshButton')}
         </Button>
         <Button
@@ -243,8 +242,18 @@ const Pricing = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label={t('pricingPage.singleOperation')} {...a11yProps(0)} icon={<IconTag />} iconPosition="start" />
-                <Tab label={t('pricingPage.multipleOperation')} {...a11yProps(1)} icon={<IconTags />} iconPosition="start" />
+                <Tab
+                  label={t('pricingPage.singleOperation')}
+                  {...a11yProps(0)}
+                  icon={<Icon icon="solar:tag-bold-duotone" />}
+                  iconPosition="start"
+                />
+                <Tab
+                  label={t('pricingPage.multipleOperation')}
+                  {...a11yProps(1)}
+                  icon={<Icon icon="solar:list-line-duotone" />}
+                  iconPosition="start"
+                />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

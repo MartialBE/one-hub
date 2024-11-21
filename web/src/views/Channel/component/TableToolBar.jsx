@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-import { IconKey, IconBrandGithubCopilot, IconSitemap, IconVersions } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material'; //
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             placeholder={t('channel_index.channelName')}
             startAdornment={
               <InputAdornment position="start">
-                <IconSitemap stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="ph:open-ai-logo-duotone" width={20} height={20} color={grey500} />
               </InputAdornment>
             }
           />
@@ -47,7 +47,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             placeholder={t('channel_index.modelName')}
             startAdornment={
               <InputAdornment position="start">
-                <IconBrandGithubCopilot stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:box-minimalistic-bold-duotone" width={20} height={20} color={grey500} />
               </InputAdornment>
             }
           />
@@ -66,7 +66,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             placeholder={t('channel_index.testModel')}
             startAdornment={
               <InputAdornment position="start">
-                <IconBrandGithubCopilot stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:test-tube-bold-duotone" width={20} height={20} color={grey500} />
               </InputAdornment>
             }
           />
@@ -85,7 +85,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             placeholder="key"
             startAdornment={
               <InputAdornment position="start">
-                <IconKey stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:key-bold-duotone" width={20} height={20} color={grey500} />
               </InputAdornment>
             }
           />
@@ -104,7 +104,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             placeholder={t('channel_index.otherParameters')}
             startAdornment={
               <InputAdornment position="start">
-                <IconVersions stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:settings-bold-duotone" width={20} height={20} color={grey500} />
               </InputAdornment>
             }
           />

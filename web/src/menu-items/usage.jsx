@@ -1,6 +1,10 @@
-import { IconArticle, IconBrush, IconList } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
-const icons = { IconArticle, IconBrush, IconList };
+const icons = {
+  IconArticle: () => <Icon width={20} icon="solar:document-text-bold-duotone" />,
+  IconBrush: () => <Icon width={20} icon="tabler:photo-ai" />,
+  IconList: () => <Icon width={20} icon="solar:checklist-minimalistic-bold-duotone" />
+};
 
 const usage = {
   id: 'usage',

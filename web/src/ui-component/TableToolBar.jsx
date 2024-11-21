@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
+import { Icon } from '@iconify/react';
 
 import Toolbar from '@mui/material/Toolbar';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { useTheme } from '@mui/material/styles';
-import { IconSearch } from '@tabler/icons-react';
 
 // ----------------------------------------------------------------------
 
@@ -26,12 +26,19 @@ export default function TableToolBar({ placeholder }) {
         id="keyword"
         name="keyword"
         sx={{
-          minWidth: '100%'
+          minWidth: '100%',
+          '& .MuiInputAdornment-root:hover': {
+            '& .search-icon': {
+              borderRadius: '50%',
+              boxShadow: '0 0 8px rgba(0,0,0,0.1)',
+              transition: 'all 0.3s ease'
+            }
+          }
         }}
         placeholder={placeholder}
         startAdornment={
           <InputAdornment position="start">
-            <IconSearch stroke={1.5} size="20px" color={grey500} />
+            <Icon icon="solar:minimalistic-magnifer-line-duotone" className="search-icon" width="20" height="20" color={grey500} />
           </InputAdornment>
         }
       />

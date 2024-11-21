@@ -28,7 +28,7 @@ func setOpenAIRouter(router *gin.Engine) {
 		modelsRouter.GET("/:model", relay.RetrieveModel)
 	}
 	relayV1Router := router.Group("/v1")
-	relayV1Router.Use(middleware.RelayPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute())
+	relayV1Router.Use(middleware.RelayPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/completions", relay.Relay)
 		relayV1Router.POST("/chat/completions", relay.Relay)
@@ -74,7 +74,7 @@ func setMJRouter(router *gin.Engine) {
 // Path: router/relay-router.go
 func registerMjRouterGroup(relayMjRouter *gin.RouterGroup) {
 	relayMjRouter.GET("/image/:id", midjourney.RelayMidjourneyImage)
-	relayMjRouter.Use(middleware.RelayMJPanicRecover(), middleware.MjAuth(), middleware.Distribute())
+	relayMjRouter.Use(middleware.RelayMJPanicRecover(), middleware.MjAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayMjRouter.POST("/submit/action", midjourney.RelayMidjourney)
 		relayMjRouter.POST("/submit/shorten", midjourney.RelayMidjourney)
@@ -95,7 +95,7 @@ func registerMjRouterGroup(relayMjRouter *gin.RouterGroup) {
 
 func setSunoRouter(router *gin.Engine) {
 	relaySunoRouter := router.Group("/suno")
-	relaySunoRouter.Use(middleware.RelaySunoPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute())
+	relaySunoRouter.Use(middleware.RelaySunoPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relaySunoRouter.POST("/submit/:action", task.RelayTaskSubmit)
 		relaySunoRouter.POST("/fetch", suno.GetFetch)
@@ -106,7 +106,7 @@ func setSunoRouter(router *gin.Engine) {
 func setClaudeRouter(router *gin.Engine) {
 	relayClaudeRouter := router.Group("/claude")
 	relayV1Router := relayClaudeRouter.Group("/v1")
-	relayV1Router.Use(middleware.RelayCluadePanicRecover(), middleware.ClaudeAuth(), middleware.Distribute())
+	relayV1Router.Use(middleware.RelayCluadePanicRecover(), middleware.ClaudeAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/messages", relay.RelaycClaudeOnly)
 	}
@@ -115,7 +115,7 @@ func setClaudeRouter(router *gin.Engine) {
 func setGeminiRouter(router *gin.Engine) {
 	relayGeminiRouter := router.Group("/gemini")
 	relayV1Router := relayGeminiRouter.Group("/v1beta")
-	relayV1Router.Use(middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute())
+	relayV1Router.Use(middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/models/:model", relay.RelaycGeminiOnly)
 	}

@@ -17,7 +17,7 @@ import TableToolBar from './component/TableToolBar';
 import { API } from 'utils/api';
 import { isAdmin } from 'utils/common';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconSearch } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 
 import { useTranslation } from 'react-i18next'; // Add this import
@@ -139,11 +139,11 @@ export default function Log() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('midjourneyPage.refreshClearSearch')}
               </Button>
 
-              <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
+              <Button onClick={searchLogs} startIcon={<Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />}>
                 {t('midjourneyPage.search')}
               </Button>
             </ButtonGroup>

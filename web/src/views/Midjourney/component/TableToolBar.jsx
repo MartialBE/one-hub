@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-import { IconBroadcast, IconCalendarEvent } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel } from '@mui/material';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -32,7 +32,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
               placeholder={t('tableToolBar.channelIdPlaceholder')}
               startAdornment={
                 <InputAdornment position="start">
-                  <IconBroadcast stroke={1.5} size="20px" color={grey500} />
+                  <Icon icon="ph:open-ai-logo-duotone" width={20} color={grey500} />
                 </InputAdornment>
               }
             />
@@ -52,7 +52,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             placeholder={t('tableToolBar.taskIdPlaceholder')}
             startAdornment={
               <InputAdornment position="start">
-                <IconCalendarEvent stroke={1.5} size="20px" color={grey500} />
+                <Icon icon="solar:tag-horizontal-bold" width={20} color={grey500} />
               </InputAdornment>
             }
           />

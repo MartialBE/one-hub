@@ -1,6 +1,7 @@
 import { closeSnackbar } from 'notistack';
-import { IconX } from '@tabler/icons-react';
 import { IconButton } from '@mui/material';
+import { Icon } from '@iconify/react';
+
 const action = (snackbarId) => (
   <>
     <IconButton
@@ -8,7 +9,7 @@ const action = (snackbarId) => (
         closeSnackbar(snackbarId);
       }}
     >
-      <IconX stroke={1.5} size="1.25rem" />
+      <Icon icon="solar:close-circle-bold" width="20" />
     </IconButton>
   </>
 );

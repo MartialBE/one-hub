@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"one-api/common/config"
 	"one-api/common/logger"
@@ -19,9 +20,10 @@ type ChannelChoice struct {
 
 type ChannelsChooser struct {
 	sync.RWMutex
-	Channels map[int]*ChannelChoice
-	Rule     map[string]map[string][][]int // group -> model -> priority -> channelIds
-	Match    []string
+	Channels  map[int]*ChannelChoice
+	Rule      map[string]map[string][][]int // group -> model -> priority -> channelIds
+	Match     []string
+	Cooldowns sync.Map
 }
 
 type ChannelsFilterFunc func(channelId int, choice *ChannelChoice) bool
@@ -38,18 +40,52 @@ func FilterOnlyChat() ChannelsFilterFunc {
 	}
 }
 
-func (cc *ChannelsChooser) Cooldowns(channelId int) bool {
-	if config.RetryCooldownSeconds == 0 {
-		return false
-	}
-	cc.Lock()
-	defer cc.Unlock()
-	if _, ok := cc.Channels[channelId]; !ok {
+func init() {
+	// 每小时清理一次过期的冷却时间
+	go func() {
+		ticker := time.NewTicker(1 * time.Hour)
+		for range ticker.C {
+			ChannelGroup.CleanupExpiredCooldowns()
+		}
+	}()
+}
+
+func (cc *ChannelsChooser) SetCooldowns(channelId int, modelName string) bool {
+	if channelId == 0 || modelName == "" || config.RetryCooldownSeconds == 0 {
 		return false
 	}
 
-	cc.Channels[channelId].CooldownsTime = time.Now().Unix() + int64(config.RetryCooldownSeconds)
+	key := fmt.Sprintf("%d:%s", channelId, modelName)
+	nowTime := time.Now().Unix()
+
+	cooldownTime, exists := cc.Cooldowns.Load(key)
+	if exists && nowTime < cooldownTime.(int64) {
+		return true
+	}
+
+	cc.Cooldowns.LoadOrStore(key, nowTime+int64(config.RetryCooldownSeconds))
 	return true
+}
+
+func (cc *ChannelsChooser) IsInCooldown(channelId int, modelName string) bool {
+	key := fmt.Sprintf("%d:%s", channelId, modelName)
+
+	cooldownTime, exists := cc.Cooldowns.Load(key)
+	if !exists {
+		return false
+	}
+
+	return time.Now().Unix() < cooldownTime.(int64)
+}
+
+func (cc *ChannelsChooser) CleanupExpiredCooldowns() {
+	now := time.Now().Unix()
+	cc.Cooldowns.Range(func(key, value interface{}) bool {
+		if now >= value.(int64) {
+			cc.Cooldowns.Delete(key)
+		}
+		return true
+	})
 }
 
 func (cc *ChannelsChooser) Disable(channelId int) {
@@ -80,14 +116,17 @@ func (cc *ChannelsChooser) ChangeStatus(channelId int, status bool) {
 	}
 }
 
-func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFunc) *Channel {
-	nowTime := time.Now().Unix()
+func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFunc, modelName string) *Channel {
 	totalWeight := 0
 
 	validChannels := make([]*ChannelChoice, 0, len(channelIds))
 	for _, channelId := range channelIds {
 		choice, ok := cc.Channels[channelId]
-		if !ok || choice.Disable || choice.CooldownsTime >= nowTime {
+		if !ok || choice.Disable {
+			continue
+		}
+
+		if cc.IsInCooldown(channelId, modelName) {
 			continue
 		}
 
@@ -148,7 +187,7 @@ func (cc *ChannelsChooser) Next(group, modelName string, filters ...ChannelsFilt
 	}
 
 	for _, priority := range channelsPriority {
-		channel := cc.balancer(priority, filters)
+		channel := cc.balancer(priority, filters, modelName)
 		if channel != nil {
 			return channel, nil
 		}
