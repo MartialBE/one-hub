@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { API } from 'utils/api';
+import { UserContext } from 'contexts/UserContext';
 
 const CardStyle = styled(Card)(({ theme }) => ({
   background: theme.typography.menuChip.background,
@@ -59,6 +60,8 @@ const MenuCard = () => {
   const [balance, setBalance] = useState(0);
   const [usedQuota, setUsedQuota] = useState(0);
   const [requestCount, setRequestCount] = useState(0);
+  const { userGroup } = useContext(UserContext);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const loadUserData = async () => {

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, createElement } from 'react';  // 修改这行
 import { Link } from 'react-router-dom';
+
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -68,8 +69,13 @@ const Breadcrumbs = ({ card, divider, icon, icons, maxItems, navigation, rightAl
   });
 
   // item separator
-  const SeparatorIcon = separator;
-  const separatorIcon = separator ? <SeparatorIcon stroke={1.5} size="1rem" /> : <IconTallymark1 stroke={1.5} size="1rem" />;
+  const separatorIcon = separator ? (
+    React.isValidElement(separator) ? 
+      React.cloneElement(separator, { stroke: 1.5, size: "1rem" }) : 
+      createElement(separator, { stroke: 1.5, size: "1rem" })
+  ) : (
+    <IconTallymark1 stroke={1.5} size="1rem" />
+  );
 
   let mainContent;
   let itemContent;
