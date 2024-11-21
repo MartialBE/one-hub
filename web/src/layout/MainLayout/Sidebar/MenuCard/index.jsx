@@ -22,8 +22,6 @@ import { IconHeadset } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { API } from 'utils/api';
 
-
-
 const CardStyle = styled(Card)(({ theme }) => ({
   background: theme.typography.menuChip.background,
   marginBottom: '22px',
@@ -121,7 +119,7 @@ const MenuCard = () => {
                     color: theme.palette.primary[200],
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'flex-start',
+                    alignItems: 'flex-start'
                   }}
                 >
                   <span>{userData ? userData.display_name : 'Loading...'}</span>
@@ -136,11 +134,6 @@ const MenuCard = () => {
                   )}
                 </Typography>
               }
-              // secondary={
-              //   // <Typography variant="caption" color={theme.palette.text.secondary}>
-              //   //   {t('dashboard_index.calls')}: {requestCount}
-              //   // </Typography>
-              // }
             />
           </ListItem>
         </List>
@@ -163,8 +156,8 @@ const MenuCard = () => {
                 bgcolor: theme.palette.background.default,
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 5,
-                  bgcolor: theme.palette.success.dark,
-                },
+                  bgcolor: theme.palette.success.dark
+                }
               }}
             />
             <Typography
@@ -175,10 +168,10 @@ const MenuCard = () => {
                 position: 'absolute',
                 right: theme.spacing(1),
                 top: '50%',
-                transform: 'translateY(-50%)',
+                transform: 'translateY(-50%)'
               }}
             >
-               {`${t('dashboard_index.used')}: $${usedQuota} / ${Math.round(progressValue)}%`}
+              {`${t('dashboard_index.used')}: $${usedQuota} / ${Math.round(progressValue)}% (RPM:${userGroup?.[users.group]?.api_rate || 0})`}
             </Typography>
           </Box>
         </Box>
@@ -192,7 +185,7 @@ const MenuCard = () => {
             color: theme.palette.primary.main,
             '&:hover': {
               backgroundColor: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
+              color: theme.palette.primary.contrastText
             }
           }}
           onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
