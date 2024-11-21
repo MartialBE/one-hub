@@ -199,8 +199,8 @@ func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 		"group_name":   q.groupName,
 		"price_type":   q.price.Type,
 		"group_ratio":  q.groupRatio,
-		"input_ratio":  q.inputRatio,
-		"output_ratio": q.outputRatio,
+		"input_ratio":  q.price.GetInput(),
+		"output_ratio": q.price.GetOutput(),
 	}
 
 	if usage != nil {

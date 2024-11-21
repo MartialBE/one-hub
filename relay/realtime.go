@@ -126,6 +126,7 @@ func (r *RelayModeChatRealtime) getProvider() bool {
 		r.providerConn = providerConn
 
 		if r.getRealtimeFirstMessage() {
+			metrics.RecordProvider(r.c, 200)
 			return true
 		}
 

@@ -16,7 +16,7 @@ import { drawerWidth } from 'store/constant';
 import { SET_MENU } from 'store/actions';
 
 // assets
-import { IconChevronRight } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
 // styles
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -89,7 +89,7 @@ const MainLayout = () => {
       {/* main content */}
       <Main theme={theme} open={leftDrawerOpened}>
         {/* breadcrumb */}
-        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+        <Breadcrumbs separator={<Icon icon="solar:arrow-right-linear" />} navigation={navigation} icon title rightAlign />
         <AuthGuard>
           <AdminContainer>
             <Outlet />

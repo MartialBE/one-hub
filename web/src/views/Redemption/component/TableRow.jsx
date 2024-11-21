@@ -20,7 +20,7 @@ import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
 import { timestamp2string, renderQuota, copy } from 'utils/common';
 
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 
 export default function RedemptionTableRow({ item, manageRedemption, handleOpenModal, setModalRedemptionId }) {
@@ -92,7 +92,7 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
               {t('token_index.copy')}
             </Button>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <IconDotsVertical />
+              <Icon icon="solar:menu-dots-circle-bold-duotone" />
             </IconButton>
           </Stack>
         </TableCell>
@@ -116,11 +116,11 @@ export default function RedemptionTableRow({ item, manageRedemption, handleOpenM
             setModalRedemptionId(item.id);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

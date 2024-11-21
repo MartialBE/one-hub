@@ -34,7 +34,8 @@ const originInputs = {
   symbol: '',
   name: '',
   ratio: 1,
-  public: false
+  public: false,
+  api_rate: 300
 };
 
 const EditModal = ({ open, userGroupId, onCancel, onOk }) => {
@@ -168,6 +169,28 @@ const EditModal = ({ open, userGroupId, onCancel, onOk }) => {
                   <FormHelperText error id="helper-tex-channel-ratio-label">
                     {t(errors.ratio)}
                   </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.api_rate && errors.api_rate)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-api-rate-label">{t('userGroup.apiRate')}</InputLabel>
+                <OutlinedInput
+                  id="channel-api-rate-label"
+                  label={t('userGroup.apiRate')}
+                  type="number"
+                  value={values.api_rate}
+                  name="api_rate"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  aria-describedby="helper-text-channel-api-rate-label"
+                />
+
+                {touched.api_rate && errors.api_rate ? (
+                  <FormHelperText error id="helper-tex-channel-api-rate-label">
+                    {t(errors.api_rate)}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText id="helper-tex-channel-api-rate-label"> {t('userGroup.apiRateTip')} </FormHelperText>
                 )}
               </FormControl>
 

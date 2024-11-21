@@ -92,6 +92,7 @@ ghcr.io/martialbe/one-api
   - [Berry Free React Admin Template](https://github.com/codedthemes/berry-free-react-admin-template)为本项目的前端界面
   - [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react),使用了其中的部分样式
   - [new api](https://github.com/Calcium-Ion/new-api)，Midjourney/Suno 模块的代码来源于此
+  - [go-zero](https://github.com/zeromicro/go-zero) - Token 限流器的实现
 
 感谢以上项目的作者和贡献者
 

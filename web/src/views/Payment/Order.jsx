@@ -16,7 +16,7 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/OrderTableToolBar';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconSearch } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 
 export default function Order() {
@@ -131,10 +131,10 @@ export default function Order() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('orderlogPage.refreshClear')}
               </Button>
-              <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
+              <Button onClick={searchLogs} startIcon={<Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />}>
                 {t('orderlogPage.search')}
               </Button>
             </ButtonGroup>

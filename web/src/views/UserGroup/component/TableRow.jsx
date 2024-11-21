@@ -17,8 +17,8 @@ import {
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react';
 
 export default function UserGroupTableRow({ item, manageUserGroup, handleOpenModal, setModalUserGroupId }) {
   const { t } = useTranslation();
@@ -64,7 +64,7 @@ export default function UserGroupTableRow({ item, manageUserGroup, handleOpenMod
         <TableCell>{item.symbol}</TableCell>
         <TableCell>{item.name}</TableCell>
         <TableCell>{item.ratio}</TableCell>
-
+        <TableCell>{item.api_rate}</TableCell>
         <TableCell>
           <Label variant="outlined" color={item.public ? 'primary' : 'error'}>
             {item.public ? '是' : '否'}
@@ -77,7 +77,7 @@ export default function UserGroupTableRow({ item, manageUserGroup, handleOpenMod
         </TableCell>
         <TableCell>
           <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-            <IconDotsVertical />
+            <Icon icon="solar:menu-dots-circle-bold-duotone" />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -99,11 +99,11 @@ export default function UserGroupTableRow({ item, manageUserGroup, handleOpenMod
             setModalUserGroupId(item.id);
           }}
         >
-          <IconEdit style={{ marginRight: '16px' }} />
+          <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

@@ -17,7 +17,7 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
 import { ITEMS_PER_PAGE } from 'constants';
-import { IconRefresh, IconPlus, IconBrandTelegram, IconReload } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import EditeModal from './component/EditModal';
 
 // ----------------------------------------------------------------------
@@ -179,7 +179,12 @@ export default function Telegram() {
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">{t('telegramPage.title')}</Typography>
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
+          onClick={() => handleOpenModal(0)}
+        >
           {t('telegramPage.createMenu')}
         </Button>
       </Stack>
@@ -188,14 +193,14 @@ export default function Telegram() {
       </Stack>
       <Stack direction="row" alignItems="center" justifyContent="flex-start" mb={2} spacing={2}>
         <Chip
-          icon={<IconBrandTelegram />}
+          icon={<Icon icon="uim:telegram" />}
           label={(status ? t('telegramPage.online') : t('telegramPage.offline')) + (isWebhook ? '(Webhook)' : '(Polling)')}
           color={status ? 'primary' : 'error'}
           variant="outlined"
           size="small"
         />
 
-        <Button variant="contained" size="small" endIcon={<IconReload />} onClick={reload}>
+        <Button variant="contained" size="small" endIcon={<Icon icon="solar:refresh-bold-duotone" />} onClick={reload}>
           {t('telegramPage.reloadMenu')}
         </Button>
       </Stack>
@@ -214,7 +219,7 @@ export default function Telegram() {
         >
           <Container>
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('telegramPage.refresh')}
               </Button>
             </ButtonGroup>

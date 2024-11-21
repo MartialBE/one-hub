@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab, Box, Card } from '@mui/material';
-import { IconListDetails, IconList } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import ChannelList from './ChannelList';
 import ChannelTag from './ChannelTag';
 import AdminContainer from 'ui-component/AdminContainer';
@@ -69,8 +69,18 @@ const ChannelTab = () => {
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                <Tab label={t('channel_index.channelList')} {...a11yProps(0)} icon={<IconList />} iconPosition="start" />
-                <Tab label={t('channel_index.channelTags')} {...a11yProps(1)} icon={<IconListDetails />} iconPosition="start" />
+                <Tab
+                  label={t('channel_index.channelList')}
+                  {...a11yProps(0)}
+                  icon={<Icon icon="solar:menu-dots-bold-duotone" />}
+                  iconPosition="start"
+                />
+                <Tab
+                  label={t('channel_index.channelTags')}
+                  {...a11yProps(1)}
+                  icon={<Icon icon="solar:tag-horizontal-bold-duotone" />}
+                  iconPosition="start"
+                />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>

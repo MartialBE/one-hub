@@ -34,8 +34,8 @@ import TableSwitch from 'ui-component/Switch';
 import ResponseTimeLabel from './ResponseTimeLabel';
 // import GroupLabel from './GroupLabel';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconCopy, IconWorldWww } from '@tabler/icons-react';
 import { styled, alpha } from '@mui/material/styles';
+import { Icon } from '@iconify/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy, renderQuota  } from 'utils/common';
@@ -325,7 +325,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
               </Button>
             </Tooltip>
             <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <IconDotsVertical />
+              <Icon icon="solar:menu-dots-circle-bold-duotone" />
             </IconButton>
           </Stack>
         </TableCell>
@@ -349,7 +349,7 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
               setModalChannelId(item.id);
             }}
           >
-            <IconEdit style={{ marginRight: '16px' }} />
+            <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
             {t('common.edit')}
           </MenuItem>
         )}
@@ -360,29 +360,29 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             manageChannel(item.id, 'copy');
           }}
         >
-          <IconCopy style={{ marginRight: '16px' }} /> {t('token_index.copy')}{' '}
+          <Icon icon="solar:copy-bold-duotone" style={{ marginRight: '16px' }} />
+          {t('token_index.copy')}
         </MenuItem>
         {CHANNEL_OPTIONS[item.type]?.url && (
           <MenuItem
             onClick={() => {
               handleCloseMenu();
-              // 新页面打开
               window.open(CHANNEL_OPTIONS[item.type].url);
             }}
           >
-            <IconWorldWww style={{ marginRight: '16px' }} />
+            <Icon icon="solar:global-line-duotone" style={{ marginRight: '16px' }} />
             {t('channel_row.channelWeb')}
           </MenuItem>
         )}
 
         {item.tag && (
           <MenuItem onClick={handleDeleteTag} sx={{ color: 'error.main' }}>
-            <IconTrash style={{ marginRight: '16px' }} />
+            <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
             {t('channel_row.delTag')}
           </MenuItem>
         )}
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
-          <IconTrash style={{ marginRight: '16px' }} />
+          <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
       </Popover>

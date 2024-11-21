@@ -58,7 +58,7 @@ func RelayTaskSubmit(c *gin.Context) {
 
 	channel := taskAdaptor.GetProvider().GetChannel()
 	for i := retryTimes; i > 0; i-- {
-		model.ChannelGroup.Cooldowns(channel.Id)
+		model.ChannelGroup.SetCooldowns(channel.Id, taskAdaptor.GetModelName())
 		taskErr = taskAdaptor.SetProvider()
 		if taskErr != nil {
 			continue

@@ -1,6 +1,9 @@
-import { IconCreditCard, IconBrandGithubCopilot } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 
-const icons = { IconCreditCard, IconBrandGithubCopilot };
+const icons = {
+  IconCreditCard: () => <Icon width={20} icon="solar:card-bold-duotone" />,
+  IconBrandGithubCopilot: () => <Icon width={20} icon="solar:box-minimalistic-bold-duotone" />
+};
 
 const Billing = {
   id: 'billing',
