@@ -11,7 +11,6 @@ import {
   ListItemAvatar,
   ListItemText,
   Typography,
-  // ListItemIcon,
   Chip,
   Button,
   Box,
@@ -21,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { API } from 'utils/api';
-import { UserContext } from 'contexts/UserContext';
+// import { UserContext } from 'contexts/UserContext';
 
 const CardStyle = styled(Card)(({ theme }) => ({
   background: theme.typography.menuChip.background,
@@ -60,8 +59,8 @@ const MenuCard = () => {
   const [balance, setBalance] = useState(0);
   const [usedQuota, setUsedQuota] = useState(0);
   const [requestCount, setRequestCount] = useState(0);
-  const { userGroup } = useContext(UserContext);
-  const [users, setUsers] = useState([]);
+  // const { userGroup } = useContext(UserContext);
+  // const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -174,7 +173,7 @@ const MenuCard = () => {
                 transform: 'translateY(-50%)'
               }}
             >
-              {`${t('dashboard_index.used')}: $${usedQuota} / ${Math.round(progressValue)}% (RPM:${userGroup?.[users.group]?.api_rate || 0})`}
+              {`${t('dashboard_index.used')}:💲${usedQuota} | ${Math.round(progressValue)}% `}
             </Typography>
           </Box>
         </Box>
@@ -193,7 +192,7 @@ const MenuCard = () => {
           }}
           onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
         >
-          在线客服
+          微信客服
         </Button>
       </CardContent>
     </CardStyle>
