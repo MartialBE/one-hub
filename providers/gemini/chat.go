@@ -222,7 +222,12 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 
 	choices := make([]types.ChatCompletionStreamChoice, 0, len(geminiResponse.Candidates))
 
+	isStop := false
 	for _, candidate := range geminiResponse.Candidates {
+		if candidate.FinishReason != nil && *candidate.FinishReason == "STOP" {
+			isStop = true
+			candidate.FinishReason = nil
+		}
 		choices = append(choices, candidate.ToOpenAIStreamChoice(h.Request))
 	}
 
@@ -238,6 +243,20 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		streamResponse.Choices = choices
 		responseBody, _ := json.Marshal(streamResponse)
 		dataChan <- string(responseBody)
+	}
+
+	if isStop {
+		streamResponse.Choices = []types.ChatCompletionStreamChoice{
+			{
+				FinishReason: types.FinishReasonStop,
+				Delta: types.ChatCompletionStreamChoiceDelta{
+					Role: types.ChatMessageRoleAssistant,
+				},
+			},
+		}
+		responseBody, _ := json.Marshal(streamResponse)
+		dataChan <- string(responseBody)
+		return
 	}
 
 	// 和ExecutableCode的tokens共用，所以跳过
