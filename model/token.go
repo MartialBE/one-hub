@@ -294,6 +294,9 @@ func sendQuotaWarningEmail(userId int, userQuota int, noMoreQuota bool) {
 }
 
 func PostConsumeTokenQuota(tokenId int, quota int) (err error) {
+	if quota == 0 {
+		return nil
+	}
 	token, err := GetTokenById(tokenId)
 	if err != nil {
 		return err
