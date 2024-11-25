@@ -256,7 +256,6 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		}
 		responseBody, _ := json.Marshal(streamResponse)
 		dataChan <- string(responseBody)
-		return
 	}
 
 	// 和ExecutableCode的tokens共用，所以跳过
