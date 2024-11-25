@@ -132,18 +132,18 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	}()
 
 	quota := q.GetTotalQuotaByUsage(usage)
-	if quota == 0 {
-		return fmt.Errorf("user_id: %d, channel_id: %d, token_id: %d, quota is 0", q.userId, q.channelId, q.tokenId)
-	}
 
-	quotaDelta := quota - q.preConsumedQuota
-	err := model.PostConsumeTokenQuota(q.tokenId, quotaDelta)
-	if err != nil {
-		return errors.New("error consuming token remain quota: " + err.Error())
-	}
-	err = model.CacheUpdateUserQuota(q.userId)
-	if err != nil {
-		return errors.New("error consuming token remain quota: " + err.Error())
+	if quota > 0 {
+		quotaDelta := quota - q.preConsumedQuota
+		err := model.PostConsumeTokenQuota(q.tokenId, quotaDelta)
+		if err != nil {
+			return errors.New("error consuming token remain quota: " + err.Error())
+		}
+		err = model.CacheUpdateUserQuota(q.userId)
+		if err != nil {
+			return errors.New("error consuming token remain quota: " + err.Error())
+		}
+		model.UpdateChannelUsedQuota(q.channelId, quota)
 	}
 
 	model.RecordConsumeLog(
@@ -161,7 +161,6 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		q.GetLogMeta(usage),
 	)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
-	model.UpdateChannelUsedQuota(q.channelId, quota)
 
 	return nil
 }
