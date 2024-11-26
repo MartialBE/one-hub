@@ -29,6 +29,7 @@
   },
   "alloy 映射": "合金マッピング",
   "analytics": "分析",
+  "playground": "遊び場",
   "analytics_index": {
     "active": "アクティブ",
     "averageLatency": "平均遅延",
