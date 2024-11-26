@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ThemeButton from 'ui-component/ThemeButton';
+import NoticeButton from 'ui-component/NoticeButton';
 import I18nButton from 'ui-component/i18nButton';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 import { IconMenu2 } from '@tabler/icons-react';
@@ -67,6 +68,7 @@ const Header = () => {
       <Stack spacing={2} direction="row" justifyContent="center" alignItems="center">
         {isMobile ? (
           <>
+            <NoticeButton />
             <ThemeButton />
             <I18nButton />
             <IconButton onClick={handleOpenMenu}>
@@ -80,12 +82,13 @@ const Header = () => {
             </Button>
             {account.user && (
               <Button component={Link} variant="text" to="/playground" color={pathname === '/playground' ? 'primary' : 'inherit'}>
-                Playground
+                {t('playground')}
               </Button>
             )}
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
               {t('menu.about')}
             </Button>
+            <NoticeButton />
             <ThemeButton />
             <I18nButton />
             {account.user ? (

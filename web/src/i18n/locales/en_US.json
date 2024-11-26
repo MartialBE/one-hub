@@ -30,6 +30,7 @@
   },
   "alloy 映射": "alloy mapping",
   "analytics": "Analytics",
+  "playground": "Playground",
   "analytics_index": {
     "active": "Active",
     "averageLatency": "Average Latency",
