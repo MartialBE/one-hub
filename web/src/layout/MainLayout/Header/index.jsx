@@ -11,6 +11,7 @@ import LogoSection from '../LogoSection';
 import ProfileSection from './ProfileSection';
 import ThemeButton from 'ui-component/ThemeButton';
 import I18nButton from 'ui-component/i18nButton';
+import NoticeButton from '../../../ui-component/NoticeButton';
 
 // assets
 // import { Icon } from '@iconify/react';
@@ -68,6 +69,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
 
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />
+      <NoticeButton />
       <ThemeButton />
       <I18nButton />
       <ProfileSection />
