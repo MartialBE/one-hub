@@ -29,6 +29,7 @@
   },
   "alloy 映射": "alloy 映射",
   "analytics": "分析",
+  "plauground": "聊天",
   "analytics_index": {
     "active": "正常",
     "averageLatency": "平均延遲",

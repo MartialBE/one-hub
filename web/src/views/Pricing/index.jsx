@@ -214,7 +214,7 @@ const Pricing = () => {
         </Alert>
       )}
       <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={5} spacing={2}>
-        <Button variant="contained" color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />}>
+        <Button variant="contained" onClick={()=>handleOpenaddModal(null)} color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />}>
           {t('pricingPage.newButton')}
         </Button>
         <Button variant="contained" onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" />}>
