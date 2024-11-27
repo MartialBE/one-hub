@@ -1,10 +1,12 @@
 package requester
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
 
+	"one-api/common/logger"
 	"one-api/types"
 )
 
@@ -70,27 +72,21 @@ func (p *WSProxy) transfer(src, dst *websocket.Conn, source MessageSource, close
 		p.done <- struct{}{}
 	}()
 
-	inactivityTimer := time.NewTimer(p.timeout)
-	defer inactivityTimer.Stop()
-
 	for {
 		src.SetReadDeadline(time.Now().Add(p.timeout))
 
 		messageType, message, err := src.ReadMessage()
 		if err != nil {
+			logger.SysError(fmt.Sprintf("source: %d, ReadMessage error: %s", source, err.Error()))
 			return
 		}
-
-		if !inactivityTimer.Stop() {
-			<-inactivityTimer.C
-		}
-		inactivityTimer.Reset(p.timeout)
 
 		if p.handler != nil {
 			shouldContinue, usage, newMessage, err := p.handler(source, messageType, message)
 			if err != nil {
 				errMsg := []byte(err.Error())
 				dst.WriteMessage(websocket.TextMessage, errMsg)
+				logger.SysError(fmt.Sprintf("source: %d, handler error: %s", source, err.Error()))
 				return
 			}
 
@@ -108,6 +104,7 @@ func (p *WSProxy) transfer(src, dst *websocket.Conn, source MessageSource, close
 					dst.WriteMessage(websocket.TextMessage, message)
 					errMsg := []byte(err.Error())
 					dst.WriteMessage(websocket.TextMessage, errMsg)
+					logger.SysError(fmt.Sprintf("source: %d, usageHandler error: %s", source, err.Error()))
 					return
 				}
 			}
@@ -115,6 +112,7 @@ func (p *WSProxy) transfer(src, dst *websocket.Conn, source MessageSource, close
 
 		err = dst.WriteMessage(messageType, message)
 		if err != nil {
+			logger.SysError(fmt.Sprintf("source: %d, WriteMessage error: %s", source, err.Error()))
 			return
 		}
 	}
