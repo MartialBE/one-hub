@@ -83,7 +83,7 @@ const Header = () => {
             <Button component={Link} variant="text" to="/about" color={pathname === '/about' ? 'primary' : 'inherit'}>
             {t('menu.about')}
             </Button>
-            <NoticeButton />
+            {/* <NoticeButton /> */}
             <Button
               variant="text"
               href="https://work.weixin.qq.com/kfid/kfce787ac8bbad50026" // 使用href而不是to
