@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/common/requester"
 	"one-api/types"
 
@@ -58,6 +59,7 @@ func (p *OpenAIProvider) HandleMessage(source requester.MessageSource, messageTy
 
 	// 处理错误事件
 	if event.IsError() {
+		logger.SysError("event error: " + event.Error())
 		return false, nil, nil, &event
 	}
 

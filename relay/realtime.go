@@ -64,7 +64,7 @@ func ChatRealtime(c *gin.Context) {
 
 	relay.usage = &types.UsageEvent{}
 
-	wsProxy := requester.NewWSProxy(relay.userConn, relay.providerConn, time.Minute*1, relay.messageHandler, relay.usageHandler)
+	wsProxy := requester.NewWSProxy(relay.userConn, relay.providerConn, time.Minute*2, relay.messageHandler, relay.usageHandler)
 
 	wsProxy.Start()
 
