@@ -72,7 +72,7 @@ func GenerateToken(tokenID, userID int) (string, error) {
 func ValidateToken(token string) (tokenID, userID int, err error) {
 	parts := bytes.SplitN([]byte(token), []byte("_"), 2)
 	if len(parts) != 2 {
-		return 0, 0, fmt.Errorf("无效的令牌")
+		return 0, 0, fmt.Errorf("无效的Key")
 	}
 
 	payloadEncoded, receivedSignature := parts[0], parts[1]
@@ -97,7 +97,7 @@ func ValidateToken(token string) (tokenID, userID int, err error) {
 
 	numbers := hashids.Decode(string(payloadEncoded))
 	if len(numbers) != 2 {
-		return 0, 0, fmt.Errorf("无效的令牌")
+		return 0, 0, fmt.Errorf("无效的Key")
 	}
 
 	return int(numbers[0]), int(numbers[1]), nil

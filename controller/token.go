@@ -76,7 +76,7 @@ func GetPlaygroundToken(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "创建令牌失败，请去系统手动配置一个名称为：sys_playground 的令牌",
+				"message": "创建Key失败，请去系统手动配置一个名称为：sys_playground 的Key",
 			})
 			return
 		}

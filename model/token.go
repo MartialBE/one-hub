@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ErrTokenNotFound          = errors.New("令牌不存在")
+	ErrTokenNotFound          = errors.New("Key不存在")
 	ErrTokenExpired           = errors.New("令牌已过期")
 	ErrTokenQuotaExhausted    = errors.New("令牌额度已用尽")
 	ErrTokenStatusUnavailable = errors.New("令牌状态不可用")

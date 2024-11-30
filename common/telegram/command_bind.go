@@ -27,7 +27,7 @@ func commandBindStart(b *gotgbot.Bot, ctx *ext.Context) error {
 		return handlers.EndConversation()
 	}
 
-	_, err := ctx.EffectiveMessage.Reply(b, "请输入你的访问令牌", &gotgbot.SendMessageOpts{
+	_, err := ctx.EffectiveMessage.Reply(b, "请输入你的访问Key", &gotgbot.SendMessageOpts{
 		ParseMode:   "html",
 		ReplyMarkup: cancelConversationInlineKeyboard(),
 	})
