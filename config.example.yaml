@@ -19,6 +19,7 @@ sql_dsn: "" # 设置之后将使用指定数据库而非 SQLite，请使用 MySQ
 sqlite_path: "one-api.db" # sqlite 数据库文件路径
 sqlite_busy_timeout: 3000 # sqlite 数据库繁忙超时时间，单位为毫秒，默认为 3000。
 redis_conn_string: "" # 设置之后将使用指定 Redis 作为缓存，格式为 "redis://default:redispw@localhost:49153"，未设置则不使用 Redis。
+redis_db: 0 # redis 数据库，未设置则不使用 Redis。
 
 memory_cache_enabled: false # 是否启用内存缓存，启用后将缓存部分数据，减少数据库查询次数。
 sync_frequency: 600 # 在启用缓存的情况下与数据库同步配置的频率，单位为秒，默认为 600 秒
@@ -28,6 +29,10 @@ polling_interval: 0 # 批量更新渠道余额以及测试可用性时的请求�
 batch_update_interval: 5 # 批量更新聚合的时间间隔，单位为秒，默认为 5。
 batch_update_enabled: false # 启用数据库批量更新聚合，会导致用户额度的更新存在一定的延迟可选值为 true 和 false，未设置则默认为 false
 auto_price_updates: true # 启用自动更新价格，可选值为 true 和 false，默认为 true
+
+# 令牌设置
+user_token_secret: "" # 用户令牌密钥, 请设置32位随机字符串，丢失后用户令牌将无法验证，例如：vWVmFxp5YIOXuHhEod8jBcqiw0zKP2fk
+hashids_salt: "" # hashids 盐, 丢失后用户令牌将无法验证，例如：QqGmDAFIdHzc7YBLMUPkEt6XuKjNnarwglZThvOW3y85Jo1bVxC02ipRs94fSe
 
 # 全局设置
 global:

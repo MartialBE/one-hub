@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"strconv"
 	"strings"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -36,6 +37,52 @@ func removeKeyIndexMigration() *gormigrate.Migration {
 	}
 }
 
+func changeTokenKeyColumnType() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202411300001",
+		Migrate: func(tx *gorm.DB) error {
+			// 如果表不存在，说明是新数据库，直接跳过
+			if !tx.Migrator().HasTable("tokens") {
+				return nil
+			}
+
+			dialect := tx.Dialector.Name()
+			var err error
+
+			switch dialect {
+			case "mysql":
+				err = tx.Exec("ALTER TABLE tokens MODIFY COLUMN `key` varchar(59)").Error
+			case "postgres":
+				err = tx.Exec("ALTER TABLE tokens ALTER COLUMN key TYPE varchar(59)").Error
+			case "sqlite":
+				return nil
+			}
+
+			if err != nil {
+				logger.SysLog("修改 tokens.key 字段类型失败: " + err.Error())
+				return err
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			if !tx.Migrator().HasTable("tokens") {
+				return nil
+			}
+
+			dialect := tx.Dialector.Name()
+			var err error
+
+			switch dialect {
+			case "mysql":
+				err = tx.Exec("ALTER TABLE tokens MODIFY COLUMN `key` char(48)").Error
+			case "postgres":
+				err = tx.Exec("ALTER TABLE tokens ALTER COLUMN key TYPE char(48)").Error
+			}
+			return err
+		},
+	}
+}
+
 func migrationBefore(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -50,6 +97,7 @@ func migrationBefore(db *gorm.DB) error {
 
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		removeKeyIndexMigration(),
+		changeTokenKeyColumnType(),
 	})
 	return m.Migrate()
 }
@@ -186,6 +234,27 @@ func initUserGroup() *gormigrate.Migration {
 	}
 }
 
+func addOldTokenMaxId() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202411300002",
+		Migrate: func(tx *gorm.DB) error {
+			var token Token
+			tx.Last(&token)
+			tokenMaxId := token.Id
+			option := Option{
+				Key: "OldTokenMaxId",
+			}
+
+			DB.FirstOrCreate(&option, Option{Key: "OldTokenMaxId"})
+			option.Value = strconv.Itoa(tokenMaxId)
+			return DB.Save(&option).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Rollback().Error
+		},
+	}
+}
+
 func migrationAfter(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -196,6 +265,7 @@ func migrationAfter(db *gorm.DB) error {
 		addStatistics(),
 		changeChannelApiVersion(),
 		initUserGroup(),
+		addOldTokenMaxId(),
 	})
 	return m.Migrate()
 }

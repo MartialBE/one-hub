@@ -32,6 +32,8 @@ func InitRedisClient() (err error) {
 		logger.FatalLog("failed to parse Redis connection string: " + err.Error())
 		return
 	}
+
+	opt.DB = viper.GetInt("redis_db")
 	RDB = redis.NewClient(opt)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -87,4 +89,20 @@ func GetRedisClient() *redis.Client {
 
 func ScriptRunCtx(ctx context.Context, script *redis.Script, keys []string, args ...interface{}) (interface{}, error) {
 	return script.Run(ctx, RDB, keys, args...).Result()
+}
+
+func RedisExists(key string) (bool, error) {
+	ctx := context.Background()
+	exists, err := RDB.Exists(ctx, key).Result()
+	return exists > 0, err
+}
+
+func RedisSAdd(key string, members ...interface{}) error {
+	ctx := context.Background()
+	return RDB.SAdd(ctx, key, members...).Err()
+}
+
+func RedisSIsMember(key string, member interface{}) (bool, error) {
+	ctx := context.Background()
+	return RDB.SIsMember(ctx, key, member).Result()
 }

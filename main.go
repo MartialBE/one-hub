@@ -44,6 +44,13 @@ func main() {
 
 	logger.SetupLogger()
 	logger.SysLog("One Hub " + config.Version + " started")
+
+	// Initialize user token
+	err := common.InitUserToken()
+	if err != nil {
+		logger.FatalLog("failed to initialize user token: " + err.Error())
+	}
+
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
@@ -55,6 +62,8 @@ func main() {
 	// Initialize oidc
 	oidc.InitOIDCConfig()
 	relay_util.NewPricing()
+	model.HandleOldTokenMaxId()
+
 	initMemoryCache()
 	initSync()
 
