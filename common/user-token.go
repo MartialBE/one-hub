@@ -28,17 +28,23 @@ var (
 
 func InitUserToken() error {
 	tokenSecret := viper.GetString("user_token_secret")
-	hashidsSalt := viper.GetString("hashids_salt")
+	sqidsAlphabet := viper.GetString("hashids_salt")
 
-	if tokenSecret == "" || hashidsSalt == "" {
+	if tokenSecret == "" {
 		return errors.New("token_secret or hashids_salt is not set")
 	}
 
 	var err error
-	hashids, err = sqids.New(sqids.Options{
+
+	sqidsOptions := sqids.Options{
 		MinLength: uint8(hashidsMinLength),
-		Alphabet:  hashidsSalt,
-	})
+	}
+
+	if sqidsAlphabet != "" {
+		sqidsOptions.Alphabet = sqidsAlphabet
+	}
+
+	hashids, err = sqids.New(sqidsOptions)
 
 	jwtSecretBytes = []byte(tokenSecret)
 

@@ -31,8 +31,8 @@ batch_update_enabled: false # 启用数据库批量更新聚合，会导致用�
 auto_price_updates: true # 启用自动更新价格，可选值为 true 和 false，默认为 true
 
 # 令牌设置
-user_token_secret: "" # 用户令牌密钥, 请设置32位随机字符串，丢失后用户令牌将无法验证，例如：vWVmFxp5YIOXuHhEod8jBcqiw0zKP2fk
-hashids_salt: "" # hashids 盐, 丢失后用户令牌将无法验证，例如：QqGmDAFIdHzc7YBLMUPkEt6XuKjNnarwglZThvOW3y85Jo1bVxC02ipRs94fSe
+user_token_secret: "" # 用户令牌密钥, 请设置至少32位的随机字符串，修改后用户令牌将无法验证，例如：vWVmFxp5YIOXuHhEod8jBcqiw0zKP2fk
+hashids_salt: "" # sqids alphabet参数，可空，如果不设置则使用默认字表, 如果配置则需要保证字符串中文字不重复，修改后用户令牌将无法验证，
 
 # 全局设置
 global:
