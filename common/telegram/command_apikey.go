@@ -52,7 +52,7 @@ func getApikeyList(userId, page int) (message string, pageParams *paginationPara
 	}
 
 	if list.Data == nil || len(*list.Data) == 0 {
-		return "找不到令牌", nil
+		return "找不到Key", nil
 	}
 
 	chatUrlTmp := ""
@@ -60,7 +60,7 @@ func getApikeyList(userId, page int) (message string, pageParams *paginationPara
 		chatUrlTmp = getChatUrl()
 	}
 
-	message = "点击令牌可复制：\n"
+	message = "点击Key可复制：\n"
 
 	for _, token := range *list.Data {
 		key := "sk-" + token.Key

@@ -93,22 +93,14 @@ func tokenAuth(c *gin.Context, key string) {
 		return
 	}
 
-	parts := strings.Split(key, "-")
+	parts := strings.Split(key, "#")
 	key = parts[0]
 	token, err := model.ValidateUserToken(key)
 	if err != nil {
 		abortWithMessage(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	userEnabled, err := model.CacheIsUserEnabled(token.UserId)
-	if err != nil {
-		abortWithMessage(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	if !userEnabled {
-		abortWithMessage(c, http.StatusForbidden, "用户已被封禁")
-		return
-	}
+
 	c.Set("id", token.UserId)
 	c.Set("token_id", token.Id)
 	c.Set("token_name", token.Name)

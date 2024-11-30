@@ -62,9 +62,9 @@ func GetPlaygroundToken(c *gin.Context) {
 	token, err := model.GetTokenByName(tokenName, userId)
 	if err != nil {
 		cleanToken := model.Token{
-			UserId:         userId,
-			Name:           tokenName,
-			Key:            utils.GenerateKey(),
+			UserId: userId,
+			Name:   tokenName,
+			// Key:            utils.GenerateKey(),
 			CreatedTime:    utils.GetTimestamp(),
 			AccessedTime:   utils.GetTimestamp(),
 			ExpiredTime:    0,
@@ -76,7 +76,7 @@ func GetPlaygroundToken(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "创建令牌失败，请去系统手动配置一个名称为：sys_playground 的令牌",
+				"message": "创建Key失败，请去系统手动配置一个名称为：sys_playground 的Key",
 			})
 			return
 		}
@@ -117,9 +117,9 @@ func AddToken(c *gin.Context) {
 	}
 
 	cleanToken := model.Token{
-		UserId:         c.GetInt("id"),
-		Name:           token.Name,
-		Key:            utils.GenerateKey(),
+		UserId: c.GetInt("id"),
+		Name:   token.Name,
+		// Key:            utils.GenerateKey(),
 		CreatedTime:    utils.GetTimestamp(),
 		AccessedTime:   utils.GetTimestamp(),
 		ExpiredTime:    token.ExpiredTime,

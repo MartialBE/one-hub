@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	TokenBurstMultiplier = 10 // 令牌桶的突发流量倍数
+	TokenBurstMultiplier = 10 // Key桶的突发流量倍数
 	RPMThreshold         = 60 // RPM阈值
 	window               = 1 * time.Minute
 )

@@ -20,6 +20,8 @@ var (
 	UserEnabledCacheKey         = "user_enabled:%d"
 	UserRealtimeQuotaKey        = "user_realtime_quota:%d"
 	UserRealtimeQuotaExpiration = 24 * time.Hour
+
+	OldUserTokensCacheKey = "old_user_tokens_cache"
 )
 
 func CacheGetTokenByKey(key string) (*Token, error) {
@@ -186,4 +188,48 @@ func CacheUpdateUserRealtimeQuota(id int, quota int) (int64, error) {
 	}
 
 	return newValue, nil
+}
+
+func HandleOldTokenMaxId() {
+	if config.OldTokenMaxId == 0 || !config.RedisEnabled {
+		return
+	}
+
+	// 检测OldUserTokensCacheKey是否存在
+	exists, _ := redis.RedisExists(OldUserTokensCacheKey)
+	if exists {
+		return
+	}
+	const batchSize = 1000
+	var offset int
+
+	for {
+		var tokenKeys []interface{}
+		result := DB.Model(&Token{}).
+			Where("id <= ?", config.OldTokenMaxId).
+			Limit(batchSize).
+			Offset(offset).
+			Pluck("key", &tokenKeys)
+
+		if result.Error != nil {
+			logger.SysError("查询旧token失败: " + result.Error.Error())
+			return
+		}
+
+		if len(tokenKeys) == 0 {
+			if offset == 0 {
+				logger.SysLog("没有找到旧token")
+			}
+			break
+		}
+
+		if err := redis.RedisSAdd(OldUserTokensCacheKey, tokenKeys...); err != nil {
+			logger.SysError("添加旧token到Redis失败: " + err.Error())
+		}
+
+		logger.SysLog(fmt.Sprintf("已处理 %d 个旧token", offset+len(tokenKeys)))
+		offset += batchSize
+
+		time.Sleep(100 * time.Millisecond)
+	}
 }

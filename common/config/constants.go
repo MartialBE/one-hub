@@ -15,6 +15,8 @@ var SystemName = "CZLOapi"
 var ServerAddress = "http://localhost:3000"
 var Debug = false
 
+var OldTokenMaxId = 0
+
 var Language = ""
 var Footer = ""
 var Logo = ""

@@ -104,7 +104,7 @@ const Setting = {
 
     {
       id: 'token',
-      title: '令牌',
+      title: 'Key',
       type: 'item',
       url: '/panel/token',
       icon: icons.IconKey,
