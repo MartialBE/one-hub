@@ -99,7 +99,7 @@ const MenuCard = () => {
             <ListItemAvatar sx={{ mt: 0 }}>
               <Avatar
                 variant="rounded"
-                src={User1}
+                src={account.user?.avatar_url || User1}
                 sx={{
                   ...theme.typography.commonAvatar,
                   ...theme.typography.largeAvatar,

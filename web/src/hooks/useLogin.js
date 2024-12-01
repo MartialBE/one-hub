@@ -30,7 +30,8 @@ const useLogin = () => {
 
   const githubLogin = async (code, state) => {
     try {
-      const res = await API.get(`/api/oauth/github?code=${code}&state=${state}`);
+      const affCode = localStorage.getItem('aff');
+      const res = await API.get(`/api/oauth/github?code=${code}&state=${state}&aff=${affCode}`);
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
@@ -52,7 +53,8 @@ const useLogin = () => {
 
   const oidcLogin = async (code, state) => {
     try {
-      const res = await API.get(`/api/oauth/oidc?code=${code}&state=${state}`);
+      const affCode = localStorage.getItem('aff');
+      const res = await API.get(`/api/oauth/oidc?code=${code}&state=${state}&aff=${affCode}`);
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
@@ -74,7 +76,8 @@ const useLogin = () => {
 
   const larkLogin = async (code, state) => {
     try {
-      const res = await API.get(`/api/oauth/lark?code=${code}&state=${state}`);
+      const affCode = localStorage.getItem('aff');
+      const res = await API.get(`/api/oauth/lark?code=${code}&state=${state}&aff=${affCode}`);
       const { success, message, data } = res.data;
       if (success) {
         if (message === 'bind') {
@@ -96,7 +99,8 @@ const useLogin = () => {
 
   const wechatLogin = async (code) => {
     try {
-      const res = await API.get(`/api/oauth/wechat?code=${code}`);
+      const affCode = localStorage.getItem('aff');
+      const res = await API.get(`/api/oauth/wechat?code=${code}&aff=${affCode}`);
       const { success, message, data } = res.data;
       if (success) {
         dispatch({ type: LOGIN, payload: data });

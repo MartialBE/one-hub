@@ -3,10 +3,12 @@ import { Box, Avatar } from '@mui/material';
 import Card from '@mui/material/Card';
 import userAvatar from 'assets/images/users/user-round.svg';
 import userBackground from 'assets/images/users/background-1.webp';
+import { useSelector } from 'react-redux';
 
 import React from 'react';
 
 export default function UserCard({ children }) {
+  const account = useSelector((state) => state.account);
   return (
     <Card
       sx={{
@@ -45,7 +47,7 @@ export default function UserCard({ children }) {
         }}
       >
         <Avatar
-          src={userAvatar}
+          src={account.user?.avatar_url || userAvatar}
           sx={{
             width: '100%',
             height: '100%'

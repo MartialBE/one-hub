@@ -34,6 +34,7 @@ const SystemSetting = () => {
     GitHubOAuthEnabled: '',
     GitHubClientId: '',
     GitHubClientSecret: '',
+    GitHubOldIdCloseEnabled: '',
     LarkAuthEnabled: '',
     LarkClientId: '',
     LarkClientSecret: '',
@@ -103,6 +104,7 @@ const SystemSetting = () => {
       case 'PasswordRegisterEnabled':
       case 'EmailVerificationEnabled':
       case 'GitHubOAuthEnabled':
+      case 'GitHubOldIdCloseEnabled':
       case 'WeChatAuthEnabled':
       case 'LarkAuthEnabled':
       case 'OIDCAuthEnabled':
@@ -361,6 +363,19 @@ const SystemSetting = () => {
                 label={t('setting_index.systemSettings.configureLoginRegister.turnstileCheck')}
                 control={
                   <Checkbox checked={inputs.TurnstileCheckEnabled === 'true'} onChange={handleInputChange} name="TurnstileCheckEnabled" />
+                }
+              />
+            </Grid>
+
+            <Grid xs={12} md={3}>
+              <FormControlLabel
+                label={t('setting_index.systemSettings.configureLoginRegister.gitHubOldIdClose')}
+                control={
+                  <Checkbox
+                    checked={inputs.GitHubOldIdCloseEnabled === 'true'}
+                    onChange={handleInputChange}
+                    name="GitHubOldIdCloseEnabled"
+                  />
                 }
               />
             </Grid>
@@ -750,11 +765,7 @@ const SystemSetting = () => {
 
         <SubCard
           title={t('setting_index.systemSettings.configureOIDCAuthorization.title')}
-          subTitle={
-            <span>
-              {t('setting_index.systemSettings.configureOIDCAuthorization.subTitle')}
-            </span>
-          }
+          subTitle={<span>{t('setting_index.systemSettings.configureOIDCAuthorization.subTitle')}</span>}
         >
           <Grid container spacing={{ xs: 3, sm: 2, md: 4 }}>
             <Grid xs={12}>
@@ -781,7 +792,9 @@ const SystemSetting = () => {
 
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="OIDCClientSecret">{t('setting_index.systemSettings.configureOIDCAuthorization.clientSecret')}</InputLabel>
+                <InputLabel htmlFor="OIDCClientSecret">
+                  {t('setting_index.systemSettings.configureOIDCAuthorization.clientSecret')}
+                </InputLabel>
                 <OutlinedInput
                   id="OIDCClientSecret"
                   name="OIDCClientSecret"
@@ -826,7 +839,9 @@ const SystemSetting = () => {
 
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="OIDCUsernameClaims">{t('setting_index.systemSettings.configureOIDCAuthorization.usernameClaims')}</InputLabel>
+                <InputLabel htmlFor="OIDCUsernameClaims">
+                  {t('setting_index.systemSettings.configureOIDCAuthorization.usernameClaims')}
+                </InputLabel>
                 <OutlinedInput
                   id="OIDCUsernameClaims"
                   name="OIDCUsernameClaims"
@@ -838,7 +853,6 @@ const SystemSetting = () => {
                 />
               </FormControl>
             </Grid>
-
 
             <Grid xs={12}>
               <Button variant="contained" onClick={submitOIDCOAuth}>

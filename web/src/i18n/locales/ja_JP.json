@@ -746,7 +746,8 @@
         "registerEnabled": "新規ユーザー登録を許可（これを無効にすると、新規登録はできません）",
         "title": "ログインと登録の設定",
         "turnstileCheck": "Turnstileユーザー検証を有効にする",
-        "weChatAuth": "WeChatでのログイン＆登録を許可"
+        "weChatAuth": "WeChatでのログイン＆登録を許可",
+        "gitHubOldIdClose": "GitHub の古い ID ログインを閉じる"
       },
       "configureOIDCAuthorization": {
         "alert1": "ホームページリンクを入力してください",
@@ -906,7 +907,9 @@
     "unlimited": "制限なし",
     "unlimitedQuota": "無制限のクォータ",
     "usedQuota": "使用済みクォータ",
-    "userGroup": "グループ"
+    "userGroup": "グループ",
+    "apiRate": "APIレート",
+    "apiRateTip": "1分あたりの許可されるリクエスト数は、速度が60未満の場合にはカウンターリミッターを使用し、速度が60以上の場合にはトークンバケットリミッターを使用します。Redisが有効な場合にのみ適用されます。"
   },
   "topup": "トップアップ",
   "topupCard": {
@@ -1084,5 +1087,6 @@
     "apiRate": "APIレート",
     "apiRateTip": "1分あたりのリクエスト数は、速度が60未満の場合はカウンターリミッターを使用し、速度が60以上の場合はトークンバケットリミッターを使用します。Redisが有効な場合にのみ適用されます。"
   },
-  "user_group": "ユーザーグループ"
+  "user_group": "ユーザーグループ",
+  "plauground": "チャット"
 }

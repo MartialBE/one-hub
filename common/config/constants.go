@@ -80,6 +80,7 @@ var ChatImageRequestProxy = ""
 
 var GitHubClientId = ""
 var GitHubClientSecret = ""
+var GitHubOldIdCloseEnabled = false
 
 var LarkClientId = ""
 var LarkClientSecret = ""

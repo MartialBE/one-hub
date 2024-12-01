@@ -35,6 +35,7 @@ const ProfileSection = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const customization = useSelector((state) => state.customization);
+  const account = useSelector((state) => state.account);
   const { logout } = useLogin();
 
   const [open, setOpen] = useState(false);
@@ -89,7 +90,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src={User1}
+            src={account.user?.avatar_url || User1}
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px !important',

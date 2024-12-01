@@ -603,7 +603,8 @@
         "weChatAuth": "允许通过微信登录 & 注册",
         "larkAuth": "允许通过飞书登录 & 注册",
         "registerEnabled": "允许新用户注册（此项为否时，新用户将无法以任何方式进行注册）",
-        "turnstileCheck": "启用 Turnstile 用户校验"
+        "turnstileCheck": "启用 Turnstile 用户校验",
+        "gitHubOldIdClose": "关闭 GitHub 老 ID 登录"
       },
       "configureEmailDomainWhitelist": {
         "title": "配置邮箱域名白名单",

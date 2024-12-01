@@ -76,8 +76,13 @@ func setupLogin(user *model.User, c *gin.Context) {
 		})
 		return
 	}
+	user.LastLoginTime = time.Now().Unix()
+
+	user.Update(false)
+
 	cleanUser := model.User{
 		Id:          user.Id,
+		AvatarUrl:   user.AvatarUrl,
 		Username:    user.Username,
 		DisplayName: user.DisplayName,
 		Role:        user.Role,

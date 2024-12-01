@@ -747,7 +747,8 @@
         "registerEnabled": "Allow New User Registration (Disabling this will prevent any new registrations)",
         "title": "Configure Login and Register",
         "turnstileCheck": "Enable Turnstile User Verification",
-        "weChatAuth": "Allow Login & Register via WeChat"
+        "weChatAuth": "Allow Login & Register via WeChat",
+        "gitHubOldIdClose": "Disable logging in with old GitHub ID."
       },
       "configureOIDCAuthorization": {
         "alert1": "Fill in the homepage link",
@@ -907,7 +908,9 @@
     "unlimited": "Unlimited",
     "unlimitedQuota": "Unlimited Quota",
     "usedQuota": "Used Quota",
-    "userGroup": "group"
+    "userGroup": "group",
+    "apiRate": "API rate",
+    "apiRateTip": "The number of requests allowed per minute, when the rate is less than 60, use a counter limiter; when the rate is greater than or equal to 60, use a token bucket limiter. This only applies when Redis is enabled."
   },
   "topup": "Top-up",
   "topupCard": {
@@ -1084,5 +1087,6 @@
     "apiRate": "API rate",
     "apiRateTip": "The number of requests allowed per minute. When the rate is less than 60, use a counter limiter; when the rate is greater than or equal to 60, use a token bucket limiter. This setting is only effective when Redis is enabled."
   },
-  "user_group": "User grouping"
+  "user_group": "User grouping",
+  "plauground": "chat"
 }

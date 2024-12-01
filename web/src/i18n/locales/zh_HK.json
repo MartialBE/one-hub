@@ -748,7 +748,8 @@
         "registerEnabled": "允許新用戶註冊（此項為否時，新用戶將無法以任何方式進行註冊）",
         "title": "配置登錄和註冊",
         "turnstileCheck": "啟用 Turnstile 用戶校驗",
-        "weChatAuth": "允許通過微信登錄 & 註冊"
+        "weChatAuth": "允許通過微信登錄 & 註冊",
+        "gitHubOldIdClose": "關閉 GitHub 老 ID 登錄"
       },
       "configureOIDCAuthorization": {
         "alert1": "首頁鏈接填",
