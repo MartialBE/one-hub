@@ -50,6 +50,8 @@ ghcr.io/martialbe/one-api
 - 支持自动获取供应商模型
 - 支持仅聊天，开启后如果有传入`function call`参数会跳过该渠道
 - 支持支付
+- 支持配置用户组 RPM
+- 支持`Prometheus`监控
 
 ## 文档
 

@@ -22,7 +22,9 @@ type User struct {
 	Role             int            `json:"role" gorm:"type:int;default:1"`   // admin, common
 	Status           int            `json:"status" gorm:"type:int;default:1"` // enabled, disabled
 	Email            string         `json:"email" gorm:"index" validate:"max=50"`
+	AvatarUrl        string         `json:"avatar_url" gorm:"type:varchar(500);column:avatar_url;default:''"`
 	GitHubId         string         `json:"github_id" gorm:"column:github_id;index"`
+	GitHubIdNew      int            `json:"github_id_new" gorm:"column:github_id_new;index"`
 	WeChatId         string         `json:"wechat_id" gorm:"column:wechat_id;index"`
 	TelegramId       int64          `json:"telegram_id" gorm:"bigint,column:telegram_id;default:0;"`
 	LarkId           string         `json:"lark_id" gorm:"column:lark_id;index"`
@@ -37,6 +39,7 @@ type User struct {
 	AffQuota         int            `json:"aff_quota" gorm:"type:int;default:0;column:aff_quota"`
 	AffHistoryQuota  int            `json:"aff_history_quota" gorm:"type:int;default:0;column:aff_history"`
 	InviterId        int            `json:"inviter_id" gorm:"type:int;column:inviter_id;index"`
+	LastLoginTime    int64          `json:"last_login_time" gorm:"bigint;default:0"`
 	CreatedTime      int64          `json:"created_time" gorm:"bigint"`
 	DeletedAt        gorm.DeletedAt `json:"-" gorm:"index"`
 }
@@ -146,13 +149,18 @@ func (user *User) Insert(inviterId int) error {
 
 func (user *User) Update(updatePassword bool) error {
 	var err error
+	omitFields := []string{"quota", "used_quota", "request_count", "aff_count", "aff_quota", "aff_history"}
+
 	if updatePassword {
 		user.Password, err = common.Password2Hash(user.Password)
 		if err != nil {
 			return err
 		}
+	} else {
+		omitFields = append(omitFields, "password")
 	}
-	err = DB.Model(user).Updates(user).Error
+
+	err = DB.Model(user).Omit(omitFields...).Updates(user).Error
 
 	if err == nil && user.Role == config.RoleRootUser {
 		config.RootUserEmail = user.Email
@@ -244,6 +252,14 @@ func (user *User) FillUserByGitHubId() error {
 	return nil
 }
 
+func (user *User) FillUserByGitHubIdNew() error {
+	if user.GitHubIdNew == 0 {
+		return errors.New("GitHub id new 为空！")
+	}
+	DB.Where(User{GitHubIdNew: user.GitHubIdNew}).First(user)
+	return nil
+}
+
 func (user *User) FillUserByWeChatId() error {
 	if user.WeChatId == "" {
 		return errors.New("WeChat id 为空！")
@@ -271,24 +287,49 @@ func (user *User) FillUserByUsername() error {
 	return nil
 }
 
+func FindUserByField(field string, value any) (*User, error) {
+	user := &User{}
+	err := DB.Where(fmt.Sprintf("%s = ?", field), value).First(user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+
+	return user, err
+}
+
+func IsFieldAlreadyTaken(field string, value any) bool {
+	var count int64
+	DB.Model(&User{}).Where(fmt.Sprintf("%s = ?", field), value).Limit(1).Count(&count)
+	return count > 0
+}
+
+func IsUsernameAlreadyTaken(username string) bool {
+	return IsFieldAlreadyTaken("username", username)
+}
+
 func IsEmailAlreadyTaken(email string) bool {
-	return DB.Where("email = ?", email).Find(&User{}).RowsAffected == 1
+	return IsFieldAlreadyTaken("email", email)
 }
 
 func IsWeChatIdAlreadyTaken(wechatId string) bool {
-	return DB.Where("wechat_id = ?", wechatId).Find(&User{}).RowsAffected == 1
+	return IsFieldAlreadyTaken("wechat_id", wechatId)
 }
 
 func IsGitHubIdAlreadyTaken(githubId string) bool {
-	return DB.Where("github_id = ?", githubId).Find(&User{}).RowsAffected == 1
+	return IsFieldAlreadyTaken("github_id", githubId)
 }
 
-func IsLarkIdAlreadyTaken(githubId string) bool {
-	return DB.Where("lark_id = ?", githubId).Find(&User{}).RowsAffected == 1
+func IsGitHubIdNewAlreadyTaken(githubIdNew int) bool {
+	return IsFieldAlreadyTaken("github_id_new", githubIdNew)
+}
+
+func IsLarkIdAlreadyTaken(larkId string) bool {
+	return IsFieldAlreadyTaken("lark_id", larkId)
 }
 
 func IsTelegramIdAlreadyTaken(telegramId int64) bool {
-	return DB.Where("telegram_id = ?", telegramId).Find(&User{}).RowsAffected == 1
+	return IsFieldAlreadyTaken("telegram_id", telegramId)
 }
 
 func ResetUserPasswordByEmail(email string, password string) error {
