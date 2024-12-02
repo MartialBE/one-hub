@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 
+import { useSelector } from 'react-redux';
+
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
 import {
@@ -16,6 +18,7 @@ import {
   Box,
   LinearProgress
 } from '@mui/material';
+import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { IconHeadset } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -53,6 +56,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
 
 const MenuCard = () => {
   const theme = useTheme();
+  const account = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [userData, setUserData] = useState(null);
