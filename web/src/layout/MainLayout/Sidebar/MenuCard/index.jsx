@@ -98,7 +98,7 @@ const MenuCard = () => {
             <ListItemAvatar sx={{ mt: 0 }}>
               <Avatar
                 variant="rounded"
-                src="https://webp-sh.czl.net/r2/2024/03/26/6602ae7c2066b.webp"
+                src={account.user?.avatar_url || User1}
                 sx={{
                   ...theme.typography.commonAvatar,
                   ...theme.typography.largeAvatar,

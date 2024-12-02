@@ -35,6 +35,7 @@ const ProfileSection = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const customization = useSelector((state) => state.customization);
+  const account = useSelector((state) => state.account);
   const { logout } = useLogin();
 
   const [open, setOpen] = useState(false);
@@ -89,7 +90,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src="https://webp-sh.czl.net/r2/2024/03/26/6602ae7c2066b.webp"
+            src={account.user?.avatar_url || User1}
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px !important',

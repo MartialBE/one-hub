@@ -65,6 +65,8 @@ If you find that a new model is missing, please update the newly added model in 
 - Support automatic acquisition of supplier models
 - Support chat only. If there is an incoming `function call` parameter after opening, the channel will be skipped.
 - Support payment
+- Support configuring user group RPM
+- Support `Prometheus` monitoring
 
 ## Documentation
 

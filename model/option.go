@@ -95,6 +95,7 @@ func InitOptionMap() {
 	config.OptionMap["CFWorkerImageUrl"] = config.CFWorkerImageUrl
 	config.OptionMap["CFWorkerImageKey"] = config.CFWorkerImageKey
 	config.OptionMap["OldTokenMaxId"] = strconv.Itoa(config.OldTokenMaxId)
+	config.OptionMap["GitHubOldIdCloseEnabled"] = strconv.FormatBool(config.GitHubOldIdCloseEnabled)
 
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
@@ -166,6 +167,7 @@ var optionBoolMap = map[string]*bool{
 	"DisplayInCurrencyEnabled":       &config.DisplayInCurrencyEnabled,
 	"MjNotifyEnabled":                &config.MjNotifyEnabled,
 	"ChatCacheEnabled":               &config.ChatCacheEnabled,
+	"GitHubOldIdCloseEnabled":        &config.GitHubOldIdCloseEnabled,
 }
 
 var optionStringMap = map[string]*string{
