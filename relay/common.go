@@ -120,6 +120,12 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		filters = append(filters, model.FilterChannelId(skipChannelIds))
 	}
 
+	if types, exists := c.Get("allow_channel_type"); exists {
+		if allowTypes, ok := types.([]int); ok {
+			filters = append(filters, model.FilterChannelTypes(allowTypes))
+		}
+	}
+
 	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)

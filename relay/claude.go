@@ -18,6 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var AllowChannelType = []int{config.ChannelTypeAnthropic, config.ChannelTypeVertexAI}
+
 func RelaycClaudeOnly(c *gin.Context) {
 	request := &claude.ClaudeRequest{}
 
@@ -25,6 +27,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 		common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(err))
 		return
 	}
+	c.Set("allow_channel_type", AllowChannelType)
 
 	cacheProps := relay_util.NewChatCacheProps(c, true)
 	cacheProps.SetHash(request)
