@@ -25,73 +25,49 @@ func shouldEnableChannel(err error, openAIErr *types.OpenAIErrorWithStatusCode) 
 	return true
 }
 
+var containsKeywords = []string{
+	"Your credit balance is too low",                        // claude
+	"This organization has been disabled.",                  // openai
+	"You exceeded your current quota",                       // openai
+	"Permission denied",                                     // gcp
+	"The security token included in the request is invalid", //AWS
+	"Operation not allowed",                                 //AWS
+	"Your account is not authorized",                        //AWS
+}
+
 func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode) bool {
-	if !config.AutomaticDisableChannelEnabled {
+	if !config.AutomaticDisableChannelEnabled || err == nil || err.LocalError {
 		return false
 	}
 
-	if err == nil {
-		return false
-	}
-
-	if err.LocalError {
-		return false
-	}
-
+	// 状态码检查
 	if err.StatusCode == http.StatusUnauthorized {
 		return true
 	}
+	if err.StatusCode == http.StatusForbidden && channelType == config.ChannelTypeGemini {
+		return true
+	}
 
-	if err.StatusCode == http.StatusForbidden {
-		switch channelType {
-		case config.ChannelTypeGemini:
+	// 错误代码检查
+	switch err.OpenAIError.Code {
+	case "invalid_api_key", "account_deactivated", "billing_not_active":
+		return true
+	}
+
+	// 错误类型检查
+	switch err.OpenAIError.Type {
+	case "insufficient_quota", "authentication_error", "permission_error", "forbidden":
+		return true
+	}
+
+	message := err.OpenAIError.Message
+	for _, keyword := range containsKeywords {
+		if strings.Contains(message, keyword) {
 			return true
 		}
 	}
 
-	switch err.OpenAIError.Code {
-	case "invalid_api_key":
-		return true
-	case "account_deactivated":
-		return true
-	case "billing_not_active":
-		return true
-	}
-
-	switch err.Type {
-	case "insufficient_quota":
-		return true
-	// https://docs.anthropic.com/claude/reference/errors
-	case "authentication_error":
-		return true
-	case "permission_error":
-		return true
-	case "forbidden":
-		return true
-	}
-
-	if strings.Contains(err.OpenAIError.Message, "Your credit balance is too low") { // anthropic
-		return true
-	} else if strings.Contains(err.OpenAIError.Message, "This organization has been disabled.") {
-		return true
-	} else if strings.Contains(err.OpenAIError.Message, "You exceeded your current quota") {
-		return true
-	} else if strings.Contains(err.OpenAIError.Message, "Permission denied") {
-		return true
-	}
-
-	if strings.Contains(err.OpenAIError.Message, "credit") {
-		return true
-	}
-	if strings.Contains(err.OpenAIError.Message, "balance") {
-		return true
-	}
-
-	if strings.Contains(err.OpenAIError.Message, "Access denied") {
-		return true
-	}
 	return false
-
 }
 
 // disable & notify

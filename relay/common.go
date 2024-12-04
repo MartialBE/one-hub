@@ -282,47 +282,39 @@ func shouldRetry(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channe
 
 	metrics.RecordProvider(c, apiErr.StatusCode)
 
-	if apiErr.LocalError {
+	if apiErr.LocalError ||
+		(channelId > 0 && !ignore) {
 		return false
 	}
 
-	if channelId > 0 && !ignore {
+	switch apiErr.StatusCode {
+	case http.StatusTooManyRequests, http.StatusTemporaryRedirect:
+		return true
+	case http.StatusRequestTimeout, http.StatusGatewayTimeout, 524:
 		return false
-	}
-
-	if apiErr.StatusCode == http.StatusTooManyRequests {
-		return true
-	}
-
-	if apiErr.StatusCode == 307 {
-		return true
+	case http.StatusBadRequest:
+		return shouldRetryBadRequest(channelType, apiErr)
 	}
 
 	if apiErr.StatusCode/100 == 5 {
-		// 超时不重试
-		if apiErr.StatusCode == 504 || apiErr.StatusCode == 524 {
-			return false
-		}
 		return true
-	}
-
-	if apiErr.StatusCode == http.StatusBadRequest {
-		// 如果是culade 400错误，需要重试
-		if channelType == config.ChannelTypeAnthropic && strings.Contains(apiErr.Message, "This organization has been disabled") {
-			return true
-		}
-		return false
-	}
-
-	if apiErr.StatusCode == 408 {
-		// azure处理超时不重试
-		return false
 	}
 
 	if apiErr.StatusCode/100 == 2 {
 		return false
 	}
 	return true
+}
+
+func shouldRetryBadRequest(channelType int, apiErr *types.OpenAIErrorWithStatusCode) bool {
+	switch channelType {
+	case config.ChannelTypeAnthropic:
+		return strings.Contains(apiErr.OpenAIError.Message, "Your credit balance is too low")
+	case config.ChannelTypeBedrock:
+		return strings.Contains(apiErr.OpenAIError.Message, "Operation not allowed")
+	default:
+		return false
+	}
 }
 
 func processChannelRelayError(ctx context.Context, channelId int, channelName string, err *types.OpenAIErrorWithStatusCode, channelType int) {
