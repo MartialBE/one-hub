@@ -18,7 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AllowChannelType = []int{config.ChannelTypeAnthropic, config.ChannelTypeVertexAI}
+var AllowChannelType = []int{config.ChannelTypeAnthropic, config.ChannelTypeVertexAI, config.ChannelTypeBedrock}
 
 func RelaycClaudeOnly(c *gin.Context) {
 	request := &claude.ClaudeRequest{}

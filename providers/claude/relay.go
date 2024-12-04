@@ -3,6 +3,7 @@ package claude
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"one-api/common"
 	"one-api/common/requester"
 	"one-api/types"
@@ -10,9 +11,12 @@ import (
 )
 
 type ClaudeRelayStreamHandler struct {
-	Usage     *types.Usage
-	ModelName string
-	Prefix    string
+	Usage      *types.Usage
+	ModelName  string
+	Prefix     string
+	StartUsage *Usage
+
+	AddEvent bool
 }
 
 func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeResponse, *ClaudeErrorWithStatusCode) {
@@ -75,6 +79,10 @@ func (h *ClaudeRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		return
 	}
 
+	if h.AddEvent {
+		rawStr = fmt.Sprintf("data: %s\n", rawStr)
+	}
+
 	noSpaceLine := bytes.TrimSpace(*rawLine)
 	if strings.HasPrefix(string(noSpaceLine), "data: ") {
 		// 去除前缀
@@ -89,20 +97,35 @@ func (h *ClaudeRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 	}
 
 	if claudeResponse.Error != nil {
+		if h.AddEvent {
+			event := "event: error\n"
+			dataChan <- event
+		}
+
 		errChan <- claudeResponse.Error
 		return
 	}
 
+	if h.AddEvent {
+		event := fmt.Sprintf("event: %s\n", claudeResponse.Type)
+		dataChan <- event
+	}
+
 	switch claudeResponse.Type {
 	case "message_start":
-		h.Usage.PromptTokens = claudeResponse.Message.Usage.InputTokens
+		ClaudeUsageToOpenaiUsage(&claudeResponse.Message.Usage, h.Usage)
+		h.StartUsage = &claudeResponse.Message.Usage
 	case "message_delta":
-		h.Usage.CompletionTokens = claudeResponse.Usage.OutputTokens
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		ClaudeUsageToOpenaiUsage(&claudeResponse.Usage, h.Usage)
 	case "content_block_delta":
 		h.Usage.CompletionTokens += common.CountTokenText(claudeResponse.Delta.Text, h.ModelName)
 		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 
 	dataChan <- rawStr
+
+	if h.AddEvent {
+		event := "\n"
+		dataChan <- event
+	}
 }

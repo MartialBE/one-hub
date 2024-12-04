@@ -10,7 +10,7 @@ import (
 	"one-api/types"
 )
 
-const anthropicVersion = "bedrock-2023-05-31"
+const AnthropicVersion = "bedrock-2023-05-31"
 
 type ClaudeRequest struct {
 	*claude.ClaudeRequest
@@ -33,7 +33,7 @@ func ConvertClaudeFromChatOpenai(request *types.ChatCompletionRequest) (any, *ty
 
 	claudeRequest := &ClaudeRequest{}
 	claudeRequest.ClaudeRequest = rawRequest
-	claudeRequest.AnthropicVersion = anthropicVersion
+	claudeRequest.AnthropicVersion = AnthropicVersion
 
 	// 删除model字段
 	claudeRequest.Model = ""
