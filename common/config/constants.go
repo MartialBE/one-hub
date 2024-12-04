@@ -46,10 +46,6 @@ var TurnstileCheckEnabled = false
 var RegisterEnabled = true
 var OIDCAuthEnabled = false
 
-// chat cache
-var ChatCacheEnabled = false
-var ChatCacheExpireMinute = 5 // 5 Minute
-
 // mj
 var MjNotifyEnabled = false
 

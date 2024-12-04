@@ -83,9 +83,6 @@ func InitOptionMap() {
 
 	config.OptionMap["MjNotifyEnabled"] = strconv.FormatBool(config.MjNotifyEnabled)
 
-	config.OptionMap["ChatCacheEnabled"] = strconv.FormatBool(config.ChatCacheEnabled)
-	config.OptionMap["ChatCacheExpireMinute"] = strconv.Itoa(config.ChatCacheExpireMinute)
-
 	config.OptionMap["ChatImageRequestProxy"] = ""
 
 	config.OptionMap["PaymentUSDRate"] = strconv.FormatFloat(config.PaymentUSDRate, 'f', -1, 64)
@@ -136,17 +133,16 @@ func UpdateOption(key string, value string) error {
 }
 
 var optionIntMap = map[string]*int{
-	"SMTPPort":              &config.SMTPPort,
-	"QuotaForNewUser":       &config.QuotaForNewUser,
-	"QuotaForInviter":       &config.QuotaForInviter,
-	"QuotaForInvitee":       &config.QuotaForInvitee,
-	"QuotaRemindThreshold":  &config.QuotaRemindThreshold,
-	"PreConsumedQuota":      &config.PreConsumedQuota,
-	"RetryTimes":            &config.RetryTimes,
-	"RetryCooldownSeconds":  &config.RetryCooldownSeconds,
-	"ChatCacheExpireMinute": &config.ChatCacheExpireMinute,
-	"PaymentMinAmount":      &config.PaymentMinAmount,
-	"OldTokenMaxId":         &config.OldTokenMaxId,
+	"SMTPPort":             &config.SMTPPort,
+	"QuotaForNewUser":      &config.QuotaForNewUser,
+	"QuotaForInviter":      &config.QuotaForInviter,
+	"QuotaForInvitee":      &config.QuotaForInvitee,
+	"QuotaRemindThreshold": &config.QuotaRemindThreshold,
+	"PreConsumedQuota":     &config.PreConsumedQuota,
+	"RetryTimes":           &config.RetryTimes,
+	"RetryCooldownSeconds": &config.RetryCooldownSeconds,
+	"PaymentMinAmount":     &config.PaymentMinAmount,
+	"OldTokenMaxId":        &config.OldTokenMaxId,
 }
 
 var optionBoolMap = map[string]*bool{
@@ -166,7 +162,6 @@ var optionBoolMap = map[string]*bool{
 	"LogConsumeEnabled":              &config.LogConsumeEnabled,
 	"DisplayInCurrencyEnabled":       &config.DisplayInCurrencyEnabled,
 	"MjNotifyEnabled":                &config.MjNotifyEnabled,
-	"ChatCacheEnabled":               &config.ChatCacheEnabled,
 	"GitHubOldIdCloseEnabled":        &config.GitHubOldIdCloseEnabled,
 }
 

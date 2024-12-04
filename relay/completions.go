@@ -77,7 +77,7 @@ func (r *relayCompletions) send() (err *types.OpenAIErrorWithStatusCode, done bo
 			return r.getUsageResponse()
 		}
 
-		err = responseStreamClient(r.c, response, r.cache, doneStr)
+		err = responseStreamClient(r.c, response, doneStr)
 	} else {
 		var response *types.CompletionResponse
 		response, err = provider.CreateCompletion(&r.request)
@@ -85,7 +85,6 @@ func (r *relayCompletions) send() (err *types.OpenAIErrorWithStatusCode, done bo
 			return
 		}
 		err = responseJsonClient(r.c, response)
-		r.cache.SetResponse(response)
 	}
 
 	if err != nil {

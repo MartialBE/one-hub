@@ -34,7 +34,6 @@ type Token struct {
 	RemainQuota    int            `json:"remain_quota" gorm:"default:0"`
 	UnlimitedQuota bool           `json:"unlimited_quota" gorm:"default:false"`
 	UsedQuota      int            `json:"used_quota" gorm:"default:0"` // used quota
-	ChatCache      bool           `json:"chat_cache" gorm:"default:false"`
 	Group          string         `json:"group" gorm:"default:''"`
 	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
 }
@@ -197,21 +196,13 @@ func GetTokenByKey(key string) (*Token, error) {
 }
 
 func (token *Token) Insert() error {
-	if token.ChatCache && !config.ChatCacheEnabled {
-		token.ChatCache = false
-	}
-
 	err := DB.Create(token).Error
 	return err
 }
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
 func (token *Token) Update() error {
-	if token.ChatCache && !config.ChatCacheEnabled {
-		token.ChatCache = false
-	}
-
-	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "chat_cache", "group").Updates(token).Error
+	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "group").Updates(token).Error
 	// 防止Redis缓存不生效，直接删除
 	if err == nil && config.RedisEnabled {
 		redis.RedisDel(fmt.Sprintf(UserTokensKey, token.Key))

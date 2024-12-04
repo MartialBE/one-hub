@@ -612,11 +612,6 @@
           "label": "Cloudflare Worker Image Proxy"
         },
         "alert": "When users use the vision model and provide an image link, our server needs to download these images and calculate tokens. To protect the server's IP address from being exposed when downloading images, you can configure a proxy below. This proxy configuration uses HTTP or SOCKS5 proxy. If you are an individual user, you can ignore this configuration. The proxy format is http://127.0.0.1:1080 or socks5://127.0.0.1:1080",
-        "chatCache": "Enable chat cache (if Redis is not enabled, it will be stored in the database)",
-        "chatCacheExpireMinute": {
-          "label": "Cache Expiry Time (minutes)",
-          "placeholder": "Cache expiry time when caching is enabled"
-        },
         "chatImageRequestProxy": {
           "label": "Image Detection Proxy",
           "placeholder": "Chat image detection proxy settings, may leak server IP if not set"

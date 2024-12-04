@@ -51,17 +51,6 @@ func RelaycGeminiOnly(c *gin.Context) {
 
 	c.Set("allow_channel_type", AllowGeminiChannelType)
 
-	cacheProps := relay_util.NewChatCacheProps(c, true)
-	cacheProps.SetHash(request)
-
-	cache := cacheProps.GetCache()
-
-	if cache != nil {
-		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache, request.Stream)
-		return
-	}
-
 	chatProvider, modelName, fail := GetGeminiChatInterface(c, request.Model)
 	if fail != nil {
 		common.AbortWithErr(c, http.StatusServiceUnavailable, fail)
@@ -80,7 +69,7 @@ func RelaycGeminiOnly(c *gin.Context) {
 		return
 	}
 
-	errWithCode, done := RelayGeminiHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+	errWithCode, done := RelayGeminiHandler(c, promptTokens, chatProvider, request, originalModel)
 
 	if errWithCode == nil {
 		metrics.RecordProvider(c, 200)
@@ -117,7 +106,7 @@ func RelaycGeminiOnly(c *gin.Context) {
 			}
 		}
 
-		errWithCode, done = RelayGeminiHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+		errWithCode, done = RelayGeminiHandler(c, promptTokens, chatProvider, request, originalModel)
 		if errWithCode == nil {
 			metrics.RecordProvider(c, 200)
 			return
@@ -138,7 +127,7 @@ func RelaycGeminiOnly(c *gin.Context) {
 	}
 }
 
-func RelayGeminiHandler(c *gin.Context, promptTokens int, chatProvider gemini.GeminiChatInterface, cache *relay_util.ChatCacheProps, request *gemini.GeminiChatRequest, originalModel string) (errWithCode *gemini.GeminiErrorWithStatusCode, done bool) {
+func RelayGeminiHandler(c *gin.Context, promptTokens int, chatProvider gemini.GeminiChatInterface, request *gemini.GeminiChatRequest, originalModel string) (errWithCode *gemini.GeminiErrorWithStatusCode, done bool) {
 
 	usage := &types.Usage{
 		PromptTokens: promptTokens,
@@ -150,7 +139,7 @@ func RelayGeminiHandler(c *gin.Context, promptTokens int, chatProvider gemini.Ge
 		return gemini.OpenaiErrToGeminiErr(err), true
 	}
 
-	errWithCode, done = SendGemini(c, chatProvider, cache, request)
+	errWithCode, done = SendGemini(c, chatProvider, request)
 
 	if errWithCode != nil {
 		quota.Undo(c)
@@ -158,14 +147,11 @@ func RelayGeminiHandler(c *gin.Context, promptTokens int, chatProvider gemini.Ge
 	}
 
 	quota.Consume(c, usage, request.Stream)
-	if usage.CompletionTokens > 0 {
-		go cache.StoreCache(c.GetInt("channel_id"), usage.PromptTokens, usage.CompletionTokens, originalModel)
-	}
 
 	return
 }
 
-func SendGemini(c *gin.Context, chatProvider gemini.GeminiChatInterface, cache *relay_util.ChatCacheProps, request *gemini.GeminiChatRequest) (errWithCode *gemini.GeminiErrorWithStatusCode, done bool) {
+func SendGemini(c *gin.Context, chatProvider gemini.GeminiChatInterface, request *gemini.GeminiChatRequest) (errWithCode *gemini.GeminiErrorWithStatusCode, done bool) {
 	if request.Stream {
 		var response requester.StreamReaderInterface[string]
 		response, errWithCode = chatProvider.CreateGeminiChatStream(request)
@@ -176,7 +162,7 @@ func SendGemini(c *gin.Context, chatProvider gemini.GeminiChatInterface, cache *
 		doneStr := func() string {
 			return ""
 		}
-		responseGeneralStreamClient(c, response, cache, doneStr)
+		responseGeneralStreamClient(c, response, doneStr)
 	} else {
 		var response *gemini.GeminiChatResponse
 		response, errWithCode = chatProvider.CreateGeminiChat(request)
@@ -185,9 +171,6 @@ func SendGemini(c *gin.Context, chatProvider gemini.GeminiChatInterface, cache *
 		}
 
 		openErr := responseJsonClient(c, response)
-		if openErr == nil && len(response.Candidates) > 0 {
-			cache.SetResponse(response)
-		}
 
 		if openErr != nil {
 			errWithCode = gemini.OpenaiErrToGeminiErr(openErr)

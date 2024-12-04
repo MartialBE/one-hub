@@ -18,6 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var AllowChannelType = []int{config.ChannelTypeAnthropic, config.ChannelTypeVertexAI, config.ChannelTypeBedrock}
+
 func RelaycClaudeOnly(c *gin.Context) {
 	request := &claude.ClaudeRequest{}
 
@@ -25,17 +27,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 		common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(err))
 		return
 	}
-
-	cacheProps := relay_util.NewChatCacheProps(c, true)
-	cacheProps.SetHash(request)
-
-	cache := cacheProps.GetCache()
-
-	if cache != nil {
-		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache, request.Stream)
-		return
-	}
+	c.Set("allow_channel_type", AllowChannelType)
 
 	chatProvider, modelName, fail := GetClaudeChatInterface(c, request.Model)
 	if fail != nil {
@@ -55,7 +47,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 		return
 	}
 
-	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, request, originalModel)
 
 	if errWithCode == nil {
 		metrics.RecordProvider(c, 200)
@@ -92,7 +84,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 			}
 		}
 
-		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, request, originalModel)
 		if errWithCode == nil {
 			metrics.RecordProvider(c, 200)
 			return
@@ -113,7 +105,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 	}
 }
 
-func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.ClaudeChatInterface, cache *relay_util.ChatCacheProps, request *claude.ClaudeRequest, originalModel string) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
+func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.ClaudeChatInterface, request *claude.ClaudeRequest, originalModel string) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
 
 	usage := &types.Usage{
 		PromptTokens: promptTokens,
@@ -125,7 +117,7 @@ func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.Cl
 		return claude.OpenaiErrToClaudeErr(err), true
 	}
 
-	errWithCode, done = SendClaude(c, chatProvider, cache, request)
+	errWithCode, done = SendClaude(c, chatProvider, request)
 
 	if errWithCode != nil {
 		quota.Undo(c)
@@ -133,14 +125,11 @@ func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.Cl
 	}
 
 	quota.Consume(c, usage, request.Stream)
-	if usage.CompletionTokens > 0 {
-		go cache.StoreCache(c.GetInt("channel_id"), usage.PromptTokens, usage.CompletionTokens, originalModel)
-	}
 
 	return
 }
 
-func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, cache *relay_util.ChatCacheProps, request *claude.ClaudeRequest) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
+func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, request *claude.ClaudeRequest) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
 	if request.Stream {
 		var response requester.StreamReaderInterface[string]
 		response, errWithCode = chatProvider.CreateClaudeChatStream(request)
@@ -151,7 +140,7 @@ func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, cache *
 		doneStr := func() string {
 			return ""
 		}
-		responseGeneralStreamClient(c, response, cache, doneStr)
+		responseGeneralStreamClient(c, response, doneStr)
 	} else {
 		var response *claude.ClaudeResponse
 		response, errWithCode = chatProvider.CreateClaudeChat(request)
@@ -160,9 +149,6 @@ func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, cache *
 		}
 
 		openErr := responseJsonClient(c, response)
-		if openErr == nil && len(response.Content) > 0 {
-			cache.SetResponse(response)
-		}
 
 		if openErr != nil {
 			errWithCode = claude.OpenaiErrToClaudeErr(openErr)

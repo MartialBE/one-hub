@@ -34,6 +34,12 @@ func FilterChannelId(skipChannelIds []int) ChannelsFilterFunc {
 	}
 }
 
+func FilterChannelTypes(channelTypes []int) ChannelsFilterFunc {
+	return func(_ int, choice *ChannelChoice) bool {
+		return !utils.Contains(choice.Channel.Type, channelTypes)
+	}
+}
+
 func FilterOnlyChat() ChannelsFilterFunc {
 	return func(channelId int, choice *ChannelChoice) bool {
 		return choice.Channel.OnlyChat

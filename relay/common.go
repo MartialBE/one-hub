@@ -17,7 +17,6 @@ import (
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
-	"one-api/relay/relay_util"
 	"one-api/types"
 	"regexp"
 	"strings"
@@ -26,13 +25,10 @@ import (
 )
 
 func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
-	allowCache := false
 	var relay RelayBaseInterface
 	if strings.HasPrefix(path, "/v1/chat/completions") {
-		allowCache = true
 		relay = NewRelayChat(c)
 	} else if strings.HasPrefix(path, "/v1/completions") {
-		allowCache = true
 		relay = NewRelayCompletions(c)
 	} else if strings.HasPrefix(path, "/v1/embeddings") {
 		relay = NewRelayEmbeddings(c)
@@ -50,10 +46,6 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 		relay = NewRelayTranscriptions(c)
 	} else if strings.HasPrefix(path, "/v1/audio/translations") {
 		relay = NewRelayTranslations(c)
-	}
-
-	if relay != nil {
-		relay.SetChatCache(allowCache)
 	}
 
 	return relay
@@ -120,6 +112,12 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		filters = append(filters, model.FilterChannelId(skipChannelIds))
 	}
 
+	if types, exists := c.Get("allow_channel_type"); exists {
+		if allowTypes, ok := types.([]int); ok {
+			filters = append(filters, model.FilterChannelTypes(allowTypes))
+		}
+	}
+
 	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
@@ -152,74 +150,155 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 
 type StreamEndHandler func() string
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
+	// 创建一个done channel用于通知处理完成
+	done := make(chan struct{})
+	var finalErr *types.OpenAIErrorWithStatusCode
+
 	defer stream.Close()
-	c.Stream(func(w io.Writer) bool {
-		select {
-		case data := <-dataChan:
-			streamData := "data: " + data + "\n\n"
-			fmt.Fprint(w, streamData)
-			cache.SetResponse(streamData)
-			return true
-		case err := <-errChan:
-			if !errors.Is(err, io.EOF) {
-				fmt.Fprint(w, "data: "+err.Error()+"\n\n")
-				errWithOP = common.ErrorWrapper(err, "stream_error", http.StatusInternalServerError)
-				// 报错不应该缓存
-				cache.NoCache()
-			}
 
-			if errWithOP == nil && endHandler != nil {
-				streamData := endHandler()
-				if streamData != "" {
-					fmt.Fprint(w, "data: "+streamData+"\n\n")
-					cache.SetResponse(streamData)
+	// 在新的goroutine中处理stream数据
+	go func() {
+		defer close(done)
+
+		for {
+			select {
+			case data, ok := <-dataChan:
+				if !ok {
+					return
 				}
+				streamData := "data: " + data + "\n\n"
+
+				// 尝试写入数据，如果客户端断开也继续处理
+				select {
+				case <-c.Request.Context().Done():
+					// 客户端已断开，不执行任何操作，直接跳过
+				default:
+					// 客户端正常，发送数据
+					c.Writer.Write([]byte(streamData))
+					c.Writer.Flush()
+				}
+
+			case err := <-errChan:
+				if !errors.Is(err, io.EOF) {
+					// 处理错误情况
+					errMsg := "data: " + err.Error() + "\n\n"
+					select {
+					case <-c.Request.Context().Done():
+						// 客户端已断开，不执行任何操作，直接跳过
+					default:
+						// 客户端正常，发送错误信息
+						c.Writer.Write([]byte(errMsg))
+						c.Writer.Flush()
+					}
+
+					finalErr = common.StringErrorWrapper(err.Error(), "stream_error", 900)
+					logger.LogError(c.Request.Context(), "Stream err:"+err.Error())
+				} else {
+					// 正常结束，处理endHandler
+					if finalErr == nil && endHandler != nil {
+						streamData := endHandler()
+						if streamData != "" {
+							select {
+							case <-c.Request.Context().Done():
+								// 客户端已断开，不执行任何操作，直接跳过
+							default:
+								// 客户端正常，发送数据
+								c.Writer.Write([]byte("data: " + streamData + "\n\n"))
+								c.Writer.Flush()
+							}
+						}
+					}
+
+					// 发送结束标记
+					streamData := "data: [DONE]\n\n"
+					select {
+					case <-c.Request.Context().Done():
+						// 客户端已断开，不执行任何操作，直接跳过
+					default:
+						c.Writer.Write([]byte(streamData))
+						c.Writer.Flush()
+					}
+				}
+				return
 			}
-
-			streamData := "data: [DONE]\n\n"
-			fmt.Fprint(w, streamData)
-			cache.SetResponse(streamData)
-			return false
 		}
-	})
+	}()
 
+	// 等待处理完成
+	<-done
 	return nil
 }
 
-func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) {
+func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
+	// 创建一个done channel用于通知处理完成
+	done := make(chan struct{})
+	// var finalErr *types.OpenAIErrorWithStatusCode
+
 	defer stream.Close()
-	c.Stream(func(w io.Writer) bool {
-		select {
-		case data := <-dataChan:
-			fmt.Fprint(w, data)
-			cache.SetResponse(data)
-			return true
-		case err := <-errChan:
-			if !errors.Is(err, io.EOF) {
-				fmt.Fprint(w, err.Error())
-				logger.LogError(c.Request.Context(), "Stream err:"+err.Error())
-				// 报错不应该缓存
-				cache.NoCache()
-			}
 
-			if endHandler != nil {
-				streamData := endHandler()
-				if streamData != "" {
-					fmt.Fprint(w, streamData)
-					cache.SetResponse(streamData)
+	// 在新的goroutine中处理stream数据
+	go func() {
+		defer close(done)
+
+		for {
+			select {
+			case data, ok := <-dataChan:
+				if !ok {
+					return
 				}
-			}
-			return false
-		}
-	})
+				// 尝试写入数据，如果客户端断开也继续处理
+				select {
+				case <-c.Request.Context().Done():
+					// 客户端已断开，不执行任何操作，直接跳过
+				default:
+					// 客户端正常，发送数据
+					fmt.Fprint(c.Writer, data)
+					c.Writer.Flush()
+				}
 
+			case err := <-errChan:
+				if !errors.Is(err, io.EOF) {
+					// 处理错误情况
+					select {
+					case <-c.Request.Context().Done():
+						// 客户端已断开，不执行任何操作，直接跳过
+					default:
+						// 客户端正常，发送错误信息
+						fmt.Fprint(c.Writer, err.Error())
+						c.Writer.Flush()
+					}
+
+					logger.LogError(c.Request.Context(), "Stream err:"+err.Error())
+				} else {
+					// 正常结束，处理endHandler
+					if endHandler != nil {
+						streamData := endHandler()
+						if streamData != "" {
+							select {
+							case <-c.Request.Context().Done():
+								// 客户端已断开，只记录数据
+							default:
+								// 客户端正常，发送数据
+								fmt.Fprint(c.Writer, streamData)
+								c.Writer.Flush()
+							}
+						}
+					}
+				}
+				return
+			}
+		}
+	}()
+
+	// 等待处理完成
+	<-done
 }
 
 func responseMultipart(c *gin.Context, resp *http.Response) *types.OpenAIErrorWithStatusCode {
@@ -276,47 +355,39 @@ func shouldRetry(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channe
 
 	metrics.RecordProvider(c, apiErr.StatusCode)
 
-	if apiErr.LocalError {
+	if apiErr.LocalError ||
+		(channelId > 0 && !ignore) {
 		return false
 	}
 
-	if channelId > 0 && !ignore {
+	switch apiErr.StatusCode {
+	case http.StatusTooManyRequests, http.StatusTemporaryRedirect:
+		return true
+	case http.StatusRequestTimeout, http.StatusGatewayTimeout, 524:
 		return false
-	}
-
-	if apiErr.StatusCode == http.StatusTooManyRequests {
-		return true
-	}
-
-	if apiErr.StatusCode == 307 {
-		return true
+	case http.StatusBadRequest:
+		return shouldRetryBadRequest(channelType, apiErr)
 	}
 
 	if apiErr.StatusCode/100 == 5 {
-		// 超时不重试
-		if apiErr.StatusCode == 504 || apiErr.StatusCode == 524 {
-			return false
-		}
 		return true
-	}
-
-	if apiErr.StatusCode == http.StatusBadRequest {
-		// 如果是culade 400错误，需要重试
-		if channelType == config.ChannelTypeAnthropic && strings.Contains(apiErr.Message, "This organization has been disabled") {
-			return true
-		}
-		return false
-	}
-
-	if apiErr.StatusCode == 408 {
-		// azure处理超时不重试
-		return false
 	}
 
 	if apiErr.StatusCode/100 == 2 {
 		return false
 	}
 	return true
+}
+
+func shouldRetryBadRequest(channelType int, apiErr *types.OpenAIErrorWithStatusCode) bool {
+	switch channelType {
+	case config.ChannelTypeAnthropic:
+		return strings.Contains(apiErr.OpenAIError.Message, "Your credit balance is too low")
+	case config.ChannelTypeBedrock:
+		return strings.Contains(apiErr.OpenAIError.Message, "Operation not allowed")
+	default:
+		return false
+	}
 }
 
 func processChannelRelayError(ctx context.Context, channelId int, channelName string, err *types.OpenAIErrorWithStatusCode, channelType int) {

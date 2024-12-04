@@ -14,22 +14,9 @@ import (
 
 func RelayRerank(c *gin.Context) {
 	relay := NewRelayRerank(c)
-	relay.SetChatCache(true)
 
 	if err := relay.setRequest(); err != nil {
 		common.AbortWithErr(c, http.StatusBadRequest, &types.RerankError{Detail: err.Error()})
-		return
-	}
-
-	cacheProps := relay.GetChatCache()
-	cacheProps.SetHash(relay.getRequest())
-
-	// 获取缓存
-	cache := cacheProps.GetCache()
-
-	if cache != nil {
-		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache, relay.IsStream())
 		return
 	}
 
@@ -121,10 +108,6 @@ func (r *relayRerank) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 		return
 	}
 	err = responseJsonClient(r.c, response)
-
-	if err == nil {
-		r.cache.SetResponse(response)
-	}
 
 	if err != nil {
 		done = true

@@ -505,11 +505,6 @@
       "otherSettings": {
         "title": "其他设置",
         "mjNotify": "Midjourney 允许回调（会泄露服务器ip地址）",
-        "chatCache": "是否开启聊天缓存(如果没有启用Redis，将会存储在数据库中)",
-        "chatCacheExpireMinute": {
-          "label": "缓存时间(分钟)",
-          "placeholder": "开启缓存时，数据缓存的时间"
-        },
         "alert": "当用户使用vision模型并提供了图片链接时，我们的服务器需要下载这些图片并计算 tokens。为了在下载图片时保护服务器的 IP 地址不被泄露，可以在下方配置一个代理。这个代理配置使用的是 HTTP 或 SOCKS5 代理。如果你是个人用户，这个配置可以不用理会。代理格式为 http://127.0.0.1:1080 或 socks5://127.0.0.1:1080",
         "chatImageRequestProxy": {
           "label": "图片检测代理",
