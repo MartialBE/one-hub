@@ -34,8 +34,6 @@ const OperationSetting = () => {
     RetryTimes: 0,
     RetryCooldownSeconds: 0,
     MjNotifyEnabled: '',
-    ChatCacheEnabled: '',
-    ChatCacheExpireMinute: 5,
     ChatImageRequestProxy: '',
     PaymentUSDRate: 0,
     PaymentMinAmount: 1,
@@ -167,9 +165,6 @@ const OperationSetting = () => {
         }
         break;
       case 'other':
-        if (originInputs['ChatCacheExpireMinute'] !== inputs.ChatCacheExpireMinute) {
-          await updateOption('ChatCacheExpireMinute', inputs.ChatCacheExpireMinute);
-        }
         if (originInputs['ChatImageRequestProxy'] !== inputs.ChatImageRequestProxy) {
           await updateOption('ChatImageRequestProxy', inputs.ChatImageRequestProxy);
         }
@@ -333,27 +328,6 @@ const OperationSetting = () => {
               label={t('setting_index.operationSettings.otherSettings.mjNotify')}
               control={<Checkbox checked={inputs.MjNotifyEnabled === 'true'} onChange={handleInputChange} name="MjNotifyEnabled" />}
             />
-            <FormControlLabel
-              sx={{ marginLeft: '0px' }}
-              label={t('setting_index.operationSettings.otherSettings.chatCache')}
-              control={<Checkbox checked={inputs.ChatCacheEnabled === 'true'} onChange={handleInputChange} name="ChatCacheEnabled" />}
-            />
-          </Stack>
-          <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>
-            <FormControl>
-              <InputLabel htmlFor="ChatCacheExpireMinute">
-                {t('setting_index.operationSettings.otherSettings.chatCacheExpireMinute.label')}
-              </InputLabel>
-              <OutlinedInput
-                id="ChatCacheExpireMinute"
-                name="ChatCacheExpireMinute"
-                value={inputs.ChatCacheExpireMinute}
-                onChange={handleInputChange}
-                label={t('setting_index.operationSettings.otherSettings.chatCacheExpireMinute.label')}
-                placeholder={t('setting_index.operationSettings.otherSettings.chatCacheExpireMinute.placeholder')}
-                disabled={loading}
-              />
-            </FormControl>
           </Stack>
           <Stack spacing={2}>
             <Alert severity="info">{t('setting_index.operationSettings.otherSettings.alert')}</Alert>

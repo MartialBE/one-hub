@@ -28,7 +28,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { renderQuotaWithPrompt, showSuccess, showError } from 'utils/common';
 import { API } from 'utils/api';
-import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import 'dayjs/locale/zh-cn';
 
@@ -46,7 +45,6 @@ const originInputs = {
   remain_quota: 0,
   expired_time: -1,
   unlimited_quota: false,
-  chat_cache: false,
   group: ''
 };
 
@@ -54,7 +52,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
-  const siteInfo = useSelector((state) => state.siteInfo);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -221,19 +218,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   }
                   label={t('token_index.unlimitedQuota')}
                 />
-                {siteInfo.chat_cache_enabled && (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={values.chat_cache}
-                        onClick={() => {
-                          setFieldValue('chat_cache', !values.chat_cache);
-                        }}
-                      />
-                    }
-                    label={t('token_index.enableCache')}
-                  />
-                )}
               </FormControl>
               <FormControl fullWidth>
                 <InputLabel>{t('token_index.userGroup')}</InputLabel>

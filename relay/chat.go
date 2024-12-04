@@ -87,7 +87,7 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 			return r.getUsageResponse()
 		}
 
-		err = responseStreamClient(r.c, response, r.cache, doneStr)
+		err = responseStreamClient(r.c, response, doneStr)
 	} else {
 		var response *types.ChatCompletionResponse
 		response, err = chatProvider.CreateChatCompletion(&r.chatRequest)
@@ -96,9 +96,6 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 		}
 		err = responseJsonClient(r.c, response)
 
-		if err == nil && response.GetContent() != "" {
-			r.cache.SetResponse(response)
-		}
 	}
 
 	if err != nil {

@@ -17,7 +17,6 @@ import (
 	"one-api/model"
 	"one-api/providers"
 	providersBase "one-api/providers/base"
-	"one-api/relay/relay_util"
 	"one-api/types"
 	"regexp"
 	"strings"
@@ -26,13 +25,10 @@ import (
 )
 
 func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
-	allowCache := false
 	var relay RelayBaseInterface
 	if strings.HasPrefix(path, "/v1/chat/completions") {
-		allowCache = true
 		relay = NewRelayChat(c)
 	} else if strings.HasPrefix(path, "/v1/completions") {
-		allowCache = true
 		relay = NewRelayCompletions(c)
 	} else if strings.HasPrefix(path, "/v1/embeddings") {
 		relay = NewRelayEmbeddings(c)
@@ -50,10 +46,6 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 		relay = NewRelayTranscriptions(c)
 	} else if strings.HasPrefix(path, "/v1/audio/translations") {
 		relay = NewRelayTranslations(c)
-	}
-
-	if relay != nil {
-		relay.SetChatCache(allowCache)
 	}
 
 	return relay
@@ -158,7 +150,7 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 
 type StreamEndHandler func() string
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -168,27 +160,22 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 		case data := <-dataChan:
 			streamData := "data: " + data + "\n\n"
 			fmt.Fprint(w, streamData)
-			cache.SetResponse(streamData)
 			return true
 		case err := <-errChan:
 			if !errors.Is(err, io.EOF) {
 				fmt.Fprint(w, "data: "+err.Error()+"\n\n")
 				errWithOP = common.ErrorWrapper(err, "stream_error", http.StatusInternalServerError)
-				// 报错不应该缓存
-				cache.NoCache()
 			}
 
 			if errWithOP == nil && endHandler != nil {
 				streamData := endHandler()
 				if streamData != "" {
 					fmt.Fprint(w, "data: "+streamData+"\n\n")
-					cache.SetResponse(streamData)
 				}
 			}
 
 			streamData := "data: [DONE]\n\n"
 			fmt.Fprint(w, streamData)
-			cache.SetResponse(streamData)
 			return false
 		}
 	})
@@ -196,7 +183,7 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 	return nil
 }
 
-func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], cache *relay_util.ChatCacheProps, endHandler StreamEndHandler) {
+func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -205,21 +192,17 @@ func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderIn
 		select {
 		case data := <-dataChan:
 			fmt.Fprint(w, data)
-			cache.SetResponse(data)
 			return true
 		case err := <-errChan:
 			if !errors.Is(err, io.EOF) {
 				fmt.Fprint(w, err.Error())
 				logger.LogError(c.Request.Context(), "Stream err:"+err.Error())
-				// 报错不应该缓存
-				cache.NoCache()
 			}
 
 			if endHandler != nil {
 				streamData := endHandler()
 				if streamData != "" {
 					fmt.Fprint(w, streamData)
-					cache.SetResponse(streamData)
 				}
 			}
 			return false

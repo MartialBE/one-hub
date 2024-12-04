@@ -608,11 +608,6 @@
           "label": "Cloudflare Worker 圖片代理"
         },
         "alert": "當用戶使用 vision 模型並提供了圖片鏈接時，我們的伺服器需要下載這些圖片並計算 tokens。為了在下載圖片時保護伺服器的 IP 地址不被洩露，可以在下方配置一個代理。這個代理配置使用的是 HTTP 或 SOCKS5 代理。如果你是個人用戶，這個配置可以不用理會。代理格式為 http://127.0.0.1:1080 或 socks5://127.0.0.1:1080",
-        "chatCache": "是否開啟聊天緩存(如果沒有啟用 Redis，將會存儲在數據庫中)",
-        "chatCacheExpireMinute": {
-          "label": "緩存時間(分鐘)",
-          "placeholder": "開啟緩存時，數據緩存的時間"
-        },
         "chatImageRequestProxy": {
           "label": "圖片檢測代理",
           "placeholder": "聊天圖片檢測代理設置，如果不設置可能會洩漏伺服器 IP"

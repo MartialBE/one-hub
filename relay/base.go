@@ -1,7 +1,6 @@
 package relay
 
 import (
-	"one-api/relay/relay_util"
 	"one-api/types"
 
 	providersBase "one-api/providers/base"
@@ -14,7 +13,6 @@ type relayBase struct {
 	provider      providersBase.ProviderInterface
 	originalModel string
 	modelName     string
-	cache         *relay_util.ChatCacheProps
 }
 
 type RelayBaseInterface interface {
@@ -27,17 +25,7 @@ type RelayBaseInterface interface {
 	getOriginalModel() string
 	getModelName() string
 	getContext() *gin.Context
-	SetChatCache(allow bool)
-	GetChatCache() *relay_util.ChatCacheProps
 	IsStream() bool
-}
-
-func (r *relayBase) SetChatCache(allow bool) {
-	r.cache = relay_util.NewChatCacheProps(r.c, allow)
-}
-
-func (r *relayBase) GetChatCache() *relay_util.ChatCacheProps {
-	return r.cache
 }
 
 func (r *relayBase) getRequest() interface{} {
