@@ -88,7 +88,9 @@
     "addModelHeader": "Add Custom Header",
     "addModelMappingByJson": "Add model mapping (JSON)",
     "invalidJson": "Invalid JSON",
-    "jsonInputLabel": "JSON object, where the key is the request model and the value is the actual forwarding model."
+    "jsonInputLabel": "JSON object, where the key is the request model and the value is the actual forwarding model.",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
