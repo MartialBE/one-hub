@@ -87,7 +87,9 @@
     "requiredKey": "密鑰 不能為空",
     "requiredModels": "模型 不能為空",
     "requiredName": "名稱 不能為空",
-    "validJson": "必須是有效的JSON字符串"
+    "validJson": "必須是有效的JSON字符串",
+    "collapse": "收起",
+    "expand": "展開"
   },
   "channel_index": {
     "AzureApiVersion": "Azure 版本號",

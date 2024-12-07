@@ -159,7 +159,9 @@
     "invalidJson": "无效的JSON",
     "modelHeaderKey": "自定义Header Key",
     "modelHeaderValue": "自定义Header Value",
-    "addModelHeader": "添加自定义Header"
+    "addModelHeader": "添加自定义Header",
+    "collapse": "收起",
+    "expand": "展开"
   },
   "token_index": {
     "token": "令牌",

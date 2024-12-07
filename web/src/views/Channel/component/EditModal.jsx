@@ -26,9 +26,13 @@ import {
   FormControlLabel,
   Typography,
   Tooltip,
+  Collapse,
+  Box,
   Chip
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -82,6 +86,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const [batchAdd, setBatchAdd] = useState(false);
   const [providerModelsLoad, setProviderModelsLoad] = useState(false);
   const [hasTag, setHasTag] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -917,48 +922,80 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   const plugin = pluginList[values.type][pluginId];
                   return (
                     <>
-                      <Divider sx={{ ...theme.typography.otherInput }} />
-                      <Typography variant="h3">{customizeT(plugin.name)}</Typography>
-                      <Typography variant="caption">{customizeT(plugin.description)}</Typography>
-                      {Object.keys(plugin.params).map((paramId) => {
-                        const param = plugin.params[paramId];
-                        const name = `plugin.${pluginId}.${paramId}`;
-                        return param.type === 'bool' ? (
-                          <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
-                            <FormControlLabel
-                              key={name}
-                              required
-                              control={
-                                <Switch
-                                  key={name}
-                                  name={name}
-                                  disabled={hasTag}
-                                  checked={values.plugin?.[pluginId]?.[paramId] || false}
-                                  onChange={(event) => {
-                                    setFieldValue(name, event.target.checked);
-                                  }}
-                                />
-                              }
-                              label={t('channel_edit.isEnable')}
-                            />
-                            <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
-                          </FormControl>
-                        ) : (
-                          <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
-                            <TextField
-                              multiline
-                              key={name}
-                              name={name}
-                              disabled={hasTag}
-                              value={values.plugin?.[pluginId]?.[paramId] || ''}
-                              label={customizeT(param.name)}
-                              placeholder={customizeT(param.description)}
-                              onChange={handleChange}
-                            />
-                            <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
-                          </FormControl>
-                        );
-                      })}
+                      <Box
+                        sx={{
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 2,
+                          marginTop: 2,
+                          marginBottom: 2,
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: 2,
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="h3">{customizeT(plugin.name)}</Typography>
+                            <Typography variant="caption">{customizeT(plugin.description)}</Typography>
+                          </Box>
+                          <Button
+                            onClick={() => setExpanded(!expanded)}
+                            endIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            sx={{ textTransform: 'none', marginLeft: 2 }}
+                          >
+                            {expanded ? t('channel_edit.collapse') : t('channel_edit.expand')}
+                          </Button>
+                        </Box>
+
+                        <Collapse in={expanded}>
+                          <Box sx={{ padding: 2, marginTop: -3 }}>
+                            {Object.keys(plugin.params).map((paramId) => {
+                              const param = plugin.params[paramId];
+                              const name = `plugin.${pluginId}.${paramId}`;
+                              return param.type === 'bool' ? (
+                                <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
+                                  <FormControlLabel
+                                    key={name}
+                                    required
+                                    control={
+                                      <Switch
+                                        key={name}
+                                        name={name}
+                                        disabled={hasTag}
+                                        checked={values.plugin?.[pluginId]?.[paramId] || false}
+                                        onChange={(event) => {
+                                          setFieldValue(name, event.target.checked);
+                                        }}
+                                      />
+                                    }
+                                    label={t('channel_edit.isEnable')}
+                                  />
+                                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
+                                </FormControl>
+                              ) : (
+                                <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
+                                  <TextField
+                                    multiline
+                                    key={name}
+                                    name={name}
+                                    disabled={hasTag}
+                                    value={values.plugin?.[pluginId]?.[paramId] || ''}
+                                    label={customizeT(param.name)}
+                                    placeholder={customizeT(param.description)}
+                                    onChange={handleChange}
+                                  />
+                                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
+                                </FormControl>
+                              );
+                            })}
+                          </Box>
+                        </Collapse>
+                      </Box>
                     </>
                   );
                 })}

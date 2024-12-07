@@ -87,7 +87,9 @@
     "addModelHeader": "カスタムヘッダーを追加",
     "addModelMappingByJson": "モデルマッピング（JSON）の追加",
     "invalidJson": "無効なJSON",
-    "jsonInputLabel": "JSONオブジェクト、キーはリクエストモデルであり、値は実際の転送モデルです。"
+    "jsonInputLabel": "JSONオブジェクト、キーはリクエストモデルであり、値は実際の転送モデルです。",
+    "collapse": "折りたたむ",
+    "expand": "展開する"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
