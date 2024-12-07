@@ -309,29 +309,40 @@ func CountTokenImage(input interface{}) (int, error) {
 	switch v := input.(type) {
 	case types.ImageRequest:
 		// 处理 ImageRequest
-		return calculateToken(v.Model, v.Size, v.N, v.Quality)
+		return calculateToken(v.Model, v.Size, v.N, v.Quality, v.Style)
 	case types.ImageEditRequest:
 		// 处理 ImageEditsRequest
-		return calculateToken(v.Model, v.Size, v.N, "")
+		return calculateToken(v.Model, v.Size, v.N, "", "")
 	default:
 		return 0, errors.New("unsupported type")
 	}
 }
 
-func calculateToken(model string, size string, n int, quality string) (int, error) {
-	imageCostRatio, hasValidSize := DalleSizeRatios[model][size]
+func calculateToken(model string, size string, n int, quality, style string) (int, error) {
 
-	if hasValidSize {
-		if quality == "hd" && model == "dall-e-3" {
-			if size == "1024x1024" {
-				imageCostRatio *= 2
-			} else {
-				imageCostRatio *= 1.5
-			}
+	imageCostRatio := 1.0
+	hasValidSize := false
+
+	switch model {
+	case "recraft20b", "recraftv3":
+		if style == "vector_illustration" {
+			imageCostRatio = 2
 		}
-	} else {
-		imageCostRatio = 1
-		// return 0, errors.New("size not supported for this image model")
+
+	default:
+		imageCostRatio, hasValidSize = DalleSizeRatios[model][size]
+
+		if hasValidSize {
+			if quality == "hd" && model == "dall-e-3" {
+				if size == "1024x1024" {
+					imageCostRatio *= 2
+				} else {
+					imageCostRatio *= 1.5
+				}
+			}
+		} else {
+			imageCostRatio = 1
+		}
 	}
 
 	return int(imageCostRatio*1000) * n, nil

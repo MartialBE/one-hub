@@ -42,5 +42,6 @@ func init() {
 		config.ChannelTypeRerank:       "Rerank",
 		config.ChannelTypeGithub:       "Github",
 		config.ChannelTypeReplicate:    "Replicate",
+		config.ChannelTypeRecraft:      "RecraftAI",
 	}
 }

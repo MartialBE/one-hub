@@ -18,6 +18,7 @@ func SetRelayRouter(router *gin.Engine) {
 	setSunoRouter(router)
 	setClaudeRouter(router)
 	setGeminiRouter(router)
+	setRecraftRouter(router)
 }
 
 func setOpenAIRouter(router *gin.Engine) {
@@ -118,5 +119,18 @@ func setGeminiRouter(router *gin.Engine) {
 	relayV1Router.Use(middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/models/:model", relay.RelaycGeminiOnly)
+	}
+}
+
+func setRecraftRouter(router *gin.Engine) {
+	relayRecraftRouter := router.Group("/recraftAI/v1")
+	relayRecraftRouter.Use(middleware.RelayPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
+	{
+		relayRecraftRouter.POST("/images/generations", relay.Relay)
+		relayRecraftRouter.POST("/images/vectorize", relay.RelayRecraftAI)
+		relayRecraftRouter.POST("/images/removeBackground", relay.RelayRecraftAI)
+		relayRecraftRouter.POST("/images/clarityUpscale", relay.RelayRecraftAI)
+		relayRecraftRouter.POST("/images/generativeUpscale", relay.RelayRecraftAI)
+		relayRecraftRouter.POST("/styles", relay.RelayRecraftAI)
 	}
 }

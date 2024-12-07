@@ -465,6 +465,19 @@ const typeConfig = {
       base_url: 'https://models.inference.ai.azure.com'
     },
     modelGroup: 'Github'
+  },
+  51: {
+    input: {
+      models: [
+        'recraftv3',
+        'recraft20b',
+        'recraft_vectorize',
+        'recraft_removeBackground',
+        'recraft_clarityUpscale',
+        'recraft_generativeUpscale',
+        'recraft_styles'
+      ]
+    }
   }
 };
 

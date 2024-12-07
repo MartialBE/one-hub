@@ -222,6 +222,13 @@ export const CHANNEL_OPTIONS = {
     color: 'default',
     url: 'https://github.com/marketplace/models'
   },
+  51: {
+    key: 51,
+    text: 'RecraftAI',
+    value: 51,
+    color: 'orange',
+    url: ''
+  },
   52: {
     key: 52,
     text: 'Replicate',

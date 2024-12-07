@@ -34,7 +34,7 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 		relay = NewRelayEmbeddings(c)
 	} else if strings.HasPrefix(path, "/v1/moderations") {
 		relay = NewRelayModerations(c)
-	} else if strings.HasPrefix(path, "/v1/images/generations") {
+	} else if strings.HasPrefix(path, "/v1/images/generations") || strings.HasPrefix(path, "/recraftAI/v1/images/generations") {
 		relay = NewRelayImageGenerations(c)
 	} else if strings.HasPrefix(path, "/v1/images/edits") {
 		relay = NewRelayImageEdits(c)
