@@ -1,6 +1,7 @@
 package openai
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -94,13 +95,14 @@ func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletio
 
 func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
 	// 如果rawLine 前缀不为data:，则直接返回
-	if !strings.HasPrefix(string(*rawLine), "data: ") {
+	if !strings.HasPrefix(string(*rawLine), "data:") {
 		*rawLine = nil
 		return
 	}
 
 	// 去除前缀
-	*rawLine = (*rawLine)[6:]
+	*rawLine = (*rawLine)[5:]
+	*rawLine = bytes.TrimSpace(*rawLine)
 
 	// 如果等于 DONE 则结束
 	if string(*rawLine) == "[DONE]" {
