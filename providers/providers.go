@@ -90,10 +90,7 @@ func GetProvider(channel *model.Channel, c *gin.Context) base.ProviderInterface 
 	var provider base.ProviderInterface
 	if !ok {
 		// 处理未找到的供应商工厂
-		baseURL := config.ChannelBaseURLs[channel.Type]
-		if channel.GetBaseURL() != "" {
-			baseURL = channel.GetBaseURL()
-		}
+		baseURL := channel.GetBaseURL()
 		if baseURL == "" {
 			return nil
 		}
