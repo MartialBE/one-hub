@@ -3,14 +3,18 @@ package types
 import "mime/multipart"
 
 type ImageRequest struct {
-	Prompt         string `json:"prompt,omitempty" binding:"required"`
-	Model          string `json:"model,omitempty"`
-	N              int    `json:"n,omitempty"`
-	Quality        string `json:"quality,omitempty"`
-	Size           string `json:"size,omitempty"`
-	Style          string `json:"style,omitempty"`
-	ResponseFormat string `json:"response_format,omitempty"`
-	User           string `json:"user,omitempty"`
+	Prompt           string  `json:"prompt,omitempty" binding:"required"`
+	Model            string  `json:"model,omitempty"`
+	N                int     `json:"n,omitempty"`
+	Quality          string  `json:"quality,omitempty"`
+	Size             string  `json:"size,omitempty"`
+	Style            string  `json:"style,omitempty"`
+	ResponseFormat   string  `json:"response_format,omitempty"`
+	User             string  `json:"user,omitempty"`
+	AspectRatio      *string `json:"aspect_ratio,omitempty"`
+	OutputQuality    *int    `json:"output_quality,omitempty"`
+	SafetyTolerance  *string `json:"safety_tolerance,omitempty"`
+	PromptUpsampling *string `json:"prompt_upsampling,omitempty"`
 }
 
 type ImageResponse struct {

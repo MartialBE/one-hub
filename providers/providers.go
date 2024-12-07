@@ -28,6 +28,7 @@ import (
 	"one-api/providers/ollama"
 	"one-api/providers/openai"
 	"one-api/providers/palm"
+	"one-api/providers/replicate"
 	"one-api/providers/siliconflow"
 	"one-api/providers/stabilityAI"
 	"one-api/providers/suno"
@@ -81,6 +82,7 @@ func init() {
 		config.ChannelTypeSiliconflow:  siliconflow.SiliconflowProviderFactory{},
 		config.ChannelTypeJina:         jina.JinaProviderFactory{},
 		config.ChannelTypeGithub:       github.GithubProviderFactory{},
+		config.ChannelTypeReplicate:    replicate.ReplicateProviderFactory{},
 	}
 }
 

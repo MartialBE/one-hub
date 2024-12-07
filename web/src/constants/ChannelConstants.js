@@ -222,6 +222,13 @@ export const CHANNEL_OPTIONS = {
     color: 'default',
     url: 'https://github.com/marketplace/models'
   },
+  52: {
+    key: 52,
+    text: 'Replicate',
+    value: 52,
+    color: 'default',
+    url: ''
+  },
   8: {
     key: 8,
     text: '自定义渠道',

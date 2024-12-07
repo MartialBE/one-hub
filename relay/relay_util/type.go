@@ -41,5 +41,6 @@ func init() {
 		config.ChannelTypeJina:         "Jina",
 		config.ChannelTypeRerank:       "Rerank",
 		config.ChannelTypeGithub:       "Github",
+		config.ChannelTypeReplicate:    "Replicate",
 	}
 }
