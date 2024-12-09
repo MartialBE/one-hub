@@ -24,6 +24,8 @@ type ChannelsChooser struct {
 	Rule      map[string]map[string][][]int // group -> model -> priority -> channelIds
 	Match     []string
 	Cooldowns sync.Map
+
+	ModelGroup map[string]map[string]bool
 }
 
 type ChannelsFilterFunc func(channelId int, choice *ChannelChoice) bool
@@ -218,6 +220,13 @@ func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 	return models, nil
 }
 
+func (cc *ChannelsChooser) GetModelsGroups() map[string]map[string]bool {
+	cc.RLock()
+	defer cc.RUnlock()
+
+	return cc.ModelGroup
+}
+
 func (cc *ChannelsChooser) GetChannel(channelId int) *Channel {
 	cc.RLock()
 	defer cc.RUnlock()
@@ -244,6 +253,7 @@ func (cc *ChannelsChooser) Load() {
 	newGroup := make(map[string]map[string][][]int)
 	newChannels := make(map[int]*ChannelChoice)
 	newMatch := make(map[string]bool)
+	newModelGroup := make(map[string]map[string]bool)
 
 	for _, channel := range channels {
 		if *channel.Weight == 0 {
@@ -259,6 +269,10 @@ func (cc *ChannelsChooser) Load() {
 	for _, ability := range abilities {
 		if _, ok := newGroup[ability.Group]; !ok {
 			newGroup[ability.Group] = make(map[string][][]int)
+		}
+
+		if _, ok := newModelGroup[ability.Model]; !ok {
+			newModelGroup[ability.Model] = make(map[string]bool)
 		}
 
 		if _, ok := newGroup[ability.Group][ability.Model]; !ok {
@@ -280,6 +294,7 @@ func (cc *ChannelsChooser) Load() {
 		}
 
 		newGroup[ability.Group][ability.Model] = append(newGroup[ability.Group][ability.Model], priorityIds)
+		newModelGroup[ability.Model][ability.Group] = true
 	}
 
 	newMatchList := make([]string, 0, len(newMatch))
@@ -291,6 +306,7 @@ func (cc *ChannelsChooser) Load() {
 	cc.Rule = newGroup
 	cc.Channels = newChannels
 	cc.Match = newMatchList
+	cc.ModelGroup = newModelGroup
 	cc.Unlock()
 	logger.SysLog("channels Load success")
 }

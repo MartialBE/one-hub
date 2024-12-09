@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/common/utils"
 	"one-api/model"
 	"one-api/relay/relay_util"
 	"one-api/types"
@@ -13,48 +14,22 @@ import (
 )
 
 // https://platform.openai.com/docs/api-reference/models/list
-
-type OpenAIModelPermission struct {
-	Id                 string  `json:"id"`
-	Object             string  `json:"object"`
-	Created            int     `json:"created"`
-	AllowCreateEngine  bool    `json:"allow_create_engine"`
-	AllowSampling      bool    `json:"allow_sampling"`
-	AllowLogprobs      bool    `json:"allow_logprobs"`
-	AllowSearchIndices bool    `json:"allow_search_indices"`
-	AllowView          bool    `json:"allow_view"`
-	AllowFineTuning    bool    `json:"allow_fine_tuning"`
-	Organization       string  `json:"organization"`
-	Group              *string `json:"group"`
-	IsBlocking         bool    `json:"is_blocking"`
-}
-
-type ModelPrice struct {
-	Type   string `json:"type"`
-	Input  string `json:"input"`
-	Output string `json:"output"`
-}
 type OpenAIModels struct {
-	Id         string                   `json:"id"`
-	Object     string                   `json:"object"`
-	Created    int                      `json:"created"`
-	OwnedBy    *string                  `json:"owned_by"`
-	Permission *[]OpenAIModelPermission `json:"permission"`
-	Root       *string                  `json:"root"`
-	Parent     *string                  `json:"parent"`
-	Price      *ModelPrice              `json:"price"`
+	Id      string  `json:"id"`
+	Object  string  `json:"object"`
+	Created int     `json:"created"`
+	OwnedBy *string `json:"owned_by"`
 }
 
-func ListModels(c *gin.Context) {
-	groupName := c.GetString("group")
+func ListModelsByToken(c *gin.Context) {
+	groupName := c.GetString("token_group")
 	if groupName == "" {
-		id := c.GetInt("id")
-		user, err := model.GetUserById(id, false)
-		if err != nil {
-			common.AbortWithMessage(c, http.StatusServiceUnavailable, err.Error())
-			return
-		}
-		groupName = user.Group
+		groupName = c.GetString("group")
+	}
+
+	if groupName == "" {
+		common.AbortWithMessage(c, http.StatusServiceUnavailable, "分组不存在")
+		return
 	}
 
 	models, err := model.ChannelGroup.GetGroupModels(groupName)
@@ -94,13 +69,10 @@ func ListModelsForAdmin(c *gin.Context) {
 	var openAIModels []OpenAIModels
 	for modelId, price := range prices {
 		openAIModels = append(openAIModels, OpenAIModels{
-			Id:         modelId,
-			Object:     "model",
-			Created:    1677649963,
-			OwnedBy:    getModelOwnedBy(price.ChannelType),
-			Permission: nil,
-			Root:       nil,
-			Parent:     nil,
+			Id:      modelId,
+			Object:  "model",
+			Created: 1677649963,
+			OwnedBy: getModelOwnedBy(price.ChannelType),
 		})
 	}
 	// 根据 OwnedBy 排序
@@ -150,13 +122,10 @@ func getOpenAIModelWithName(modelName string) *OpenAIModels {
 	price := relay_util.PricingInstance.GetPrice(modelName)
 
 	return &OpenAIModels{
-		Id:         modelName,
-		Object:     "model",
-		Created:    1677649963,
-		OwnedBy:    getModelOwnedBy(price.ChannelType),
-		Permission: nil,
-		Root:       nil,
-		Parent:     nil,
+		Id:      modelName,
+		Object:  "model",
+		Created: 1677649963,
+		OwnedBy: getModelOwnedBy(price.ChannelType),
 	}
 }
 
@@ -166,4 +135,64 @@ func GetModelOwnedBy(c *gin.Context) {
 		"message": "",
 		"data":    relay_util.ModelOwnedBy,
 	})
+}
+
+type ModelPrice struct {
+	Type   string  `json:"type"`
+	Input  float64 `json:"input"`
+	Output float64 `json:"output"`
+}
+
+type AvailableModelResponse struct {
+	Groups  []string   `json:"groups"`
+	OwnedBy string     `json:"owned_by"`
+	Price   ModelPrice `json:"price"`
+}
+
+func AvailableModel(c *gin.Context) {
+	groupName := c.GetString("group")
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    getAvailableModels(groupName),
+	})
+}
+
+func getAvailableModels(groupName string) map[string]*AvailableModelResponse {
+	publicModels := model.ChannelGroup.GetModelsGroups()
+	publicGroups := model.GlobalUserGroupRatio.GetPublicGroupList()
+	if groupName != "" && !utils.Contains(groupName, publicGroups) {
+		publicGroups = append(publicGroups, groupName)
+	}
+
+	availableModels := make(map[string]*AvailableModelResponse, len(publicModels))
+
+	for model, group := range publicModels {
+		groups := []string{}
+		for _, publicGroup := range publicGroups {
+			if group[publicGroup] {
+				groups = append(groups, publicGroup)
+			}
+		}
+
+		if len(groups) == 0 {
+			continue
+		}
+
+		if _, ok := availableModels[model]; !ok {
+			price := relay_util.PricingInstance.GetPrice(model)
+			availableModels[model] = &AvailableModelResponse{
+				Groups:  groups,
+				OwnedBy: *getModelOwnedBy(price.ChannelType),
+				Price: ModelPrice{
+					Type:   price.Type,
+					Input:  price.Input,
+					Output: price.Output,
+				},
+			}
+		}
+	}
+
+	return availableModels
 }

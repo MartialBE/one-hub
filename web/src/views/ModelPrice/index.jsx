@@ -1,39 +1,109 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { Card, Stack, Typography } from '@mui/material';
 import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-  GridToolbarDensitySelector
-} from '@mui/x-data-grid';
-import { zhCN } from '@mui/x-data-grid/locales';
+  Card,
+  Stack,
+  Typography,
+  Tabs,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  TextField,
+  InputAdornment,
+  styled,
+  Box,
+  ToggleButton,
+  ToggleButtonGroup
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { API } from 'utils/api';
-import { showError } from 'utils/common';
-import { ValueFormatter, priceType } from 'views/Pricing/component/util';
+import { showError, ValueFormatter } from 'utils/common';
+import { useTheme } from '@mui/material/styles';
+
+const GroupChip = styled(Chip)(({ theme, selected }) => ({
+  margin: theme.spacing(0.5),
+  cursor: 'pointer',
+  height: '28px',
+  borderRadius: '14px',
+  padding: '0 12px',
+  fontSize: '13px',
+  fontWeight: 500,
+  transition: 'all 0.2s ease-in-out',
+  backgroundColor: selected ? theme.palette.primary.main : theme.palette.background.paper,
+  color: selected ? theme.palette.common.white : theme.palette.text.secondary,
+  border: `1px solid ${selected ? 'transparent' : theme.palette.divider}`,
+  boxShadow: selected ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
+
+  '&:hover': {
+    backgroundColor: selected ? theme.palette.primary.dark : theme.palette.action.hover,
+    transform: 'translateY(-1px)',
+    boxShadow: '0 3px 6px rgba(0,0,0,0.12)'
+  },
+
+  '& .MuiChip-label': {
+    padding: '0 4px'
+  }
+}));
+
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: '8px',
+  padding: '2px',
+  '& .MuiToggleButton-root': {
+    border: 'none',
+    borderRadius: '6px',
+    padding: '4px 12px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover
+    },
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+      '&:hover': {
+        backgroundColor: theme.palette.primary.dark
+      }
+    }
+  }
+}));
+
+const StyledToggleButton = styled(ToggleButton)({
+  '&.MuiToggleButton-root': {
+    textTransform: 'none',
+    minWidth: '36px',
+    transition: 'all 0.2s ease-in-out'
+  }
+});
 
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const [rows, setRows] = useState([]);
-  const [userModelList, setUserModelList] = useState([]);
-  const [prices, setPrices] = useState({});
-  const [ownedby, setOwnedby] = useState([]);
+  const [filteredRows, setFilteredRows] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [availableModels, setAvailableModels] = useState({});
+  const [userGroupMap, setUserGroupMap] = useState({});
+  const [selectedGroup, setSelectedGroup] = useState('');
+  const [selectedOwnedBy, setSelectedOwnedBy] = useState('');
+  const [unit, setUnit] = useState('K');
 
-  const fetchOwnedby = useCallback(async () => {
+  const fetchAvailableModels = useCallback(async () => {
     try {
-      const res = await API.get('/api/ownedby');
+      const res = await API.get('/api/available_model');
       const { success, message, data } = res.data;
       if (success) {
-        let ownedbyList = [];
-        for (let key in data) {
-          ownedbyList.push({ value: parseInt(key), label: data[key] });
-        }
-        setOwnedby(ownedbyList);
+        setAvailableModels(data);
+        setSelectedOwnedBy(Object.values(data)[0]?.owned_by || '');
       } else {
         showError(message);
       }
@@ -42,151 +112,180 @@ export default function ModelPrice() {
     }
   }, []);
 
-  const fetchPrices = useCallback(async () => {
+  const fetchUserGroupMap = useCallback(async () => {
     try {
-      const res = await API.get('/api/prices');
+      const res = await API.get('/api/user_group_map');
       const { success, message, data } = res.data;
       if (success) {
-        let pricesObj = {};
-        data.forEach((price) => {
-          if (pricesObj[price.model] === undefined) {
-            pricesObj[price.model] = price;
+        setUserGroupMap(data);
+        setSelectedGroup(Object.keys(data)[0]); // 默认选择第一个分组
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAvailableModels();
+    fetchUserGroupMap();
+  }, [fetchAvailableModels, fetchUserGroupMap]);
+
+  useEffect(() => {
+    if (!availableModels || !userGroupMap || !selectedGroup) return;
+
+    const newRows = Object.entries(availableModels)
+      .filter(([, model]) => model.owned_by === selectedOwnedBy)
+      .map(([modelName, model], index) => {
+        const group = userGroupMap[selectedGroup];
+        const price = model.groups.includes(selectedGroup)
+          ? {
+              input: group.ratio * model.price.input,
+              output: group.ratio * model.price.output
+            }
+          : { input: t('modelpricePage.noneGroup'), output: t('modelpricePage.noneGroup') };
+
+        const formatPrice = (value, type) => {
+          if (typeof value === 'number') {
+            let nowUnit = '';
+            if (type === 'tokens') {
+              nowUnit = `/ 1${unit}`;
+            }
+            return ValueFormatter(value, true, unit === 'M') + nowUnit;
           }
-        });
-        setPrices(pricesObj);
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+          return value;
+        };
 
-  const fetchUserModelList = useCallback(async () => {
-    try {
-      const res = await API.get('/api/user/models');
-      if (res === undefined) {
-        setUserModelList([]);
-        return;
-      }
-      setUserModelList(res.data.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (userModelList.length === 0 || Object.keys(prices).length === 0 || ownedby.length === 0) {
-      return;
-    }
-
-    let newRows = [];
-    userModelList.forEach((model, index) => {
-      const price = prices[model.id];
-      // const type_label = priceType.find((pt) => pt.value === price?.type);
-      // const channel_label = ownedby.find((ob) => ob.value === price?.channel_type);
-      newRows.push({
-        id: index + 1,
-        model: model.id,
-        type: price?.type,
-        channel_type: price?.channel_type,
-        input: price?.input !== undefined && price?.input !== null ? price.input : 30,
-        output: price?.output !== undefined && price?.output !== null ? price.output : 30
+        return {
+          id: index + 1,
+          model: modelName,
+          userGroup: model.groups,
+          type: model.price.type,
+          input: formatPrice(price.input, model.price.type),
+          output: formatPrice(price.output, model.price.type)
+        };
       });
-    });
-    console.log(newRows);
+
     setRows(newRows);
-  }, [userModelList, ownedby, prices]);
+    setFilteredRows(newRows);
+  }, [availableModels, userGroupMap, selectedGroup, selectedOwnedBy, t, unit]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await Promise.all([fetchOwnedby(), fetchUserModelList()]);
-        fetchPrices();
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    const filtered = rows.filter((row) => row.model.toLowerCase().includes(searchQuery.toLowerCase()));
+    setFilteredRows(filtered);
+  }, [searchQuery, rows]);
 
-    fetchData();
-  }, [fetchOwnedby, fetchUserModelList, fetchPrices]);
+  const handleTabChange = (event, newValue) => {
+    setSelectedOwnedBy(newValue);
+  };
 
-  const modelRatioColumns = useMemo(
-    () => [
-      {
-        field: 'model',
-        sortable: true,
-        headerName: t('modelpricePage.model'),
-        minWidth: 220,
-        flex: 1
-      },
-      {
-        field: 'type',
-        sortable: true,
-        headerName: t('modelpricePage.type'),
-        flex: 0.5,
-        minWidth: 100,
-        type: 'singleSelect',
-        valueOptions: priceType
-      },
-      {
-        field: 'channel_type',
-        sortable: true,
-        headerName: t('modelpricePage.channelType'),
-        flex: 0.5,
-        minWidth: 100,
-        type: 'singleSelect',
-        valueOptions: ownedby
-      },
-      {
-        field: 'input',
-        sortable: true,
-        headerName: t('modelpricePage.inputMultiplier'),
-        flex: 0.8,
-        minWidth: 150,
-        type: 'number',
-        valueFormatter: (params) => ValueFormatter(params.value)
-      },
-      {
-        field: 'output',
-        sortable: true,
-        headerName: t('modelpricePage.outputMultiplier'),
-        flex: 0.8,
-        minWidth: 150,
-        type: 'number',
-        valueFormatter: (params) => ValueFormatter(params.value)
-      }
-    ],
-    [ownedby, t]
-  );
+  const handleGroupChange = (event) => {
+    setSelectedGroup(event.target.value);
+  };
 
-  function EditToolbar() {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarColumnsButton />
-        <GridToolbarFilterButton />
-        <GridToolbarDensitySelector />
-        <GridToolbarQuickFilter />
-      </GridToolbarContainer>
-    );
-  }
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleUnitChange = (event, newUnit) => {
+    if (newUnit !== null) {
+      setUnit(newUnit);
+    }
+  };
+
+  const uniqueOwnedBy = [...new Set(Object.values(availableModels).map((model) => model.owned_by))];
 
   return (
-    <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('modelpricePage.availableModels')}</Typography>
-      </Stack>
-      <Card>
-        <DataGrid
-          rows={rows}
-          columns={modelRatioColumns}
-          initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
-          pageSizeOptions={[20, 30, 50, 100]}
-          disableRowSelectionOnClick
-          slots={{ toolbar: EditToolbar }}
-          localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
-        />
+    <Stack spacing={3} sx={{ padding: theme.spacing(3) }}>
+      <Typography variant="h4" color="textPrimary">
+        {t('modelpricePage.availableModels')}
+      </Typography>
+
+      <Card sx={{ p: 2, backgroundColor: theme.palette.background.paper }}>
+        <Stack spacing={2}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {t('modelpricePage.group')}
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              alignItems: 'center'
+            }}
+          >
+            {Object.entries(userGroupMap).map(([key, group]) => (
+              <GroupChip
+                key={key}
+                label={group.name}
+                onClick={() => handleGroupChange({ target: { value: key } })}
+                selected={selectedGroup === key}
+                variant={selectedGroup === key ? 'filled' : 'outlined'}
+              />
+            ))}
+          </Box>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
+              placeholder={t('modelpricePage.search')}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              variant="outlined"
+              size="small"
+              sx={{ backgroundColor: theme.palette.background.paper }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+            <StyledToggleButtonGroup value={unit} exclusive onChange={handleUnitChange} size="small" aria-label="unit toggle">
+              <StyledToggleButton value="K">K</StyledToggleButton>
+              <StyledToggleButton value="M">M</StyledToggleButton>
+            </StyledToggleButtonGroup>
+          </Stack>
+        </Stack>
       </Card>
-    </>
+
+      <Tabs
+        value={selectedOwnedBy}
+        onChange={handleTabChange}
+        textColor="inherit"
+        indicatorColor="primary"
+        variant="scrollable"
+        scrollButtons="auto"
+      >
+        {uniqueOwnedBy.map((ownedBy, index) => (
+          <Tab key={index} label={ownedBy} value={ownedBy} />
+        ))}
+      </Tabs>
+
+      <Card sx={{ backgroundColor: theme.palette.background.default }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell width="25%">{t('modelpricePage.model')}</TableCell>
+                <TableCell width="30%">{t('modelpricePage.type')}</TableCell>
+                <TableCell width="22.5%">{t('modelpricePage.inputPrice')}</TableCell>
+                <TableCell width="22.5%">{t('modelpricePage.outputPrice')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredRows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>{row.model}</TableCell>
+                  <TableCell>{row.type === 'tokens' ? t('modelpricePage.tokens') : t('modelpricePage.times')}</TableCell>
+                  <TableCell>{row.input}</TableCell>
+                  <TableCell>{row.output}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+    </Stack>
   );
 }

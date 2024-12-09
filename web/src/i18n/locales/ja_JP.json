@@ -29,7 +29,6 @@
   },
   "alloy 映射": "合金マッピング",
   "analytics": "分析",
-  "playground": "遊び場",
   "analytics_index": {
     "active": "アクティブ",
     "averageLatency": "平均遅延",
@@ -62,34 +61,34 @@
   },
   "channel": "チャネル",
   "channel_edit": {
+    "addModelHeader": "カスタムヘッダーを追加",
+    "addModelMapping": "モデルマッピングの追加",
+    "addModelMappingByJson": "モデルマッピング（JSON）の追加",
     "addSuccess": "無事作成されました！",
     "batchAdd": "バッチで追加",
     "batchBaseurlTip": "1 行に 1 つずつ、順序は次のキーに対応します。対応するキーが一致しない場合は、最初のキーがデフォルトで使用されます。",
     "batchKeytip": "、1 行に 1 つのキー",
+    "collapse": "折りたたむ",
     "customModelTip": "カスタマイズ: をクリックするか Enter キーを押して入力します。",
     "editSuccess": "アップデート完了！",
+    "expand": "展開する",
     "inputAllModel": "すべてのモデルを入力してください",
     "inputChannelModel": "チャネルサポートモデルを入力します",
+    "invalidJson": "無効なJSON",
     "isEnable": "有効にするかどうか",
+    "jsonInputLabel": "JSONオブジェクト、キーはリクエストモデルであり、値は実際の転送モデルです。",
+    "modelHeaderKey": "カスタムヘッダーキー",
+    "modelHeaderValue": "カスタムヘッダー値",
     "modelListError": "モデルリストの取得に失敗しました",
+    "modelMappingKey": "ユーザーリクエストモデル",
+    "modelMappingValue": "実際の転送モデル",
     "requiredBaseUrl": "チャネル API アドレスを空にすることはできません",
     "requiredChannel": "チャンネルを空にすることはできません",
     "requiredGroup": "ユーザーグループを空にすることはできません",
     "requiredKey": "キーを空にすることはできません",
     "requiredModels": "モデルを空にすることはできません",
     "requiredName": "名前は必須です",
-    "validJson": "有効な JSON 文字列である必要があります",
-    "addModelMapping": "モデルマッピングの追加",
-    "modelMappingKey": "ユーザーリクエストモデル",
-    "modelMappingValue": "実際の転送モデル",
-    "modelHeaderKey": "カスタムヘッダーキー",
-    "modelHeaderValue": "カスタムヘッダー値",
-    "addModelHeader": "カスタムヘッダーを追加",
-    "addModelMappingByJson": "モデルマッピング（JSON）の追加",
-    "invalidJson": "無効なJSON",
-    "jsonInputLabel": "JSONオブジェクト、キーはリクエストモデルであり、値は実際の転送モデルです。",
-    "collapse": "折りたたむ",
-    "expand": "展開する"
+    "validJson": "有効な JSON 文字列である必要があります"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
@@ -175,10 +174,13 @@
     "copyUrl": "アドレスをコピーする",
     "create": "作成する",
     "delete": "消去",
+    "deleteConfirm": "{{title}}を削除しますか？",
     "disable": "無効",
     "downImg": "写真をダウンロードする",
     "edit": "編集",
     "enable": "アクティブ化された",
+    "execute": "{{title}}を実行しますか？",
+    "executeConfirm": "実行",
     "exhaust": "疲れ果てた",
     "expired": "期限切れ",
     "imgUrl": "地図の住所",
@@ -197,10 +199,7 @@
     "unableServer": "サーバーに正しく接続できません!",
     "unableServerTip": "新しいバージョンが利用可能です: {{version}}、ショートカット キー Shift F5 を使用してページを更新してください",
     "unknown": "未知",
-    "verificationCode": "検証コード",
-    "execute": "{{title}}を実行しますか？",
-    "executeConfirm": "実行",
-    "deleteConfirm": "{{title}}を削除しますか？"
+    "verificationCode": "検証コード"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -246,13 +245,19 @@
   "jump": "リダイレクト中...",
   "log": "ログ",
   "logPage": {
+    "cachedTokens": "Cache Tokens",
     "channelLabel": "チャネル",
     "detailLabel": "詳細",
     "durationLabel": "時間",
     "durationTooltip": "t/s: 出力トークンの数を総生成時間で割った値であり、生成速度を示します。",
+    "groupLabel": "グループ",
+    "inputAudioTokens": "Input audio tokens",
     "inputLabel": "入力",
+    "inputTextTokens": "Input text tokens",
     "modelLabel": "モデル",
+    "outputAudioTokens": "Output audio tokens",
     "outputLabel": "出力",
+    "outputTextTokens": "Output text tokens",
     "quotaLabel": "クォータ",
     "refreshButton": "更新/検索条件をクリア",
     "searchButton": "検索",
@@ -260,16 +265,10 @@
     "timeLabel": "時間",
     "title": "ログ",
     "tokenLabel": "トークン",
-    "typeLabel": "タイプ",
-    "userLabel": "ユーザー",
-    "cachedTokens": "Cache Tokens",
-    "outputAudioTokens": "Output audio tokens",
-    "inputAudioTokens": "Input audio tokens",
-    "inputTextTokens": "Input text tokens",
-    "outputTextTokens": "Output text tokens",
     "totalInputTokens": "Total input tokens",
     "totalOutputTokens": "Total output tokens",
-    "groupLabel": "グループ"
+    "typeLabel": "タイプ",
+    "userLabel": "ユーザー"
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",
@@ -327,13 +326,19 @@
   "modelpricePage": {
     "availableModels": "利用可能なモデル",
     "channelType": "サプライヤー",
-    "inputMultiplier": "入力倍率",
+    "group": "グループ",
+    "inputPrice": "価格を入力してください",
     "model": "モデル名",
-    "outputMultiplier": "出力倍率",
+    "noneGroup": "現在のグループは利用できません",
+    "outputPrice": "価格を出力します。",
+    "search": "検索",
+    "times": "回数制課金",
+    "tokens": "量に応じて支払う",
     "type": "タイプ"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
+  "operation": "オペレーション",
   "orderlogPage": {
     "endTimeLabel": "終了時間",
     "gatewayIdLabel": "ゲートウェイID",
@@ -370,6 +375,7 @@
     "tradeNoLabel": "注文番号",
     "userIdLabel": "ユーザーID"
   },
+  "paySetting": "支払い設定",
   "payment": "支払い",
   "paymentGatewayPage": {
     "createPayment": "支払いを作成",
@@ -415,6 +421,7 @@
     "delPaymentTip": "支払いを削除するかどうか",
     "sortTip": "並べ替えを 0 未満にすることはできません"
   },
+  "playground": "遊び場",
   "pricing": "価格設定",
   "pricingPage": {
     "ModelCount": "モデル数",
@@ -736,6 +743,7 @@
       "configureLoginRegister": {
         "emailVerification": "パスワード登録時にメール認証が必要",
         "gitHubOAuth": "GitHubアカウントでのログイン＆登録を許可",
+        "gitHubOldIdClose": "GitHub の古い ID ログインを閉じる",
         "larkAuth": "Larkでのログイン＆登録を許可",
         "oidcAuth": "OIDCアカウントを使用してログイン＆登録を許可",
         "passwordLogin": "パスワードでログインを許可",
@@ -743,8 +751,7 @@
         "registerEnabled": "新規ユーザー登録を許可（これを無効にすると、新規登録はできません）",
         "title": "ログインと登録の設定",
         "turnstileCheck": "Turnstileユーザー検証を有効にする",
-        "weChatAuth": "WeChatでのログイン＆登録を許可",
-        "gitHubOldIdClose": "GitHub の古い ID ログインを閉じる"
+        "weChatAuth": "WeChatでのログイン＆登録を許可"
       },
       "configureOIDCAuthorization": {
         "alert1": "ホームページリンクを入力してください",
@@ -905,8 +912,8 @@
     "unlimitedQuota": "無制限のクォータ",
     "usedQuota": "使用済みクォータ",
     "userGroup": "グループ",
-    "apiRate": "APIレート",
-    "apiRateTip": "1分あたりの許可されるリクエスト数は、速度が60未満の場合にはカウンターリミッターを使用し、速度が60以上の場合にはトークンバケットリミッターを使用します。Redisが有効な場合にのみ適用されます。"
+    "apiRate": "",
+    "apiRateTip": ""
   },
   "topup": "トップアップ",
   "topupCard": {
@@ -943,6 +950,20 @@
     "modelName": "機種名"
   },
   "user": "ユーザー",
+  "userGroup": {
+    "apiRate": "APIレート",
+    "apiRateTip": "1分あたりのリクエスト数は、速度が60未満の場合はカウンターリミッターを使用し、速度が60以上の場合はトークンバケットリミッターを使用します。Redisが有効な場合にのみ適用されます。",
+    "create": "新しいグループを作成",
+    "enable": "有効にします",
+    "id": "ID\n\nID",
+    "name": "名前",
+    "nameTip": "ユーザーに表示する名前",
+    "public": "公開されていますか？",
+    "ratio": "倍率 -> 倍率",
+    "symbol": "識別",
+    "symbolTip": "ユーザーグループを区別するための識別子を使用してください。英語で入力し、重複しないようにしてください。",
+    "title": "ユーザーグループ"
+  },
   "userPage": {
     "action": "アクション",
     "adminUserRole": "管理者",
@@ -979,6 +1000,7 @@
     "usernameRequired": "ユーザー名は必須です",
     "users": "ユーザー"
   },
+  "user_group": "ユーザーグループ",
   "validation": {
     "requiredName": "名前は必須です"
   },
@@ -1029,6 +1051,7 @@
   "模型名称为coze-{bot_id}，你也可以直接使用 coze-* 通配符来匹配所有coze开头的模型": "モデル名は coze-{bot_id} です。coze-* ワイルドカードを直接使用して、coze で始まるすべてのモデルと一致させることもできます。",
   "模型名称映射， 你可以取一个容易记忆的名字来代替coze-{bot_id}，例如：{\"coze-translate\": \"coze-xxxxx\"},注意：如果使用了模型映射，那么上面的模型名称必须使用映射前的名称，上述例子中，你应该在模型中填入coze-translate(如果已经使用了coze-*，可以忽略)。": "モデル名のマッピングでは、coze-{bot_id} を覚えやすい名前に置き換えることができます (例: {\"coze-translate\": \"coze-xxxxx\"})。 注: モデル マッピングが使用されている場合は、上記のモデル名が使用されます。上記の例では、モデルに coze-translate を入力する必要があります (coze-* がすでに使用されている場合は無視できます)。",
   "模型映射关系": "モデルマッピング関係",
+  "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。": "モデルマッピング関係：例えば、ユーザーがモデルAを要求した場合、実際にはチャネルに転送されるモデルはBです。",
   "测速模型": "スピードモデル",
   "渠道API地址": "チャネルAPIアドレス",
   "渠道名称": "チャンネル名",
@@ -1051,13 +1074,14 @@
   "请输入渠道对应的鉴权密钥": "チャンネルに対応する認証キーを入力してください",
   "请输入版本号，例如：v1": "バージョン番号を入力してください (例: v1)",
   "请输入版本号，例如：v3.1": "バージョン番号を入力してください、例：v3.1",
-  "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。": "モデルマッピング関係：例えば、ユーザーがモデルAを要求した場合、実際にはチャネルに転送されるモデルはBです。",
   "请输入默认API版本，例如：2024-05-01-preview": "デフォルトの API バージョンを入力してください (例: 2024-05-01-preview)",
   "请选择渠道类型": "チャンネルタイプを選択してください",
   "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的": "このチャネルでサポートされているモデルを選択してください。たとえば、gpt-3.5* のように、ワイルドカード文字 * を入力することもできます。これは、gpt-3.5 で始まるすべてのモデルが使用できることを意味します。最後の桁に があり、その前に文字が必要です。例: gpt-3.5* は正しいですが、*gpt-3.5 は間違っています。",
   "请选择该渠道所支持的用户组": "このチャンネルでサポートされているユーザー グループを選択してください",
   "请随意填写": "お気軽にご記入ください",
   "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx.com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "入力後、リクエストアドレスのv1が置き換えられます。例：freeapi、チャットをリクエストする場合は、https://xxx.com/freeapi/chat/completions となります。バージョン番号を無効にする必要がある場合は、「disable」と入力してください。",
+  "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "こちらでは料金予測オプションを選択し、費用の見積もりに使用します。画像計算がリソースを多く消費すると感じた場合は、画像計算を無効にすることができます。ただし、注意してください：一部のチャネルはstream下ではトークンを返さないため、入力トークンが誤って計算される可能性があります。",
+  "预计费选项": "見積オプション",
   "默认 API 版本": "デフォルトのAPIバージョン",
   "默认 zh-CN-XiaochenNeural": "デフォルトのzh-CN-XiaochenNeural",
   "默认 zh-CN-XiaohanNeural": "デフォルトのzh-CN-XiaohanNeural",
@@ -1065,25 +1089,5 @@
   "默认 zh-CN-YunxiNeural|boy": "デフォルト zh-CN-YunxiNeural|boy",
   "默认 zh-CN-YunyangNeural": "デフォルトのzh-CN-YunyangNeural",
   "默认 zh-CN-YunyeNeural": "デフォルトのzh-CN-YunyeNeural",
-  "这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。": "こちらでは料金予測オプションを選択し、費用の見積もりに使用します。画像計算がリソースを多く消費すると感じた場合は、画像計算を無効にすることができます。ただし、注意してください：一部のチャネルはstream下ではトークンを返さないため、入力トークンが誤って計算される可能性があります。",
-  "预计费选项": "見積オプション",
-  "Please enter the version number, for example: v3[1]": "",
-  "operation": "オペレーション",
-  "paySetting": "支払い設定",
-  "userGroup": {
-    "create": "新しいグループを作成",
-    "enable": "有効にします",
-    "id": "ID\n\nID",
-    "name": "名前",
-    "nameTip": "ユーザーに表示する名前",
-    "public": "公開されていますか？",
-    "ratio": "倍率 -> 倍率",
-    "symbol": "識別",
-    "symbolTip": "ユーザーグループを区別するための識別子を使用してください。英語で入力し、重複しないようにしてください。",
-    "title": "ユーザーグループ",
-    "apiRate": "APIレート",
-    "apiRateTip": "1分あたりのリクエスト数は、速度が60未満の場合はカウンターリミッターを使用し、速度が60以上の場合はトークンバケットリミッターを使用します。Redisが有効な場合にのみ適用されます。"
-  },
-  "user_group": "ユーザーグループ",
-  "plauground": "チャット"
+  "plauground": ""
 }

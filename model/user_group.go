@@ -98,8 +98,9 @@ func ChangeUserGroupEnable(id int, enable bool) error {
 
 type UserGroupRatio struct {
 	sync.RWMutex
-	UserGroup  map[string]*UserGroup
-	APILimiter map[string]limit.RateLimiter
+	UserGroup   map[string]*UserGroup
+	APILimiter  map[string]limit.RateLimiter
+	PublicGroup []string
 }
 
 var GlobalUserGroupRatio = UserGroupRatio{}
@@ -112,10 +113,14 @@ func (cgrm *UserGroupRatio) Load() {
 
 	newUserGroups := make(map[string]*UserGroup, len(userGroups))
 	newAPILimiter := make(map[string]limit.RateLimiter, len(userGroups))
+	publicGroup := make([]string, 0)
 
 	for _, userGroup := range userGroups {
 		newUserGroups[userGroup.Symbol] = userGroup
 		newAPILimiter[userGroup.Symbol] = limit.NewAPILimiter(userGroup.APIRate)
+		if userGroup.Public {
+			publicGroup = append(publicGroup, userGroup.Symbol)
+		}
 	}
 
 	cgrm.Lock()
@@ -123,6 +128,7 @@ func (cgrm *UserGroupRatio) Load() {
 
 	cgrm.UserGroup = newUserGroups
 	cgrm.APILimiter = newAPILimiter
+	cgrm.PublicGroup = publicGroup
 }
 
 func (cgrm *UserGroupRatio) GetBySymbol(symbol string) *UserGroup {
@@ -163,6 +169,13 @@ func (cgrm *UserGroupRatio) GetAPIRate(symbol string) int {
 	}
 
 	return userGroup.APIRate
+}
+
+func (cgrm *UserGroupRatio) GetPublicGroupList() []string {
+	cgrm.RLock()
+	defer cgrm.RUnlock()
+
+	return cgrm.PublicGroup
 }
 
 func (cgrm *UserGroupRatio) GetAPILimiter(symbol string) limit.RateLimiter {

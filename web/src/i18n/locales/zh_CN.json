@@ -399,9 +399,14 @@
     "model": "模型名称",
     "type": "类型",
     "channelType": "供应商",
-    "inputMultiplier": "输入倍率",
-    "outputMultiplier": "输出倍率",
-    "availableModels": "可用模型"
+    "availableModels": "可用模型",
+    "group": "分组",
+    "inputPrice": "输入价格",
+    "outputPrice": "输出价格",
+    "search": "搜索",
+    "tokens": "按量付费",
+    "times": "按次付费",
+    "noneGroup": "当前分组不可用"
   },
   "paymentPage": {
     "orderList": "订单列表",

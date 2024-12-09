@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import { enqueueSnackbar } from 'notistack';
 import { snackbarConstants } from 'constants/SnackbarConstants';
 import { API } from './api';
@@ -289,4 +290,33 @@ export function getChatLinks(filterShow = false) {
 
 export function replaceChatPlaceholders(text, key, server) {
   return text.replace('{key}', key).replace('{server}', server);
+}
+
+export function ValueFormatter(value, onlyUsd = false, unitMillion = false) {
+  if (value == null) {
+    return '';
+  }
+  if (value === 0) {
+    return 'Free';
+  }
+
+  let decimalValue = new Decimal(value.toString());
+  if (unitMillion) {
+    decimalValue = decimalValue.mul(1000);
+  }
+
+  let usd = decimalValue.mul(0.002).toPrecision(6);
+
+  if (onlyUsd) {
+    usd = usd.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+
+    return `$${usd}`;
+  }
+
+  let rmb = decimalValue.mul(0.014).toPrecision(6);
+
+  usd = usd.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+  rmb = rmb.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+
+  return `$${usd} / ￥${rmb}`;
 }

@@ -6,6 +6,7 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"one-api/common/redis"
 	"one-api/common/utils"
 	"strings"
 
@@ -164,6 +165,11 @@ func (user *User) Update(updatePassword bool) error {
 
 	if err == nil && user.Role == config.RoleRootUser {
 		config.RootUserEmail = user.Email
+	}
+
+	// 删除缓存
+	if config.RedisEnabled {
+		redis.RedisDel(fmt.Sprintf(UserGroupCacheKey, user.Id))
 	}
 
 	return err

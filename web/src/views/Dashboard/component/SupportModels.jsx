@@ -13,19 +13,29 @@ const SupportModels = () => {
 
   const fetchModels = async () => {
     try {
-      let res = await API.get(`/api/user/models`);
-      if (res === undefined) {
-        return;
-      }
-      // 对 res.data.data 里面的 owned_by 进行分组
-      let modelGroup = {};
-      res.data.data.forEach((model) => {
-        if (modelGroup[model.owned_by] === undefined) {
-          modelGroup[model.owned_by] = [];
+      const res = await API.get(`/api/available_model`);
+      const { data, success } = res.data;
+      if (!success) return;
+
+      const modelGroup = Object.entries(data).reduce((acc, [modelId, modelInfo]) => {
+        const { owned_by } = modelInfo;
+        if (!acc[owned_by]) {
+          acc[owned_by] = [];
         }
-        modelGroup[model.owned_by].push(model.id);
-      });
-      setModelList(modelGroup);
+        acc[owned_by].push(modelId);
+        return acc;
+      }, {});
+
+      Object.values(modelGroup).forEach((models) => models.sort());
+
+      const sortedModelGroup = Object.keys(modelGroup)
+        .sort()
+        .reduce((acc, key) => {
+          acc[key] = modelGroup[key];
+          return acc;
+        }, {});
+
+      setModelList(sortedModelGroup);
     } catch (error) {
       showError(error.message);
     }

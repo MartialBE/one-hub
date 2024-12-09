@@ -327,9 +327,14 @@
   "modelpricePage": {
     "availableModels": "可用模型",
     "channelType": "供應商",
-    "inputMultiplier": "輸入倍率",
+    "group": "分組",
+    "inputPrice": "輸入價格",
     "model": "模型名稱",
-    "outputMultiplier": "輸出倍率",
+    "noneGroup": "當前分組不可用",
+    "outputPrice": "輸出價格",
+    "search": "搜尋",
+    "times": "按次付費",
+    "tokens": "按量付費",
     "type": "類型"
   },
   "nova 映射": "nova 映射",
@@ -955,7 +960,9 @@
     "ratio": "倍率",
     "symbol": "標識",
     "symbolTip": "標識用於區分用戶組，請使用英文，不可重複",
-    "title": "用戶分組"
+    "title": "用戶分組",
+    "apiRate": "API速率",
+    "apiRateTip": "每分鐘允許的請求數，當速率小於60時，使用計數器限制器，當速率大於等於60時，使用令牌桶限制器，僅在啟用Redis時有效。"
   },
   "userPage": {
     "action": "操作",
@@ -1081,5 +1088,6 @@
   "默认 zh-CN-YunxiNeural": "默認 zh-HK-YunxiNeural",
   "默认 zh-CN-YunxiNeural|boy": "默認 zh-HK-YunxiNeural|boy",
   "默认 zh-CN-YunyangNeural": "默認 zh-HK-YunyangNeural",
-  "默认 zh-CN-YunyeNeural": "默認 zh-HK-YunyeNeural"
+  "默认 zh-CN-YunyeNeural": "默認 zh-HK-YunyeNeural",
+  "playground": "聊天"
 }

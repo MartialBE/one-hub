@@ -22,6 +22,7 @@
     "apexcharts": "3.35.3",
     "axios": "^0.28.0",
     "dayjs": "^1.11.10",
+    "decimal.js": "^10.4.3",
     "formik": "^2.4.5",
     "framer-motion": "^11.0.3",
     "highlight.js": "^11.10.0",
