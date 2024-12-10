@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { showError, showNotice } from 'utils/common';
+import { showError } from 'utils/common';
 import { API } from 'utils/api';
 import { marked } from 'marked';
 import BaseIndex from './baseIndex';
@@ -10,24 +10,6 @@ const Home = () => {
   const { t } = useTranslation();
   const [homePageContentLoaded, setHomePageContentLoaded] = useState(false);
   const [homePageContent, setHomePageContent] = useState('');
-  const displayNotice = async () => {
-    try {
-      const res = await API.get('/api/notice');
-      const { success, message, data } = res.data;
-      if (success) {
-        let oldNotice = localStorage.getItem('notice');
-        if (data !== oldNotice && data !== '') {
-          const htmlNotice = marked(data);
-          showNotice(htmlNotice, true);
-          localStorage.setItem('notice', data);
-        }
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      return;
-    }
-  };
 
   const displayHomePageContent = async () => {
     setHomePageContent(localStorage.getItem('home_page_content') || '');
@@ -52,7 +34,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-    displayNotice().then();
     displayHomePageContent().then();
   }, []);
 

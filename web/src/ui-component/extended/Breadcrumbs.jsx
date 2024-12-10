@@ -68,8 +68,15 @@ const Breadcrumbs = ({ card, divider, icon, icons, maxItems, navigation, rightAl
   });
 
   // item separator
-  const SeparatorIcon = separator;
-  const separatorIcon = separator ? <SeparatorIcon stroke={1.5} size="1rem" /> : <IconTallymark1 stroke={1.5} size="1rem" />;
+  const separatorIcon = separator ? (
+    typeof separator === 'function' ? (
+      <separator stroke={1.5} size="1rem" />
+    ) : (
+      separator
+    )
+  ) : (
+    <IconTallymark1 stroke={1.5} size="1rem" />
+  );
 
   let mainContent;
   let itemContent;

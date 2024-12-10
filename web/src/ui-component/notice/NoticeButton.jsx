@@ -1,11 +1,13 @@
-import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
-import { Icon } from '@iconify/react';
-import { marked } from 'marked';
-import { showNotice } from '../utils/common';
+import { useTheme } from '@mui/material/styles';
 
-export default function NoticeButton() {
+import { Icon } from '@iconify/react';
+
+import { useNotice } from './NoticeContext';
+
+export function NoticeButton() {
   const theme = useTheme();
+  const { openNotice } = useNotice();
 
   return (
     <Box
@@ -36,13 +38,7 @@ export default function NoticeButton() {
               borderRadius: '50%'
             }
           }}
-          onClick={() => {
-            let notice = localStorage.getItem('notice');
-            if (notice !== '') {
-              const htmlNotice = marked(notice);
-              showNotice(htmlNotice, true);
-            }
-          }}
+          onClick={openNotice}
           color="inherit"
         >
           <Icon icon="lets-icons:message-duotone" width="1.3rem" />

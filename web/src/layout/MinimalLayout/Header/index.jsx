@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ThemeButton from 'ui-component/ThemeButton';
-import NoticeButton from 'ui-component/NoticeButton';
+import { NoticeButton } from 'ui-component/notice';
 import I18nButton from 'ui-component/i18nButton';
 import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 import { IconMenu2 } from '@tabler/icons-react';
