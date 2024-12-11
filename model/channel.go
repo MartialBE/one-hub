@@ -81,7 +81,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.Models != "" {
-		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE model IN (?))", params.Models)
+		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE model LIKE ? GROUP BY channel_id)", "%"+params.Models+"%")
 	}
 
 	if params.Other != "" {
