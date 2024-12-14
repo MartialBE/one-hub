@@ -5,11 +5,14 @@ import { Box, Card, Stack, alpha, Tooltip, IconButton, Typography } from '@mui/m
 import Label from 'ui-component/Label';
 import { useTranslation } from 'react-i18next';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import IconWrapper from 'ui-component/IconWrapper';
 
 const SupportModels = () => {
   const [modelList, setModelList] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const { t } = useTranslation();
+  const ownedby = useSelector((state) => state.siteInfo?.ownedby);
 
   const fetchModels = async () => {
     try {
@@ -44,6 +47,11 @@ const SupportModels = () => {
   useEffect(() => {
     fetchModels();
   }, []);
+
+  const getIconByName = (name) => {
+    const owner = ownedby.find((item) => item.name === name);
+    return owner?.icon;
+  };
 
   return (
     <Card>
@@ -159,7 +167,10 @@ const SupportModels = () => {
                     fontWeight: 'bold'
                   }}
                 >
-                  {provider}
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <IconWrapper url={getIconByName(provider)} />
+                    <span>{provider}</span>
+                  </Stack>
                 </Typography>
                 <Box
                   sx={{

@@ -12,7 +12,8 @@ const icons = {
   IconCoin: () => <Icon width={20} icon="solar:dollar-minimalistic-bold-duotone" />,
   IconBrandPaypal: () => <Icon width={20} icon="solar:wallet-money-bold-duotone" />,
   IconCoins: () => <Icon width={20} icon="solar:hand-money-bold-duotone" />,
-  IconUsers: () => <Icon width={20} icon="solar:users-group-rounded-bold-duotone" />
+  IconUsers: () => <Icon width={20} icon="solar:users-group-rounded-bold-duotone" />,
+  IconModel: () => <Icon width={20} icon="mingcute:ai-fill" />
 };
 
 const Setting = {
@@ -69,6 +70,15 @@ const Setting = {
           type: 'item',
           url: '/panel/telegram',
           icon: icons.IconBrandTelegram,
+          breadcrumbs: false,
+          isAdmin: true
+        },
+        {
+          id: 'model_ownedby',
+          title: '模型归属',
+          type: 'item',
+          url: '/panel/model_ownedby',
+          icon: icons.IconModel,
           breadcrumbs: false,
           isAdmin: true
         }

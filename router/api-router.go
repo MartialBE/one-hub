@@ -85,6 +85,17 @@ func SetApiRouter(router *gin.Engine) {
 			optionRoute.GET("/telegram/:id", controller.GetTelegramMenu)
 			optionRoute.DELETE("/telegram/:id", controller.DeleteTelegramMenu)
 		}
+
+		modelOwnedByRoute := apiRouter.Group("/model_ownedby")
+		modelOwnedByRoute.Use(middleware.AdminAuth())
+		{
+			modelOwnedByRoute.GET("/", controller.GetAllModelOwnedBy)
+			modelOwnedByRoute.GET("/:id", controller.GetModelOwnedBy)
+			modelOwnedByRoute.POST("/", controller.CreateModelOwnedBy)
+			modelOwnedByRoute.PUT("/", controller.UpdateModelOwnedBy)
+			modelOwnedByRoute.DELETE("/:id", controller.DeleteModelOwnedBy)
+		}
+
 		userGroup := apiRouter.Group("/user_group")
 		userGroup.Use(middleware.AdminAuth())
 		{

@@ -95,7 +95,7 @@ func ListModelsForAdmin(c *gin.Context) {
 func RetrieveModel(c *gin.Context) {
 	modelName := c.Param("model")
 	openaiModel := getOpenAIModelWithName(modelName)
-	if *openaiModel.OwnedBy != relay_util.UnknownOwnedBy {
+	if *openaiModel.OwnedBy != model.UnknownOwnedBy {
 		c.JSON(200, openaiModel)
 	} else {
 		openAIError := types.OpenAIError{
@@ -111,11 +111,12 @@ func RetrieveModel(c *gin.Context) {
 }
 
 func getModelOwnedBy(channelType int) (ownedBy *string) {
-	if ownedByName, ok := relay_util.ModelOwnedBy[channelType]; ok {
+	ownedByName := model.ModelOwnedBysInstance.GetName(channelType)
+	if ownedByName != "" {
 		return &ownedByName
 	}
 
-	return &relay_util.UnknownOwnedBy
+	return &model.UnknownOwnedBy
 }
 
 func getOpenAIModelWithName(modelName string) *OpenAIModels {
@@ -133,7 +134,7 @@ func GetModelOwnedBy(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    relay_util.ModelOwnedBy,
+		"data":    model.ModelOwnedBysInstance.GetAll(),
 	})
 }
 

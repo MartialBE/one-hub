@@ -1089,5 +1089,16 @@
   "默认 zh-CN-YunxiNeural|boy": "默認 zh-HK-YunxiNeural|boy",
   "默认 zh-CN-YunyangNeural": "默認 zh-HK-YunyangNeural",
   "默认 zh-CN-YunyeNeural": "默認 zh-HK-YunyeNeural",
-  "playground": "聊天"
+  "playground": "聊天",
+  "modelOwnedby": {
+    "action": "操作",
+    "create": "新建模型歸屬",
+    "icon": "圖標",
+    "iconTip": "圖標用於在模型清單中顯示",
+    "id": "身分證",
+    "idTip": "渠道ID，數字，請設定大於1000以上的數字，設定好不可更改。",
+    "name": "名稱",
+    "nameTip": "渠道名稱",
+    "title": "模型歸屬"
+  }
 }

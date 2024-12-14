@@ -1,7 +1,10 @@
 import config from 'config';
 import * as actionTypes from './actions';
 
-export const initialState = config.siteInfo;
+export const initialState = {
+  ...config.siteInfo,
+  ownedby: []
+};
 
 const siteInfoReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -9,7 +12,12 @@ const siteInfoReducer = (state = initialState, action) => {
       return {
         ...state,
         ...action.payload,
-        isLoading: false // 添加加载状态
+        isLoading: false
+      };
+    case actionTypes.SET_MODEL_OWNEDBY:
+      return {
+        ...state,
+        ownedby: action.payload
       };
     default:
       return state;

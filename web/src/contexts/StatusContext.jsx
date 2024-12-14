@@ -1,7 +1,7 @@
 import { useEffect, useCallback, createContext } from 'react';
 import { API } from 'utils/api';
 import { showNotice, showError } from 'utils/common';
-import { SET_SITE_INFO } from 'store/actions';
+import { SET_SITE_INFO, SET_MODEL_OWNEDBY } from 'store/actions';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -64,9 +64,22 @@ const StatusProvider = ({ children }) => {
     // eslint-disable-next-line
   }, [dispatch]);
 
+  const loadOwnedby = useCallback(async () => {
+    try {
+      const res = await API.get('/api/model_ownedby');
+      const { success, data } = res.data;
+      if (success) {
+        dispatch({ type: SET_MODEL_OWNEDBY, payload: data });
+      }
+    } catch (error) {
+      showError(error.message);
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     loadStatus().then();
-  }, [loadStatus]);
+    loadOwnedby();
+  }, [loadStatus, loadOwnedby]);
 
   return <LoadStatusContext.Provider value={loadStatus}> {children} </LoadStatusContext.Provider>;
 };

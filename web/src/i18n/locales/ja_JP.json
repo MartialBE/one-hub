@@ -1089,5 +1089,16 @@
   "默认 zh-CN-YunxiNeural|boy": "デフォルト zh-CN-YunxiNeural|boy",
   "默认 zh-CN-YunyangNeural": "デフォルトのzh-CN-YunyangNeural",
   "默认 zh-CN-YunyeNeural": "デフォルトのzh-CN-YunyeNeural",
-  "plauground": ""
+  "plauground": "",
+  "modelOwnedby": {
+    "action": "操作を実行します",
+    "create": "新しいモデルの帰属",
+    "icon": "アイコン",
+    "iconTip": "モデルリストでの表示にアイコンを使用します",
+    "id": "ID",
+    "idTip": "チャネルIDは数字で、1000以上の値を設定し、一旦設定したら変更できないようにしてください。",
+    "name": "名前",
+    "nameTip": "チャネル名",
+    "title": "モデルの帰属"
+  }
 }

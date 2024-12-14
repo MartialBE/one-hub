@@ -1089,5 +1089,16 @@
   "默认 zh-CN-YunyangNeural": "Default zh-CN-YunyangNeural",
   "默认 zh-CN-YunyeNeural": "Default zh-CN-YunyeNeural",
   "plauground": "",
-  "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1"
+  "请输入版本号，例如：v3[1]": "Please enter the version number, for example: v3.1",
+  "modelOwnedby": {
+    "action": "Operation",
+    "create": "New model ownership",
+    "icon": "Icon",
+    "iconTip": "Icons are used to display in the model list.",
+    "id": "ID",
+    "idTip": "Channel ID, a number. Please set it to a number greater than 1000; once set, it cannot be changed.",
+    "name": "Name",
+    "nameTip": "Channel Name",
+    "title": "Model Ownership"
+  }
 }

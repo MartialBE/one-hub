@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import {
   Card,
   Stack,
@@ -24,6 +25,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { API } from 'utils/api';
 import { showError, ValueFormatter } from 'utils/common';
 import { useTheme } from '@mui/material/styles';
+import IconWrapper from 'ui-component/IconWrapper';
 
 const GroupChip = styled(Chip)(({ theme, selected }) => ({
   margin: theme.spacing(0.5),
@@ -87,6 +89,7 @@ const StyledToggleButton = styled(ToggleButton)({
 export default function ModelPrice() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const ownedby = useSelector((state) => state.siteInfo?.ownedby);
 
   const [rows, setRows] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
@@ -196,6 +199,11 @@ export default function ModelPrice() {
 
   const uniqueOwnedBy = [...new Set(Object.values(availableModels).map((model) => model.owned_by))];
 
+  const getIconByName = (name) => {
+    const owner = ownedby.find((item) => item.name === name);
+    return owner?.icon;
+  };
+
   return (
     <Stack spacing={3} sx={{ padding: theme.spacing(3) }}>
       <Typography variant="h4" color="textPrimary">
@@ -249,18 +257,54 @@ export default function ModelPrice() {
         </Stack>
       </Card>
 
-      <Tabs
-        value={selectedOwnedBy}
-        onChange={handleTabChange}
-        textColor="inherit"
-        indicatorColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-      >
-        {uniqueOwnedBy.map((ownedBy, index) => (
-          <Tab key={index} label={ownedBy} value={ownedBy} />
-        ))}
-      </Tabs>
+      <Box sx={{ width: '100%' }}>
+        <Tabs
+          value={selectedOwnedBy}
+          onChange={handleTabChange}
+          textColor="inherit"
+          indicatorColor="primary"
+          variant="standard"
+          sx={{
+            '& .MuiTabs-flexContainer': {
+              flexWrap: 'wrap',
+              gap: 1
+            },
+            '& .MuiTabs-indicator': {
+              display: 'none'
+            }
+          }}
+        >
+          {uniqueOwnedBy.map((ownedBy, index) => (
+            <Tab
+              key={index}
+              value={ownedBy}
+              icon={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <IconWrapper url={getIconByName(ownedBy)} />
+                  <span>{ownedBy}</span>
+                </Stack>
+              }
+              sx={{
+                minHeight: '48px',
+                padding: '6px 16px',
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '& .MuiTab-iconWrapper': {
+                  margin: 0
+                },
+                '&:hover': {
+                  backgroundColor: (theme) => theme.palette.action.hover,
+                  transform: 'translateY(-1px)'
+                },
+                '&.Mui-selected': {
+                  backgroundColor: (theme) => theme.palette.action.selected,
+                  boxShadow: (theme) => (theme.palette.mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.1)')
+                }
+              }}
+            />
+          ))}
+        </Tabs>
+      </Box>
 
       <Card sx={{ backgroundColor: theme.palette.background.default }}>
         <TableContainer>
@@ -269,8 +313,8 @@ export default function ModelPrice() {
               <TableRow>
                 <TableCell width="25%">{t('modelpricePage.model')}</TableCell>
                 <TableCell width="30%">{t('modelpricePage.type')}</TableCell>
-                <TableCell width="22.5%">{t('modelpricePage.inputPrice')}</TableCell>
-                <TableCell width="22.5%">{t('modelpricePage.outputPrice')}</TableCell>
+                <TableCell width="22.5%">{t('modelpricePage.inputMultiplier')}</TableCell>
+                <TableCell width="22.5%">{t('modelpricePage.outputMultiplier')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
