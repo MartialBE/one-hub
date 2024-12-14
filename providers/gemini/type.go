@@ -284,18 +284,30 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 		}
 		content.Role = ConvertRole(openaiContent.Role)
 		if openaiContent.ToolCalls != nil || openaiContent.FunctionCall != nil {
+			argeStr := ""
 			if openaiContent.ToolCalls != nil {
 				useToolName = openaiContent.ToolCalls[0].Function.Name
+				if openaiContent.ToolCalls[0].Function.Arguments != "" {
+					argeStr = openaiContent.ToolCalls[0].Function.Arguments
+				}
 			} else {
 				useToolName = openaiContent.FunctionCall.Name
+				if openaiContent.FunctionCall.Arguments != "" {
+					argeStr = openaiContent.FunctionCall.Arguments
+				}
 			}
+			arge := map[string]interface{}{}
+			if argeStr != "" {
+				json.Unmarshal([]byte(argeStr), &arge)
+			}
+
 			content = GeminiChatContent{
 				Role: "model",
 				Parts: []GeminiPart{
 					{
 						FunctionCall: &GeminiFunctionCall{
 							Name: useToolName,
-							Args: map[string]interface{}{},
+							Args: arge,
 						},
 					},
 				},
