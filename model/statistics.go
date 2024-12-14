@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"one-api/common"
+	"strings"
 	"time"
 )
 
@@ -43,29 +44,67 @@ func GetUserModelStatisticsByPeriod(userId int, startTime, endTime string) (LogS
 	return
 }
 
-func GetChannelExpensesStatisticsByPeriod(startTime, endTime string) (LogStatistics []*LogStatisticGroupChannel, err error) {
+func GetChannelExpensesStatisticsByPeriod(startTime, endTime, groupType string, userID int) (LogStatistics []*LogStatisticGroupChannel, err error) {
+
+	var whereClause strings.Builder
+	whereClause.WriteString("WHERE date BETWEEN ? AND ?")
+	args := []interface{}{startTime, endTime}
+
+	if userID > 0 {
+		whereClause.WriteString(" AND user_id = ?")
+		args = append(args, userID)
+	}
+
 	dateStr := "date"
 	if common.UsingPostgreSQL {
 		dateStr = "TO_CHAR(date, 'YYYY-MM-DD') as date"
 	} else if common.UsingSQLite {
 		dateStr = "strftime('%Y-%m-%d', date) as date"
 	}
-	err = DB.Raw(`
-		SELECT `+dateStr+`,
-		sum(request_count) as request_count,
-		sum(quota) as quota,
-		sum(prompt_tokens) as prompt_tokens,
-		sum(completion_tokens) as completion_tokens,
-		sum(request_time) as request_time,
-		MAX(channels.name) AS channel
-		FROM statistics
-		JOIN channels ON statistics.channel_id = channels.id
-		WHERE date BETWEEN ? AND ?
-		GROUP BY date, channel_id
-		ORDER BY date, channel_id
-	`, startTime, endTime).Scan(&LogStatistics).Error
 
-	return LogStatistics, err
+	baseSelect := `
+        SELECT ` + dateStr + `,
+        sum(request_count) as request_count,
+        sum(quota) as quota,
+        sum(prompt_tokens) as prompt_tokens,
+        sum(completion_tokens) as completion_tokens,
+        sum(request_time) as request_time,`
+
+	var sql string
+	if groupType == "model" {
+		sql = baseSelect + `
+            model_name as channel
+            FROM statistics
+            %s
+            GROUP BY date, model_name
+            ORDER BY date, model_name`
+	} else if groupType == "model_type" {
+		sql = baseSelect + `
+            model_owned_by.name as channel
+            FROM statistics
+            JOIN prices ON statistics.model_name = prices.model
+			JOIN model_owned_by ON prices.channel_type = model_owned_by.id
+            %s
+            GROUP BY date, model_owned_by.name
+            ORDER BY date, model_owned_by.name`
+
+	} else {
+		sql = baseSelect + `
+            channels.name as channel
+            FROM statistics
+            JOIN channels ON statistics.channel_id = channels.id
+            %s
+            GROUP BY date, channel_id
+            ORDER BY date, channel_id`
+	}
+
+	sql = fmt.Sprintf(sql, whereClause.String())
+	err = DB.Raw(sql, args...).Scan(&LogStatistics).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return LogStatistics, nil
 }
 
 type StatisticsUpdateType int

@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 const ApexCharts = ({ isLoading, chartDatas, title = 'dashboard_index.statistics' }) => {
   const { t } = useTranslation();
+  console.log(isLoading);
   return (
     <>
       {isLoading ? (
@@ -32,7 +33,7 @@ const ApexCharts = ({ isLoading, chartDatas, title = 'dashboard_index.statistics
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              {chartDatas.series ? (
+              {chartDatas?.series ? (
                 <Chart {...chartDatas} />
               ) : (
                 <Box

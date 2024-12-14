@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Grid, Typography, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Grid, Typography, Divider, Box, TextField, Button, Select, MenuItem } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import DateRangePicker from 'ui-component/DateRangePicker';
 import ApexCharts from 'ui-component/chart/ApexCharts';
@@ -20,11 +20,19 @@ export default function Overview() {
   const [orderLoading, setOrderLoading] = useState(true);
   const [usersData, setUsersData] = useState([]);
   const [dateRange, setDateRange] = useState({ start: dayjs().subtract(6, 'day').startOf('day'), end: dayjs().endOf('day') });
+
+  const [groupType, setGroupType] = useState('model_type');
+  const [userId, setUserId] = useState(0);
+
+  const handleSearch = () => {
+    fetchData(dateRange, groupType, userId);
+  };
+
   const handleDateRangeChange = (value) => {
     setDateRange(value);
   };
 
-  const period = useCallback(async () => {
+  const fetchData = async (date, gType, uId) => {
     setUsersLoading(true);
     setChannelLoading(true);
     setRedemptionLoading(true);
@@ -32,54 +40,74 @@ export default function Overview() {
     try {
       const res = await API.get('/api/analytics/period', {
         params: {
-          start_timestamp: dateRange.start.unix(),
-          end_timestamp: dateRange.end.unix()
+          start_timestamp: date.start.unix(),
+          end_timestamp: date.end.unix(),
+          group_type: gType,
+          user_id: uId
         }
       });
       const { success, message, data } = res.data;
       if (success) {
         if (data) {
-          if (data.user_statistics) {
-            setUsersData(getUsersData(data.user_statistics, dateRange));
-          }
+          setUsersData(getUsersData(data?.user_statistics, date));
 
-          if (data.channel_statistics) {
-            setChannelData(getBarChartOptions(data.channel_statistics, dateRange));
-          }
+          setChannelData(getBarChartOptions(data?.channel_statistics, date));
 
-          if (data.redemption_statistics) {
-            setRedemptionData(getRedemptionData(data.redemption_statistics, dateRange));
-          }
+          setRedemptionData(getRedemptionData(data?.redemption_statistics, date));
 
-          if (data.order_statistics) {
-            setOrderData(getOrdersData(data.order_statistics, dateRange));
-          }
+          setOrderData(getOrdersData(data?.order_statistics, date));
         }
-        setUsersLoading(false);
-        setChannelLoading(false);
-        setRedemptionLoading(false);
-        setOrderLoading(false);
       } else {
         showError(message);
       }
       setUsersLoading(false);
+      setChannelLoading(false);
+      setRedemptionLoading(false);
+      setOrderLoading(false);
     } catch (error) {
+      console.log(error);
       return;
     }
-  }, [dateRange]);
+  };
 
   useEffect(() => {
-    period();
-  }, [dateRange, period]);
+    fetchData(dateRange, groupType, userId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Grid container spacing={gridSpacing}>
-      <Grid item lg={8} xs={12}>
-        <DateRangePicker
-          defaultValue={dateRange}
-          onChange={handleDateRangeChange}
-          localeText={{ start: t('analytics_index.startTime'), end: t('analytics_index.endTime') }}
-        />
+      <Grid lg={12} xs={12}>
+        <Box sx={{ display: 'flex', gap: 2, m: 3 }}>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={6}>
+              <DateRangePicker
+                defaultValue={dateRange}
+                onChange={handleDateRangeChange}
+                localeText={{ start: '开始时间', end: '结束时间' }}
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Select value={groupType} onChange={(e) => setGroupType(e.target.value)} fullWidth>
+                <MenuItem value="model_type">Model Type</MenuItem>
+                <MenuItem value="model">Model</MenuItem>
+                <MenuItem value="channel">Channel</MenuItem>
+              </Select>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField type="number" label="用户ID" value={userId} onChange={(e) => setUserId(Number(e.target.value))} fullWidth />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Button variant="contained" onClick={handleSearch} fullWidth>
+                搜索
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h3">
@@ -89,7 +117,7 @@ export default function Overview() {
       <Grid item xs={12}>
         <Divider />
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12}>
         <ApexCharts
           id="cost"
           isLoading={channelLoading}
@@ -98,7 +126,7 @@ export default function Overview() {
           decimal={3}
         />
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12}>
         <ApexCharts
           id="token"
           isLoading={channelLoading}
@@ -107,7 +135,7 @@ export default function Overview() {
           unit=""
         />
       </Grid>
-      <Grid item xs={12} md={6}>
+      {/* <Grid item xs={12}>
         <ApexCharts
           id="latency"
           isLoading={channelLoading}
@@ -115,8 +143,8 @@ export default function Overview() {
           title={t('analytics_index.averageLatency')}
           unit=""
         />
-      </Grid>
-      <Grid item xs={12} md={6}>
+      </Grid> */}
+      <Grid item xs={12}>
         <ApexCharts
           id="requests"
           isLoading={channelLoading}
@@ -192,6 +220,8 @@ function getBarDataGroup(data, dates) {
 }
 
 function getBarChartOptions(data, dateRange) {
+  if (!data) return null;
+
   const dates = getDates(dateRange.start, dateRange.end);
   const result = getBarDataGroup(data, dates);
 
@@ -249,6 +279,8 @@ function getBarChartOptions(data, dateRange) {
 }
 
 function getRedemptionData(data, dateRange) {
+  if (!data) return null;
+
   const dates = getDates(dateRange.start, dateRange.end);
   const result = [
     {
@@ -313,6 +345,8 @@ function getRedemptionData(data, dateRange) {
 }
 
 function getUsersData(data, dateRange) {
+  if (!data) return null;
+
   const dates = getDates(dateRange.start, dateRange.end);
   const result = [
     {
@@ -344,6 +378,8 @@ function getUsersData(data, dateRange) {
 }
 
 function getOrdersData(data, dateRange) {
+  if (!data) return null;
+
   const dates = getDates(dateRange.start, dateRange.end);
   const result = [
     {
