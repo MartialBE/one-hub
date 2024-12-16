@@ -277,6 +277,7 @@ func (g *GeminiChatResponse) GetResponseText() string {
 func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]GeminiChatContent, *types.OpenAIErrorWithStatusCode) {
 	contents := make([]GeminiChatContent, 0)
 	useToolName := ""
+
 	for _, openaiContent := range openaiContents {
 		content := GeminiChatContent{
 			Role:  ConvertRole(openaiContent.Role),
@@ -299,6 +300,11 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 			arge := map[string]interface{}{}
 			if argeStr != "" {
 				json.Unmarshal([]byte(argeStr), &arge)
+			}
+
+			text := openaiContent.StringContent()
+			if text != "" {
+				contents = append(contents, createSystemResponse(text))
 			}
 
 			content = GeminiChatContent{
@@ -358,19 +364,23 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 		}
 		contents = append(contents, content)
 		if openaiContent.Role == types.ChatMessageRoleSystem {
-			contents = append(contents, GeminiChatContent{
-				Role: "model",
-				Parts: []GeminiPart{
-					{
-						Text: "Okay",
-					},
-				},
-			})
+			contents = append(contents, createSystemResponse("Okay"))
 		}
 
 	}
 
 	return contents, nil
+}
+
+func createSystemResponse(text string) GeminiChatContent {
+	return GeminiChatContent{
+		Role: "model",
+		Parts: []GeminiPart{
+			{
+				Text: text,
+			},
+		},
+	}
 }
 
 type ModelListResponse struct {
