@@ -33,7 +33,7 @@ type SiliconflowProvider struct {
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:             "https://api.siliconflow.cn",
+		BaseURL:             "https://api.siliconflow.com",
 		ImagesGenerations:   "/v1/%s/text-to-image",
 		ChatCompletions:     "/v1/chat/completions",
 		Embeddings:          "/v1/embeddings",
