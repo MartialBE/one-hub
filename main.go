@@ -18,7 +18,6 @@ import (
 	"one-api/cron"
 	"one-api/middleware"
 	"one-api/model"
-	"one-api/relay/relay_util"
 	"one-api/relay/task"
 	"one-api/router"
 	"time"
@@ -61,7 +60,7 @@ func main() {
 	model.InitOptionMap()
 	// Initialize oidc
 	oidc.InitOIDCConfig()
-	relay_util.NewPricing()
+	model.NewPricing()
 	model.HandleOldTokenMaxId()
 
 	initMemoryCache()
@@ -141,6 +140,6 @@ func SyncChannelCache(frequency int) {
 		time.Sleep(time.Duration(frequency) * time.Second)
 		logger.SysLog("syncing channels from database")
 		model.ChannelGroup.Load()
-		relay_util.PricingInstance.Init()
+		model.PricingInstance.Init()
 	}
 }

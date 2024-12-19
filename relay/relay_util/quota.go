@@ -42,7 +42,7 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) *Quota {
 		HandelStatus: false,
 	}
 
-	quota.price = *PricingInstance.GetPrice(quota.modelName)
+	quota.price = *model.PricingInstance.GetPrice(quota.modelName)
 	quota.groupRatio = c.GetFloat64("group_ratio")
 	quota.groupName = c.GetString("token_group")
 	quota.inputRatio = quota.price.GetInput() * quota.groupRatio

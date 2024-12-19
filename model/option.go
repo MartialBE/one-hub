@@ -94,6 +94,8 @@ func InitOptionMap() {
 	config.OptionMap["OldTokenMaxId"] = strconv.Itoa(config.OldTokenMaxId)
 	config.OptionMap["GitHubOldIdCloseEnabled"] = strconv.FormatBool(config.GitHubOldIdCloseEnabled)
 
+	config.OptionMap["AudioTokenJson"] = GetDefaultAudioRatio()
+
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -227,6 +229,11 @@ func updateOptionMap(key string, value string) (err error) {
 	case "RechargeDiscount":
 		err = common.UpdateRechargeDiscountByJSONString(value)
 		config.RechargeDiscount = common.RechargeDiscount2JSONString()
+	case "AudioTokenJson":
+		config.AudioTokenJson = value
+		if PricingInstance != nil {
+			PricingInstance.Init()
+		}
 	}
 	return err
 }

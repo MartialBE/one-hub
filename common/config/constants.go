@@ -72,6 +72,8 @@ var SMTPAccount = ""
 var SMTPFrom = ""
 var SMTPToken = ""
 
+var AudioTokenJson = ""
+
 var ChatImageRequestProxy = ""
 
 var GitHubClientId = ""

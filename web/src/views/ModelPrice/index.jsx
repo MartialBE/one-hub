@@ -26,6 +26,7 @@ import { API } from 'utils/api';
 import { showError, ValueFormatter } from 'utils/common';
 import { useTheme } from '@mui/material/styles';
 import IconWrapper from 'ui-component/IconWrapper';
+import Label from 'ui-component/Label';
 
 const GroupChip = styled(Chip)(({ theme, selected }) => ({
   margin: theme.spacing(0.5),
@@ -166,7 +167,8 @@ export default function ModelPrice() {
           userGroup: model.groups,
           type: model.price.type,
           input: formatPrice(price.input, model.price.type),
-          output: formatPrice(price.output, model.price.type)
+          output: formatPrice(price.output, model.price.type),
+          extraRatios: model.price?.extra_ratios
         };
       });
 
@@ -312,24 +314,57 @@ export default function ModelPrice() {
             <TableHead>
               <TableRow>
                 <TableCell width="25%">{t('modelpricePage.model')}</TableCell>
-                <TableCell width="30%">{t('modelpricePage.type')}</TableCell>
+                <TableCell width="10%">{t('modelpricePage.type')}</TableCell>
                 <TableCell width="22.5%">{t('modelpricePage.inputMultiplier')}</TableCell>
                 <TableCell width="22.5%">{t('modelpricePage.outputMultiplier')}</TableCell>
+                <TableCell width="22.5%">{t('modelpricePage.other')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredRows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{row.model}</TableCell>
-                  <TableCell>{row.type === 'tokens' ? t('modelpricePage.tokens') : t('modelpricePage.times')}</TableCell>
-                  <TableCell>{row.input}</TableCell>
-                  <TableCell>{row.output}</TableCell>
+                  <TableCell>
+                    {row.type === 'tokens' ? (
+                      <Label color="primary">{t('modelpricePage.tokens')}</Label>
+                    ) : (
+                      <Label color="secondary">{t('modelpricePage.times')}</Label>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Label color="info" variant="outlined">
+                      {row.input}
+                    </Label>
+                  </TableCell>
+                  <TableCell>
+                    <Label color="info" variant="outlined">
+                      {row.output}
+                    </Label>
+                  </TableCell>
+                  <TableCell>{getOther(t, row.extraRatios)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Card>
+    </Stack>
+  );
+}
+
+function getOther(t, extraRatios) {
+  if (!extraRatios) return '';
+  const inputRatio = extraRatios.input_audio_tokens_ratio;
+  const outputRatio = extraRatios.output_audio_tokens_ratio;
+
+  return (
+    <Stack direction="column" spacing={1}>
+      <Label color="primary" variant="outlined">
+        {t('modelpricePage.inputAudioTokensRatio')}: {inputRatio}
+      </Label>
+      <Label color="primary" variant="outlined">
+        {t('modelpricePage.outputAudioTokensRatio')}: {outputRatio}
+      </Label>
     </Stack>
   );
 }

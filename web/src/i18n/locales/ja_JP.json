@@ -334,7 +334,10 @@
     "search": "検索",
     "times": "回数制課金",
     "tokens": "量に応じて支払う",
-    "type": "タイプ"
+    "type": "タイプ",
+    "inputAudioTokensRatio": "オーディオ入力倍率",
+    "other": "その他",
+    "outputAudioTokensRatio": "オーディオ出力倍率"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
@@ -669,7 +672,12 @@
         "save": "レート設定を保存",
         "title": "レート設定"
       },
-      "title": "運営設定"
+      "title": "運営設定",
+      "audioTokenSettings": {
+        "info": "オーディオ倍率を設定します。JSON形式で、キーはモデル名であり、値は入力および出力のオーディオトークンの倍率です。例：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
+        "save": "オーディオトークン設定を保存します",
+        "title": "オーディオトークンの設定"
+      }
     },
     "otherSettings": {
       "customSettings": {

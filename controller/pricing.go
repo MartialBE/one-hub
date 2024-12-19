@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"one-api/common"
 	"one-api/model"
-	"one-api/relay/relay_util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +13,7 @@ import (
 func GetPricesList(c *gin.Context) {
 	pricesType := c.DefaultQuery("type", "db")
 
-	prices := relay_util.GetPricesList(pricesType)
+	prices := model.GetPricesList(pricesType)
 
 	if len(prices) == 0 {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("pricing data not found"))
@@ -33,7 +32,7 @@ func GetPricesList(c *gin.Context) {
 }
 
 func GetAllModelList(c *gin.Context) {
-	prices := relay_util.PricingInstance.GetAllPrices()
+	prices := model.PricingInstance.GetAllPrices()
 	channelModel := model.ChannelGroup.Rule
 
 	modelsMap := make(map[string]bool)
@@ -68,7 +67,7 @@ func AddPrice(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.AddPrice(&price); err != nil {
+	if err := model.PricingInstance.AddPrice(&price); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -94,7 +93,7 @@ func UpdatePrice(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.UpdatePrice(modelName, &price); err != nil {
+	if err := model.PricingInstance.UpdatePrice(modelName, &price); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -114,7 +113,7 @@ func DeletePrice(c *gin.Context) {
 	modelName = modelName[1:]
 	modelName, _ = url.PathUnescape(modelName)
 
-	if err := relay_util.PricingInstance.DeletePrice(modelName); err != nil {
+	if err := model.PricingInstance.DeletePrice(modelName); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -127,7 +126,7 @@ func DeletePrice(c *gin.Context) {
 
 type PriceBatchRequest struct {
 	OriginalModels []string `json:"original_models"`
-	relay_util.BatchPrices
+	model.BatchPrices
 }
 
 func BatchSetPrices(c *gin.Context) {
@@ -137,7 +136,7 @@ func BatchSetPrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchSetPrices(&pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil {
+	if err := model.PricingInstance.BatchSetPrices(&pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -159,7 +158,7 @@ func BatchDeletePrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchDeletePrices(pricesBatch.Models); err != nil {
+	if err := model.PricingInstance.BatchDeletePrices(pricesBatch.Models); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -184,7 +183,7 @@ func SyncPricing(c *gin.Context) {
 		return
 	}
 
-	err := relay_util.PricingInstance.SyncPricing(prices, overwrite == "true")
+	err := model.PricingInstance.SyncPricing(prices, overwrite == "true")
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return

@@ -1,4 +1,4 @@
-package relay_util
+package model
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
-	"one-api/model"
 	"sort"
 	"strings"
 	"sync"
@@ -20,13 +19,13 @@ var PricingInstance *Pricing
 // Pricing is a struct that contains the pricing data
 type Pricing struct {
 	sync.RWMutex
-	Prices map[string]*model.Price `json:"models"`
-	Match  []string                `json:"-"`
+	Prices map[string]*Price `json:"models"`
+	Match  []string          `json:"-"`
 }
 
 type BatchPrices struct {
-	Models []string    `json:"models" binding:"required"`
-	Price  model.Price `json:"price" binding:"required"`
+	Models []string `json:"models" binding:"required"`
+	Price  Price    `json:"price" binding:"required"`
 }
 
 // NewPricing creates a new Pricing instance
@@ -34,7 +33,7 @@ func NewPricing() {
 	logger.SysLog("Initializing Pricing")
 
 	PricingInstance = &Pricing{
-		Prices: make(map[string]*model.Price),
+		Prices: make(map[string]*Price),
 		Match:  make([]string, 0),
 	}
 
@@ -48,7 +47,7 @@ func NewPricing() {
 	// 初始化时，需要检测是否有更新
 	if viper.GetBool("auto_price_updates") || len(PricingInstance.Prices) == 0 {
 		logger.SysLog("Checking for pricing updates")
-		prices := model.GetDefaultPrice()
+		prices := GetDefaultPrice()
 		PricingInstance.SyncPricing(prices, false)
 		logger.SysLog("Pricing initialized")
 	}
@@ -56,7 +55,7 @@ func NewPricing() {
 
 // initializes the Pricing instance
 func (p *Pricing) Init() error {
-	prices, err := model.GetAllPrices()
+	prices, err := GetAllPrices()
 	if err != nil {
 		return err
 	}
@@ -65,7 +64,7 @@ func (p *Pricing) Init() error {
 		return nil
 	}
 
-	newPrices := make(map[string]*model.Price)
+	newPrices := make(map[string]*Price)
 	newMatch := make(map[string]bool)
 
 	for _, price := range prices {
@@ -92,7 +91,7 @@ func (p *Pricing) Init() error {
 }
 
 // GetPrice returns the price of a model
-func (p *Pricing) GetPrice(modelName string) *model.Price {
+func (p *Pricing) GetPrice(modelName string) *Price {
 	p.RLock()
 	defer p.RUnlock()
 
@@ -105,20 +104,20 @@ func (p *Pricing) GetPrice(modelName string) *model.Price {
 		return price
 	}
 
-	return &model.Price{
-		Type:        model.TokensPriceType,
+	return &Price{
+		Type:        TokensPriceType,
 		ChannelType: config.ChannelTypeUnknown,
-		Input:       model.DefaultPrice,
-		Output:      model.DefaultPrice,
+		Input:       DefaultPrice,
+		Output:      DefaultPrice,
 	}
 }
 
-func (p *Pricing) GetAllPrices() map[string]*model.Price {
+func (p *Pricing) GetAllPrices() map[string]*Price {
 	return p.Prices
 }
 
-func (p *Pricing) GetAllPricesList() []*model.Price {
-	var prices []*model.Price
+func (p *Pricing) GetAllPricesList() []*Price {
+	var prices []*Price
 	for _, price := range p.Prices {
 		prices = append(prices, price)
 	}
@@ -126,7 +125,7 @@ func (p *Pricing) GetAllPricesList() []*model.Price {
 	return prices
 }
 
-func (p *Pricing) updateRawPrice(modelName string, price *model.Price) error {
+func (p *Pricing) updateRawPrice(modelName string, price *Price) error {
 	if _, ok := p.Prices[modelName]; !ok {
 		return errors.New("model not found")
 	}
@@ -143,7 +142,7 @@ func (p *Pricing) updateRawPrice(modelName string, price *model.Price) error {
 }
 
 // UpdatePrice updates the price of a model
-func (p *Pricing) UpdatePrice(modelName string, price *model.Price) error {
+func (p *Pricing) UpdatePrice(modelName string, price *Price) error {
 
 	if err := p.updateRawPrice(modelName, price); err != nil {
 		return err
@@ -154,7 +153,7 @@ func (p *Pricing) UpdatePrice(modelName string, price *model.Price) error {
 	return err
 }
 
-func (p *Pricing) addRawPrice(price *model.Price) error {
+func (p *Pricing) addRawPrice(price *Price) error {
 	if _, ok := p.Prices[price.Model]; ok {
 		return errors.New("model already exists")
 	}
@@ -163,7 +162,7 @@ func (p *Pricing) addRawPrice(price *model.Price) error {
 }
 
 // AddPrice adds a new price to the Pricing instance
-func (p *Pricing) AddPrice(price *model.Price) error {
+func (p *Pricing) AddPrice(price *Price) error {
 	if err := p.addRawPrice(price); err != nil {
 		return err
 	}
@@ -194,7 +193,7 @@ func (p *Pricing) DeletePrice(modelName string) error {
 }
 
 // SyncPricing syncs the pricing data
-func (p *Pricing) SyncPricing(pricing []*model.Price, overwrite bool) error {
+func (p *Pricing) SyncPricing(pricing []*Price, overwrite bool) error {
 	var err error
 	if overwrite {
 		err = p.SyncPriceWithOverwrite(pricing)
@@ -206,16 +205,16 @@ func (p *Pricing) SyncPricing(pricing []*model.Price, overwrite bool) error {
 }
 
 // SyncPriceWithOverwrite syncs the pricing data with overwrite
-func (p *Pricing) SyncPriceWithOverwrite(pricing []*model.Price) error {
-	tx := model.DB.Begin()
+func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
+	tx := DB.Begin()
 
-	err := model.DeleteAllPrices(tx)
+	err := DeleteAllPrices(tx)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	err = model.InsertPrices(tx, pricing)
+	err = InsertPrices(tx, pricing)
 
 	if err != nil {
 		tx.Rollback()
@@ -228,8 +227,8 @@ func (p *Pricing) SyncPriceWithOverwrite(pricing []*model.Price) error {
 }
 
 // SyncPriceWithoutOverwrite syncs the pricing data without overwrite
-func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
-	var newPrices []*model.Price
+func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*Price) error {
+	var newPrices []*Price
 
 	for _, price := range pricing {
 		if _, ok := p.Prices[price.Model]; !ok {
@@ -241,8 +240,8 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 		return nil
 	}
 
-	tx := model.DB.Begin()
-	err := model.InsertPrices(tx, newPrices)
+	tx := DB.Begin()
+	err := InsertPrices(tx, newPrices)
 
 	if err != nil {
 		tx.Rollback()
@@ -256,9 +255,9 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 
 // BatchDeletePrices deletes the prices of multiple models
 func (p *Pricing) BatchDeletePrices(models []string) error {
-	tx := model.DB.Begin()
+	tx := DB.Begin()
 
-	err := model.DeletePrices(tx, models)
+	err := DeletePrices(tx, models)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -279,7 +278,7 @@ func (p *Pricing) BatchDeletePrices(models []string) error {
 func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string) error {
 	// 查找需要删除的model
 	var deletePrices []string
-	var addPrices []*model.Price
+	var addPrices []*Price
 	var updatePrices []string
 
 	for _, model := range originalModels {
@@ -298,9 +297,9 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 		}
 	}
 
-	tx := model.DB.Begin()
+	tx := DB.Begin()
 	if len(addPrices) > 0 {
-		err := model.InsertPrices(tx, addPrices)
+		err := InsertPrices(tx, addPrices)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -308,7 +307,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	if len(updatePrices) > 0 {
-		err := model.UpdatePrices(tx, updatePrices, &batchPrices.Price)
+		err := UpdatePrices(tx, updatePrices, &batchPrices.Price)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -316,7 +315,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	if len(deletePrices) > 0 {
-		err := model.DeletePrices(tx, deletePrices)
+		err := DeletePrices(tx, deletePrices)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -328,12 +327,12 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	return p.Init()
 }
 
-func GetPricesList(pricingType string) []*model.Price {
-	var prices []*model.Price
+func GetPricesList(pricingType string) []*Price {
+	var prices []*Price
 
 	switch pricingType {
 	case "default":
-		prices = model.GetDefaultPrice()
+		prices = GetDefaultPrice()
 	case "db":
 		prices = PricingInstance.GetAllPricesList()
 	case "old":
@@ -352,8 +351,8 @@ func GetPricesList(pricingType string) []*model.Price {
 	return prices
 }
 
-func GetOldPricesList() []*model.Price {
-	oldDataJson, err := model.GetOption("ModelRatio")
+func GetOldPricesList() []*Price {
+	oldDataJson, err := GetOption("ModelRatio")
 	if err != nil || oldDataJson.Value == "" {
 		return nil
 	}
@@ -365,12 +364,12 @@ func GetOldPricesList() []*model.Price {
 		return nil
 	}
 
-	var prices []*model.Price
+	var prices []*Price
 	for modelName, oldPrice := range oldData {
 		price := PricingInstance.GetPrice(modelName)
-		prices = append(prices, &model.Price{
+		prices = append(prices, &Price{
 			Model:       modelName,
-			Type:        model.TokensPriceType,
+			Type:        TokensPriceType,
 			ChannelType: price.ChannelType,
 			Input:       oldPrice[0],
 			Output:      oldPrice[1],
@@ -380,7 +379,7 @@ func GetOldPricesList() []*model.Price {
 	return prices
 }
 
-// func ConvertBatchPrices(prices []*model.Price) []*BatchPrices {
+// func ConvertBatchPrices(prices []*Price) []*BatchPrices {
 // 	batchPricesMap := make(map[string]*BatchPrices)
 // 	for _, price := range prices {
 // 		key := fmt.Sprintf("%s-%d-%g-%g", price.Type, price.ChannelType, price.Input, price.Output)

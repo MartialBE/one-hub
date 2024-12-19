@@ -39,7 +39,8 @@ const OperationSetting = () => {
     PaymentMinAmount: 1,
     RechargeDiscount: '',
     CFWorkerImageUrl: '',
-    CFWorkerImageKey: ''
+    CFWorkerImageKey: '',
+    AudioTokenJson: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -191,6 +192,15 @@ const OperationSetting = () => {
             return;
           }
           await updateOption('RechargeDiscount', inputs.RechargeDiscount);
+        }
+        break;
+      case 'AudioTokenJson':
+        if (originInputs.AudioTokenJson !== inputs.AudioTokenJson) {
+          if (!verifyJSON(inputs.AudioTokenJson)) {
+            showError('音频令牌不是合法的 JSON 字符串');
+            return;
+          }
+          await updateOption('AudioTokenJson', inputs.AudioTokenJson);
         }
         break;
     }
@@ -639,6 +649,35 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.chatLinkSettings.save')}
+            </Button>
+          </Stack>
+        </Stack>
+      </SubCard>
+
+      <SubCard title={t('setting_index.operationSettings.audioTokenSettings.title')}>
+        <Stack spacing={2}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControl fullWidth>
+              <TextField
+                multiline
+                maxRows={15}
+                id="audioTokenJson"
+                label={t('setting_index.operationSettings.audioTokenSettings.info')}
+                value={inputs.AudioTokenJson}
+                name="AudioTokenJson"
+                onChange={handleInputChange}
+                minRows={5}
+                placeholder={t('setting_index.operationSettings.audioTokenSettings.info')}
+                disabled={loading}
+              />
+            </FormControl>
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('AudioTokenJson').then();
+              }}
+            >
+              {t('setting_index.operationSettings.audioTokenSettings.save')}
             </Button>
           </Stack>
         </Stack>

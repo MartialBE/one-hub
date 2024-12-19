@@ -6,7 +6,6 @@ import (
 	"one-api/common"
 	"one-api/common/utils"
 	"one-api/model"
-	"one-api/relay/relay_util"
 	"one-api/types"
 	"sort"
 
@@ -65,7 +64,7 @@ func ListModelsByToken(c *gin.Context) {
 }
 
 func ListModelsForAdmin(c *gin.Context) {
-	prices := relay_util.PricingInstance.GetAllPrices()
+	prices := model.PricingInstance.GetAllPrices()
 	var openAIModels []OpenAIModels
 	for modelId, price := range prices {
 		openAIModels = append(openAIModels, OpenAIModels{
@@ -120,7 +119,7 @@ func getModelOwnedBy(channelType int) (ownedBy *string) {
 }
 
 func getOpenAIModelWithName(modelName string) *OpenAIModels {
-	price := relay_util.PricingInstance.GetPrice(modelName)
+	price := model.PricingInstance.GetPrice(modelName)
 
 	return &OpenAIModels{
 		Id:      modelName,
@@ -145,9 +144,9 @@ type ModelPrice struct {
 }
 
 type AvailableModelResponse struct {
-	Groups  []string   `json:"groups"`
-	OwnedBy string     `json:"owned_by"`
-	Price   ModelPrice `json:"price"`
+	Groups  []string     `json:"groups"`
+	OwnedBy string       `json:"owned_by"`
+	Price   *model.Price `json:"price"`
 }
 
 func AvailableModel(c *gin.Context) {
@@ -169,7 +168,7 @@ func getAvailableModels(groupName string) map[string]*AvailableModelResponse {
 
 	availableModels := make(map[string]*AvailableModelResponse, len(publicModels))
 
-	for model, group := range publicModels {
+	for modelName, group := range publicModels {
 		groups := []string{}
 		for _, publicGroup := range publicGroups {
 			if group[publicGroup] {
@@ -181,16 +180,12 @@ func getAvailableModels(groupName string) map[string]*AvailableModelResponse {
 			continue
 		}
 
-		if _, ok := availableModels[model]; !ok {
-			price := relay_util.PricingInstance.GetPrice(model)
-			availableModels[model] = &AvailableModelResponse{
+		if _, ok := availableModels[modelName]; !ok {
+			price := model.PricingInstance.GetPrice(modelName)
+			availableModels[modelName] = &AvailableModelResponse{
 				Groups:  groups,
 				OwnedBy: *getModelOwnedBy(price.ChannelType),
-				Price: ModelPrice{
-					Type:   price.Type,
-					Input:  price.Input,
-					Output: price.Output,
-				},
+				Price:   price,
 			}
 		}
 	}

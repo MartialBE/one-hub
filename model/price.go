@@ -1,8 +1,8 @@
 package model
 
 import (
+	"encoding/json"
 	"one-api/common/config"
-	"strings"
 
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
@@ -34,28 +34,23 @@ func GetAllPrices() ([]*Price, error) {
 		return nil, err
 	}
 
+	if config.AudioTokenJson == "" {
+		return prices, nil
+	}
+
+	audioToken := make(map[string]map[string]float64)
+	err := json.Unmarshal([]byte(config.AudioTokenJson), &audioToken)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, price := range prices {
-		price.ExtraRatios = getExtraRatioMap(price.Model)
+		if ratio, ok := audioToken[price.Model]; ok {
+			price.ExtraRatios = ratio
+		}
 	}
 
 	return prices, nil
-}
-
-func getExtraRatioMap(modelName string) map[string]float64 {
-	if !strings.HasPrefix(modelName, "gpt-4o-realtime") && !strings.HasPrefix(modelName, "gpt-4o-audio") {
-		return nil
-	}
-
-	extraRatios := make(map[string]float64)
-	if strings.HasPrefix(modelName, "gpt-4o-realtime") {
-		extraRatios["input_audio_tokens_ratio"] = 20
-		extraRatios["output_audio_tokens_ratio"] = 10
-	} else {
-		extraRatios["input_audio_tokens_ratio"] = 40
-		extraRatios["output_audio_tokens_ratio"] = 20
-	}
-
-	return extraRatios
 }
 
 func (price *Price) Update(modelName string) error {
@@ -423,4 +418,14 @@ func GetDefaultPrice() []*Price {
 	}
 
 	return prices
+}
+
+func GetDefaultAudioRatio() string {
+	if config.AudioTokenJson != "" {
+		return config.AudioTokenJson
+	}
+
+	config.AudioTokenJson = `{"gpt-4o-audio-preview":{"input_audio_tokens_ratio":40,"output_audio_tokens_ratio":20},"gpt-4o-audio-preview-2024-10-01":{"input_audio_tokens_ratio":40,"output_audio_tokens_ratio":20},"gpt-4o-audio-preview-2024-12-17":{"input_audio_tokens_ratio":16,"output_audio_tokens_ratio":8},"gpt-4o-mini-audio-preview":{"input_audio_tokens_ratio":67,"output_audio_tokens_ratio":34},"gpt-4o-mini-audio-preview-2024-12-17":{"input_audio_tokens_ratio":67,"output_audio_tokens_ratio":34},"gpt-4o-realtime-preview":{"input_audio_tokens_ratio":20,"output_audio_tokens_ratio":10},"gpt-4o-realtime-preview-2024-10-01":{"input_audio_tokens_ratio":20,"output_audio_tokens_ratio":10},"gpt-4o-realtime-preview-2024-12-17":{"input_audio_tokens_ratio":8,"output_audio_tokens_ratio":4},"gpt-4o-mini-realtime-preview":{"input_audio_tokens_ratio":17,"output_audio_tokens_ratio":8.4},"gpt-4o-mini-realtime-preview-2024-12-17":{"input_audio_tokens_ratio":17,"output_audio_tokens_ratio":8.4}}`
+
+	return config.AudioTokenJson
 }

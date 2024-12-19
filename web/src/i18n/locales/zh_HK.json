@@ -335,7 +335,10 @@
     "search": "搜尋",
     "times": "按次付費",
     "tokens": "按量付費",
-    "type": "類型"
+    "type": "類型",
+    "inputAudioTokensRatio": "音頻輸入倍率",
+    "other": "其他",
+    "outputAudioTokensRatio": "音頻輸出倍率"
   },
   "nova 映射": "nova 映射",
   "onyx 映射": "onyx 映射",
@@ -669,7 +672,12 @@
         "save": "保存倍率設置",
         "title": "倍率設置"
       },
-      "title": "運營設置"
+      "title": "運營設置",
+      "audioTokenSettings": {
+        "info": "配置音頻倍率。配置格式為JSON，鍵為模型名稱，值為輸入輸出令牌倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
+        "save": "保留音頻權杖設置",
+        "title": "音頻令牌設置"
+      }
     },
     "otherSettings": {
       "customSettings": {
