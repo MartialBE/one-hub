@@ -96,7 +96,7 @@ func errorHandle(geminiError *GeminiErrorResponse) *types.OpenAIError {
 }
 
 func cleaningError(errorInfo *GeminiError) {
-	if strings.Contains(errorInfo.Message, "Publisher Model") || strings.Contains(errorInfo.Message, "api_key") {
+	if errorInfo.Status == "PERMISSIONDENIED" || strings.Contains(errorInfo.Message, "Publisher Model") || strings.Contains(errorInfo.Message, "apikey") || strings.Contains(errorInfo.Message, "Permission denied") {
 		logger.SysError(fmt.Sprintf("Gemini Error: %s", errorInfo.Message))
 		errorInfo.Message = "上游错误，请联系管理员."
 	}
