@@ -268,7 +268,19 @@
     "totalInputTokens": "Total input tokens",
     "totalOutputTokens": "Total output tokens",
     "typeLabel": "Type",
-    "userLabel": "User"
+    "userLabel": "User",
+    "content": {
+      "calculate_steps": "Calculation steps:",
+      "calculate_steps_tip": "PS: This system calculates based on points, and all amounts are converted from points. 1 point = $0.000002, with a minimum spending of 1 point. This calculation is for reference only; actual charges may vary.",
+      "channel_group": "Group: {{ channel_group }}",
+      "group_discount": "Group discount: {{ discount }}",
+      "input_price": "Input: ${{ price }} /M",
+      "original_input_price": "Original input price: ${{ price }} /M",
+      "original_output_price": "Original output price: ${{ price }} /M",
+      "original_times_price": "Original price: ${{ times }} per time",
+      "output_price": "Output: ${{ price }} /M",
+      "times_price": "${{ times }} / time"
+    }
   },
   "login": {
     "codeRequired": "verification code must be filled",

@@ -208,15 +208,18 @@ func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 
 		if promptDetails.CachedTokens != 0 {
 			meta["cached_tokens"] = promptDetails.CachedTokens
+			meta["cached_tokens_ratio"] = q.price.GetExtraRatio("cached_tokens_ratio")
 		}
 		if promptDetails.AudioTokens != 0 {
 			meta["input_audio_tokens"] = promptDetails.AudioTokens
+			meta["input_audio_tokens_ratio"] = q.price.GetExtraRatio("input_audio_tokens_ratio")
 		}
 		if promptDetails.TextTokens != 0 {
 			meta["input_text_tokens"] = promptDetails.TextTokens
 		}
 		if completionDetails.AudioTokens != 0 {
 			meta["output_audio_tokens"] = completionDetails.AudioTokens
+			meta["output_audio_tokens_ratio"] = q.price.GetExtraRatio("output_audio_tokens_ratio")
 		}
 		if completionDetails.TextTokens != 0 {
 			meta["output_text_tokens"] = completionDetails.TextTokens

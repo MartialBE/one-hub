@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types';
+import { useMemo } from 'react';
+import Decimal from 'decimal.js';
 
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
@@ -70,6 +72,8 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
     request_ts_str = request_ts.toFixed(2) + ' t/s';
   }
 
+  const { totalInputTokens, totalOutputTokens, show, tokenDetails } = useMemo(() => calculateTokens(item), [item]);
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -109,10 +113,10 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
             {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
           </Stack>
         </TableCell>
-        <TableCell>{viewInput(item, t)}</TableCell>
+        <TableCell>{viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails)}</TableCell>
         <TableCell>{item.completion_tokens || ''}</TableCell>
         <TableCell>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>
-        <TableCell>{item.content}</TableCell>
+        <TableCell>{viewLogContent(item, t, totalInputTokens, totalOutputTokens)}</TableCell>
       </TableRow>
     </>
   );
@@ -166,43 +170,15 @@ const MetadataTypography = styled(Typography)(({ theme }) => ({
   }
 }));
 
-function viewInput(item, t) {
-  const { prompt_tokens, completion_tokens, metadata } = item;
+function viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails) {
+  const { prompt_tokens } = item;
 
   if (!prompt_tokens) return '';
-  if (!metadata) return prompt_tokens;
+  if (!show) return prompt_tokens;
 
-  let totalInputTokens = prompt_tokens;
-  let totalOutputTokens = completion_tokens;
-
-  let show = false;
-  const inputAudioTokensRatio = metadata?.input_audio_tokens_ratio || 20;
-  const outputAudioTokensRatio = metadata?.output_audio_tokens_ratio || 10;
-
-  const tooltipContent = [
-    { key: 'input_text_tokens', label: t('logPage.inputTextTokens'), rate: 1 },
-    { key: 'output_text_tokens', label: t('logPage.outputTextTokens'), rate: 1 },
-    { key: 'input_audio_tokens', label: t('logPage.inputAudioTokens'), rate: inputAudioTokensRatio },
-    { key: 'output_audio_tokens', label: t('logPage.outputAudioTokens'), rate: outputAudioTokensRatio },
-    { key: 'cached_tokens', label: t('logPage.cachedTokens'), rate: 0.5 }
-  ]
-    .filter(({ key }) => metadata[key] > 0)
-    .map(({ key, label, rate }) => {
-      const tokens = Math.ceil(metadata[key] * rate);
-      if (key === 'input_audio_tokens' || key === 'cached_tokens') {
-        totalInputTokens += tokens - metadata[key];
-        show = true;
-      } else if (key === 'output_audio_tokens') {
-        totalOutputTokens += tokens - metadata[key];
-        show = true;
-      }
-
-      return <MetadataTypography key={key}>{`${label}: ${metadata[key]} * ${rate} = ${tokens}`}</MetadataTypography>;
-    });
-
-  if (!show) {
-    return prompt_tokens;
-  }
+  const tooltipContent = tokenDetails.map(({ key, label, tokens, value, rate, labelParams }) => (
+    <MetadataTypography key={key}>{`${t(label, labelParams)}: ${value} * ${rate} = ${tokens}`}</MetadataTypography>
+  ));
 
   return (
     <Badge variant="dot" color="primary">
@@ -225,4 +201,189 @@ function viewInput(item, t) {
       </Tooltip>
     </Badge>
   );
+}
+
+const TOKEN_RATIOS = {
+  INPUT_AUDIO: 20,
+  OUTPUT_AUDIO: 10,
+  CACHED: 0.5,
+  TEXT: 1
+};
+
+function calculateTokens(item) {
+  const { prompt_tokens, completion_tokens, metadata } = item;
+
+  if (!prompt_tokens || !metadata) {
+    return {
+      totalInputTokens: prompt_tokens || 0,
+      totalOutputTokens: completion_tokens || 0,
+      show: false,
+      tokenDetails: []
+    };
+  }
+
+  let totalInputTokens = prompt_tokens;
+  let totalOutputTokens = completion_tokens;
+  let show = false;
+
+  const input_audio_tokens = metadata?.input_audio_tokens_ratio || TOKEN_RATIOS.INPUT_AUDIO;
+  const output_audio_tokens = metadata?.output_audio_tokens_ratio || TOKEN_RATIOS.OUTPUT_AUDIO;
+
+  const tokenDetails = [
+    { key: 'input_text_tokens', label: 'logPage.inputTextTokens', rate: TOKEN_RATIOS.TEXT },
+    { key: 'output_text_tokens', label: 'logPage.outputTextTokens', rate: TOKEN_RATIOS.TEXT },
+    {
+      key: 'input_audio_tokens',
+      label: 'logPage.inputAudioTokens',
+      rate: input_audio_tokens,
+      labelParams: { ratio: input_audio_tokens }
+    },
+    {
+      key: 'output_audio_tokens',
+      label: 'logPage.outputAudioTokens',
+      rate: output_audio_tokens,
+      labelParams: { ratio: output_audio_tokens }
+    },
+    { key: 'cached_tokens', label: 'logPage.cachedTokens', rate: TOKEN_RATIOS.CACHED }
+  ]
+    .filter(({ key }) => metadata[key] > 0)
+    .map(({ key, label, rate, labelParams }) => {
+      const tokens = Math.ceil(metadata[key] * rate);
+
+      if (key === 'input_audio_tokens' || key === 'cached_tokens') {
+        totalInputTokens += tokens - metadata[key];
+        show = true;
+      } else if (key === 'output_audio_tokens') {
+        totalOutputTokens += tokens - metadata[key];
+        show = true;
+      }
+
+      return { key, label, tokens, value: metadata[key], rate, labelParams };
+    });
+
+  return {
+    totalInputTokens,
+    totalOutputTokens,
+    show,
+    tokenDetails
+  };
+}
+
+function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
+  if (!item?.metadata?.input_ratio) {
+    return item.content;
+  }
+
+  const groupDiscount = item?.metadata?.group_ratio || 1;
+
+  const priceType = item?.metadata?.price_type;
+  const originalCompletionRatio = item?.metadata?.output_ratio;
+  const originalInputRatio = item?.metadata?.input_ratio;
+
+  let inputPriceInfo = '';
+  let outputPriceInfo = '';
+  let calculateSteps = '';
+  let originalInputPriceInfo = '';
+  let originalOutputPriceInfo = '';
+
+  if (priceType === 'times') {
+    const inputPrice = calculatePrice(originalInputRatio, groupDiscount, true);
+
+    inputPriceInfo = t('logPage.content.times_price', {
+      times: inputPrice
+    });
+
+    const originalInputPrice = calculatePrice(originalInputRatio, 1, 1, true, true);
+
+    originalInputPriceInfo = t('logPage.content.original_times_price', {
+      times: originalInputPrice
+    });
+  } else {
+    const inputPrice = calculatePrice(originalInputRatio, groupDiscount, false);
+    const outputPrice = calculatePrice(originalCompletionRatio, groupDiscount, false);
+
+    inputPriceInfo = t('logPage.content.input_price', {
+      price: inputPrice
+    });
+    outputPriceInfo = t('logPage.content.output_price', {
+      price: outputPrice
+    });
+
+    const originalInputPrice = calculatePrice(originalInputRatio, 1, false);
+
+    originalInputPriceInfo = t('logPage.content.original_input_price', {
+      price: originalInputPrice
+    });
+
+    const originalOutputPrice = calculatePrice(originalCompletionRatio, 1, false);
+
+    originalOutputPriceInfo = t('logPage.content.original_output_price', {
+      price: originalOutputPrice
+    });
+
+    calculateSteps = `${t('logPage.content.calculate_steps')}( ${totalInputTokens} / 1000000 * ${inputPrice}) `;
+
+    if (totalOutputTokens > 0) {
+      calculateSteps += `+ (${totalOutputTokens} / 1000000 * ${outputPrice})`;
+    }
+
+    calculateSteps += ` = ${renderQuota(item.quota, 6)}`;
+  }
+
+  const tips = (
+    <>
+      {originalInputPriceInfo && <MetadataTypography>{originalInputPriceInfo}</MetadataTypography>}
+      {originalOutputPriceInfo && <MetadataTypography>{originalOutputPriceInfo}</MetadataTypography>}
+      {groupDiscount > 0 && groupDiscount !== 1 && (
+        <MetadataTypography>
+          {t('logPage.content.group_discount', {
+            discount: getDiscountLang(groupDiscount, 1)
+          })}
+        </MetadataTypography>
+      )}
+      {calculateSteps && (
+        <>
+          <MetadataTypography>{calculateSteps}</MetadataTypography>
+          <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
+        </>
+      )}
+    </>
+  );
+
+  return (
+    <Tooltip title={tips} placement="top" arrow>
+      <Stack direction="column" spacing={0.3}>
+        {inputPriceInfo && (
+          <Label color="info" variant="soft">
+            {inputPriceInfo}
+          </Label>
+        )}
+        {outputPriceInfo && (
+          <Label color="info" variant="soft">
+            {outputPriceInfo}
+          </Label>
+        )}
+      </Stack>
+    </Tooltip>
+  );
+}
+
+function calculatePrice(ratio, groupDiscount, isTimes) {
+  let discount = new Decimal(ratio).mul(groupDiscount);
+
+  if (!isTimes) {
+    discount = discount.mul(1000);
+  }
+
+  let price = discount.mul(0.002).toFixed(6);
+  price = price.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+
+  return price;
+}
+
+export function getDiscountLang(value1, value2) {
+  const discount = new Decimal(value1).mul(value2);
+
+  const discountMultiplier = discount.toFixed(2);
+  return `${discountMultiplier} 倍`;
 }

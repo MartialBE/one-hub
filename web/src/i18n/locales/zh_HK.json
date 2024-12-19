@@ -269,7 +269,19 @@
     "totalInputTokens": "計算輸入Tokens",
     "totalOutputTokens": "計算輸出Tokens",
     "typeLabel": "類型",
-    "userLabel": "用戶"
+    "userLabel": "用戶",
+    "content": {
+      "calculate_steps": "計算步驟:",
+      "calculate_steps_tip": "PS：本系統按照積分計算，所有金額均為積分換算而來，1積分=$0.000002，最低消費為1積分，本計算步驟僅供參考，以實際扣費為準。",
+      "channel_group": "分組: {{ channel_group }}",
+      "group_discount": "分組折扣: {{ discount }}",
+      "input_price": "輸入: ${{ price }} /M",
+      "original_input_price": "原輸入價格: ${{ price }} /M",
+      "original_output_price": "原輸出價格: ${{ price }} /M",
+      "original_times_price": "原價格: ${{ times }} / 次",
+      "output_price": "輸出: ${{ price }} /M",
+      "times_price": "${{ times }} / 次"
+    }
   },
   "login": {
     "codeRequired": "驗證碼不能為空",

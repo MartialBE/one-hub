@@ -268,7 +268,19 @@
     "totalInputTokens": "Total input tokens",
     "totalOutputTokens": "Total output tokens",
     "typeLabel": "タイプ",
-    "userLabel": "ユーザー"
+    "userLabel": "ユーザー",
+    "content": {
+      "calculate_steps": "計算手順:",
+      "calculate_steps_tip": "PS：このシステムはポイントに基づいて計算され、すべての金額はポイント換算であり、1ポイント＝$0.000002です。最低消費額は1ポイントであり、この計算手順は参考用として提供されます。実際の料金が優先されます。",
+      "channel_group": "グループ：{{ channel_group }}",
+      "group_discount": "グループ割引：{{ discount }}",
+      "input_price": "入力：${{ price }} /M",
+      "original_input_price": "元の入力価格：${{ price }}/M",
+      "original_output_price": "元の出力価格：${{ price }}/M",
+      "original_times_price": "元の価格：${{ times }} / 回",
+      "output_price": "出力: ${{ price }} /M",
+      "times_price": "${{ times }} / 回"
+    }
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",
