@@ -35,11 +35,11 @@ function requestTimeLabelOptions(request_time) {
   let color = 'error';
   if (request_time === 0) {
     color = 'default';
-  } else if (request_time <= 1000) {
+  } else if (request_time <= 10) {
     color = 'success';
-  } else if (request_time <= 3000) {
+  } else if (request_time <= 50) {
     color = 'primary';
-  } else if (request_time <= 5000) {
+  } else if (request_time <= 100) {
     color = 'secondary';
   }
 
@@ -109,7 +109,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
 
         <TableCell>
           <Stack direction="row" spacing={1}>
-            <Label color={requestTimeLabelOptions(item.request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Label>
+            <Label color={requestTimeLabelOptions(request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Label>
             {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
           </Stack>
         </TableCell>
