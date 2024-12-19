@@ -206,6 +206,8 @@ type ChatCompletionRequest struct {
 	ParallelToolCalls   bool                          `json:"parallel_tool_calls,omitempty"`
 	Modalities          []string                      `json:"modalities,omitempty"`
 	Audio               *ChatAudio                    `json:"audio,omitempty"`
+	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
+	Prediction          any                           `json:"prediction,omitempty"`
 }
 
 func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {
