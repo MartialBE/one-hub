@@ -7,6 +7,7 @@ import (
 	"one-api/common/image"
 	"one-api/common/utils"
 	"one-api/types"
+	"strings"
 )
 
 type GeminiChatRequest struct {
@@ -75,7 +76,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 		choice.FinishReason = ConvertFinishReason(*candidate.FinishReason)
 	}
 
-	content := ""
+	var content []string
 	isTools := false
 
 	for _, part := range candidate.Content.Parts {
@@ -87,16 +88,16 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 			choice.Delta.ToolCalls = append(choice.Delta.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else {
 			if part.ExecutableCode != nil {
-				content += "```" + part.ExecutableCode.Language + "\n" + part.ExecutableCode.Code + "\n```\n"
+				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
 			} else if part.CodeExecutionResult != nil {
-				content += "```output\n" + part.CodeExecutionResult.Output + "\n```\n"
+				content = append(content, "```output\n"+part.CodeExecutionResult.Output+"\n```")
 			} else {
-				content += part.Text
+				content = append(content, part.Text)
 			}
 		}
 	}
 
-	choice.Delta.Content = content
+	choice.Delta.Content = strings.Join(content, "\n")
 
 	if isTools {
 		choice.FinishReason = types.FinishReasonToolCalls
@@ -124,7 +125,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 		return choice
 	}
 
-	content := ""
+	var content []string
 	useTools := false
 
 	for _, part := range candidate.Content.Parts {
@@ -136,16 +137,16 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 			choice.Message.ToolCalls = append(choice.Message.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else {
 			if part.ExecutableCode != nil {
-				content += "```" + part.ExecutableCode.Language + "\n" + part.ExecutableCode.Code + "\n```\n"
+				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
 			} else if part.CodeExecutionResult != nil {
-				content += "```output\n" + part.CodeExecutionResult.Output + "\n```\n"
+				content = append(content, "```output\n"+part.CodeExecutionResult.Output+"\n```")
 			} else {
-				content += part.Text
+				content = append(content, part.Text)
 			}
 		}
 	}
 
-	choice.Message.Content = content
+	choice.Message.Content = strings.Join(content, "\n")
 
 	if useTools {
 		choice.FinishReason = types.FinishReasonToolCalls
