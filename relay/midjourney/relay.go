@@ -46,7 +46,7 @@ func RelayMidjourney(c *gin.Context) {
 			"code":        err.Code,
 		})
 		channelId := c.GetInt("channel_id")
-		logger.SysError(fmt.Sprintf("relay error (channel #%d): %s", channelId, fmt.Sprintf("%s %s", err.Description, err.Result)))
+		logger.LogError(c, fmt.Sprintf("relay error (channel #%d, status code %d): %s", channelId, statusCode, fmt.Sprintf("%s %s", err.Description, err.Result)))
 	}
 }
 

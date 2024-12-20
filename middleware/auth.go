@@ -195,6 +195,21 @@ func GeminiAuth() func(c *gin.Context) {
 
 func MjAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		// 判断path :mode
+		model := c.Param("mode")
+
+		if model != "" && model != "mj-fast" && model != "mj-turbo" && model != "mj-relax" {
+			midjourneyAbortWithMessage(c, 4, "无效的加速模式")
+			return
+		}
+
+		if model == "" {
+			model = "mj-fast"
+		}
+
+		model = strings.TrimPrefix(model, "mj-")
+		c.Set("mj_model", model)
+
 		key := c.Request.Header.Get("mj-api-secret")
 		tokenAuth(c, key)
 	}

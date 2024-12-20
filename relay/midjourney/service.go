@@ -9,15 +9,20 @@ import (
 	"strings"
 )
 
-func CoverActionToModelName(mjAction string) string {
-	modelName := "mj_" + strings.ToLower(mjAction)
-	if mjAction == mjProvider.MjActionSwapFace {
-		modelName = "swap_face"
+func CoverActionToModelName(mjAction, model string) string {
+	if model == "fast" {
+		model = ""
 	}
+
+	if model != "" {
+		model = model + "_"
+	}
+
+	modelName := "mj_" + model + strings.ToLower(mjAction)
 	return modelName
 }
 
-func GetMjRequestModel(relayMode int, midjRequest *mjProvider.MidjourneyRequest) (string, *mjProvider.MidjourneyResponse, bool) {
+func GetMjRequestModel(relayMode int, midjRequest *mjProvider.MidjourneyRequest, mjModel string) (string, *mjProvider.MidjourneyResponse, bool) {
 	action := ""
 	if relayMode == mjProvider.RelayModeMidjourneyAction {
 		// plus request
@@ -57,7 +62,7 @@ func GetMjRequestModel(relayMode int, midjRequest *mjProvider.MidjourneyRequest)
 		}
 	}
 
-	modelName := CoverActionToModelName(action)
+	modelName := CoverActionToModelName(action, mjModel)
 	return modelName, nil, true
 }
 

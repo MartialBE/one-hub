@@ -11,14 +11,13 @@ import (
 	"log"
 	"net/http"
 	"one-api/common"
-	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/controller"
 	"one-api/model"
 	provider "one-api/providers/midjourney"
 	"one-api/relay"
 	"one-api/relay/relay_util"
 	"one-api/types"
-	"strconv"
 	"strings"
 	"time"
 
@@ -113,12 +112,8 @@ func coverMidjourneyTaskDto(originTask *model.Midjourney) (midjourneyTask provid
 	midjourneyTask.StartTime = originTask.StartTime
 	midjourneyTask.FinishTime = originTask.FinishTime
 	midjourneyTask.ImageUrl = ""
-	if originTask.ImageUrl != "" {
-		midjourneyTask.ImageUrl = config.ServerAddress + "/mj/image/" + originTask.MjId
-		if originTask.Status != "SUCCESS" {
-			midjourneyTask.ImageUrl += "?rand=" + strconv.FormatInt(time.Now().UnixNano(), 10)
-		}
-	}
+
+	midjourneyTask.ImageUrl = originTask.ImageUrl
 	midjourneyTask.Status = originTask.Status
 	midjourneyTask.FailReason = originTask.FailReason
 	midjourneyTask.Action = originTask.Action
@@ -149,6 +144,7 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 
 	startTime := time.Now().UnixNano() / int64(time.Millisecond)
 	userId := c.GetInt("id")
+	tokenId := c.GetInt("token_id")
 	var swapFaceRequest provider.SwapFaceRequest
 	err := common.UnmarshalBodyReusable(c, &swapFaceRequest)
 	if err != nil {
@@ -166,6 +162,15 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 		}
 	}
 	requestURL := getMjRequestPath(c.Request.URL.String())
+
+	// 保存一份
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		// 处理错误
+		return provider.MidjourneyErrorWrapper(provider.MjRequestError, "read_request_body_failed")
+	}
+	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
 	mjResp, _, err := mjProvider.Send(60, requestURL)
 	if err != nil {
 		quotaInstance.Undo(c)
@@ -180,11 +185,39 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 		}
 	}(c.Request.Context())
 
-	quota := int(quotaInstance.GetInputRatio() * 1000)
+	quota := quotaInstance.GetTotalQuotaByUsage(&types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
 
 	midjResponse := &mjResp.Response
+
+	// 如果帐号负载已满，且是fast模式，则更改为relax模式
+	mjModelType := c.GetString("mj_model")
+	if midjResponse.Code == 3 && mjModelType == "fast" {
+		logger.LogWarn(c, "当前MJ无帐号可用，尝试更改为relax模式")
+		// 退钱
+		quotaInstance.Undo(c)
+		c.Set("mj_model", "relax")
+		mjModelType = "relax"
+		quotaInstance, errWithOA = getQuota(c, provider.MjActionSwapFace)
+		if errWithOA != nil {
+			return &provider.MidjourneyResponse{
+				Code:        4,
+				Description: errWithOA.Message,
+			}
+		}
+		c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		mjResp, _, err = mjProvider.Send(60, requestURL)
+		if err != nil {
+			quotaInstance.Undo(c)
+			return &mjResp.Response
+		}
+		quota = quotaInstance.GetTotalQuotaByUsage(&types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
+
+		midjResponse = &mjResp.Response
+	}
+
 	midjourneyTask := &model.Midjourney{
 		UserId:      userId,
+		TokenID:     tokenId,
 		Code:        midjResponse.Code,
 		Action:      provider.MjActionSwapFace,
 		MjId:        midjResponse.Result,
@@ -201,6 +234,7 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 		FailReason:  "",
 		ChannelId:   c.GetInt("channel_id"),
 		Quota:       quota,
+		Mode:        mjModelType,
 	}
 	err = midjourneyTask.Insert()
 	if err != nil {
@@ -319,7 +353,9 @@ func RelayMidjourneyTask(c *gin.Context, relayMode int) *provider.MidjourneyResp
 
 func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyResponse {
 	userId := c.GetInt("id")
+	tokenId := c.GetInt("token_id")
 	consumeQuota := true
+	mjModelType := c.GetString("mj_model")
 	var midjRequest provider.MidjourneyRequest
 	err := common.UnmarshalBodyReusable(c, &midjRequest)
 	if err != nil {
@@ -392,6 +428,12 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 			if errWithMJ != nil {
 				return errWithMJ
 			}
+
+			if originTask.Mode != "" {
+				mjModelType = originTask.Mode
+				c.Set("mj_model", mjModelType)
+			}
+
 			log.Printf("检测到此操作为放大、变换、重绘，获取原channel信息: %d", originTask.ChannelId)
 		}
 		midjRequest.Prompt = originTask.Prompt
@@ -421,6 +463,14 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		}
 	}
 
+	// 保存一份
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		// 处理错误
+		return provider.MidjourneyErrorWrapper(provider.MjRequestError, "read_request_body_failed")
+	}
+	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
 	midjResponseWithStatus, responseBody, err := mjProvider.Send(60, requestURL)
 	if err != nil {
 		quotaInstance.Undo(c)
@@ -435,9 +485,34 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		}
 	}(c.Request.Context())
 
-	quota := int(quotaInstance.GetInputRatio() * 1000)
+	quota := quotaInstance.GetTotalQuotaByUsage(&types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
 
 	midjResponse := &midjResponseWithStatus.Response
+
+	// 如果帐号负载已满，且是fast模式，则更改为relax模式
+	if midjResponse.Code == 3 && mjModelType == "fast" && midjRequest.TaskId == "" {
+		logger.LogWarn(c, "当前MJ无帐号可用，尝试更改为relax模式")
+		// 退钱
+		quotaInstance.Undo(c)
+		mjModelType = "relax"
+		c.Set("mj_model", mjModelType)
+		quotaInstance, errWithOA = getQuota(c, midjRequest.Action)
+		if errWithOA != nil {
+			return &provider.MidjourneyResponse{
+				Code:        4,
+				Description: errWithOA.Message,
+			}
+		}
+		c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
+		midjResponseWithStatus, responseBody, err = mjProvider.Send(60, requestURL)
+		if err != nil {
+			quotaInstance.Undo(c)
+			return &midjResponseWithStatus.Response
+		}
+		quota = quotaInstance.GetTotalQuotaByUsage(&types.Usage{CompletionTokens: 0, PromptTokens: 1, TotalTokens: 1})
+		midjResponse = &midjResponseWithStatus.Response
+	}
 
 	// 文档：https://github.com/novicezk/midjourney-proxy/blob/main/docs/api.md
 	//1-提交成功
@@ -448,6 +523,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 	// other: 提交错误，description为错误描述
 	midjourneyTask := &model.Midjourney{
 		UserId:      userId,
+		TokenID:     tokenId,
 		Code:        midjResponse.Code,
 		Action:      midjRequest.Action,
 		MjId:        midjResponse.Result,
@@ -464,6 +540,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		FailReason:  "",
 		ChannelId:   c.GetInt("channel_id"),
 		Quota:       quota,
+		Mode:        mjModelType,
 	}
 
 	if midjResponse.Code != 1 && midjResponse.Code != 21 && midjResponse.Code != 22 {
@@ -555,8 +632,9 @@ func getMjRequestPath(path string) string {
 }
 
 func getQuota(c *gin.Context, action string) (*relay_util.Quota, *types.OpenAIErrorWithStatusCode) {
-	modelName := CoverActionToModelName(action)
-	quota := relay_util.NewQuota(c, modelName, 1000)
+	model := c.GetString("mj_model")
+	modelName := CoverActionToModelName(action, model)
+	quota := relay_util.NewQuota(c, modelName, 1)
 	if err := quota.PreQuotaConsumption(); err != nil {
 		return nil, err
 	}
@@ -565,7 +643,8 @@ func getQuota(c *gin.Context, action string) (*relay_util.Quota, *types.OpenAIEr
 }
 
 func getMJProviderWithRequest(c *gin.Context, relayMode int, request *provider.MidjourneyRequest) (*provider.MidjourneyProvider, *provider.MidjourneyResponse) {
-	midjourneyModel, mjErr, _ := GetMjRequestModel(relayMode, request)
+	mjModel := c.GetString("mj_model")
+	midjourneyModel, mjErr, _ := GetMjRequestModel(relayMode, request, mjModel)
 	if mjErr != nil {
 		return nil, MidjourneyErrorFromInternal(mjErr.Code, mjErr.Description)
 	}
