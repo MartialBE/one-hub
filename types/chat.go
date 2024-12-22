@@ -16,6 +16,7 @@ const (
 
 const (
 	ChatMessageRoleSystem    = "system"
+	ChatMessageRoleDeveloper = "developer"
 	ChatMessageRoleUser      = "user"
 	ChatMessageRoleAssistant = "assistant"
 	ChatMessageRoleFunction  = "function"
@@ -153,6 +154,10 @@ func (m *ChatCompletionMessage) ToolToFuncCalls() {
 		}
 		m.ToolCalls = nil
 	}
+}
+
+func (m *ChatCompletionMessage) IsSystemRole() bool {
+	return m.Role == ChatMessageRoleSystem || m.Role == ChatMessageRoleDeveloper
 }
 
 type ChatMessageImageURL struct {

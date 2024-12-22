@@ -75,7 +75,7 @@ func (p *CozeProvider) GetFullRequestURL(requestURL string) string {
 
 func convertRole(role string) string {
 	switch role {
-	case types.ChatMessageRoleSystem, types.ChatMessageRoleAssistant:
+	case types.ChatMessageRoleSystem, types.ChatMessageRoleAssistant, types.ChatMessageRoleDeveloper:
 		return types.ChatMessageRoleAssistant
 	default:
 		return types.ChatMessageRoleUser

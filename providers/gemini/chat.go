@@ -220,9 +220,17 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		geminiRequest.Tools = append(geminiRequest.Tools, geminiChatTools)
 	}
 
-	geminiContent, err := OpenAIToGeminiChatContent(request.Messages)
+	geminiContent, systemContent, err := OpenAIToGeminiChatContent(request.Messages)
 	if err != nil {
 		return nil, err
+	}
+
+	if systemContent != "" {
+		geminiRequest.SystemInstruction = &GeminiChatContent{
+			Parts: []GeminiPart{
+				{Text: systemContent},
+			},
+		}
 	}
 
 	geminiRequest.Contents = geminiContent

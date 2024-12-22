@@ -135,7 +135,7 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *MiniMaxChatReq
 	var messges []MiniMaxChatMessage
 	request.ClearEmptyMessages()
 	for _, message := range request.Messages {
-		if message.Role == types.ChatMessageRoleSystem {
+		if message.IsSystemRole() {
 			botSettings = append(botSettings, MiniMaxBotSetting{
 				BotName: types.ChatMessageRoleAssistant,
 				Content: message.StringContent(),

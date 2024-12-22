@@ -76,7 +76,7 @@ func (p *CohereProvider) GetFullRequestURL(requestURL string) string {
 
 func convertRole(role string) string {
 	switch role {
-	case types.ChatMessageRoleSystem:
+	case types.ChatMessageRoleSystem, types.ChatMessageRoleDeveloper:
 		return "SYSTEM"
 	case types.ChatMessageRoleAssistant:
 		return "CHATBOT"

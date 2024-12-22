@@ -98,7 +98,7 @@ func convertRole(roleName string) (string, string) {
 	switch roleName {
 	case types.ChatMessageRoleTool, types.ChatMessageRoleFunction:
 		return "FUNCTION", types.ChatMessageRoleAssistant
-	case types.ChatMessageRoleSystem, types.ChatMessageRoleAssistant:
+	case types.ChatMessageRoleSystem, types.ChatMessageRoleAssistant, types.ChatMessageRoleDeveloper:
 		return "BOT", types.ChatMessageRoleAssistant
 	default:
 		return "USER", types.ChatMessageRoleUser

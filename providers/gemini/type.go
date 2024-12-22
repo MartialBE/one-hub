@@ -275,16 +275,23 @@ func (g *GeminiChatResponse) GetResponseText() string {
 	return ""
 }
 
-func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]GeminiChatContent, *types.OpenAIErrorWithStatusCode) {
+func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]GeminiChatContent, string, *types.OpenAIErrorWithStatusCode) {
 	contents := make([]GeminiChatContent, 0)
 	useToolName := ""
+	var systemContent []string
 
 	for _, openaiContent := range openaiContents {
+		if openaiContent.IsSystemRole() {
+			systemContent = append(systemContent, openaiContent.StringContent())
+			continue
+		}
+
 		content := GeminiChatContent{
 			Role:  ConvertRole(openaiContent.Role),
 			Parts: make([]GeminiPart, 0),
 		}
 		content.Role = ConvertRole(openaiContent.Role)
+
 		if openaiContent.ToolCalls != nil || openaiContent.FunctionCall != nil {
 			argeStr := ""
 			if openaiContent.ToolCalls != nil {
@@ -352,7 +359,7 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 					}
 					mimeType, data, err := image.GetImageFromUrl(openaiPart.ImageURL.URL)
 					if err != nil {
-						return nil, common.ErrorWrapper(err, "image_url_invalid", http.StatusBadRequest)
+						return nil, "", common.ErrorWrapper(err, "image_url_invalid", http.StatusBadRequest)
 					}
 					content.Parts = append(content.Parts, GeminiPart{
 						InlineData: &GeminiInlineData{
@@ -364,13 +371,10 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 			}
 		}
 		contents = append(contents, content)
-		if openaiContent.Role == types.ChatMessageRoleSystem {
-			contents = append(contents, createSystemResponse("Okay"))
-		}
 
 	}
 
-	return contents, nil
+	return contents, strings.Join(systemContent, "\n"), nil
 }
 
 func createSystemResponse(text string) GeminiChatContent {
