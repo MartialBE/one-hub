@@ -201,6 +201,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 				Category:  "HARM_CATEGORY_DANGEROUS_CONTENT",
 				Threshold: "BLOCK_NONE",
 			},
+			{
+				Category:  "HARM_CATEGORY_CIVIC_INTEGRITY",
+				Threshold: "BLOCK_NONE",
+			},
 		},
 		GenerationConfig: GeminiChatGenerationConfig{
 			Temperature:     request.Temperature,
@@ -272,6 +276,8 @@ func removeAdditionalPropertiesWithDepth(schema interface{}, depth int) interfac
 	if typeVal, exists := v["type"]; !exists || (typeVal != "object" && typeVal != "array") {
 		return schema
 	}
+
+	delete(v, "title")
 
 	switch v["type"] {
 	case "object":

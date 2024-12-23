@@ -133,6 +133,7 @@ func (m *ChatCompletionMessage) FuncToToolCalls() {
 	if m.FunctionCall != nil {
 		m.ToolCalls = []*ChatCompletionToolCalls{
 			{
+				Id:       m.FunctionCall.Name,
 				Type:     ChatMessageRoleFunction,
 				Function: m.FunctionCall,
 			},
