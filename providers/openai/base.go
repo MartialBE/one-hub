@@ -106,8 +106,13 @@ func ErrorHandle(openaiError *types.OpenAIErrorResponse) *types.OpenAIError {
 func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
 
-	if strings.HasPrefix(modelName, "gpt-4o-realtime") {
-		baseURL = strings.Replace(baseURL, "https://", "wss://", 1)
+	if strings.Contains(modelName, "-realtime") {
+		if strings.HasPrefix(baseURL, "https://") {
+			baseURL = strings.Replace(baseURL, "https://", "wss://", 1)
+		} else {
+			baseURL = strings.Replace(baseURL, "http://", "ws://", 1)
+		}
+
 		if p.IsAzure {
 			// wss://my-eastus2-openai-resource.openai.azure.com/openai/realtime?api-version=2024-10-01-preview&deployment=gpt-4o-realtime-preview-1001
 			requestURL = fmt.Sprintf("/openai/%s?api-version=%s&deployment=%s", requestURL, p.Channel.Other, modelName)
