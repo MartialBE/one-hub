@@ -14,6 +14,8 @@ type GeminiRelayStreamHandler struct {
 	LastType       string
 	Prefix         string
 	ModelName      string
+
+	key string
 }
 
 func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiChatResponse, *GeminiErrorWithStatusCode) {
@@ -43,12 +45,16 @@ func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (req
 	}
 	defer req.Body.Close()
 
+	channel := p.GetChannel()
+
 	chatHandler := &GeminiRelayStreamHandler{
 		Usage:          p.Usage,
 		ModelName:      request.Model,
 		Prefix:         `data: `,
 		LastCandidates: 0,
 		LastType:       "",
+
+		key: channel.Key,
 	}
 
 	// 发送请求
@@ -84,7 +90,7 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 	}
 
 	if geminiResponse.ErrorInfo != nil {
-		cleaningError(geminiResponse.ErrorInfo)
+		cleaningError(geminiResponse.ErrorInfo, h.key)
 		errChan <- geminiResponse.ErrorInfo
 		return
 	}

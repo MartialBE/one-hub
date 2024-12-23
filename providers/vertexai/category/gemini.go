@@ -16,7 +16,7 @@ func init() {
 		ChatComplete:              ConvertGeminiFromChatOpenai,
 		ResponseChatComplete:      ConvertGeminiToChatOpenai,
 		ResponseChatCompleteStrem: GeminiChatCompleteStrem,
-		ErrorHandler:              gemini.RequestErrorHandle,
+		ErrorHandler:              gemini.RequestErrorHandle(""),
 		GetModelName:              GetGeminiModelName,
 		GetOtherUrl:               getGeminiOtherUrl,
 	}

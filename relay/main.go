@@ -68,9 +68,6 @@ func Relay(c *gin.Context) {
 	}
 
 	if apiErr != nil {
-		if apiErr.StatusCode == http.StatusTooManyRequests {
-			apiErr.OpenAIError.Message = "当前分组上游负载已饱和，请稍后再试"
-		}
 		relayResponseWithErr(c, apiErr)
 	}
 }

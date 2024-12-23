@@ -24,6 +24,8 @@ type GeminiStreamHandler struct {
 	LastCandidates int
 	LastType       string
 	Request        *types.ChatCompletionRequest
+
+	key string
 }
 
 type OpenAIStreamHandler struct {
@@ -94,6 +96,7 @@ func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionReque
 
 func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
 
+	channel := p.GetChannel()
 	if p.UseOpenaiAPI {
 		streamOptions := request.StreamOptions
 		request.StreamOptions = &types.StreamOptions{
@@ -145,6 +148,8 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		LastCandidates: 0,
 		LastType:       "",
 		Request:        request,
+
+		key: channel.Key,
 	}
 
 	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerStream)
@@ -294,15 +299,6 @@ func removeAdditionalPropertiesWithDepth(schema interface{}, depth int) interfac
 }
 
 func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	aiError := errorHandle(&response.GeminiErrorResponse)
-	if aiError != nil {
-		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *aiError,
-			StatusCode:  http.StatusBadRequest,
-		}
-		return
-	}
-
 	openaiResponse = &types.ChatCompletionResponse{
 		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion",
@@ -339,7 +335,7 @@ func (h *GeminiStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 		return
 	}
 
-	aiError := errorHandle(&geminiResponse.GeminiErrorResponse)
+	aiError := errorHandle(&geminiResponse.GeminiErrorResponse, h.key)
 	if aiError != nil {
 		errChan <- aiError
 		return

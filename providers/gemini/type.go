@@ -431,4 +431,8 @@ type GeminiOpenaiChatStreamResponse struct {
 	Usage *GeminiOpenaiUsage `json:"usage,omitempty"`
 }
 
-type GeminiOpenaiError []GeminiErrorResponse
+type GeminiErrors []*GeminiErrorResponse
+
+func (e *GeminiErrors) Error() *GeminiErrorResponse {
+	return (*e)[0]
+}

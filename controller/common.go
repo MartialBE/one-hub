@@ -30,6 +30,7 @@ var containsKeywords = []string{
 	"This organization has been disabled.",                  // openai
 	"You exceeded your current quota",                       // openai
 	"Permission denied",                                     // gcp
+	"Quota exceeded for quota metric",                       // gemini
 	"The security token included in the request is invalid", //AWS
 	"Operation not allowed",                                 //AWS
 	"Your account is not authorized",                        //AWS
@@ -57,6 +58,11 @@ func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode)
 	// 错误类型检查
 	switch err.OpenAIError.Type {
 	case "insufficient_quota", "authentication_error", "permission_error", "forbidden":
+		return true
+	}
+
+	switch err.OpenAIError.Param {
+	case "PERMISSIONDENIED":
 		return true
 	}
 
