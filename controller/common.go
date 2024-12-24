@@ -45,7 +45,7 @@ func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode)
 	if err.StatusCode == http.StatusUnauthorized {
 		return true
 	}
-	if err.StatusCode == http.StatusForbidden && channelType == config.ChannelTypeGemini {
+	if err.StatusCode == http.StatusForbidden && (channelType == config.ChannelTypeGemini || channelType == config.ChannelTypeSiliconflow) {
 		return true
 	}
 
