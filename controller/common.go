@@ -34,6 +34,7 @@ var containsKeywords = []string{
 	"The security token included in the request is invalid", //AWS
 	"Operation not allowed",                                 //AWS
 	"Your account is not authorized",                        //AWS
+	"your account balance is insufficient",                  // siliconflow
 }
 
 func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode) bool {
@@ -45,7 +46,7 @@ func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode)
 	if err.StatusCode == http.StatusUnauthorized {
 		return true
 	}
-	if err.StatusCode == http.StatusForbidden && (channelType == config.ChannelTypeGemini || channelType == config.ChannelTypeSiliconflow) {
+	if err.StatusCode == http.StatusForbidden && channelType == config.ChannelTypeGemini {
 		return true
 	}
 
