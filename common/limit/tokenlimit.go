@@ -32,8 +32,8 @@ import (
 )
 
 const (
-	tokenFormat     = "%s:tokens"
-	timestampFormat = "%s:ts"
+	tokenFormat     = "{%s}:tokens"
+	timestampFormat = "{%s}:ts"
 )
 
 var (

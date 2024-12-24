@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	countFormat = "%s:count"
+	countFormat = "{%s}:count"
 )
 
 var (
