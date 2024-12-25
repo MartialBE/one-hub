@@ -79,6 +79,7 @@ func UpdateChannelsTag(tag string, channel *Channel) error {
 	// 判断模型和分组是否有变化
 	if channelTag.Models == channel.Models && channelTag.Group == channel.Group {
 		tx.Commit()
+		go ChannelGroup.Load()
 		return nil
 	}
 
