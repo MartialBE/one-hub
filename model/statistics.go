@@ -59,7 +59,7 @@ func GetChannelExpensesStatisticsByPeriod(startTime, endTime, groupType string, 
 	if common.UsingPostgreSQL {
 		dateStr = "TO_CHAR(date, 'YYYY-MM-DD') as date"
 	} else if common.UsingSQLite {
-		dateStr = "strftime('%Y-%m-%d', date) as date"
+		dateStr = "strftime('%%Y-%%m-%%d', date) as date"
 	}
 
 	baseSelect := `
