@@ -11,8 +11,8 @@ import (
 )
 
 func GetModelList(c *gin.Context) {
-	channel := model.Channel{}
-	err := c.ShouldBindJSON(&channel)
+	channel := &model.Channel{}
+	err := c.ShouldBindJSON(channel)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -23,7 +23,26 @@ func GetModelList(c *gin.Context) {
 	keys := strings.Split(channel.Key, "\n")
 	channel.Key = keys[0]
 
-	provider := providers.GetProvider(&channel, c)
+	if channel.Key == "" {
+		if channel.Id == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "key is required",
+			})
+			return
+		}
+
+		channel, err = model.GetChannelById(channel.Id)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+	}
+
+	provider := providers.GetProvider(channel, c)
 	if provider == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,

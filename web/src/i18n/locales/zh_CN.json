@@ -887,6 +887,7 @@
     "otherArg": "其他参数",
     "delChannel": "删除渠道",
     "delChannelInfo": "是否删除渠道",
+    "check": "检测",
     "manual": "手动",
     "auto": "自动",
     "testAllChannel": "已成功开始测试所有通道，请刷新页面查看结果。",
