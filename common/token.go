@@ -297,7 +297,7 @@ func CountTokenInput(input any, model string) int {
 		}
 		return CountTokenText(text, model)
 	}
-	return 0
+	return CountTokenInput(fmt.Sprintf("%v", input), model)
 }
 
 func CountTokenText(text string, model string) int {

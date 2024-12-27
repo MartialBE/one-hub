@@ -1,7 +1,7 @@
 package types
 
 type ModerationRequest struct {
-	Input string `json:"input,omitempty" binding:"required"`
+	Input any    `json:"input,omitempty" binding:"required"`
 	Model string `json:"model,omitempty"`
 }
 
