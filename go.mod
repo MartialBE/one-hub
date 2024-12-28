@@ -37,15 +37,16 @@ require (
 	github.com/shopspring/decimal v1.4.0
 	github.com/smartwalle/alipay/v3 v3.2.21
 	github.com/spf13/viper v1.18.2
+	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.9.0
 	github.com/stripe/stripe-go/v80 v80.2.0
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.20
 	github.com/wneessen/go-mail v0.5.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.28.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/image v0.18.0
 	golang.org/x/oauth2 v0.23.0
-	golang.org/x/sync v0.8.0
+	golang.org/x/sync v0.10.0
 	google.golang.org/api v0.188.0
 	google.golang.org/grpc v1.64.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -93,7 +94,6 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/sqids/sqids-go v0.4.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -146,8 +146,8 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/net v0.27.0
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.0
