@@ -250,16 +250,12 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		geminiRequest.GenerationConfig.ResponseMimeType = "application/json"
 
 		if request.ResponseFormat.JsonSchema != nil && request.ResponseFormat.JsonSchema.Schema != nil {
-			cleanedSchema := removeAdditionalProperties(request.ResponseFormat.JsonSchema.Schema)
+			cleanedSchema := removeAdditionalPropertiesWithDepth(request.ResponseFormat.JsonSchema.Schema, 0)
 			geminiRequest.GenerationConfig.ResponseSchema = cleanedSchema
 		}
 	}
 
 	return &geminiRequest, nil
-}
-
-func removeAdditionalProperties(schema interface{}) interface{} {
-	return removeAdditionalPropertiesWithDepth(schema, 0)
 }
 
 func removeAdditionalPropertiesWithDepth(schema interface{}, depth int) interface{} {
@@ -312,6 +308,12 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatRe
 		Model:   request.Model,
 		Choices: make([]types.ChatCompletionChoice, 0, len(response.Candidates)),
 	}
+
+	if len(response.Candidates) == 0 {
+		errWithCode = common.StringErrorWrapper("no candidates", "no_candidates", http.StatusInternalServerError)
+		return
+	}
+
 	for _, candidate := range response.Candidates {
 		openaiResponse.Choices = append(openaiResponse.Choices, candidate.ToOpenAIChoice(request))
 	}
