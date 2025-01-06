@@ -9,6 +9,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"net/http"
 	"one-api/common/config"
 	"regexp"
 	"strings"
@@ -35,6 +36,13 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 			return
 		}
 		mimeType = resp.Header.Get("Content-Type")
+		if !strings.HasPrefix(mimeType, "image/") {
+			firstBytes := buffer.Bytes()[:512]
+			actualMime := http.DetectContentType(firstBytes)
+			if strings.HasPrefix(actualMime, "image/") {
+				mimeType = actualMime
+			}
+		}
 		data = base64.StdEncoding.EncodeToString(buffer.Bytes())
 	} else {
 		var cfResp *CFResponse
