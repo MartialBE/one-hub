@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"one-api/common"
@@ -711,5 +712,53 @@ func TopUp(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    quota,
+	})
+}
+
+type ChangeUserQuotaRequest struct {
+	Quota  int    `json:"quota" form:"quota"`
+	Remark string `json:"remark" form:"remark"`
+}
+
+func ChangeUserQuota(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	var req ChangeUserQuotaRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	if req.Quota == 0 {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("不能为0"))
+		return
+	}
+
+	err = model.ChangeUserQuota(userId, req.Quota, false)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	remark := fmt.Sprintf("管理员增减用户额度 %s", common.LogQuota(req.Quota))
+
+	if req.Remark != "" {
+		remark = fmt.Sprintf("%s, 备注: %s", remark, req.Remark)
+	}
+
+	model.RecordLog(userId, model.LogTypeManage, remark)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
 	})
 }

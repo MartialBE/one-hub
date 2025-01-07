@@ -163,7 +163,8 @@
     "testModels": "Speed ​​test model:",
     "updateChannelBalance": "All enabled channel balances have been updated!",
     "updateOk": "update completed!",
-    "weightTip": "Weight cannot be less than 1"
+    "weightTip": "Weight cannot be less than 1",
+    "check": "Check"
   },
   "common": {
     "again": "Retry ({{count}})",
@@ -1018,7 +1019,12 @@
     "userRole": "User Role",
     "username": "Username",
     "usernameRequired": "Username is required",
-    "users": "Users"
+    "users": "Users",
+    "changeQuota": "Change quota",
+    "changeQuotaHelperText": "Here is an increase or decrease, not a direct change to the user's balance. Enter dollars, you can deduct up to {{quota}} at most.",
+    "changeQuotaNotEmpty": "Please fill in the change amount.",
+    "changeQuotaNotEnough": "Cannot deduct an amount exceeding the user's balance.",
+    "quotaRemark": "Remark"
   },
   "user_group": "User grouping",
   "validation": {

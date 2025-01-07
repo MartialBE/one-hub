@@ -100,23 +100,28 @@ export default function Users() {
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
 
   const manageUser = async (username, action, value) => {
-    const url = '/api/user/manage';
-    let data = { username: username, action: '' };
+    let url = '/api/user/manage';
+    let valueData = {};
+    // let data = { username: username, action: '' };
     let res;
     switch (action) {
       case 'delete':
-        data.action = 'delete';
+        valueData = { username, action: 'delete' };
         break;
       case 'status':
-        data.action = value === 1 ? 'enable' : 'disable';
+        valueData = { username, action: value === 1 ? 'enable' : 'disable' };
         break;
       case 'role':
-        data.action = value === true ? 'promote' : 'demote';
+        valueData = { username, action: value === true ? 'promote' : 'demote' };
+        break;
+      case 'quota':
+        url = `/api/user/quota/${username}`;
+        valueData = value;
         break;
     }
 
     try {
-      res = await API.post(url, data);
+      res = await API.post(url, valueData);
       const { success, message } = res.data;
       if (success) {
         showSuccess(t('userPage.operationSuccess'));

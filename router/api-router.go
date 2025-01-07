@@ -70,6 +70,7 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.GET("/:id", controller.GetUser)
 				adminRoute.POST("/", controller.CreateUser)
 				adminRoute.POST("/manage", controller.ManageUser)
+				adminRoute.POST("/quota/:id", controller.ChangeUserQuota)
 				adminRoute.PUT("/", controller.UpdateUser)
 				adminRoute.DELETE("/:id", controller.DeleteUser)
 			}
@@ -88,9 +89,9 @@ func SetApiRouter(router *gin.Engine) {
 		}
 
 		modelOwnedByRoute := apiRouter.Group("/model_ownedby")
+		modelOwnedByRoute.GET("/", controller.GetAllModelOwnedBy)
 		modelOwnedByRoute.Use(middleware.AdminAuth())
 		{
-			modelOwnedByRoute.GET("/", controller.GetAllModelOwnedBy)
 			modelOwnedByRoute.GET("/:id", controller.GetModelOwnedBy)
 			modelOwnedByRoute.POST("/", controller.CreateModelOwnedBy)
 			modelOwnedByRoute.PUT("/", controller.UpdateModelOwnedBy)

@@ -355,7 +355,12 @@
     "cUserRole": "普通用户",
     "adminUserRole": "管理员",
     "superAdminRole": "超级管理员",
-    "uUserRole": "未知身份"
+    "uUserRole": "未知身份",
+    "changeQuota": "增减额度",
+    "changeQuotaHelperText": "这里是增减，不是直接更改用户余额，输入美元，你最多可以减扣 {{quota}}",
+    "changeQuotaNotEmpty": "请填写变更额度",
+    "changeQuotaNotEnough": "不能扣除超过用户余额的额度",
+    "quotaRemark": "备注"
   },
   "profilePage": {
     "personalInfo": "个人信息",

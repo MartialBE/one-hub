@@ -14,15 +14,18 @@ import {
   DialogTitle,
   Button,
   Tooltip,
-  Stack
+  Stack,
+  TextField,
+  InputAdornment
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
 import TableSwitch from 'ui-component/Switch';
-import { renderQuota, renderNumber, timestamp2string } from 'utils/common';
+import { renderQuota, renderNumber, timestamp2string, renderQuotaByMoney, showError } from 'utils/common';
 import { Icon } from '@iconify/react';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
+import ConfirmDialog from 'ui-component/confirm-dialog';
 
 function renderRole(t, role) {
   switch (role) {
@@ -42,7 +45,10 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
   const theme = useTheme();
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openChangeQuota, setOpenChangeQuota] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
+  const [money, setMoney] = useState(0);
+  const [remark, setRemark] = useState('');
 
   const handleDeleteOpen = () => {
     handleCloseMenu();
@@ -59,6 +65,23 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
 
   const handleCloseMenu = () => {
     setOpen(null);
+  };
+
+  const handleChangeQuota = async () => {
+    if (money === 0) {
+      showError(t('userPage.changeQuotaNotEmpty'));
+    }
+
+    const quota = Number(renderQuotaByMoney(money));
+
+    if (money < 0 && Math.abs(quota) > item.quota) {
+      showError(t('userPage.changeQuotaNotEnough'));
+      return;
+    }
+    const ok = await manageUser(item.id, 'quota', { quota: Number(quota), remark });
+    if (ok) {
+      setOpenChangeQuota(false);
+    }
   };
 
   const handleStatus = async () => {
@@ -165,6 +188,15 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
           <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.edit')}
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+            setOpenChangeQuota(true);
+          }}
+        >
+          <Icon icon="solar:wallet-money-bold-duotone" style={{ marginRight: '16px' }} />
+          {t('userPage.changeQuota')}
+        </MenuItem>
         <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
           <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
@@ -185,6 +217,44 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={openChangeQuota}
+        onClose={() => setOpenChangeQuota(false)}
+        title={t('userPage.changeQuota')}
+        content={
+          <>
+            <TextField
+              fullWidth
+              id="quota-label"
+              label={t('userPage.changeQuota')}
+              type="number"
+              value={money}
+              onChange={(e) => setMoney(e.target.value)}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                endAdornment: <InputAdornment position="end">{renderQuotaByMoney(money)}</InputAdornment>
+              }}
+              helperText={t('userPage.changeQuotaHelperText', { quota: renderQuota(item.quota, 6) })}
+              sx={{ mt: 2 }}
+            />
+            <TextField
+              fullWidth
+              id="quota-remark-label"
+              label={t('userPage.quotaRemark')}
+              type="text"
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+          </>
+        }
+        action={
+          <Button variant="contained" color="primary" onClick={handleChangeQuota}>
+            {t('common.submit')}
+          </Button>
+        }
+      />
     </>
   );
 }

@@ -163,7 +163,8 @@
     "testModels": "スピードテストモデル：",
     "updateChannelBalance": "有効になっているすべてのチャンネルバランスが更新されました。",
     "updateOk": "アップデート完了！",
-    "weightTip": "重みは 1 未満にはできません"
+    "weightTip": "重みは 1 未満にはできません",
+    "check": "検出"
   },
   "common": {
     "again": "再試行 ({{count}})",
@@ -1018,7 +1019,12 @@
     "userRole": "ユーザーの役割",
     "username": "ユーザー名",
     "usernameRequired": "ユーザー名は必須です",
-    "users": "ユーザー"
+    "users": "ユーザー",
+    "changeQuota": "増減枠",
+    "changeQuotaHelperText": "こちらは増減です。ユーザーの残高を直接変更するものではありません。ドルを入力し、最大で {{quota}} を差し引くことができます。",
+    "changeQuotaNotEmpty": "変更枠を記入してください",
+    "changeQuotaNotEnough": "ユーザーの残高を超える金額を差し引くことはできません。",
+    "quotaRemark": "コメント"
   },
   "user_group": "ユーザーグループ",
   "validation": {

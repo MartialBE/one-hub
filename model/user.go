@@ -527,3 +527,25 @@ func GetUserStatisticsByPeriod(startTimestamp, endTimestamp int64) (statistics [
 
 	return statistics, err
 }
+
+func ChangeUserQuota(id int, quota int, isRecharge bool) (err error) {
+	updateMap := map[string]interface{}{
+		"quota": gorm.Expr("quota + ?", quota),
+	}
+
+	if isRecharge {
+		updateMap["recharge_count"] = gorm.Expr("recharge_count + 1")
+	}
+
+	err = DB.Model(&User{}).Where("id = ?", id).Updates(updateMap).Error
+
+	if err != nil {
+		return err
+	}
+
+	if config.RedisEnabled {
+		redis.RedisDel(fmt.Sprintf(UserQuotaCacheKey, id))
+	}
+
+	return nil
+}

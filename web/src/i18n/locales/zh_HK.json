@@ -164,7 +164,8 @@
     "testModels": "測速模型",
     "updateChannelBalance": "已更新完畢所有已啟用通道餘額！",
     "updateOk": "更新成功！",
-    "weightTip": "權重不能小於 1"
+    "weightTip": "權重不能小於 1",
+    "check": "檢測"
   },
   "common": {
     "again": "重試 ({{count}})",
@@ -1018,7 +1019,12 @@
     "userRole": "用戶角色",
     "username": "用戶名",
     "usernameRequired": "用戶名不能為空",
-    "users": "用戶"
+    "users": "用戶",
+    "changeQuota": "增減額度",
+    "changeQuotaHelperText": "呢度係增減，唔係直接更改用戶餘額，輸入美元，你最多可以扣除 {{quota}}",
+    "changeQuotaNotEmpty": "請填寫更改額度",
+    "changeQuotaNotEnough": "唔可以扣除超過用戶餘額嘅金額",
+    "quotaRemark": "備註"
   },
   "user_group": "用戶分組",
   "validation": {

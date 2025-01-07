@@ -23,7 +23,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-import { renderQuotaWithPrompt, showSuccess, showError, trims } from 'utils/common';
+import { showSuccess, showError, trims } from 'utils/common';
 import { API } from 'utils/api';
 import { useTranslation } from 'react-i18next';
 
@@ -53,8 +53,7 @@ const originInputs = {
   username: '',
   display_name: '',
   password: '',
-  group: 'default',
-  quota: 0
+  group: 'default'
 };
 
 const EditModal = ({ open, userId, onCancel, onOk }) => {
@@ -221,28 +220,6 @@ const EditModal = ({ open, userId, onCancel, onOk }) => {
 
               {values.is_edit && (
                 <>
-                  <FormControl fullWidth error={Boolean(touched.quota && errors.quota)} sx={{ ...theme.typography.otherInput }}>
-                    <InputLabel htmlFor="channel-quota-label">{t('userPage.quota')}</InputLabel>
-                    <OutlinedInput
-                      id="channel-quota-label"
-                      label={t('userPage.quota')}
-                      type="number"
-                      value={values.quota}
-                      name="quota"
-                      endAdornment={<InputAdornment position="end">{renderQuotaWithPrompt(values.quota)}</InputAdornment>}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      aria-describedby="helper-text-channel-quota-label"
-                      disabled={values.unlimited_quota}
-                    />
-
-                    {touched.quota && errors.quota && (
-                      <FormHelperText error id="helper-tex-channel-quota-label">
-                        {t(errors.quota)}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-
                   <FormControl fullWidth error={Boolean(touched.group && errors.group)} sx={{ ...theme.typography.otherInput }}>
                     <InputLabel htmlFor="channel-group-label">{t('userPage.group')}</InputLabel>
                     <Select

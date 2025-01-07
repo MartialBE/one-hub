@@ -188,6 +188,16 @@ export function renderQuota(quota, digits = 2) {
   return renderNumber(quota);
 }
 
+export function renderQuotaByMoney(money) {
+  money = Number(money);
+  let quotaPerUnit = localStorage.getItem('quota_per_unit');
+  quotaPerUnit = parseFloat(quotaPerUnit);
+
+  const result = new Decimal(money).mul(quotaPerUnit);
+
+  return result.toFixed(0);
+}
+
 export const verifyJSON = (str) => {
   try {
     JSON.parse(str);
