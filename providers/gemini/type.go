@@ -277,8 +277,9 @@ func (g *GeminiChatResponse) GetResponseText() string {
 
 func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]GeminiChatContent, string, *types.OpenAIErrorWithStatusCode) {
 	contents := make([]GeminiChatContent, 0)
-	useToolName := ""
+	// useToolName := ""
 	var systemContent []string
+	toolCallId := make(map[string]string)
 
 	for _, openaiContent := range openaiContents {
 		if openaiContent.IsSystemRole() {
@@ -290,55 +291,56 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 			Role:  ConvertRole(openaiContent.Role),
 			Parts: make([]GeminiPart, 0),
 		}
-		content.Role = ConvertRole(openaiContent.Role)
 		openaiContent.FuncToToolCalls()
 
 		if openaiContent.ToolCalls != nil {
-			argeStr := ""
-			useToolName = openaiContent.ToolCalls[0].Function.Name
-			if openaiContent.ToolCalls[0].Function.Arguments != "" {
-				argeStr = openaiContent.ToolCalls[0].Function.Arguments
-			}
+			for _, toolCall := range openaiContent.ToolCalls {
+				toolCallId[toolCall.Id] = toolCall.Function.Name
 
-			arge := map[string]interface{}{}
-			if argeStr != "" {
-				json.Unmarshal([]byte(argeStr), &arge)
-			}
+				args := map[string]interface{}{}
+				if toolCall.Function.Arguments != "" {
+					json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
+				}
 
+				content.Parts = append(content.Parts, GeminiPart{
+					FunctionCall: &GeminiFunctionCall{
+						Name: toolCall.Function.Name,
+						Args: args,
+					},
+				})
+
+			}
 			text := openaiContent.StringContent()
 			if text != "" {
 				contents = append(contents, createSystemResponse(text))
 			}
-
-			content = GeminiChatContent{
-				Role: "model",
-				Parts: []GeminiPart{
-					{
-						FunctionCall: &GeminiFunctionCall{
-							Name: useToolName,
-							Args: arge,
-						},
-					},
-				},
-			}
 		} else if openaiContent.Role == types.ChatMessageRoleFunction || openaiContent.Role == types.ChatMessageRoleTool {
 			if openaiContent.Name == nil {
-				openaiContent.Name = &useToolName
+				if toolName, exists := toolCallId[openaiContent.ToolCallID]; exists {
+					openaiContent.Name = &toolName
+				}
 			}
-			content = GeminiChatContent{
-				Role: "function",
-				Parts: []GeminiPart{
-					{
-						FunctionResponse: &GeminiFunctionResponse{
-							Name: *openaiContent.Name,
-							Response: GeminiFunctionResponseContent{
-								Name:    *openaiContent.Name,
-								Content: openaiContent.StringContent(),
-							},
-						},
+
+			functionPart := GeminiPart{
+				FunctionResponse: &GeminiFunctionResponse{
+					Name: *openaiContent.Name,
+					Response: GeminiFunctionResponseContent{
+						Name:    *openaiContent.Name,
+						Content: openaiContent.StringContent(),
 					},
 				},
 			}
+
+			if len(contents) > 0 && contents[len(contents)-1].Role == "function" {
+				contents[len(contents)-1].Parts = append(contents[len(contents)-1].Parts, functionPart)
+			} else {
+				contents = append(contents, GeminiChatContent{
+					Role:  "function",
+					Parts: []GeminiPart{functionPart},
+				})
+			}
+
+			continue
 		} else {
 			openaiMessagePart := openaiContent.ParseContent()
 			imageNum := 0
