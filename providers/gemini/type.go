@@ -192,8 +192,10 @@ type GeminiChatSafetySettings struct {
 }
 
 type GeminiChatTools struct {
-	FunctionDeclarations []types.ChatCompletionFunction `json:"functionDeclarations,omitempty"`
-	CodeExecution        *GeminiCodeExecution           `json:"codeExecution,omitempty"`
+	FunctionDeclarations  []types.ChatCompletionFunction `json:"functionDeclarations,omitempty"`
+	CodeExecution         *GeminiCodeExecution           `json:"codeExecution,omitempty"`
+	GoogleSearch          any                            `json:"googleSearch,omitempty"`
+	GoogleSearchRetrieval any                            `json:"googleSearchRetrieval,omitempty"`
 }
 
 type GeminiCodeExecution struct {

@@ -154,7 +154,18 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 
 	if functions != nil {
 		var geminiChatTools GeminiChatTools
+		googleSearch := false
+		codeExecution := false
 		for _, function := range functions {
+			if function.Name == "googleSearch" {
+				googleSearch = true
+				continue
+			}
+			if function.Name == "codeExecution" {
+				codeExecution = true
+				continue
+			}
+
 			if params, ok := function.Parameters.(map[string]interface{}); ok {
 				if properties, ok := params["properties"].(map[string]interface{}); ok && len(properties) == 0 {
 					function.Parameters = nil
@@ -163,7 +174,21 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 
 			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, *function)
 		}
-		geminiRequest.Tools = append(geminiRequest.Tools, geminiChatTools)
+
+		if googleSearch && len(geminiRequest.Tools) == 0 {
+			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
+				GoogleSearch: &GeminiCodeExecution{},
+			})
+		}
+		if codeExecution && len(geminiRequest.Tools) == 0 {
+			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
+				CodeExecution: &GeminiCodeExecution{},
+			})
+		}
+
+		if len(geminiRequest.Tools) == 0 {
+			geminiRequest.Tools = append(geminiRequest.Tools, geminiChatTools)
+		}
 	}
 
 	geminiContent, systemContent, err := OpenAIToGeminiChatContent(request.Messages)
