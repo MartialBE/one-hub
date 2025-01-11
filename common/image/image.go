@@ -11,7 +11,6 @@ import (
 	_ "image/png"
 	"net/http"
 	"one-api/common/config"
-	"regexp"
 	"strings"
 	"sync"
 
@@ -19,11 +18,15 @@ import (
 )
 
 func GetImageFromUrl(url string) (mimeType string, data string, err error) {
-	if strings.HasPrefix(url, "data:image/") {
-		return ParseBase64Image(url)
+	if strings.HasPrefix(url, "data:") {
+		return ParseBase64File(url)
 	}
 
-	resp, err := RequestImage(url, "base64")
+	if !strings.HasPrefix(url, "http") {
+		return "", "", errors.New("invalid image url")
+	}
+
+	resp, err := RequestFile(url, "base64")
 	if err != nil {
 		return
 	}
@@ -36,12 +39,10 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 			return
 		}
 		mimeType = resp.Header.Get("Content-Type")
-		if !strings.HasPrefix(mimeType, "image/") {
+		if mimeType == "application/octet-stream" {
 			firstBytes := buffer.Bytes()[:512]
 			actualMime := http.DetectContentType(firstBytes)
-			if strings.HasPrefix(actualMime, "image/") {
-				mimeType = actualMime
-			}
+			mimeType = actualMime
 		}
 		data = base64.StdEncoding.EncodeToString(buffer.Bytes())
 	} else {
@@ -94,7 +95,7 @@ func GetImageSizeFromBase64(encoded string) (width, height int, err error) {
 }
 
 func GetImageSizeFromUrl(url string) (width, height int, err error) {
-	resp, err := RequestImage(url, "get16kb")
+	resp, err := RequestFile(url, "get16kb")
 	if err != nil {
 		return 0, 0, err
 	}
@@ -119,17 +120,19 @@ func GetImageSize(image string) (width, height int, err error) {
 	}
 }
 
-var dataURLPattern = regexp.MustCompile(`data:image/([^;]+);base64,(.*)`)
-
-func ParseBase64Image(base64Image string) (mimeType string, data string, err error) {
-
-	matches := dataURLPattern.FindStringSubmatch(base64Image)
-	if len(matches) == 3 && matches[2] != "" {
-		mimeType = "image/" + matches[1]
-		data = matches[2]
-		return
+func ParseBase64File(base64Data string) (string, string, error) {
+	start := len("data:")
+	// 查找 ";base64," 的位置
+	base64Index := strings.Index(base64Data, ";base64,")
+	if base64Index == -1 {
+		return "", "", errors.New("base64 decode failed")
 	}
 
-	err = errors.New("image base64 decode failed")
-	return
+	mimeType := base64Data[start:base64Index]
+	base64Data = base64Data[base64Index+len(";base64,"):]
+	if base64Data == "" {
+		return "", "", errors.New("empty base64 data")
+	}
+
+	return mimeType, base64Data, nil
 }

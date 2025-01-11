@@ -17,6 +17,8 @@ var ImageHttpClients = &http.Client{
 	Timeout: 15 * time.Second,
 }
 
+var maxFileSize int64 = 20 * 1024 * 1024 // 20MB
+
 type CFRequest struct {
 	Action string `json:"action"`
 	APIKey string `json:"api_key"`
@@ -30,7 +32,7 @@ type CFResponse struct {
 	MimeType string `json:"mimeType,omitempty"`
 }
 
-func RequestImage(url, action string) (*http.Response, error) {
+func RequestFile(url, action string) (*http.Response, error) {
 	var resCF *CFRequest
 	reqUrl := url
 	method := http.MethodGet
@@ -55,6 +57,8 @@ func RequestImage(url, action string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	response.Body = http.MaxBytesReader(nil, response.Body, maxFileSize)
 
 	if response.StatusCode != http.StatusOK && config.CFWorkerImageUrl != "" {
 		var cfResp *CFResponse
