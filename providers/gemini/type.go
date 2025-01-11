@@ -412,22 +412,6 @@ func (e *GeminiErrorWithStatusCode) ToOpenAiError() *types.OpenAIErrorWithStatus
 	}
 }
 
-type GeminiOpenaiUsage struct {
-	PromptTokens     int `json:"promptTokens"`
-	CompletionTokens int `json:"completionTokens"`
-	TotalTokens      int `json:"totalTokens"`
-}
-
-type GeminiOpenaiChatResponse struct {
-	types.ChatCompletionResponse
-	Usage *GeminiOpenaiUsage `json:"usage,omitempty"`
-}
-
-type GeminiOpenaiChatStreamResponse struct {
-	types.ChatCompletionStreamResponse
-	Usage *GeminiOpenaiUsage `json:"usage,omitempty"`
-}
-
 type GeminiErrors []*GeminiErrorResponse
 
 func (e *GeminiErrors) Error() *GeminiErrorResponse {

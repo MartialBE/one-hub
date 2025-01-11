@@ -1,13 +1,10 @@
 package gemini
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"one-api/common"
-	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/common/utils"
 	"one-api/providers/base"
@@ -35,42 +32,7 @@ type OpenAIStreamHandler struct {
 
 func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
 	if p.UseOpenaiAPI {
-		req, errWithCode := p.GetRequestTextBody(config.RelayModeChatCompletions, request.Model, request)
-		if errWithCode != nil {
-			return nil, errWithCode
-		}
-		defer req.Body.Close()
-
-		var openaiResponse types.ChatCompletionResponse
-		response := &GeminiOpenaiChatResponse{}
-		// 发送请求
-		_, errWithCode = p.Requester.SendRequest(req, response, false)
-		if errWithCode != nil {
-			return nil, errWithCode
-		}
-
-		openaiResponse = response.ChatCompletionResponse
-
-		if response.Usage == nil || response.Usage.CompletionTokens == 0 {
-			openaiResponse.Usage = &types.Usage{
-				PromptTokens:     p.Usage.PromptTokens,
-				CompletionTokens: 0,
-				TotalTokens:      0,
-			}
-			// 那么需要计算
-			response.Usage.CompletionTokens = common.CountTokenText(response.GetContent(), request.Model)
-			response.Usage.TotalTokens = response.Usage.PromptTokens + response.Usage.CompletionTokens
-		} else {
-			openaiResponse.Usage = &types.Usage{
-				PromptTokens:     response.Usage.PromptTokens,
-				CompletionTokens: response.Usage.CompletionTokens,
-				TotalTokens:      response.Usage.TotalTokens,
-			}
-		}
-
-		*p.Usage = *openaiResponse.Usage
-
-		return &openaiResponse, nil
+		return p.OpenAIProvider.CreateChatCompletion(request)
 	}
 
 	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
@@ -98,32 +60,7 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 
 	channel := p.GetChannel()
 	if p.UseOpenaiAPI {
-		streamOptions := request.StreamOptions
-		request.StreamOptions = &types.StreamOptions{
-			IncludeUsage: true,
-		}
-
-		req, errWithCode := p.GetRequestTextBody(config.RelayModeChatCompletions, request.Model, request)
-		if errWithCode != nil {
-			return nil, errWithCode
-		}
-		defer req.Body.Close()
-
-		// 恢复原来的配置
-		request.StreamOptions = streamOptions
-
-		// 发送请求
-		resp, errWithCode := p.Requester.SendRequestRaw(req)
-		if errWithCode != nil {
-			return nil, errWithCode
-		}
-
-		chatHandler := OpenAIStreamHandler{
-			Usage:     p.Usage,
-			ModelName: request.Model,
-		}
-
-		return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerChatStream)
+		return p.OpenAIProvider.CreateChatCompletionStream(request)
 	}
 
 	geminiRequest, errWithCode := ConvertFromChatOpenai(request)
@@ -492,61 +429,4 @@ func (p *GeminiProvider) pluginHandle(request *GeminiChatRequest) {
 		CodeExecution: &GeminiCodeExecution{},
 	})
 
-}
-
-func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
-	// 如果rawLine 前缀不为data:，则直接返回
-	if !strings.HasPrefix(string(*rawLine), "data:") {
-		*rawLine = nil
-		return
-	}
-
-	// 去除前缀
-	*rawLine = (*rawLine)[5:]
-	*rawLine = bytes.TrimSpace(*rawLine)
-
-	// 如果等于 DONE 则结束
-	if string(*rawLine) == "[DONE]" {
-		errChan <- io.EOF
-		*rawLine = requester.StreamClosed
-		return
-	}
-
-	var openaiResponse types.ChatCompletionStreamResponse
-	var response GeminiOpenaiChatStreamResponse
-	err := json.Unmarshal(*rawLine, &response)
-	if err != nil {
-		errChan <- common.ErrorToOpenAIError(err)
-		return
-	}
-
-	openaiResponse = response.ChatCompletionStreamResponse
-
-	if response.Usage != nil {
-		if response.Usage.CompletionTokens > 0 {
-			openaiResponse.Usage = &types.Usage{
-				PromptTokens:     response.Usage.PromptTokens,
-				CompletionTokens: response.Usage.CompletionTokens,
-				TotalTokens:      response.Usage.TotalTokens,
-			}
-
-			*h.Usage = *openaiResponse.Usage
-		}
-
-		if len(response.Choices) == 0 {
-			*rawLine = nil
-			return
-		}
-	} else {
-		if h.Usage.TotalTokens == 0 {
-			h.Usage.TotalTokens = h.Usage.PromptTokens
-		}
-		countTokenText := common.CountTokenText(openaiResponse.GetResponseText(), h.ModelName)
-		h.Usage.CompletionTokens += countTokenText
-		h.Usage.TotalTokens += countTokenText
-	}
-
-	// 转换字符串
-	responseBody, _ := json.Marshal(openaiResponse)
-	dataChan <- string(responseBody)
 }
