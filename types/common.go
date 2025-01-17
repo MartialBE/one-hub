@@ -4,24 +4,24 @@ import "encoding/json"
 
 type Usage struct {
 	PromptTokens            int                     `json:"prompt_tokens"`
-	CompletionTokens        int                     `json:"completion_tokens,omitempty"`
+	CompletionTokens        int                     `json:"completion_tokens"`
 	TotalTokens             int                     `json:"total_tokens"`
-	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details,omitempty"`
-	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details,omitempty"`
+	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details"`
+	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details"`
 }
 
 type PromptTokensDetails struct {
-	AudioTokens          int `json:"audio_tokens,omitempty"`
-	CachedTokens         int `json:"cached_tokens,omitempty"`
-	TextTokens           int `json:"text_tokens,omitempty"`
-	ImageTokens          int `json:"image_tokens,omitempty"`
-	CachedTokensInternal int `json:"cached_tokens_internal,omitempty"`
+	AudioTokens          int `json:"audio_tokens"`
+	CachedTokens         int `json:"cached_tokens"`
+	TextTokens           int `json:"text_tokens"`
+	ImageTokens          int `json:"image_tokens"`
+	CachedTokensInternal int `json:"cached_tokens_internal"`
 }
 
 type CompletionTokensDetails struct {
-	AudioTokens     int `json:"audio_tokens,omitempty"`
-	ReasoningTokens int `json:"reasoning_tokens,omitempty"`
-	TextTokens      int `json:"text_tokens,omitempty"`
+	AudioTokens     int `json:"audio_tokens"`
+	ReasoningTokens int `json:"reasoning_tokens"`
+	TextTokens      int `json:"text_tokens"`
 }
 
 func (i *PromptTokensDetails) Merge(other *PromptTokensDetails) {
