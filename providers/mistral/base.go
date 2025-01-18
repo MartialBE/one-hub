@@ -9,12 +9,13 @@ import (
 	"one-api/types"
 
 	"one-api/providers/base"
+	"one-api/providers/openai"
 )
 
 type MistralProviderFactory struct{}
 
 type MistralProvider struct {
-	base.BaseProvider
+	openai.OpenAIProvider
 }
 
 // 创建 MistralProvider
@@ -28,10 +29,13 @@ func CreateMistralProvider(channel *model.Channel, baseURL string) *MistralProvi
 	config := getMistralConfig(baseURL)
 
 	return &MistralProvider{
-		BaseProvider: base.BaseProvider{
-			Config:    config,
-			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
+		OpenAIProvider: openai.OpenAIProvider{
+			BaseProvider: base.BaseProvider{
+				Config:    config,
+				Channel:   channel,
+				Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
+			},
+			SupportStreamOptions: false,
 		},
 	}
 }
@@ -50,6 +54,7 @@ func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 	errorResponse := &MistralError{}
 	err := json.NewDecoder(resp.Body).Decode(errorResponse)
 	if err != nil {
+		fmt.Println("Error decoding Mistral error response:", err)
 		return nil
 	}
 
@@ -65,14 +70,4 @@ func errorHandle(MistralError *MistralError) *types.OpenAIError {
 		Message: MistralError.Message.Detail[0].errorMsg(),
 		Type:    MistralError.Type,
 	}
-}
-
-// 获取请求头
-func (p *MistralProvider) GetRequestHeaders() (headers map[string]string) {
-	headers = make(map[string]string)
-	p.CommonRequestHeaders(headers)
-
-	headers["Authorization"] = fmt.Sprintf("Bearer %s", p.Channel.Key)
-
-	return headers
 }
