@@ -2,7 +2,6 @@ package mistral
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"one-api/common/requester"
 	"one-api/model"
@@ -54,7 +53,6 @@ func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 	errorResponse := &MistralError{}
 	err := json.NewDecoder(resp.Body).Decode(errorResponse)
 	if err != nil {
-		fmt.Println("Error decoding Mistral error response:", err)
 		return nil
 	}
 
