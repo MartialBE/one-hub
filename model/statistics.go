@@ -29,7 +29,7 @@ func GetUserModelStatisticsByPeriod(userId int, startTime, endTime string) (LogS
 
 	err = DB.Raw(`
 		SELECT `+dateStr+`,
-		model_name, 
+		model_name,
 		sum(request_count) as request_count,
 		sum(quota) as quota,
 		sum(prompt_tokens) as prompt_tokens,
@@ -94,7 +94,7 @@ func GetChannelExpensesStatisticsByPeriod(startTime, endTime, groupType string, 
             FROM statistics
             JOIN channels ON statistics.channel_id = channels.id
             %s
-            GROUP BY date, channel_id
+            GROUP BY date, channel_id, channels.name
             ORDER BY date, channel_id`
 	}
 
@@ -118,11 +118,11 @@ const (
 func UpdateStatistics(updateType StatisticsUpdateType) error {
 	sql := `
 	%s statistics (date, user_id, channel_id, model_name, request_count, quota, prompt_tokens, completion_tokens, request_time)
-	SELECT 
+	SELECT
 		%s as date,
 		user_id,
 		channel_id,
-		model_name, 
+		model_name,
 		count(1) as request_count,
 		sum(quota) as quota,
 		sum(prompt_tokens) as prompt_tokens,
