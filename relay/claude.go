@@ -198,10 +198,7 @@ func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, er
 						return 0, err
 					}
 					tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
-
-				case "tool_use":
-					tokenNum += common.CountTokenInput(content["input"].(string), request.Model)
-				case "tool_result":
+				case "tool_result", "tool_use":
 					// 不算了  就只算他50吧
 					tokenNum += 50
 				}
