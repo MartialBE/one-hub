@@ -90,7 +90,7 @@ func GetChannelExpensesStatisticsByPeriod(startTime, endTime, groupType string, 
 
 	} else {
 		sql = baseSelect + `
-            channels.name as channel
+            MAX(channels.name) as channel
             FROM statistics
             JOIN channels ON statistics.channel_id = channels.id
             %s
