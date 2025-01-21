@@ -1,62 +1,5 @@
 package minimax
 
-import "one-api/types"
-
-type MiniMaxChatRequest struct {
-	Model            string                          `json:"model"`
-	Stream           bool                            `json:"stream,omitempty"`
-	TokensToGenerate int                             `json:"tokens_to_generate,omitempty"`
-	Temperature      *float64                        `json:"temperature,omitempty"`
-	TopP             *float64                        `json:"top_p,omitempty"`
-	Messages         []MiniMaxChatMessage            `json:"messages"`
-	BotSetting       []MiniMaxBotSetting             `json:"bot_setting,omitempty"`
-	ReplyConstraints ReplyConstraints                `json:"reply_constraints,omitempty"`
-	Functions        []*types.ChatCompletionFunction `json:"functions,omitempty"`
-}
-
-type MiniMaxChatMessage struct {
-	SenderType   string                                 `json:"sender_type"`
-	SenderName   string                                 `json:"sender_name"`
-	Text         string                                 `json:"text"`
-	FunctionCall *types.ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
-}
-
-type MiniMaxBotSetting struct {
-	BotName string `json:"bot_name"`
-	Content string `json:"content"`
-}
-
-type ReplyConstraints struct {
-	SenderType string `json:"sender_type"`
-	SenderName string `json:"sender_name"`
-}
-
-type MiniMaxChatResponse struct {
-	Created             int64                                  `json:"created"`
-	Model               string                                 `json:"model"`
-	Reply               string                                 `json:"reply"`
-	InputSensitive      bool                                   `json:"input_sensitive,omitempty"`
-	InputSensitiveType  int64                                  `json:"input_sensitive_type,omitempty"`
-	OutputSensitive     bool                                   `json:"output_sensitive"`
-	OutputSensitiveType int64                                  `json:"output_sensitive_type,omitempty"`
-	Choices             []Choice                               `json:"choices"`
-	Usage               *Usage                                 `json:"usage,omitempty"`
-	ID                  string                                 `json:"id,omitempty"`
-	RequestID           string                                 `json:"request_id"`
-	FunctionCall        *types.ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
-	MiniMaxBaseResp
-}
-
-type Choice struct {
-	Messages     []MiniMaxChatMessage `json:"messages"`
-	Index        int                  `json:"index"`
-	FinishReason string               `json:"finish_reason"`
-}
-
-type Usage struct {
-	TotalTokens int `json:"total_tokens"`
-}
-
 type MiniMaxBaseResp struct {
 	BaseResp BaseResp `json:"base_resp"`
 }
@@ -66,14 +9,46 @@ type BaseResp struct {
 	StatusMsg  string `json:"status_msg"`
 }
 
-type MiniMaxEmbeddingRequest struct {
-	Model string   `json:"model"`
-	Texts []string `json:"texts"`
-	Type  string   `json:"type"`
+type SpeechRequest struct {
+	Model        string        `json:"model"`
+	Text         string        `json:"text"`
+	VoiceSetting VoiceSetting  `json:"voice_setting"`
+	AudioSetting *AudioSetting `json:"audio_setting"`
 }
 
-type MiniMaxEmbeddingResponse struct {
-	Vectors     []any `json:"vectors"`
-	TotalTokens int   `json:"total_tokens"`
-	MiniMaxBaseResp
+type VoiceSetting struct {
+	Speed     float64  `json:"speed,omitempty"`
+	Vol       *float64 `json:"vol,omitempty"`
+	VoiceID   string   `json:"voice_id"`
+	Emotion   string   `json:"emotion,omitempty"`
+	LatexRead bool     `json:"latex_read,omitempty"`
+}
+
+type AudioSetting struct {
+	SampleRate int64  `json:"sample_rate,omitempty"`
+	Bitrate    int64  `json:"bitrate,omitempty"`
+	Format     string `json:"format"`
+	Channel    int64  `json:"channel,omitempty"`
+}
+
+type SpeechResponse struct {
+	BaseResp  BaseResp  `json:"base_resp"`
+	Data      Data      `json:"data"`
+	ExtraInfo ExtraInfo `json:"extra_info"`
+}
+
+type Data struct {
+	Audio  string `json:"audio"` // hex编码的audio
+	Status int    `json:"status"`
+}
+
+type ExtraInfo struct {
+	AudioLength             int64   `json:"audio_length"`
+	AudioSampleRate         int64   `json:"audio_sample_rate"`
+	AudioSize               int64   `json:"audio_size"`
+	AudioBitrate            int64   `json:"audio_bitrate"`
+	WordCount               int64   `json:"word_count"`
+	InvisibleCharacterRatio float64 `json:"invisible_character_ratio"`
+	AudioFormat             string  `json:"audio_format"`
+	UsageCharacters         int     `json:"usage_characters"`
 }

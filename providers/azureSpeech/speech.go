@@ -74,6 +74,8 @@ func (p *AzureSpeechProvider) getRequestBody(request *types.SpeechAudioRequest) 
 		if len(voiceMap[request.Voice]) > 1 {
 			role = voiceMap[request.Voice][1]
 		}
+	} else {
+		voice = request.Voice
 	}
 
 	ssml := CreateSSML(request.Input, voice, role)

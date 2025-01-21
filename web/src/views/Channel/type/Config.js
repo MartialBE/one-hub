@@ -232,11 +232,8 @@ const typeConfig = {
   },
   27: {
     input: {
-      models: ['abab5.5-chat', 'abab5.5s-chat', 'abab6-chat', 'embo-01'],
-      test_model: 'abab5.5-chat'
-    },
-    prompt: {
-      key: '按照如下格式输入：APISecret|groupID'
+      models: ['abab6.5s-chat', 'MiniMax-Text-01', 'speech-01-turbo', 'speech-01-240228', 'speech-01-turbo-240228'],
+      test_model: 'abab6.5s-chat'
     },
     modelGroup: 'MiniMax'
   },

@@ -172,6 +172,51 @@
     }
   },
 
+  "27": {
+    "voice": {
+      "name": "声音映射",
+      "description": "将OpenAI的声音角色映射到minimax的声音角色, 如果有emotion，请用|隔开，例如female-chengshu|happy",
+      "params": {
+        "alloy": {
+          "name": "alloy 映射",
+          "description": "默认 female-chengshu",
+          "type": "string",
+          "required": true
+        },
+        "echo": {
+          "name": "echo 映射",
+          "description": "默认 male-qn-qingse",
+          "type": "string",
+          "required": true
+        },
+        "fable": {
+          "name": "fable 映射",
+          "description": "默认 male-qn-jingying",
+          "type": "string",
+          "required": true
+        },
+        "onyx": {
+          "name": "onyx 映射",
+          "description": "默认 presenter_male",
+          "type": "string",
+          "required": true
+        },
+        "nova": {
+          "name": "nova 映射",
+          "description": "默认 presenter_female",
+          "type": "string",
+          "required": true
+        },
+        "shimmer": {
+          "name": "shimmer 映射",
+          "description": "默认 audiobook_female_1",
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  },
+
   "8": {
     "customize": {
       "name": "自定义参数",
