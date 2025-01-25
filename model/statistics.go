@@ -2,7 +2,9 @@ package model
 
 import (
 	"fmt"
+	"math"
 	"one-api/common"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -29,7 +31,7 @@ func GetUserModelStatisticsByPeriod(userId int, startTime, endTime string) (LogS
 
 	err = DB.Raw(`
 		SELECT `+dateStr+`,
-		model_name, 
+		model_name,
 		sum(request_count) as request_count,
 		sum(quota) as quota,
 		sum(prompt_tokens) as prompt_tokens,
@@ -118,11 +120,11 @@ const (
 func UpdateStatistics(updateType StatisticsUpdateType) error {
 	sql := `
 	%s statistics (date, user_id, channel_id, model_name, request_count, quota, prompt_tokens, completion_tokens, request_time)
-	SELECT 
+	SELECT
 		%s as date,
 		user_id,
 		channel_id,
-		model_name, 
+		model_name,
 		count(1) as request_count,
 		sum(quota) as quota,
 		sum(prompt_tokens) as prompt_tokens,
@@ -137,17 +139,26 @@ func UpdateStatistics(updateType StatisticsUpdateType) error {
 	%s
 	`
 
+	now := time.Now()
+	_, offset := now.Zone()
+	offsetHour := offset / 3600
+	absOffsetHour := int(math.Abs(float64(offsetHour)))
+	operation := "-"
+	if offsetHour > 0 {
+		operation = "+"
+	}
+
 	sqlPrefix := ""
 	sqlWhere := ""
 	sqlDate := ""
 	sqlSuffix := ""
 	if common.UsingSQLite {
 		sqlPrefix = "INSERT OR REPLACE INTO"
-		sqlDate = "strftime('%Y-%m-%d', datetime(created_at, 'unixepoch', '+8 hours'))"
+		sqlDate = "strftime('%Y-%m-%d', datetime(created_at, 'unixepoch', '" + operation + strconv.Itoa(absOffsetHour) + " hours'))"
 		sqlSuffix = ""
 	} else if common.UsingPostgreSQL {
 		sqlPrefix = "INSERT INTO"
-		sqlDate = "DATE_TRUNC('day', TO_TIMESTAMP(created_at))::DATE"
+		sqlDate = "DATE_TRUNC('day', TO_TIMESTAMP(created_at) " + operation + " INTERVAL '" + strconv.Itoa(absOffsetHour) + " hours')::DATE"
 		sqlSuffix = `ON CONFLICT (date, user_id, channel_id, model_name) DO UPDATE SET
 		request_count = EXCLUDED.request_count,
 		quota = EXCLUDED.quota,
@@ -156,7 +167,7 @@ func UpdateStatistics(updateType StatisticsUpdateType) error {
 		request_time = EXCLUDED.request_time`
 	} else {
 		sqlPrefix = "INSERT INTO"
-		sqlDate = "DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m-%d')"
+		sqlDate = "DATE_FORMAT(FROM_UNIXTIME(created_at) " + operation + " INTERVAL " + strconv.Itoa(absOffsetHour) + " HOUR, '%Y-%m-%d')"
 		sqlSuffix = `ON DUPLICATE KEY UPDATE
 		request_count = VALUES(request_count),
 		quota = VALUES(quota),
@@ -164,7 +175,7 @@ func UpdateStatistics(updateType StatisticsUpdateType) error {
 		completion_tokens = VALUES(completion_tokens),
 		request_time = VALUES(request_time)`
 	}
-	now := time.Now()
+
 	todayTimestamp := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Unix()
 
 	switch updateType {
