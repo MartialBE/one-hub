@@ -82,7 +82,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
         {userIsAdmin && <TableCell>{(item.channel_id || '') + ' ' + (item.channel?.name ? '(' + item.channel.name + ')' : '')}</TableCell>}
         {userIsAdmin && (
           <TableCell>
-            <Label color="default" variant="outlined">
+            <Label color="default" variant="outlined" copyText={item.username}>
               {item.username}
             </Label>
           </TableCell>
@@ -99,7 +99,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
         </TableCell>
         <TableCell>
           {item.token_name && (
-            <Label color="default" variant="soft">
+            <Label color="default" variant="soft" copyText={item.token_name}>
               {item.token_name}
             </Label>
           )}
@@ -148,7 +148,7 @@ function viewModelName(model_name, isStream) {
           }
         }}
       >
-        <Label color="primary" variant="outlined">
+        <Label color="primary" variant="outlined" copyText={model_name}>
           {model_name}
         </Label>
       </Badge>
@@ -156,7 +156,7 @@ function viewModelName(model_name, isStream) {
   }
 
   return (
-    <Label color="primary" variant="outlined">
+    <Label color="primary" variant="outlined" copyText={model_name}>
       {model_name}
     </Label>
   );
