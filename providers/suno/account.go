@@ -2,9 +2,10 @@ package suno
 
 import (
 	"net/http"
+	"one-api/types"
 )
 
-func (s *SunoProvider) GetAccount() (data *TaskResponse[SunoAccount], err error) {
+func (s *SunoProvider) GetAccount() (data *types.TaskResponse[SunoAccount], err error) {
 	fullRequestURL := s.GetFullRequestURL(s.Account, "")
 	headers := s.GetRequestHeaders()
 

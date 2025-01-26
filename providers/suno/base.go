@@ -7,6 +7,7 @@ import (
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
+	"one-api/providers/openai"
 	"one-api/types"
 )
 
@@ -16,10 +17,13 @@ type SunoProviderFactory struct{}
 // 创建 SunoProvider
 func (f SunoProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
 	return &SunoProvider{
-		BaseProvider: base.BaseProvider{
-			Config:    getConfig(),
-			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
+		OpenAIProvider: openai.OpenAIProvider{
+			BaseProvider: base.BaseProvider{
+				Config:    getConfig(),
+				Channel:   channel,
+				Requester: requester.NewHTTPRequester(*channel.Proxy, RequestErrorHandle),
+			},
+			BalanceAction: false,
 		},
 		Account:      "/suno/account",
 		Fetchs:       "/suno/fetch",
@@ -37,7 +41,7 @@ func getConfig() base.ProviderConfig {
 }
 
 type SunoProvider struct {
-	base.BaseProvider
+	openai.OpenAIProvider
 	Account      string
 	Fetchs       string
 	Fetch        string
@@ -56,7 +60,7 @@ func (p *SunoProvider) GetRequestHeaders() (headers map[string]string) {
 
 // 请求错误处理
 func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
-	errorResponse := &TaskResponse[any]{}
+	errorResponse := &types.TaskResponse[any]{}
 	err := json.NewDecoder(resp.Body).Decode(errorResponse)
 	if err != nil {
 		return nil
@@ -66,7 +70,7 @@ func RequestErrorHandle(resp *http.Response) *types.OpenAIError {
 }
 
 // 错误处理
-func ErrorHandle(err *TaskResponse[any]) *types.OpenAIError {
+func ErrorHandle(err *types.TaskResponse[any]) *types.OpenAIError {
 	if err.IsSuccess() {
 		return nil
 	}

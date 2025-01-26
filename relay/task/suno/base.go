@@ -3,7 +3,7 @@ package suno
 import (
 	"fmt"
 	"one-api/model"
-	sunoProvider "one-api/providers/suno"
+	"one-api/types"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +11,7 @@ import (
 )
 
 func StringError(c *gin.Context, httpCode int, code, message string) {
-	err := &sunoProvider.TaskResponse[any]{
+	err := &types.TaskResponse[any]{
 		Code:    code,
 		Message: message,
 	}
@@ -19,10 +19,10 @@ func StringError(c *gin.Context, httpCode int, code, message string) {
 	c.JSON(httpCode, err)
 }
 
-func TaskModel2Dto(task *model.Task) *sunoProvider.TaskDto {
+func TaskModel2Dto(task *model.Task) *types.TaskDto {
 	progress := fmt.Sprintf("%d%%", task.Progress)
 
-	taskDto := &sunoProvider.TaskDto{
+	taskDto := &types.TaskDto{
 		TaskID:     task.TaskID,
 		Action:     task.Action,
 		Status:     string(task.Status),

@@ -236,6 +236,13 @@ export const CHANNEL_OPTIONS = {
     color: 'default',
     url: ''
   },
+  53: {
+    key: 53,
+    text: 'Kling',
+    value: 53,
+    color: 'warning',
+    url: 'https://api.kling.ai'
+  },
   8: {
     key: 8,
     text: '自定义渠道',

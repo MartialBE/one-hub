@@ -475,6 +475,30 @@ const typeConfig = {
         'recraft_styles'
       ]
     }
+  },
+  53: {
+    input: {
+      models: [
+        'kling-video_kling-v1_std_5',
+        'kling-video_kling-v1_std_10',
+        'kling-video_kling-v1_pro_5',
+        'kling-video_kling-v1_pro_10',
+
+        'kling-video_kling-v1-5_std_5',
+        'kling-video_kling-v1-5_std_10',
+        'kling-video_kling-v1-5_pro_5',
+        'kling-video_kling-v1-5_pro_10',
+
+        'kling-video_kling-v1-10_std_5',
+        'kling-video_kling-v1-10_std_10',
+        'kling-video_kling-v1-10_pro_5',
+        'kling-video_kling-v1-10_pro_10'
+      ]
+    },
+    prompt: {
+      key: '官方密钥格式： accessKey|secretKey'
+    },
+    modelGroup: 'Kling'
   }
 };
 
