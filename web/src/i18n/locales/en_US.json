@@ -1128,5 +1128,6 @@
     "name": "Name",
     "nameTip": "Channel Name",
     "title": "Model Ownership"
-  }
+  },
+  "price": "Price"
 }
