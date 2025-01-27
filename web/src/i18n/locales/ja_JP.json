@@ -281,7 +281,9 @@
       "original_times_price": "元の価格：${{ times }} / 回",
       "output_price": "出力: ${{ price }} /M",
       "times_price": "${{ times }} / 回"
-    }
+    },
+    "cachedReadTokens": "キャッシュからトークンを読み取ります（* {{ ratio }} )",
+    "cachedWriteTokens": "トークンのキャッシュ書き込み（* {{ ratio }} ）"
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",

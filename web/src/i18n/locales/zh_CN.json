@@ -218,6 +218,8 @@
     "inputAudioTokens": "输入音频Tokens",
     "outputAudioTokens": "输出音频Tokens",
     "cachedTokens": "缓存Tokens",
+    "cachedWriteTokens": "缓存写入Tokens",
+    "cachedReadTokens": "缓存读取Tokens",
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
     "content": {

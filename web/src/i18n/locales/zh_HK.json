@@ -282,7 +282,9 @@
       "original_times_price": "原價格: ${{ times }} / 次",
       "output_price": "輸出: ${{ price }} /M",
       "times_price": "${{ times }} / 次"
-    }
+    },
+    "cachedReadTokens": "緩存讀取Tokens",
+    "cachedWriteTokens": "緩存寫入 Tokens"
   },
   "login": {
     "codeRequired": "驗證碼不能為空",

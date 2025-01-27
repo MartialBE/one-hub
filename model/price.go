@@ -16,6 +16,9 @@ const (
 	RMBRate            = 0.014
 	DefaultCacheRatios = 0.5
 	DefaultAudioRatio  = 40
+
+	DefaultCachedWriteRatio = 1.25
+	DefaultCachedReadRatio  = 0.1
 )
 
 type Price struct {
@@ -89,13 +92,16 @@ func (price *Price) GetExtraRatio(key string) float64 {
 		return DefaultCacheRatios
 	}
 
-	// 目前只有 音频，如果为空说明有问题，返回最大的一个倍率
-	if price.ExtraRatios == nil {
-		return DefaultAudioRatio
-	}
-
 	if ratio, ok := price.ExtraRatios[key]; ok {
 		return ratio
+	}
+
+	if key == "cached_write_ratio" {
+		return DefaultCachedWriteRatio
+	}
+
+	if key == "cached_read_ratio" {
+		return DefaultCachedReadRatio
 	}
 
 	return DefaultAudioRatio
