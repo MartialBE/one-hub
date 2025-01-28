@@ -83,7 +83,7 @@ func chooseDB() (*gorm.DB, error) {
 		logger.SysLog("using MySQL as database")
 		// mysql 时区设置
 		dsn = dsnAddArg(dsn, "loc", localTimezone)
-		dsn = dsnAddArg(dsn, "parseTime", "true")
+		// dsn = dsnAddArg(dsn, "parseTime", "true")
 		return gorm.Open(mysql.Open(dsn), &gorm.Config{
 			PrepareStmt: true, // precompile SQL
 		})
