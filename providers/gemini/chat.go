@@ -122,7 +122,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 
 	threshold := "BLOCK_NONE"
 
-	if strings.HasPrefix(request.Model, "gemini-2.0") {
+	if strings.HasPrefix(request.Model, "gemini-2.0") && !strings.Contains(request.Model, "thinking") {
 		threshold = "OFF"
 	}
 
