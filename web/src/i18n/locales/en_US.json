@@ -88,7 +88,8 @@
     "requiredKey": "Key cannot be empty",
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
-    "validJson": "Must be a valid JSON string"
+    "validJson": "Must be a valid JSON string",
+    "copyModels": "Copy model"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",

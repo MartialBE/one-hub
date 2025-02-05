@@ -88,7 +88,8 @@
     "requiredKey": "キーを空にすることはできません",
     "requiredModels": "モデルを空にすることはできません",
     "requiredName": "名前は必須です",
-    "validJson": "有効な JSON 文字列である必要があります"
+    "validJson": "有効な JSON 文字列である必要があります",
+    "copyModels": "モデルをコピーします"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",

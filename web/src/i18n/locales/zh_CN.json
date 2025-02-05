@@ -162,7 +162,8 @@
     "modelHeaderValue": "自定义Header Value",
     "addModelHeader": "添加自定义Header",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "copyModels": "复制模型"
   },
   "token_index": {
     "token": "令牌",
