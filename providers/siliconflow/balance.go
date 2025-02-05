@@ -12,8 +12,9 @@ type Response struct {
 }
 
 type UserInfo struct {
-	ID      string `json:"id"`
-	Balance string `json:"balance"`
+	ID           string `json:"id"`
+	Balance      string `json:"balance"`
+	TotalBalance string `json:"totalBalance"`
 }
 
 func (p *SiliconflowProvider) Balance() (float64, error) {
@@ -37,7 +38,7 @@ func (p *SiliconflowProvider) Balance() (float64, error) {
 		return 0, errors.New("获取余额失败")
 	}
 
-	balance, err := strconv.ParseFloat(info.Data.Balance, 64)
+	balance, err := strconv.ParseFloat(info.Data.TotalBalance, 64)
 	if err != nil {
 		return 0, err
 	}

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 
-import { showInfo, showError, renderNumber } from 'utils/common';
+import { showInfo, showError } from 'utils/common';
 import { API } from 'utils/api';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTranslation } from 'react-i18next';
@@ -502,51 +502,23 @@ ChannelTableRow.propTypes = {
 
 function renderBalance(type, balance) {
   switch (type) {
-    case 1: // OpenAI
+    case 28: // Deepseek
       return (
         <span>
-          <br />${balance.toFixed(2)}
+          <br />¥{balance}
         </span>
       );
-    case 4: // CloseAI
+    case 45: // Deepseek
       return (
         <span>
-          <br />¥{balance.toFixed(2)}
-        </span>
-      );
-    case 8: // 自定义
-      return (
-        <span>
-          <br />${balance.toFixed(2)}
-        </span>
-      );
-    case 5: // OpenAI-SB
-      return (
-        <span>
-          <br />¥{(balance / 10000).toFixed(2)}
-        </span>
-      );
-    case 10: // AI Proxy
-      return (
-        <span>
-          <br />
-          {renderNumber(balance)}
-        </span>
-      );
-    case 12: // API2GPT
-      return (
-        <span>
-          <br />¥{balance.toFixed(2)}
-        </span>
-      );
-    case 13: // AIGC2D
-      return (
-        <span>
-          <br />
-          {renderNumber(balance)}
+          <br />¥{balance}
         </span>
       );
     default:
-      return <span></span>;
+      return (
+        <span>
+          <br />${balance.toFixed(2)}
+        </span>
+      );
   }
 }
