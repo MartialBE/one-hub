@@ -86,8 +86,8 @@ func buildTestRequest(modelName string) *types.ChatCompletionRequest {
 		Stream: false,
 	}
 
-	if strings.HasPrefix(modelName, "o1-") {
-		testRequest.MaxCompletionTokens = 2
+	if strings.HasPrefix(modelName, "o1") || strings.HasPrefix(modelName, "o3") {
+		testRequest.MaxCompletionTokens = 10
 	} else {
 		testRequest.MaxTokens = 2
 	}
