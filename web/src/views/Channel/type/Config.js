@@ -438,8 +438,7 @@ const typeConfig = {
       provider_models_list: '从Siliconflow获取模型列表'
     },
     prompt: {
-      base_url: '',
-      test_model: ''
+      base_url: ''
     },
     modelGroup: 'Siliconflow'
   },
