@@ -60,18 +60,14 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
   const [inputs, setInputs] = useState(originInputs);
   const [selectModel, setSelectModel] = useState([]);
 
-  const [inputMultiplier, setInputMultiplier] = useState(0); // 美元输入价格状态
-  const [outputMultiplier, setOutputMultiplier] = useState(0); // 美元输出价格状态
+  const [inputPrice, setInputPrice] = useState(0); // 美元输入价格状态
+  const [outputPrice, setOutputPrice] = useState(0); // 美元输出价格状态
   const siteInfo = useSelector((state) => state.siteInfo);
-  const calculateInput = (multiplier) => {
-    // 根据输入的乘数计算输入价格
-    return (multiplier * siteInfo.quota_per_unit) / 1000;
+  const calculatePrice = (price) => {
+    // 计算价格
+    return (price * siteInfo.quota_per_unit) / 1000;
   };
 
-  const calculateOutput = (multiplier) => {
-    // 根据输入的乘数计算输出价格
-    return (multiplier * siteInfo.quota_per_unit) / 1000;
-  };
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -207,18 +203,17 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   id="input-multiplier-label"
                   label={t('modelpricePage.inputPrice')}
                   type="number"
-                  value={inputMultiplier}
+                  value={inputPrice}
                   endAdornment="$"
                   onChange={(e) => {
                     const value = e.target.value ? Number(e.target.value) : '';
-                    setInputMultiplier(value);
-                    values.input = calculateInput(value === '' ? 0 : Number(value)); // 更新输入价格
+                    setInputPrice(value);
+                    values.input = calculatePrice(value === '' ? 0 : Number(value)); // 更新输入价格
                   }}
                   onBlur={handleBlur}
                   aria-describedby="helper-text-input-multiplier-label"
                 />
               </FormControl>
-              {/* k输入价格*/}
               <FormControl fullWidth error={Boolean(touched.input && errors.input)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-input-label">{t('modelpricePage.inputMultiplier')}</InputLabel>
                 <OutlinedInput
@@ -247,19 +242,17 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   id="output-multiplier-label"
                   label={t('modelpricePage.outputPrice')}
                   type="number"
-                  value={outputMultiplier}
+                  value={outputPrice}
                   endAdornment="$"
                   onChange={(e) => {
                     const value = e.target.value ? Number(e.target.value) : '';
-                    setOutputMultiplier(value);
-                    values.output = calculateOutput(value === '' ? 0 : Number(value)); // 更新输出价格
+                    setOutputPrice(value);
+                    values.output = calculatePrice(value === '' ? 0 : Number(value)); // 更新输出价格
                   }}
                   onBlur={handleBlur}
                   aria-describedby="helper-text-output-multiplier-label"
                 />
               </FormControl>
-
-              {/*k输出价格*/}
               <FormControl fullWidth error={Boolean(touched.output && errors.output)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-output-label">{t('modelpricePage.outputMultiplier')}</InputLabel>
                 <OutlinedInput
