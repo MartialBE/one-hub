@@ -424,6 +424,8 @@
     "group": "分组",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
+    "inputPrice": "每K输入单价（实验功能）",
+    "outputPrice": "每K输出单价（实验功能）",
     "search": "搜索",
     "tokens": "按量付费",
     "times": "按次付费",
