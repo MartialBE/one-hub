@@ -168,6 +168,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
           <MenuItem
             onClick={() => {
               handleCloseMenu();
+              window.open(item.image_url, '_blank');
             }}
           >
             <IconExternalLink style={{ marginRight: '16px' }} /> {t('common.newWindos')}{' '}
