@@ -17,9 +17,7 @@ import {
   TextField,
   InputAdornment,
   styled,
-  Box,
-  ToggleButton,
-  ToggleButtonGroup
+  Box
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { API } from 'utils/api';
@@ -27,7 +25,7 @@ import { showError, ValueFormatter } from 'utils/common';
 import { useTheme } from '@mui/material/styles';
 import IconWrapper from 'ui-component/IconWrapper';
 import Label from 'ui-component/Label';
-
+import ToggleButtonGroup from 'ui-component/ToggleButton';
 const GroupChip = styled(Chip)(({ theme, selected }) => ({
   margin: theme.spacing(0.5),
   cursor: 'pointer',
@@ -53,39 +51,6 @@ const GroupChip = styled(Chip)(({ theme, selected }) => ({
   }
 }));
 
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '8px',
-  padding: '2px',
-  '& .MuiToggleButton-root': {
-    border: 'none',
-    borderRadius: '6px',
-    padding: '4px 12px',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    },
-    '&.Mui-selected': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.common.white,
-      '&:hover': {
-        backgroundColor: theme.palette.primary.dark
-      }
-    }
-  }
-}));
-
-const StyledToggleButton = styled(ToggleButton)({
-  '&.MuiToggleButton-root': {
-    textTransform: 'none',
-    minWidth: '36px',
-    transition: 'all 0.2s ease-in-out'
-  }
-});
-
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
   const { t } = useTranslation();
@@ -100,6 +65,11 @@ export default function ModelPrice() {
   const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedOwnedBy, setSelectedOwnedBy] = useState('');
   const [unit, setUnit] = useState('K');
+
+  const unitOptions = [
+    { value: 'K', label: 'K' },
+    { value: 'M', label: 'M' }
+  ];
 
   const fetchAvailableModels = useCallback(async () => {
     try {
@@ -251,10 +221,7 @@ export default function ModelPrice() {
                 )
               }}
             />
-            <StyledToggleButtonGroup value={unit} exclusive onChange={handleUnitChange} size="small" aria-label="unit toggle">
-              <StyledToggleButton value="K">K</StyledToggleButton>
-              <StyledToggleButton value="M">M</StyledToggleButton>
-            </StyledToggleButtonGroup>
+            <ToggleButtonGroup value={unit} onChange={handleUnitChange} options={unitOptions} aria-label="unit toggle" />
           </Stack>
         </Stack>
       </Card>

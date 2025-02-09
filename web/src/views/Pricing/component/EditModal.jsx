@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTheme } from '@mui/material/styles';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -19,7 +19,8 @@ import {
   Autocomplete,
   TextField,
   Checkbox,
-  MenuItem
+  MenuItem,
+  Stack
 } from '@mui/material';
 
 import { showSuccess, showError, trims } from 'utils/common';
@@ -29,7 +30,8 @@ import { ValueFormatter, priceType } from './util';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import ToggleButtonGroup from 'ui-component/ToggleButton';
+import Decimal from 'decimal.js';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -60,14 +62,75 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
   const [inputs, setInputs] = useState(originInputs);
   const [selectModel, setSelectModel] = useState([]);
 
-  const [inputPrice, setInputPrice] = useState(0); // 美元输入价格状态
-  const [outputPrice, setOutputPrice] = useState(0); // 美元输出价格状态
-  const siteInfo = useSelector((state) => state.siteInfo);
-  const calculatePrice = (price) => {
-    // 计算价格
-    return (price * siteInfo.quota_per_unit) / 1000;
-  };
+  const [unitType, setUnitType] = useState('rate');
+  const [unit, setUnit] = useState('K');
 
+  const calculateRate = useCallback(
+    (price) => {
+      if (unitType === 'rate') {
+        return price;
+      }
+
+      let priceValue = new Decimal(price);
+
+      if (unit == 'M') {
+        priceValue = priceValue.div(1000);
+      }
+
+      switch (unitType) {
+        case 'USD':
+          priceValue = priceValue.div(0.002);
+          break;
+        case 'RMB':
+          priceValue = priceValue.div(0.014);
+          break;
+      }
+
+      return Number(priceValue.toFixed(4));
+    },
+    [unitType, unit]
+  );
+
+  const unitTypeOptions = [
+    { value: 'rate', label: '倍率' },
+    { value: 'USD', label: 'USD' },
+    { value: 'RMB', label: 'RMB' }
+  ];
+
+  const unitOptions = [
+    { value: 'K', label: 'K' },
+    { value: 'M', label: 'M' }
+  ];
+
+  const handleEndAdornment = useCallback(
+    (value) => {
+      let endAdornment = '';
+
+      switch (unitType) {
+        case 'rate':
+          endAdornment = ValueFormatter(value);
+          break;
+        case 'USD':
+        case 'RMB':
+          endAdornment = calculateRate(value);
+          break;
+      }
+
+      return endAdornment;
+    },
+    [unitType, calculateRate]
+  );
+
+  const handleStartAdornment = useCallback(() => {
+    switch (unitType) {
+      case 'rate':
+        return 'Rate：';
+      case 'USD':
+        return `USD(${unit})：`;
+      case 'RMB':
+        return `RMB(${unit})：`;
+    }
+  }, [unitType, unit]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -80,8 +143,8 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
           model: 'batch',
           type: values.type,
           channel_type: values.channel_type,
-          input: values.input,
-          output: values.output
+          input: calculateRate(values.input),
+          output: calculateRate(values.output)
         }
       });
       const { success, message } = res.data;
@@ -196,24 +259,29 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   </FormHelperText>
                 )}
               </FormControl>
-              {/* 每K输入单价（美元） */}
+
               <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="input-multiplier-label">{t('modelpricePage.inputPrice')}</InputLabel>
-                <OutlinedInput
-                  id="input-multiplier-label"
-                  label={t('modelpricePage.inputPrice')}
-                  type="number"
-                  value={inputPrice}
-                  endAdornment="$"
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : '';
-                    setInputPrice(value);
-                    values.input = calculatePrice(value === '' ? 0 : Number(value)); // 更新输入价格
-                  }}
-                  onBlur={handleBlur}
-                  aria-describedby="helper-text-input-multiplier-label"
-                />
+                <Stack direction="row" spacing={2}>
+                  <ToggleButtonGroup
+                    value={unitType}
+                    onChange={(event, newUnitType) => {
+                      setUnitType(newUnitType);
+                    }}
+                    options={unitTypeOptions}
+                    aria-label="unit toggle"
+                  />
+
+                  <ToggleButtonGroup
+                    value={unit}
+                    onChange={(event, newUnit) => {
+                      setUnit(newUnit);
+                    }}
+                    options={unitOptions}
+                    aria-label="unit toggle"
+                  />
+                </Stack>
               </FormControl>
+
               <FormControl fullWidth error={Boolean(touched.input && errors.input)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-input-label">{t('modelpricePage.inputMultiplier')}</InputLabel>
                 <OutlinedInput
@@ -222,7 +290,8 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   type="number"
                   value={values.input}
                   name="input"
-                  endAdornment={<InputAdornment position="end">{ValueFormatter(values.input)}</InputAdornment>}
+                  startAdornment={handleStartAdornment()}
+                  endAdornment={<InputAdornment position="end">{handleEndAdornment(values.input)}</InputAdornment>}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   aria-describedby="helper-text-channel-input-label"
@@ -235,24 +304,6 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                 )}
               </FormControl>
 
-              {/* 每k输出单价（美元） */}
-              <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="output-multiplier-label">{t('modelpricePage.outputPrice')}</InputLabel>
-                <OutlinedInput
-                  id="output-multiplier-label"
-                  label={t('modelpricePage.outputPrice')}
-                  type="number"
-                  value={outputPrice}
-                  endAdornment="$"
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : '';
-                    setOutputPrice(value);
-                    values.output = calculatePrice(value === '' ? 0 : Number(value)); // 更新输出价格
-                  }}
-                  onBlur={handleBlur}
-                  aria-describedby="helper-text-output-multiplier-label"
-                />
-              </FormControl>
               <FormControl fullWidth error={Boolean(touched.output && errors.output)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-output-label">{t('modelpricePage.outputMultiplier')}</InputLabel>
                 <OutlinedInput
@@ -261,7 +312,8 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   type="number"
                   value={values.output}
                   name="output"
-                  endAdornment={<InputAdornment position="end">{ValueFormatter(values.output)}</InputAdornment>}
+                  startAdornment={handleStartAdornment()}
+                  endAdornment={<InputAdornment position="end">{handleEndAdornment(values.output)}</InputAdornment>}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   aria-describedby="helper-text-channel-output-label"
