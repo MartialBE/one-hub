@@ -354,7 +354,8 @@
     "type": "類型",
     "inputAudioTokensRatio": "音頻輸入倍率",
     "other": "其他",
-    "outputAudioTokensRatio": "音頻輸出倍率"
+    "outputAudioTokensRatio": "音頻輸出倍率",
+    "rate": "倍率"
   },
   "nova 映射": "nova 映射",
   "onyx 映射": "onyx 映射",

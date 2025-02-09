@@ -92,7 +92,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
   );
 
   const unitTypeOptions = [
-    { value: 'rate', label: '倍率' },
+    { value: 'rate', label: t('modelpricePage.rate') },
     { value: 'USD', label: 'USD' },
     { value: 'RMB', label: 'RMB' }
   ];

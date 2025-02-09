@@ -353,7 +353,8 @@
     "type": "Type",
     "inputAudioTokensRatio": "Audio input ratio",
     "other": "Other",
-    "outputAudioTokensRatio": "Audio output ratio"
+    "outputAudioTokensRatio": "Audio output ratio",
+    "rate": "Rate"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",

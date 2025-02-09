@@ -353,7 +353,8 @@
     "type": "タイプ",
     "inputAudioTokensRatio": "オーディオ入力倍率",
     "other": "その他",
-    "outputAudioTokensRatio": "オーディオ出力倍率"
+    "outputAudioTokensRatio": "オーディオ出力倍率",
+    "rate": "倍率"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
