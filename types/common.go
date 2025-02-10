@@ -11,19 +11,22 @@ type Usage struct {
 }
 
 type PromptTokensDetails struct {
-	AudioTokens          int `json:"audio_tokens"`
-	CachedTokens         int `json:"cached_tokens"`
-	TextTokens           int `json:"text_tokens"`
-	ImageTokens          int `json:"image_tokens"`
-	CachedTokensInternal int `json:"cached_tokens_internal"`
+	AudioTokens          int `json:"audio_tokens,omitempty"`
+	CachedTokens         int `json:"cached_tokens,omitempty"`
+	TextTokens           int `json:"text_tokens,omitempty"`
+	ImageTokens          int `json:"image_tokens,omitempty"`
+	CachedTokensInternal int `json:"cached_tokens_internal,omitempty"`
+
 	CachedWriteTokens int `json:"-"`
 	CachedReadTokens  int `json:"-"`
 }
 
 type CompletionTokensDetails struct {
-	AudioTokens     int `json:"audio_tokens"`
-	ReasoningTokens int `json:"reasoning_tokens"`
-	TextTokens      int `json:"text_tokens"`
+	AudioTokens              int `json:"audio_tokens,omitempty"`
+	TextTokens               int `json:"text_tokens,omitempty"`
+	ReasoningTokens          int `json:"reasoning_tokens"`
+	AcceptedPredictionTokens int `json:"accepted_prediction_tokens"`
+	RejectedPredictionTokens int `json:"rejected_prediction_tokens"`
 }
 
 func (i *PromptTokensDetails) Merge(other *PromptTokensDetails) {
