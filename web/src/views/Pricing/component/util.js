@@ -8,7 +8,7 @@ export function ValueFormatter(value) {
     return '';
   }
   if (value === 0) {
-    return '免费';
+    return 'Free';
   }
   return `$${parseFloat(value * 0.002).toFixed(6)} / ￥${parseFloat(value * 0.014).toFixed(6)}`;
 }
