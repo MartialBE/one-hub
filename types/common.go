@@ -4,10 +4,10 @@ import "encoding/json"
 
 type Usage struct {
 	PromptTokens            int                     `json:"prompt_tokens"`
-	CompletionTokens        int                     `json:"completion_tokens,omitempty"`
+	CompletionTokens        int                     `json:"completion_tokens"`
 	TotalTokens             int                     `json:"total_tokens"`
-	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details,omitempty"`
-	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details,omitempty"`
+	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details"`
+	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details"`
 }
 
 type PromptTokensDetails struct {
@@ -22,9 +22,11 @@ type PromptTokensDetails struct {
 }
 
 type CompletionTokensDetails struct {
-	AudioTokens     int `json:"audio_tokens,omitempty"`
-	ReasoningTokens int `json:"reasoning_tokens,omitempty"`
-	TextTokens      int `json:"text_tokens,omitempty"`
+	AudioTokens              int `json:"audio_tokens,omitempty"`
+	TextTokens               int `json:"text_tokens,omitempty"`
+	ReasoningTokens          int `json:"reasoning_tokens"`
+	AcceptedPredictionTokens int `json:"accepted_prediction_tokens"`
+	RejectedPredictionTokens int `json:"rejected_prediction_tokens"`
 }
 
 func (i *PromptTokensDetails) Merge(other *PromptTokensDetails) {
