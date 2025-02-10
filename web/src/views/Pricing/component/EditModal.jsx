@@ -67,7 +67,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
 
   const calculateRate = useCallback(
     (price) => {
-      if(price===''){
+      if (price === '') {
         return 0;
       }
       if (unitType === 'rate') {
@@ -76,7 +76,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
 
       let priceValue = new Decimal(price);
 
-      if (unit == 'M') {
+      if (unit === 'M') {
         priceValue = priceValue.div(1000);
       }
 
@@ -115,7 +115,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
           break;
         case 'USD':
         case 'RMB':
-          endAdornment = value===0?'Free':calculateRate(value)+" Rate";
+          endAdornment = value === 0 ? 'Free' : calculateRate(value) + ' Rate';
           break;
       }
 
