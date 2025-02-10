@@ -88,7 +88,8 @@
     "requiredKey": "Key cannot be empty",
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
-    "validJson": "Must be a valid JSON string"
+    "validJson": "Must be a valid JSON string",
+    "copyModels": "Copy model"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -281,7 +282,9 @@
       "original_times_price": "Original price: ${{ times }} per time",
       "output_price": "Output: ${{ price }} /M",
       "times_price": "${{ times }} / time"
-    }
+    },
+    "cachedReadTokens": "Cache read Tokens",
+    "cachedWriteTokens": "Write tokens to cache (* {{ ratio }})"
   },
   "login": {
     "codeRequired": "verification code must be filled",
@@ -350,7 +353,8 @@
     "type": "Type",
     "inputAudioTokensRatio": "Audio input ratio",
     "other": "Other",
-    "outputAudioTokensRatio": "Audio output ratio"
+    "outputAudioTokensRatio": "Audio output ratio",
+    "rate": "Rate"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",
@@ -1126,5 +1130,6 @@
     "name": "Name",
     "nameTip": "Channel Name",
     "title": "Model Ownership"
-  }
+  },
+  "price": "Price"
 }

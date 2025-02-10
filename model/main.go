@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"net/url"
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
@@ -63,19 +64,26 @@ func createRootAccountIfNeed() error {
 func chooseDB() (*gorm.DB, error) {
 	if viper.IsSet("sql_dsn") {
 		dsn := viper.GetString("sql_dsn")
+		localTimezone := utils.GetLocalTimezone()
 		if strings.HasPrefix(dsn, "postgres://") {
 			// Use PostgreSQL
 			logger.SysLog("using PostgreSQL as database")
 			common.UsingPostgreSQL = true
+			dsn = dsnAddArg(dsn, "timezone", localTimezone)
+
 			return gorm.Open(postgres.New(postgres.Config{
 				DSN:                  dsn,
 				PreferSimpleProtocol: true, // disables implicit prepared statement usage
 			}), &gorm.Config{
 				PrepareStmt: true, // precompile SQL
 			})
+
 		}
 		// Use MySQL
 		logger.SysLog("using MySQL as database")
+		// mysql 时区设置
+		dsn = dsnAddArg(dsn, "loc", localTimezone)
+		// dsn = dsnAddArg(dsn, "parseTime", "true")
 		return gorm.Open(mysql.Open(dsn), &gorm.Config{
 			PrepareStmt: true, // precompile SQL
 		})
@@ -216,4 +224,20 @@ func CloseDB() error {
 	}
 	err = sqlDB.Close()
 	return err
+}
+
+func dsnAddArg(dsn string, arg string, value string) string {
+	// 如果是MySQL 需要转义
+	if !common.UsingPostgreSQL {
+		value = url.QueryEscape(value)
+	}
+
+	if !strings.Contains(dsn, arg+"=") {
+		if strings.Contains(dsn, "?") {
+			dsn += "&" + arg + "=" + value
+		} else {
+			dsn += "?" + arg + "=" + value
+		}
+	}
+	return dsn
 }

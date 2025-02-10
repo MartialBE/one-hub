@@ -14,11 +14,11 @@ type GeminiChatRequest struct {
 	Model             string                     `json:"-"`
 	Stream            bool                       `json:"-"`
 	Contents          []GeminiChatContent        `json:"contents"`
-	SafetySettings    []GeminiChatSafetySettings `json:"safety_settings,omitempty"`
-	GenerationConfig  GeminiChatGenerationConfig `json:"generation_config,omitempty"`
+	SafetySettings    []GeminiChatSafetySettings `json:"safetySettings,omitempty"`
+	GenerationConfig  GeminiChatGenerationConfig `json:"generationConfig,omitempty"`
 	Tools             []GeminiChatTools          `json:"tools,omitempty"`
 	ToolConfig        *GeminiToolConfig          `json:"toolConfig,omitempty"`
-	SystemInstruction *GeminiChatContent         `json:"systemInstruction,omitempty"`
+	SystemInstruction any                        `json:"systemInstruction,omitempty"`
 }
 
 type GeminiToolConfig struct {
@@ -26,8 +26,8 @@ type GeminiToolConfig struct {
 }
 
 type GeminiFunctionCallingConfig struct {
-	Model                string   `json:"model,omitempty"`
-	AllowedFunctionNames []string `json:"allowedFunctionNames,omitempty"`
+	Model                string `json:"model,omitempty"`
+	AllowedFunctionNames any    `json:"allowedFunctionNames,omitempty"`
 }
 type GeminiInlineData struct {
 	MimeType string `json:"mimeType"`

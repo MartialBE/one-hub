@@ -20,26 +20,30 @@ type TaskBase struct {
 	Task          *model.Task
 	OriginTaskID  string
 	BaseProvider  base.ProviderInterface
+	Response      any
 }
 
 type TaskInterface interface {
 	Init() *TaskError
 	Relay() *TaskError
 	HandleError(err *TaskError)
-	ShouldRetry(err *TaskError) bool
+	ShouldRetry(c *gin.Context, err *TaskError) bool
 	GetModelName() string
 	GetTask() *model.Task
 	SetProvider() *TaskError
 	GetProvider() base.ProviderInterface
+	GinResponse()
 
 	UpdateTaskStatus(ctx context.Context, taskChannelM map[int][]string, taskM map[string]*model.Task) error
 }
 
 func (t *TaskBase) InitTask() {
 	userID := t.C.GetInt("id")
+	tokenId := t.C.GetInt("token_id")
 	t.Task = &model.Task{
 		Platform:   t.Platform,
 		UserId:     userID,
+		TokenID:    tokenId,
 		SubmitTime: time.Now().Unix(),
 		Status:     model.TaskStatusNotStart,
 		Progress:   0,
@@ -86,6 +90,10 @@ func (t *TaskBase) HandleOriginTaskID() error {
 	t.C.Set("specific_channel_id", task.ChannelId)
 
 	return nil
+}
+
+func (t *TaskBase) GinResponse() {
+	t.C.JSON(200, t.Response)
 }
 
 type TaskError struct {

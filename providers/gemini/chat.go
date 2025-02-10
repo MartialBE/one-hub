@@ -119,28 +119,35 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http
 
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
 	request.ClearEmptyMessages()
+
+	threshold := "BLOCK_NONE"
+
+	// if strings.HasPrefix(request.Model, "gemini-2.0") && !strings.Contains(request.Model, "thinking") {
+	// 	threshold = "OFF"
+	// }
+
 	geminiRequest := GeminiChatRequest{
 		Contents: make([]GeminiChatContent, 0, len(request.Messages)),
 		SafetySettings: []GeminiChatSafetySettings{
 			{
 				Category:  "HARM_CATEGORY_HARASSMENT",
-				Threshold: "BLOCK_NONE",
+				Threshold: threshold,
 			},
 			{
 				Category:  "HARM_CATEGORY_HATE_SPEECH",
-				Threshold: "BLOCK_NONE",
+				Threshold: threshold,
 			},
 			{
 				Category:  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-				Threshold: "BLOCK_NONE",
+				Threshold: threshold,
 			},
 			{
 				Category:  "HARM_CATEGORY_DANGEROUS_CONTENT",
-				Threshold: "BLOCK_NONE",
+				Threshold: threshold,
 			},
 			{
 				Category:  "HARM_CATEGORY_CIVIC_INTEGRITY",
-				Threshold: "BLOCK_NONE",
+				Threshold: threshold,
 			},
 		},
 		GenerationConfig: GeminiChatGenerationConfig{

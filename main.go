@@ -141,5 +141,6 @@ func SyncChannelCache(frequency int) {
 		logger.SysLog("syncing channels from database")
 		model.ChannelGroup.Load()
 		model.PricingInstance.Init()
+		model.ModelOwnedBysInstance.Load()
 	}
 }

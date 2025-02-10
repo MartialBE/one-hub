@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"one-api/model"
 	sunoProvider "one-api/providers/suno"
+	"one-api/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ func GetFetch(c *gin.Context) {
 		StringError(c, http.StatusBadRequest, "invalid_request", err.Error())
 		return
 	}
-	taskResponse := sunoProvider.TaskResponse[[]any]{
+	taskResponse := types.TaskResponse[[]any]{
 		Code:    "success",
 		Message: "",
 	}
@@ -59,7 +60,7 @@ func GetFetchByID(c *gin.Context) {
 
 	data := TaskModel2Dto(task)
 
-	c.JSON(http.StatusOK, sunoProvider.TaskResponse[sunoProvider.TaskDto]{
+	c.JSON(http.StatusOK, types.TaskResponse[types.TaskDto]{
 		Code: "success",
 		Data: data,
 	})

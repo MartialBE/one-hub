@@ -29,6 +29,10 @@ var TGWebHookSecret = ""
 var TGEnabled = false
 
 func InitTelegramBot() {
+	if !config.IsMasterNode {
+		return
+	}
+
 	if TGEnabled {
 		logger.SysLog("Telegram bot has been started")
 		return

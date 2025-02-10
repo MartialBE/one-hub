@@ -2,6 +2,7 @@
   "dashboard": "仪表盘",
   "analytics": "分析",
   "playground": "聊天",
+  "price": "价格",
   "channel": "渠道",
   "token": "令牌",
   "log": "日志",
@@ -161,7 +162,8 @@
     "modelHeaderValue": "自定义Header Value",
     "addModelHeader": "添加自定义Header",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "copyModels": "复制模型"
   },
   "token_index": {
     "token": "令牌",
@@ -218,6 +220,8 @@
     "inputAudioTokens": "输入音频Tokens",
     "outputAudioTokens": "输出音频Tokens",
     "cachedTokens": "缓存Tokens",
+    "cachedWriteTokens": "缓存写入Tokens",
+    "cachedReadTokens": "缓存读取Tokens",
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
     "content": {
@@ -420,6 +424,7 @@
     "group": "分组",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
+    "rate": "倍率",
     "search": "搜索",
     "tokens": "按量付费",
     "times": "按次付费",

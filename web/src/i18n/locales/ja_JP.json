@@ -88,7 +88,8 @@
     "requiredKey": "キーを空にすることはできません",
     "requiredModels": "モデルを空にすることはできません",
     "requiredName": "名前は必須です",
-    "validJson": "有効な JSON 文字列である必要があります"
+    "validJson": "有効な JSON 文字列である必要があります",
+    "copyModels": "モデルをコピーします"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
@@ -281,7 +282,9 @@
       "original_times_price": "元の価格：${{ times }} / 回",
       "output_price": "出力: ${{ price }} /M",
       "times_price": "${{ times }} / 回"
-    }
+    },
+    "cachedReadTokens": "キャッシュからトークンを読み取ります（* {{ ratio }} )",
+    "cachedWriteTokens": "トークンのキャッシュ書き込み（* {{ ratio }} ）"
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",
@@ -350,7 +353,8 @@
     "type": "タイプ",
     "inputAudioTokensRatio": "オーディオ入力倍率",
     "other": "その他",
-    "outputAudioTokensRatio": "オーディオ出力倍率"
+    "outputAudioTokensRatio": "オーディオ出力倍率",
+    "rate": "倍率"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
@@ -1126,5 +1130,6 @@
     "name": "名前",
     "nameTip": "チャネル名",
     "title": "モデルの帰属"
-  }
+  },
+  "price": "価格"
 }

@@ -109,3 +109,19 @@ func handlePanic(c *gin.Context, err interface{}, errorResponse gin.H) {
 	c.JSON(http.StatusInternalServerError, errorResponse)
 	c.Abort()
 }
+
+func RelayKlingPanicRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorResponse := gin.H{
+					"code":    "one_hub_panic",
+					"message": fmt.Sprintf("Panic detected, error: %v. Please submit a issue here: https://github.com/MartialBE/one-hub", err),
+				}
+				handlePanic(c, err, errorResponse)
+				metrics.RecordPanic("Kling")
+			}
+		}()
+		c.Next()
+	}
+}

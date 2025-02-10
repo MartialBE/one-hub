@@ -7,7 +7,7 @@ import (
 	"one-api/types"
 )
 
-func (s *SunoProvider) GetFetchs(ids []string) (data *TaskResponse[[]SunoDataResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
+func (s *SunoProvider) GetFetchs(ids []string) (data *types.TaskResponse[[]SunoDataResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
 	fullRequestURL := s.GetFullRequestURL(s.Fetchs, "")
 	headers := s.GetRequestHeaders()
 	fetchReq := &FetchReq{
@@ -19,13 +19,13 @@ func (s *SunoProvider) GetFetchs(ids []string) (data *TaskResponse[[]SunoDataRes
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
 
-	data = &TaskResponse[[]SunoDataResponse]{}
+	data = &types.TaskResponse[[]SunoDataResponse]{}
 	_, errWithCode = s.Requester.SendRequest(req, data, false)
 
 	return data, errWithCode
 }
 
-func (s *SunoProvider) GetFetch(id string) (data *TaskResponse[SunoDataResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
+func (s *SunoProvider) GetFetch(id string) (data *types.TaskResponse[SunoDataResponse], errWithCode *types.OpenAIErrorWithStatusCode) {
 	fetchUri := fmt.Sprintf(s.Fetch, id)
 
 	fullRequestURL := s.GetFullRequestURL(fetchUri, "")
@@ -37,7 +37,7 @@ func (s *SunoProvider) GetFetch(id string) (data *TaskResponse[SunoDataResponse]
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
 
-	data = &TaskResponse[SunoDataResponse]{}
+	data = &types.TaskResponse[SunoDataResponse]{}
 	_, errWithCode = s.Requester.SendRequest(req, data, false)
 
 	return data, errWithCode

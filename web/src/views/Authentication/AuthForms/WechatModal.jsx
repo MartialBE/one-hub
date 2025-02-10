@@ -14,8 +14,8 @@ const getValidationSchema = (t) =>
 
 const WechatModal = ({ open, handleClose, wechatLogin, qrCode }) => {
   const { t } = useTranslation();
-  const handleSubmit = (values) => {
-    const { success, message } = wechatLogin(values.code);
+  const handleSubmit = async (values) => {
+    const { success, message } = await wechatLogin(values.code);
     if (success) {
       handleClose();
     } else {

@@ -82,7 +82,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
         {userIsAdmin && <TableCell>{(item.channel_id || '') + ' ' + (item.channel?.name ? '(' + item.channel.name + ')' : '')}</TableCell>}
         {userIsAdmin && (
           <TableCell>
-            <Label color="default" variant="outlined">
+            <Label color="default" variant="outlined" copyText={item.username}>
               {item.username}
             </Label>
           </TableCell>
@@ -99,7 +99,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
         </TableCell>
         <TableCell>
           {item.token_name && (
-            <Label color="default" variant="soft">
+            <Label color="default" variant="soft" copyText={item.token_name}>
               {item.token_name}
             </Label>
           )}
@@ -148,7 +148,7 @@ function viewModelName(model_name, isStream) {
           }
         }}
       >
-        <Label color="primary" variant="outlined">
+        <Label color="primary" variant="outlined" copyText={model_name}>
           {model_name}
         </Label>
       </Badge>
@@ -156,7 +156,7 @@ function viewModelName(model_name, isStream) {
   }
 
   return (
-    <Label color="primary" variant="outlined">
+    <Label color="primary" variant="outlined" copyText={model_name}>
       {model_name}
     </Label>
   );
@@ -229,6 +229,10 @@ function calculateTokens(item) {
   const input_audio_tokens = metadata?.input_audio_tokens_ratio || TOKEN_RATIOS.INPUT_AUDIO;
   const output_audio_tokens = metadata?.output_audio_tokens_ratio || TOKEN_RATIOS.OUTPUT_AUDIO;
 
+  const cached_ratio = metadata?.cached_tokens_ratio || TOKEN_RATIOS.CACHED;
+  const cached_write_ratio = metadata?.cached_write_ratio || 0;
+  const cached_read_ratio = metadata?.cached_read_ratio || 0;
+
   const tokenDetails = [
     { key: 'input_text_tokens', label: 'logPage.inputTextTokens', rate: TOKEN_RATIOS.TEXT },
     { key: 'output_text_tokens', label: 'logPage.outputTextTokens', rate: TOKEN_RATIOS.TEXT },
@@ -244,7 +248,9 @@ function calculateTokens(item) {
       rate: output_audio_tokens,
       labelParams: { ratio: output_audio_tokens }
     },
-    { key: 'cached_tokens', label: 'logPage.cachedTokens', rate: TOKEN_RATIOS.CACHED }
+    { key: 'cached_tokens', label: 'logPage.cachedTokens', rate: cached_ratio },
+    { key: 'cached_write_tokens', label: 'logPage.cachedWriteTokens', rate: cached_write_ratio },
+    { key: 'cached_read_tokens', label: 'logPage.cachedReadTokens', rate: cached_read_ratio }
   ]
     .filter(({ key }) => metadata[key] > 0)
     .map(({ key, label, rate, labelParams }) => {
@@ -255,6 +261,9 @@ function calculateTokens(item) {
         show = true;
       } else if (key === 'output_audio_tokens') {
         totalOutputTokens += tokens - metadata[key];
+        show = true;
+      } else if (key === 'cached_write_tokens' || key === 'cached_read_tokens') {
+        totalInputTokens += tokens;
         show = true;
       }
 

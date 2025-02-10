@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	TaskPlatformSuno = "suno"
+	TaskPlatformSuno  = "suno"
+	TaskPlatformKling = "kling"
 )
 
 type TaskStatus string
@@ -41,12 +42,20 @@ type Task struct {
 	Progress   int            `json:"progress"`
 	Properties datatypes.JSON `json:"properties" gorm:"type:json"`
 	Data       datatypes.JSON `json:"data" gorm:"type:json"`
+	NotifyHook string         `json:"notify_hook"`
+	TokenID    int            `json:"token_id" gorm:"default:0"`
 }
 
 func GetTaskByTaskIds(platform string, userId int, taskIds []string) (task []*Task, err error) {
 	// 最多返回100个任务
-	err = DB.Where("platform = ? and user_id = ? and task_id in (?)", platform, userId, taskIds).Limit(100).
+	err = DB.Omit("channel_id", "quota", "user_id").Where("platform = ? and user_id = ? and task_id in (?)", platform, userId, taskIds).Limit(100).
 		Find(&task).Error
+
+	return
+}
+
+func GetTaskActionByTaskIds(platform string, taskIds []string) (task []*Task, err error) {
+	err = DB.Select("id,action,task_id").Where("platform = ? and task_id in (?)", platform, taskIds).Find(&task).Error
 
 	return
 }
@@ -118,6 +127,7 @@ type TaskQueryParams struct {
 	StartTimestamp int64  `form:"start_timestamp"`
 	EndTimestamp   int64  `form:"end_timestamp"`
 	UserIDs        []int  `form:"user_ids"`
+	TokenID        int    `form:"token_id"`
 }
 
 var allowedTaskOrderFields = map[string]bool{
@@ -166,8 +176,12 @@ func GetAllTasks(params *TaskQueryParams) (*DataResult[Task], error) {
 }
 
 func GetAllUserTasks(userId int, params *TaskQueryParams) (*DataResult[Task], error) {
-	tx := DB.Where("user_id = ?", userId)
+	tx := DB.Omit("channel_id").Where("user_id = ?", userId)
 	var tasks []*Task
+
+	if params.TokenID > 0 {
+		tx = tx.Where("token_id = ?", params.TokenID)
+	}
 
 	if params.Platform != "" {
 		tx = tx.Where("platform = ?", params.Platform)

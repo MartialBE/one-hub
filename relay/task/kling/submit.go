@@ -1,4 +1,4 @@
-package suno
+package kling
 
 import (
 	"context"
@@ -7,32 +7,32 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/logger"
-	"one-api/metrics"
 	"one-api/model"
 	"one-api/providers"
-	sunoProvider "one-api/providers/suno"
+	KlingProvider "one-api/providers/kling"
 	"one-api/relay/task/base"
+	"one-api/types"
 	"sort"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 )
 
-type SunoTask struct {
+type KlingTask struct {
 	base.TaskBase
-	Action   string
-	Request  *sunoProvider.SunoSubmitReq
-	Provider *sunoProvider.SunoProvider
+	TaskId   string
+	Request  *KlingProvider.KlingTask
+	Provider *KlingProvider.KlingProvider
+
+	Class  string
+	Action string
 }
 
-func (t *SunoTask) HandleError(err *base.TaskError) {
+func (t *KlingTask) HandleError(err *base.TaskError) {
 	StringError(t.C, err.StatusCode, err.Code, err.Message)
 }
 
-func (t *SunoTask) Init() *base.TaskError {
-	t.Action = strings.ToUpper(t.C.Param("action"))
-
+func (t *KlingTask) Init() *base.TaskError {
 	// 解析
 	if err := common.UnmarshalBodyReusable(t.C, &t.Request); err != nil {
 		return base.StringTaskError(http.StatusBadRequest, "invalid_request", err.Error(), true)
@@ -51,112 +51,87 @@ func (t *SunoTask) Init() *base.TaskError {
 	return nil
 }
 
-func (t *SunoTask) SetProvider() *base.TaskError {
+func (t *KlingTask) SetProvider() *base.TaskError {
 	// 开始通过模型查询渠道
 	provider, err := t.GetProviderByModel()
 	if err != nil {
 		return base.StringTaskError(http.StatusServiceUnavailable, "provider_not_found", err.Error(), true)
 	}
 
-	sunoProvider, ok := provider.(*sunoProvider.SunoProvider)
+	KlingProvider, ok := provider.(*KlingProvider.KlingProvider)
 	if !ok {
 		return base.StringTaskError(http.StatusServiceUnavailable, "provider_not_found", "provider not found", true)
 	}
 
-	t.Provider = sunoProvider
+	t.Provider = KlingProvider
 	t.BaseProvider = provider
 
 	return nil
 }
 
-func (t *SunoTask) Relay() *base.TaskError {
-	resp, err := t.Provider.Submit(t.Action, t.Request)
+func (t *KlingTask) Relay() *base.TaskError {
+	resp, err := t.Provider.Submit(t.Class, t.Action, t.Request)
 	if err != nil {
 		return base.OpenAIErrToTaskErr(err)
-	}
-
-	if !resp.IsSuccess() {
-		return base.StringTaskError(http.StatusInternalServerError, "submit_failed", resp.Message, false)
 	}
 
 	t.Response = resp
 
 	t.InitTask()
-	if resp.Data != nil {
-		t.Task.TaskID = *resp.Data
-	}
+	t.Task.TaskID = resp.Data.TaskID
 	t.Task.ChannelId = t.Provider.Channel.Id
 	t.Task.Action = t.Action
 
 	return nil
 }
 
-func (t *SunoTask) actionValidate() (err error) {
-	switch t.Action {
-	case sunoProvider.SunoActionMusic:
-		if t.Request.Mv == "" {
-			t.Request.Mv = "chirp-v3-0"
-		}
-		t.OriginalModel = t.Request.Mv
-	case sunoProvider.SunoActionLyrics:
-		if t.Request.Prompt == "" {
-			err = fmt.Errorf("prompt_empty")
-			return
-		}
-		t.OriginalModel = "suno_lyrics"
-	default:
-		err = fmt.Errorf("invalid_action")
+func (t *KlingTask) actionValidate() (err error) {
+	class := t.C.Param("class")
+	action := t.C.Param("action")
+
+	if class != "videos" {
+		err = fmt.Errorf("class is not videos")
 		return
 	}
 
-	if t.Request.ContinueClipId != "" {
-		if t.Request.TaskID == "" {
-			err = fmt.Errorf("task id is empty")
-			return
-		}
-		t.OriginTaskID = t.Request.TaskID
+	if action != "text2video" && action != "image2video" {
+		err = fmt.Errorf("action is not text2video or image2video")
+		return
 	}
+
+	if t.Request.Duration == "" {
+		t.Request.Duration = "5"
+	}
+
+	if t.Request.Duration != "5" && t.Request.Duration != "10" {
+		err = fmt.Errorf("duration is not 5 or 10")
+		return
+	}
+
+	t.Class = class
+	t.Action = action
+
+	if t.Request.ModelName == "" {
+		t.Request.ModelName = "kling-v1"
+	}
+
+	if t.Request.Mode == "" {
+		t.Request.Mode = "std"
+	}
+
+	t.OriginalModel = fmt.Sprintf("kling-video_%s_%s_%s", t.Request.ModelName, t.Request.Mode, t.Request.Duration)
 
 	return
 }
 
-func (t *SunoTask) ShouldRetry(c *gin.Context, err *base.TaskError) bool {
-	if err == nil {
-		return false
-	}
+func (t *KlingTask) ShouldRetry(c *gin.Context, err *base.TaskError) bool {
+	return false
 
-	metrics.RecordProvider(c, err.StatusCode)
-
-	if err.LocalError {
-		return false
-	}
-
-	if _, ok := t.C.Get("specific_channel_id"); ok {
-		return false
-	}
-
-	if err.StatusCode == http.StatusTooManyRequests {
-		return true
-	}
-
-	if err.StatusCode == 307 {
-		return true
-	}
-
-	if err.StatusCode/100 == 5 {
-		// 超时不重试
-		if err.StatusCode == 504 || err.StatusCode == 524 {
-			return false
-		}
-		return true
-	}
-
-	return true
 }
 
-func (t *SunoTask) UpdateTaskStatus(ctx context.Context, taskChannelM map[int][]string, taskM map[string]*model.Task) error {
+func (t *KlingTask) UpdateTaskStatus(ctx context.Context, taskChannelM map[int][]string, taskM map[string]*model.Task) error {
 	for channelId, taskIds := range taskChannelM {
-		err := updateSunoTaskAll(ctx, channelId, taskIds, taskM)
+		err := updateKlingTaskAll(ctx, channelId, taskIds, taskM)
 		if err != nil {
 			logger.LogError(ctx, fmt.Sprintf("渠道 #%d 更新异步任务失败: %s", channelId, err.Error()))
 		}
@@ -164,7 +139,7 @@ func (t *SunoTask) UpdateTaskStatus(ctx context.Context, taskChannelM map[int][]
 	return nil
 }
 
-func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, taskM map[string]*model.Task) error {
+func updateKlingTaskAll(ctx context.Context, channelId int, taskIds []string, taskM map[string]*model.Task) error {
 	logger.LogWarn(ctx, fmt.Sprintf("渠道 #%d 未完成的任务有: %d", channelId, len(taskIds)))
 	if len(taskIds) == 0 {
 		return nil
@@ -184,7 +159,7 @@ func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, tas
 	}
 
 	providers := providers.GetProvider(channel, nil)
-	sunoProvider, ok := providers.(*sunoProvider.SunoProvider)
+	KlingProvider, ok := providers.(*KlingProvider.KlingProvider)
 	if !ok {
 		err := model.TaskBulkUpdate(taskIds, map[string]any{
 			"fail_reason": "获取供应商失败，请联系管理员",
@@ -197,16 +172,24 @@ func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, tas
 		return fmt.Errorf("provider not found")
 	}
 
-	resp, errWithCode := sunoProvider.GetFetchs(taskIds)
-	if errWithCode != nil {
-		logger.SysError(fmt.Sprintf("Get Task Do req error: %v", errWithCode))
+	taskActions, err := model.GetTaskActionByTaskIds("Kling", taskIds)
+	if err != nil {
+		return fmt.Errorf("get task action failed: %v", err)
 	}
 
-	if !resp.IsSuccess() {
-		return fmt.Errorf("渠道 #%d 未完成的任务有: %d, 报错: %s", channelId, len(taskIds), resp.Message)
-	}
+	for _, taskAction := range taskActions {
+		resp, errWithCode := KlingProvider.GetFetch("videos", taskAction.Action, taskAction.TaskID)
+		if errWithCode != nil {
+			logger.SysError(fmt.Sprintf("Get Task %s Do req error: %v", taskAction.TaskID, errWithCode))
+			continue
+		}
 
-	for _, responseItem := range *resp.Data {
+		if !resp.IsSuccess() || resp.Data == nil {
+			logger.SysError(fmt.Sprintf("Get Task %s Fetch error: %v", taskAction.TaskID, resp.Message))
+			continue
+		}
+
+		responseItem := resp.Data
 		task := taskM[responseItem.TaskID]
 		if !checkTaskNeedUpdate(task, responseItem) {
 			continue
@@ -242,10 +225,11 @@ func updateSunoTaskAll(ctx context.Context, channelId int, taskIds []string, tas
 			logger.SysError("UpdateTask task error: " + err.Error())
 		}
 	}
+
 	return nil
 }
 
-func checkTaskNeedUpdate(oldTask *model.Task, newTask sunoProvider.SunoDataResponse) bool {
+func checkTaskNeedUpdate(oldTask *model.Task, newTask *types.TaskDto) bool {
 
 	if oldTask.SubmitTime != newTask.SubmitTime {
 		return true

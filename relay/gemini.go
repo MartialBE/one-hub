@@ -219,7 +219,6 @@ func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int
 }
 
 func GetGeminiChatInterface(c *gin.Context, modelName string) (gemini.GeminiChatInterface, string, *gemini.GeminiErrorResponse) {
-	fmt.Println(modelName)
 	provider, modelName, fail := GetProvider(c, modelName)
 	if fail != nil {
 		return nil, "", gemini.ErrorToGeminiErr(fail)

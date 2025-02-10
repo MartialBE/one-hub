@@ -16,6 +16,8 @@ type PromptTokensDetails struct {
 	TextTokens           int `json:"text_tokens"`
 	ImageTokens          int `json:"image_tokens"`
 	CachedTokensInternal int `json:"cached_tokens_internal"`
+	CachedWriteTokens int `json:"-"`
+	CachedReadTokens  int `json:"-"`
 }
 
 type CompletionTokensDetails struct {

@@ -34,10 +34,11 @@ import { forwardRef } from 'react';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import { alpha, styled } from '@mui/material/styles';
+import { copy } from 'utils/common';
 
 // ----------------------------------------------------------------------
 
-const Label = forwardRef(({ children, color = 'default', variant = 'soft', startIcon, endIcon, sx, ...other }, ref) => {
+const Label = forwardRef(({ children, color = 'default', variant = 'soft', startIcon, endIcon, sx, copyText, ...other }, ref) => {
   const theme = useTheme();
 
   const iconStyles = {
@@ -57,6 +58,7 @@ const Label = forwardRef(({ children, color = 'default', variant = 'soft', start
         ...sx
       }}
       theme={theme}
+      {...(copyText && { onClick: () => copy(copyText) })}
       {...other}
     >
       {startIcon && <Box sx={{ mr: 0.75, ...iconStyles }}> {startIcon} </Box>}

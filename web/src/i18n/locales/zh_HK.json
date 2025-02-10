@@ -89,7 +89,8 @@
     "requiredName": "名稱 不能為空",
     "validJson": "必須是有效的JSON字符串",
     "collapse": "收起",
-    "expand": "展開"
+    "expand": "展開",
+    "copyModels": "複製模型"
   },
   "channel_index": {
     "AzureApiVersion": "Azure 版本號",
@@ -282,7 +283,9 @@
       "original_times_price": "原價格: ${{ times }} / 次",
       "output_price": "輸出: ${{ price }} /M",
       "times_price": "${{ times }} / 次"
-    }
+    },
+    "cachedReadTokens": "緩存讀取Tokens",
+    "cachedWriteTokens": "緩存寫入 Tokens"
   },
   "login": {
     "codeRequired": "驗證碼不能為空",
@@ -351,7 +354,8 @@
     "type": "類型",
     "inputAudioTokensRatio": "音頻輸入倍率",
     "other": "其他",
-    "outputAudioTokensRatio": "音頻輸出倍率"
+    "outputAudioTokensRatio": "音頻輸出倍率",
+    "rate": "倍率"
   },
   "nova 映射": "nova 映射",
   "onyx 映射": "onyx 映射",
@@ -1126,5 +1130,6 @@
     "name": "名稱",
     "nameTip": "渠道名稱",
     "title": "模型歸屬"
-  }
+  },
+  "price": "價格"
 }

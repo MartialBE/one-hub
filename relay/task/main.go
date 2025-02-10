@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"one-api/metrics"
 	"one-api/model"
 	"one-api/relay/relay_util"
 	"one-api/relay/task/base"
@@ -43,7 +44,10 @@ func RelayTaskSubmit(c *gin.Context) {
 
 	taskErr = taskAdaptor.Relay()
 	if taskErr == nil {
-		go CompletedTask(quotaInstance, taskAdaptor, c)
+		CompletedTask(quotaInstance, taskAdaptor, c)
+		// 返回结果
+		taskAdaptor.GinResponse()
+		metrics.RecordProvider(c, 200)
 		return
 	}
 
@@ -51,7 +55,7 @@ func RelayTaskSubmit(c *gin.Context) {
 
 	retryTimes := config.RetryTimes
 
-	if !taskAdaptor.ShouldRetry(taskErr) {
+	if !taskAdaptor.ShouldRetry(c, taskErr) {
 		logger.LogError(c.Request.Context(), fmt.Sprintf("relay error happen, status code is %d, won't retry in this case", taskErr.StatusCode))
 		retryTimes = 0
 	}
@@ -74,7 +78,7 @@ func RelayTaskSubmit(c *gin.Context) {
 		}
 
 		quotaInstance.Undo(c)
-		if !taskAdaptor.ShouldRetry(taskErr) {
+		if !taskAdaptor.ShouldRetry(c, taskErr) {
 			break
 		}
 
@@ -106,6 +110,8 @@ func GetRelayMode(c *gin.Context) int {
 	path := c.Request.URL.Path
 	if strings.HasPrefix(path, "/suno") {
 		relayMode = config.RelayModeSuno
+	} else if strings.HasPrefix(path, "/kling") {
+		relayMode = config.RelayModeKling
 	}
 
 	return relayMode

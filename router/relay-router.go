@@ -5,6 +5,7 @@ import (
 	"one-api/relay"
 	"one-api/relay/midjourney"
 	"one-api/relay/task"
+	"one-api/relay/task/kling"
 	"one-api/relay/task/suno"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,7 @@ func SetRelayRouter(router *gin.Engine) {
 	setClaudeRouter(router)
 	setGeminiRouter(router)
 	setRecraftRouter(router)
+	setKlingRouter(router)
 }
 
 func setOpenAIRouter(router *gin.Engine) {
@@ -132,5 +134,17 @@ func setRecraftRouter(router *gin.Engine) {
 		relayRecraftRouter.POST("/images/clarityUpscale", relay.RelayRecraftAI)
 		relayRecraftRouter.POST("/images/generativeUpscale", relay.RelayRecraftAI)
 		relayRecraftRouter.POST("/styles", relay.RelayRecraftAI)
+	}
+}
+
+func setKlingRouter(router *gin.Engine) {
+	relayKlingRouter := router.Group("/kling")
+	relayKlingRouter.Use(middleware.RelayKlingPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute())
+	relayKlingRouter.GET("/v1/videos/text2video/:id", kling.GetFetchByID)
+	relayKlingRouter.GET("/v1/videos/image2video/:id", kling.GetFetchByID)
+
+	relayKlingRouter.Use(middleware.DynamicRedisRateLimiter())
+	{
+		relayKlingRouter.POST("/v1/:class/:action", task.RelayTaskSubmit)
 	}
 }

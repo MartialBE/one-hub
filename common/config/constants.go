@@ -209,6 +209,7 @@ const (
 	ChannelTypeGithub       = 49
 	ChannelTypeRecraft      = 51
 	ChannelTypeReplicate    = 52
+	ChannelTypeKling        = 53
 )
 
 const (
@@ -227,6 +228,7 @@ const (
 	RelayModeSuno
 	RelayModeRerank
 	RelayModeChatRealtime
+	RelayModeKling
 )
 
 type ContextKey string
