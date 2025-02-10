@@ -189,6 +189,12 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pricesItem]);
 
+  useEffect(() => {
+    if (open) {
+      setUnitType('rate');
+      setUnit('K');
+    }
+  }, [open]);
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
       <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
