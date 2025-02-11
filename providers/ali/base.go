@@ -13,6 +13,11 @@ import (
 	"one-api/types"
 )
 
+const (
+	OpenaiBaseURL = "https://dashscope.aliyuncs.com/compatible-mode"
+	AliBaseURL    = "https://dashscope.aliyuncs.com"
+)
+
 // 定义供应商工厂
 type AliProviderFactory struct{}
 
@@ -53,16 +58,18 @@ func (f AliProviderFactory) Create(channel *model.Channel) base.ProviderInterfac
 func getConfig(useOpenaiAPI bool) base.ProviderConfig {
 	if useOpenaiAPI {
 		return base.ProviderConfig{
-			BaseURL:         "https://dashscope.aliyuncs.com/compatible-mode",
+			BaseURL:         OpenaiBaseURL,
 			ChatCompletions: "/v1/chat/completions",
 			Embeddings:      "/v1/embeddings",
+			ModelList:       "/v1/models",
 		}
 	}
 
 	return base.ProviderConfig{
-		BaseURL:         "https://dashscope.aliyuncs.com",
+		BaseURL:         AliBaseURL,
 		ChatCompletions: "/api/v1/services/aigc/text-generation/generation",
 		Embeddings:      "/api/v1/services/embeddings/text-embedding/text-embedding",
+		ModelList:       "/v1/models",
 	}
 }
 

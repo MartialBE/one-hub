@@ -151,7 +151,8 @@ const typeConfig = {
   },
   17: {
     inputLabel: {
-      other: '插件参数'
+      other: '插件参数',
+      provider_models_list: '从Ali获取模型列表'
     },
     input: {
       models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-max-longcontext', 'text-embedding-v1'],
