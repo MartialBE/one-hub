@@ -21,6 +21,7 @@ type OpenAIProvider struct {
 	IsAzure              bool
 	BalanceAction        bool
 	SupportStreamOptions bool
+	StreamEscapeJSON     bool
 }
 
 // 创建 OpenAIProvider

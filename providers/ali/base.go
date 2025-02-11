@@ -9,6 +9,7 @@ import (
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
+	"one-api/providers/openai"
 	"one-api/types"
 )
 
@@ -16,22 +17,48 @@ import (
 type AliProviderFactory struct{}
 
 type AliProvider struct {
-	base.BaseProvider
+	openai.OpenAIProvider
+
+	UseOpenaiAPI bool
 }
 
 // 创建 AliProvider
 // https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
 func (f AliProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
+	useOpenaiAPI := false
+
+	if channel.Plugin != nil {
+		plugin := channel.Plugin.Data()
+		if pOpenAI, ok := plugin["use_openai_api"]; ok {
+			if enable, ok := pOpenAI["enable"].(bool); ok && enable {
+				useOpenaiAPI = true
+			}
+		}
+	}
+
 	return &AliProvider{
-		BaseProvider: base.BaseProvider{
-			Config:    getConfig(),
-			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle),
+		OpenAIProvider: openai.OpenAIProvider{
+			BaseProvider: base.BaseProvider{
+				Config:    getConfig(useOpenaiAPI),
+				Channel:   channel,
+				Requester: requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle),
+			},
+			StreamEscapeJSON:     true,
+			SupportStreamOptions: true,
 		},
+		UseOpenaiAPI: useOpenaiAPI,
 	}
 }
 
-func getConfig() base.ProviderConfig {
+func getConfig(useOpenaiAPI bool) base.ProviderConfig {
+	if useOpenaiAPI {
+		return base.ProviderConfig{
+			BaseURL:         "https://dashscope.aliyuncs.com/compatible-mode",
+			ChatCompletions: "/v1/chat/completions",
+			Embeddings:      "/v1/embeddings",
+		}
+	}
+
 	return base.ProviderConfig{
 		BaseURL:         "https://dashscope.aliyuncs.com",
 		ChatCompletions: "/api/v1/services/aigc/text-generation/generation",

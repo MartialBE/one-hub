@@ -18,6 +18,10 @@ type aliStreamHandler struct {
 }
 
 func (p *AliProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	if p.UseOpenaiAPI {
+		return p.OpenAIProvider.CreateChatCompletion(request)
+	}
+
 	req, errWithCode := p.getAliChatRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -35,6 +39,10 @@ func (p *AliProvider) CreateChatCompletion(request *types.ChatCompletionRequest)
 }
 
 func (p *AliProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	if p.UseOpenaiAPI {
+		return p.OpenAIProvider.CreateChatCompletionStream(request)
+	}
+
 	req, errWithCode := p.getAliChatRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode

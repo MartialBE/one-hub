@@ -79,6 +79,18 @@
           "required": true
         }
       }
+    },
+    "use_openai_api": {
+      "name": "使用OpenAI API",
+      "description": "使用OpenAI API",
+      "params": {
+        "enable": {
+          "name": "启用",
+          "description": "是否启用使用OpenAI API, 开启用直接使用ali官方兼容OpenAI的API，不再做类型转换, 且上述插件无效",
+          "type": "bool",
+          "required": true
+        }
+      }
     }
   },
   "24": {
