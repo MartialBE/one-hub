@@ -93,7 +93,7 @@ func initMemoryCache() {
 	model.TokenCacheSeconds = syncFrequency
 
 	logger.SysLog("memory cache enabled")
-	logger.SysError(fmt.Sprintf("sync frequency: %d seconds", syncFrequency))
+	logger.SysLog(fmt.Sprintf("sync frequency: %d seconds", syncFrequency))
 	go model.SyncOptions(syncFrequency)
 	go SyncChannelCache(syncFrequency)
 }
