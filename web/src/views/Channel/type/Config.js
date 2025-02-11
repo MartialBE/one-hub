@@ -70,7 +70,8 @@ const typeConfig = {
   3: {
     inputLabel: {
       base_url: 'AZURE_OPENAI_ENDPOINT',
-      other: '默认 API 版本'
+      other: '默认 API 版本',
+      provider_models_list: '从Azure获取已部署模型列表'
     },
     prompt: {
       base_url: '请填写AZURE_OPENAI_ENDPOINT',

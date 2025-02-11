@@ -137,8 +137,13 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 				requestURL = fmt.Sprintf("/openai/deployments/%s%s?api-version=%s", modelName, requestURL, apiVersion)
 			}
 		} else {
-			requestURL = strings.TrimPrefix(requestURL, "/v1")
-			requestURL = fmt.Sprintf("/openai%s?api-version=%s", requestURL, apiVersion)
+			if strings.Contains(requestURL, "isGetAzureModelList") {
+				//专门生成用于azure获取模型部署列表的URL，因为azure只有2023-03-15-preview版本等特定版本支持通过api-key获取models 所以本url固定写死
+				requestURL = "/openai/deployments?api-version=2023-03-15-preview"
+			} else {
+				requestURL = strings.TrimPrefix(requestURL, "/v1")
+				requestURL = fmt.Sprintf("/openai%s?api-version=%s", requestURL, apiVersion)
+			}
 		}
 	}
 
