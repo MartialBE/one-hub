@@ -20,3 +20,23 @@ type ImageAzureError struct {
 	Details    []string `json:"details,omitempty"`
 	InnerError any      `json:"innererror,omitempty"`
 }
+
+type ModelListResponse struct {
+	Object string         `json:"object"`
+	Data   []ModelDetails `json:"data"`
+}
+
+type ModelDetails struct {
+	ScaleSettings ScaleSettings `json:"scale_settings"` // 修改为单个对象
+	Model         string        `json:"model"`
+	Owner         string        `json:"owner"`
+	Id            string        `json:"id"`
+	Status        string        `json:"status"`
+	CreatedAt     int64         `json:"created_at"`
+	UpdatedAt     int64         `json:"updated_at"`
+	Object        string        `json:"object"`
+}
+
+type ScaleSettings struct {
+	ScaleType string `json:"scale_type"`
+}
