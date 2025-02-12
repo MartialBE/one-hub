@@ -10,6 +10,7 @@ import (
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/providers/base"
+	"one-api/providers/openai"
 	"one-api/types"
 	"strings"
 	"time"
@@ -20,22 +21,58 @@ type BaiduProviderFactory struct{}
 
 var baiduCacheKey = "api_token:baidu"
 
+const (
+	OpenaiBaseURL = "https://qianfan.baidubce.com"
+	BaiduBaseURL  = "https://aip.baidubce.com"
+)
+
 // 创建 BaiduProvider
 type BaiduProvider struct {
-	base.BaseProvider
+	openai.OpenAIProvider
+
+	UseOpenaiAPI bool
 }
 
 func (f BaiduProviderFactory) Create(channel *model.Channel) base.ProviderInterface {
-	return &BaiduProvider{
-		BaseProvider: base.BaseProvider{
-			Config:    getConfig(),
-			Channel:   channel,
-			Requester: requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle),
-		},
+	useOpenaiAPI := false
+
+	if channel.Plugin != nil {
+		plugin := channel.Plugin.Data()
+		if pOpenAI, ok := plugin["use_openai_api"]; ok {
+			if enable, ok := pOpenAI["enable"].(bool); ok && enable {
+				useOpenaiAPI = true
+			}
+		}
 	}
+	providers := &BaiduProvider{
+		OpenAIProvider: openai.OpenAIProvider{
+			BaseProvider: base.BaseProvider{
+				Config:  getConfig(useOpenaiAPI),
+				Channel: channel,
+			},
+			// StreamEscapeJSON:     true,
+			SupportStreamOptions: true,
+		},
+		UseOpenaiAPI: useOpenaiAPI,
+	}
+
+	if useOpenaiAPI {
+		providers.Requester = requester.NewHTTPRequester(*channel.Proxy, openai.RequestErrorHandle)
+	} else {
+		providers.Requester = requester.NewHTTPRequester(*channel.Proxy, requestErrorHandle)
+	}
+
+	return providers
 }
 
-func getConfig() base.ProviderConfig {
+func getConfig(useOpenaiAPI bool) base.ProviderConfig {
+	if useOpenaiAPI {
+		return base.ProviderConfig{
+			BaseURL:         OpenaiBaseURL,
+			ChatCompletions: "/v2/chat/completions",
+			Embeddings:      "/v2/embeddings",
+		}
+	}
 	return base.ProviderConfig{
 		BaseURL:         "https://aip.baidubce.com",
 		ChatCompletions: "/rpc/2.0/ai_custom/v1/wenxinworkshop/chat",
@@ -122,6 +159,10 @@ var modelNameMap = map[string]string{
 
 // 获取完整请求 URL
 func (p *BaiduProvider) GetFullRequestURL(requestURL string, modelName string) string {
+	if p.UseOpenaiAPI {
+		return fmt.Sprintf("%s%s", p.GetBaseURL(), requestURL)
+	}
+
 	if modelNameConvert, ok := modelNameMap[modelName]; ok {
 		modelName = modelNameConvert
 	}
@@ -139,6 +180,10 @@ func (p *BaiduProvider) GetFullRequestURL(requestURL string, modelName string) s
 func (p *BaiduProvider) GetRequestHeaders() (headers map[string]string) {
 	headers = make(map[string]string)
 	p.CommonRequestHeaders(headers)
+
+	if p.UseOpenaiAPI {
+		headers["Authorization"] = fmt.Sprintf("Bearer %s", p.Channel.Key)
+	}
 
 	return headers
 }
