@@ -43,14 +43,15 @@ type ChatCompletionToolCalls struct {
 }
 
 type ChatCompletionMessage struct {
-	Role         string                           `json:"role"`
-	Content      any                              `json:"content,omitempty"`
-	Refusal      string                           `json:"refusal,omitempty"`
-	Name         *string                          `json:"name,omitempty"`
-	FunctionCall *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
-	ToolCalls    []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
-	ToolCallID   string                           `json:"tool_call_id,omitempty"`
-	Audio        any                              `json:"audio,omitempty"`
+	Role             string                           `json:"role"`
+	Content          any                              `json:"content,omitempty"`
+	Refusal          string                           `json:"refusal,omitempty"`
+	ReasoningContent string                           `json:"reasoning_content,omitempty"`
+	Name             *string                          `json:"name,omitempty"`
+	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
+	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
+	ToolCallID       string                           `json:"tool_call_id,omitempty"`
+	Audio            any                              `json:"audio,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
