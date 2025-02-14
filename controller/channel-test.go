@@ -14,6 +14,7 @@ import (
 	"one-api/providers"
 	providers_base "one-api/providers/base"
 	"one-api/types"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -22,77 +23,136 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func testChannel(channel *model.Channel, testModel string) (err error, openaiErr *types.OpenAIErrorWithStatusCode) {
-	if testModel == "" && channel.TestModel == "" {
-		return errors.New("请填写测速模型后再试"), nil
-	}
+var (
+	embeddingsRegex = regexp.MustCompile(`(?:^text-|embed|Embed|rerank|davinci|babbage|bge-|e5-|LLM2Vec|retrieval|uae-|gte-|jina-clip|jina-embeddings)`)
+	imageRegex      = regexp.MustCompile(`flux|diffusion|stabilityai|sd-|dall|cogview|janus`)
+	noSupportRegex  = regexp.MustCompile(`(?:^tts|rerank|whisper|speech|^mj_|^chirp)`)
+)
 
+func testChannel(channel *model.Channel, testModel string) (openaiErr *types.OpenAIErrorWithStatusCode, err error) {
 	if testModel == "" {
 		testModel = channel.TestModel
+		if testModel == "" {
+			return nil, errors.New("请填写测速模型后再试")
+		}
 	}
 
-	// 创建一个 http.Request
-	req, err := http.NewRequest("POST", "/v1/chat/completions", nil)
-	if err != nil {
-		return err, nil
+	channelType := getModelType(testModel)
+	fmt.Println("channelType", channelType)
+	var url string
+	switch channelType {
+	case "embeddings":
+		url = "/v1/embeddings"
+	case "image":
+		url = "/v1/images/generations"
+	case "chat":
+		url = "/v1/chat/completions"
+	default:
+		return nil, errors.New("不支持的模型类型")
 	}
-	req.Header.Set("Content-Type", "application/json")
 
+	// 创建测试上下文
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
 	c.Request = req
 
+	// 获取并验证provider
 	provider := providers.GetProvider(channel, c)
 	if provider == nil {
-		return errors.New("channel not implemented"), nil
+		return nil, errors.New("channel not implemented")
 	}
 
 	newModelName, err := provider.ModelMappingHandler(testModel)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
-	request := buildTestRequest(newModelName)
+	usage := &types.Usage{}
+	provider.SetUsage(usage)
 
-	chatProvider, ok := provider.(providers_base.ChatInterface)
-	if !ok {
-		return errors.New("channel not implemented"), nil
+	// 执行测试请求
+	var response any
+	var openAIErrorWithStatusCode *types.OpenAIErrorWithStatusCode
+
+	switch channelType {
+	case "embeddings":
+		embeddingsProvider, ok := provider.(providers_base.EmbeddingsInterface)
+		if !ok {
+			return nil, errors.New("channel not implemented")
+		}
+		testRequest := &types.EmbeddingRequest{
+			Model: newModelName,
+			Input: "hi",
+		}
+		response, openAIErrorWithStatusCode = embeddingsProvider.CreateEmbeddings(testRequest)
+	case "image":
+		imageProvider, ok := provider.(providers_base.ImageGenerationsInterface)
+		if !ok {
+			return nil, errors.New("channel not implemented")
+		}
+
+		testRequest := &types.ImageRequest{
+			Model:  newModelName,
+			Prompt: "A cute cat",
+			N:      1,
+		}
+		response, openAIErrorWithStatusCode = imageProvider.CreateImageGenerations(testRequest)
+	case "chat":
+		chatProvider, ok := provider.(providers_base.ChatInterface)
+		if !ok {
+			return nil, errors.New("channel not implemented")
+		}
+		testRequest := &types.ChatCompletionRequest{
+			Messages: []types.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "You just need to output 'hi' next.",
+				},
+			},
+			Model:  newModelName,
+			Stream: false,
+		}
+
+		if strings.HasPrefix(newModelName, "o1") || strings.HasPrefix(newModelName, "o3") {
+			testRequest.MaxCompletionTokens = 10
+		} else {
+			testRequest.MaxTokens = 10
+		}
+		response, openAIErrorWithStatusCode = chatProvider.CreateChatCompletion(testRequest)
+	default:
+		return nil, errors.New("不支持的模型类型")
 	}
-
-	chatProvider.SetUsage(&types.Usage{})
-
-	response, openAIErrorWithStatusCode := chatProvider.CreateChatCompletion(request)
 
 	if openAIErrorWithStatusCode != nil {
-		return errors.New(openAIErrorWithStatusCode.Message), openAIErrorWithStatusCode
+		return openAIErrorWithStatusCode, errors.New(openAIErrorWithStatusCode.Message)
 	}
 
 	// 转换为JSON字符串
 	jsonBytes, _ := json.Marshal(response)
-	logger.SysLog(fmt.Sprintf("测试渠道 %s : %s 返回内容为：%s", channel.Name, request.Model, string(jsonBytes)))
+	logger.SysLog(fmt.Sprintf("测试渠道 %s : %s 返回内容为：%s", channel.Name, newModelName, string(jsonBytes)))
 
 	return nil, nil
 }
 
-func buildTestRequest(modelName string) *types.ChatCompletionRequest {
-	testRequest := &types.ChatCompletionRequest{
-		Messages: []types.ChatCompletionMessage{
-			{
-				Role:    "user",
-				Content: "You just need to output 'hi' next.",
-			},
-		},
-		Model:  modelName,
-		Stream: false,
+func getModelType(modelName string) string {
+	if noSupportRegex.MatchString(modelName) {
+		return "noSupport"
 	}
 
-	if strings.HasPrefix(modelName, "o1") || strings.HasPrefix(modelName, "o3") {
-		testRequest.MaxCompletionTokens = 10
-	} else {
-		testRequest.MaxTokens = 2
+	if embeddingsRegex.MatchString(modelName) {
+		return "embeddings"
 	}
 
-	return testRequest
+	if imageRegex.MatchString(modelName) {
+		return "image"
+	}
+
+	return "chat"
 }
 
 func TestChannel(c *gin.Context) {
@@ -114,7 +174,7 @@ func TestChannel(c *gin.Context) {
 	}
 	testModel := c.Query("model")
 	tik := time.Now()
-	err, openaiErr := testChannel(channel, testModel)
+	openaiErr, err := testChannel(channel, testModel)
 	tok := time.Now()
 	milliseconds := tok.Sub(tik).Milliseconds()
 	consumedTime := float64(milliseconds) / 1000.0
@@ -170,7 +230,7 @@ func testAllChannels(isNotify bool) error {
 			isChannelEnabled := channel.Status == config.ChannelStatusEnabled
 			sendMessage += fmt.Sprintf("**通道 %s - #%d - %s** : \n\n", utils.EscapeMarkdownText(channel.Name), channel.Id, channel.StatusToStr())
 			tik := time.Now()
-			err, openaiErr := testChannel(channel, "")
+			openaiErr, err := testChannel(channel, "")
 			tok := time.Now()
 			milliseconds := tok.Sub(tik).Milliseconds()
 			// 通道为禁用状态，并且还是请求错误 或者 响应时间超过阈值 直接跳过，也不需要更新响应时间。
