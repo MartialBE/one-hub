@@ -51,8 +51,8 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 	return relay
 }
 
-func GetProvider(c *gin.Context, modeName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
-	channel, fail := fetchChannel(c, modeName)
+func GetProvider(c *gin.Context, modelName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
+	channel, fail := fetchChannel(c, modelName)
 	if fail != nil {
 		return
 	}
@@ -64,10 +64,10 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 		fail = errors.New("channel not found")
 		return
 	}
-	provider.SetOriginalModel(modeName)
-	c.Set("original_model", modeName)
+	provider.SetOriginalModel(modelName)
+	c.Set("original_model", modelName)
 
-	newModelName, fail = provider.ModelMappingHandler(modeName)
+	newModelName, fail = provider.ModelMappingHandler(modelName)
 	if fail != nil {
 		return
 	}
