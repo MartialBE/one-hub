@@ -19,6 +19,7 @@ func InitNotifier() {
 	InitLarkNotifier()
 	InitPushdeerNotifier()
 	InitTelegramNotifier()
+	InitWeComNotifier()
 }
 
 func InitEmailNotifier() {
@@ -30,6 +31,20 @@ func InitEmailNotifier() {
 	emailNotifier := channel.NewEmail(smtpTo)
 	AddNotifiers(emailNotifier)
 	logger.SysLog("email notifier enable")
+}
+
+func InitWeComNotifier() {
+	if viper.GetBool("notify.wecom.disable") {
+		logger.SysLog("wecom notifier disabled")
+		return
+	}
+	webhook := viper.GetString("notify.wecom.webhook")
+	if webhook == "" {
+		return
+	}
+	weComNotifier := channel.NewWeCom(webhook)
+	AddNotifiers(weComNotifier)
+	logger.SysLog("wecom notifier enable")
 }
 
 func InitDingTalkNotifier() {

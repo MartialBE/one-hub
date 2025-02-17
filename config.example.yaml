@@ -62,6 +62,9 @@ notify: # 通知设置, 配置了几个通知方式，就会同时发送几次�
   email: # 邮件通知 (具体stmp配置在后台设置)
     disable: false # 是否禁用邮件通知
     smtp_to: "" # 收件人地址 (可空，如果为空则使用超级管理员邮箱)
+  wecom: # 企业微信机器人通知
+    disable: false # 是否禁用企业微信机器人通知
+    webhook: "" # 完整的调用地址
   dingTalk: # 钉钉机器人通知
     token: "" # webhook 地址最后一串字符
     secret: "" # 密钥 (secret/keyWord 二选一)
