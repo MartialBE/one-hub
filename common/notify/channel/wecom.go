@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"one-api/common/requester"
 	"one-api/types"
+	"strings"
 )
+
+var warningStrs = []string{"已被禁用"}
 
 type weComMarkdownMessage struct {
 	Content string `json:"content"`
@@ -32,11 +35,20 @@ func (w *WeCom) Name() string {
 }
 
 func (w *WeCom) Send(c context.Context, title, message string) error {
+	// match color
+	color := "info"
+	for _, warningStr := range warningStrs {
+		if strings.Contains(title, warningStr) {
+			color = "warning"
+			break
+		}
+	}
+
 	// init req data
 	msg := weComMessage{
 		MsgType: "markdown",
 		Markdown: weComMarkdownMessage{
-			Content: fmt.Sprintf("## <font color=\"info\">%s</font>\n   \n%s", title, message),
+			Content: fmt.Sprintf("## <font color=\"%s\">%s</font>\n   \n%s", color, title, message),
 		},
 	}
 
