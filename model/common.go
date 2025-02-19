@@ -73,7 +73,7 @@ func PaginateAndOrder[T modelable](db *gorm.DB, params *PaginationParams, result
 		}
 	} else {
 		// 默认排序
-		db = db.Order("id DESC")
+		db = db.Order("priority DESC, weight DESC, name ASC")
 	}
 
 	// 查询
