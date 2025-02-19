@@ -38,6 +38,7 @@ func getConfig() base.ProviderConfig {
 		ChatCompletions:     "/v1/chat/completions",
 		Embeddings:          "/v1/embeddings",
 		AudioTranscriptions: "/v1/audio/transcriptions",
+		AudioSpeech:         "/v1/audio/speech",
 		Rerank:              "/v1/rerank",
 		ModelList:           "/v1/models",
 	}
