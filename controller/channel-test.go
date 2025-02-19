@@ -38,7 +38,7 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 	}
 
 	channelType := getModelType(testModel)
-	fmt.Println("channelType", channelType)
+
 	var url string
 	switch channelType {
 	case "embeddings":
@@ -71,6 +71,8 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 	if err != nil {
 		return nil, err
 	}
+
+	newModelName = strings.TrimPrefix(newModelName, "+")
 
 	usage := &types.Usage{}
 	provider.SetUsage(usage)

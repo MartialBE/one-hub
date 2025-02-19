@@ -64,6 +64,11 @@ func (r *relayBase) getOriginalModel() string {
 }
 
 func (r *relayBase) getModelName() string {
+	billingOriginalModel := r.c.GetBool("billing_original_model")
+
+	if billingOriginalModel {
+		return r.originalModel
+	}
 	return r.modelName
 }
 

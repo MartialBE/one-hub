@@ -51,6 +51,10 @@ func (t *TaskBase) InitTask() {
 }
 
 func (t *TaskBase) GetModelName() string {
+	billingOriginalModel := t.C.GetBool("billing_original_model")
+	if billingOriginalModel {
+		return t.OriginalModel
+	}
 	return t.ModelName
 }
 

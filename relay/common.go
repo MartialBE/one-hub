@@ -77,7 +77,15 @@ func GetProvider(c *gin.Context, modelName string) (provider providersBase.Provi
 		return
 	}
 
+	BillingOriginalModel := false
+
+	if strings.HasPrefix(newModelName, "+") {
+		newModelName = newModelName[1:]
+		BillingOriginalModel = true
+	}
+
 	c.Set("new_model", newModelName)
+	c.Set("billing_original_model", BillingOriginalModel)
 
 	return
 }
