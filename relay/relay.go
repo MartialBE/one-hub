@@ -62,14 +62,16 @@ func RelayOnly(c *gin.Context) {
 
 	response, errWithCode := requester.SendRequestRaw(req)
 	if errWithCode != nil {
-		relayResponseWithErr(c, errWithCode)
+		newErrWithCode := FilterOpenAIErr(c, errWithCode)
+		relayResponseWithOpenAIErr(c, &newErrWithCode)
 		return
 	}
 
 	errWithCode = responseMultipart(c, response)
 
 	if errWithCode != nil {
-		relayResponseWithErr(c, errWithCode)
+		newErrWithCode := FilterOpenAIErr(c, errWithCode)
+		relayResponseWithOpenAIErr(c, &newErrWithCode)
 		return
 	}
 

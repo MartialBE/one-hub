@@ -11,6 +11,7 @@ import (
 	"one-api/common/utils"
 	providersBase "one-api/providers/base"
 	"one-api/types"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -77,7 +78,9 @@ func (r *relayCompletions) send() (err *types.OpenAIErrorWithStatusCode, done bo
 			return r.getUsageResponse()
 		}
 
-		err = responseStreamClient(r.c, response, doneStr)
+		var firstResponseTime time.Time
+		firstResponseTime, err = responseStreamClient(r.c, response, doneStr)
+		r.SetFirstResponseTime(firstResponseTime)
 	} else {
 		var response *types.CompletionResponse
 		response, err = provider.CreateCompletion(&r.request)

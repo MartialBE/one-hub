@@ -2,6 +2,7 @@ package relay
 
 import (
 	"one-api/types"
+	"time"
 
 	providersBase "one-api/providers/base"
 
@@ -13,6 +14,8 @@ type relayBase struct {
 	provider      providersBase.ProviderInterface
 	originalModel string
 	modelName     string
+
+	firstResponseTime time.Time
 }
 
 type RelayBaseInterface interface {
@@ -26,6 +29,8 @@ type RelayBaseInterface interface {
 	getModelName() string
 	getContext() *gin.Context
 	IsStream() bool
+	HandleError(err *types.OpenAIErrorWithStatusCode)
+	GetFirstResponseTime() time.Time
 }
 
 func (r *relayBase) getRequest() interface{} {
@@ -60,4 +65,17 @@ func (r *relayBase) getOriginalModel() string {
 
 func (r *relayBase) getModelName() string {
 	return r.modelName
+}
+
+func (r *relayBase) GetFirstResponseTime() time.Time {
+	return r.firstResponseTime
+}
+
+func (r *relayBase) SetFirstResponseTime(firstResponseTime time.Time) {
+	r.firstResponseTime = firstResponseTime
+}
+
+func (r *relayBase) HandleError(err *types.OpenAIErrorWithStatusCode) {
+	newErr := FilterOpenAIErr(r.c, err)
+	relayResponseWithOpenAIErr(r.c, &newErr)
 }

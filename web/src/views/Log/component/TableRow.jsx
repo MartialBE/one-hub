@@ -64,12 +64,18 @@ function requestTSLabelOptions(request_ts) {
 export default function LogTableRow({ item, userIsAdmin, userGroup }) {
   const { t } = useTranslation();
   let request_time = item.request_time / 1000;
-  let request_time_str = request_time.toFixed(2) + ' 秒';
+  let request_time_str = request_time.toFixed(2) + ' S';
+
+  let first_time = item.metadata?.first_response ? item.metadata.first_response / 1000 : 0;
+  let first_time_str = first_time ? `${first_time.toFixed(2)} S` : '';
+
+  const stream_time = request_time - first_time;
+
   let request_ts = 0;
   let request_ts_str = '';
-  if (request_time > 0 && item.completion_tokens > 0) {
-    request_ts = (item.completion_tokens ? item.completion_tokens : 1) / request_time;
-    request_ts_str = request_ts.toFixed(2) + ' t/s';
+  if (first_time > 0 && item.completion_tokens > 0) {
+    request_ts = (item.completion_tokens ? item.completion_tokens : 1) / stream_time;
+    request_ts_str = `${request_ts.toFixed(2)} t/s`;
   }
 
   const { totalInputTokens, totalOutputTokens, show, tokenDetails } = useMemo(() => calculateTokens(item), [item]);
@@ -108,9 +114,12 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
         <TableCell>{viewModelName(item.model_name, item.is_stream)}</TableCell>
 
         <TableCell>
-          <Stack direction="row" spacing={1}>
-            <Label color={requestTimeLabelOptions(request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Label>
-            {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
+          <Stack direction="column" spacing={0.5}>
+            <Label color={requestTimeLabelOptions(request_time)}>
+              {item.request_time == 0 ? '无' : request_time_str} {first_time_str ? ' / ' + first_time_str : ''}
+            </Label>
+
+            {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}>{request_ts_str}</Label>}
           </Stack>
         </TableCell>
         <TableCell>{viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails)}</TableCell>

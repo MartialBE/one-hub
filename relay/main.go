@@ -23,12 +23,14 @@ func Relay(c *gin.Context) {
 	}
 
 	if err := relay.setRequest(); err != nil {
-		common.AbortWithMessage(c, http.StatusBadRequest, err.Error())
+		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusBadRequest)
+		relay.HandleError(openaiErr)
 		return
 	}
 
 	if err := relay.setProvider(relay.getOriginalModel()); err != nil {
-		common.AbortWithMessage(c, http.StatusServiceUnavailable, err.Error())
+		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusServiceUnavailable)
+		relay.HandleError(openaiErr)
 		return
 	}
 
@@ -68,7 +70,7 @@ func Relay(c *gin.Context) {
 	}
 
 	if apiErr != nil {
-		relayResponseWithErr(c, apiErr)
+		relay.HandleError(apiErr)
 	}
 }
 
@@ -98,6 +100,8 @@ func RelayHandler(relay RelayBaseInterface) (err *types.OpenAIErrorWithStatusCod
 		quota.Undo(relay.getContext())
 		return
 	}
+
+	quota.SetFirstResponseTime(relay.GetFirstResponseTime())
 
 	quota.Consume(relay.getContext(), usage, relay.IsStream())
 

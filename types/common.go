@@ -1,6 +1,9 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Usage struct {
 	PromptTokens            int                     `json:"prompt_tokens"`
@@ -63,6 +66,8 @@ func (e *OpenAIError) Error() string {
 
 	// 转换为JSON
 	bytes, _ := json.Marshal(response)
+
+	fmt.Println("e", string(bytes))
 	return string(bytes)
 }
 

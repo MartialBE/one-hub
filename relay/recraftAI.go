@@ -83,7 +83,8 @@ func RelayRecraftAI(c *gin.Context) {
 	}
 
 	quota.Undo(c)
-	relayResponseWithErr(c, apiErr)
+	newErrWithCode := FilterOpenAIErr(c, apiErr)
+	common.AbortWithErr(c, newErrWithCode.StatusCode, &newErrWithCode.OpenAIError)
 }
 
 func Path2RecraftAIModel(path string) string {

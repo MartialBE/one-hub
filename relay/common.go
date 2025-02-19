@@ -20,6 +20,7 @@ import (
 	"one-api/types"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,6 +47,10 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 		relay = NewRelayTranscriptions(c)
 	} else if strings.HasPrefix(path, "/v1/audio/translations") {
 		relay = NewRelayTranslations(c)
+	} else if strings.HasPrefix(path, "/claude") {
+		relay = NewRelayClaudeOnly(c)
+	} else if strings.HasPrefix(path, "/gemini") {
+		relay = NewRelayGeminiOnly(c)
 	}
 
 	return relay
@@ -150,7 +155,7 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 
 type StreamEndHandler func() string
 
-func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) (errWithOP *types.OpenAIErrorWithStatusCode) {
+func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) (firstResponseTime time.Time, errWithOP *types.OpenAIErrorWithStatusCode) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -159,6 +164,8 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 	var finalErr *types.OpenAIErrorWithStatusCode
 
 	defer stream.Close()
+
+	var isFirstResponse bool
 
 	// 在新的goroutine中处理stream数据
 	go func() {
@@ -171,6 +178,11 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 					return
 				}
 				streamData := "data: " + data + "\n\n"
+
+				if !isFirstResponse {
+					firstResponseTime = time.Now()
+					isFirstResponse = true
+				}
 
 				// 尝试写入数据，如果客户端断开也继续处理
 				select {
@@ -230,10 +242,10 @@ func responseStreamClient(c *gin.Context, stream requester.StreamReaderInterface
 
 	// 等待处理完成
 	<-done
-	return nil
+	return firstResponseTime, nil
 }
 
-func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) {
+func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderInterface[string], endHandler StreamEndHandler) (firstResponseTime time.Time) {
 	requester.SetEventStreamHeaders(c)
 	dataChan, errChan := stream.Recv()
 
@@ -242,6 +254,7 @@ func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderIn
 	// var finalErr *types.OpenAIErrorWithStatusCode
 
 	defer stream.Close()
+	var isFirstResponse bool
 
 	// 在新的goroutine中处理stream数据
 	go func() {
@@ -252,6 +265,10 @@ func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderIn
 			case data, ok := <-dataChan:
 				if !ok {
 					return
+				}
+				if !isFirstResponse {
+					firstResponseTime = time.Now()
+					isFirstResponse = true
 				}
 				// 尝试写入数据，如果客户端断开也继续处理
 				select {
@@ -299,6 +316,8 @@ func responseGeneralStreamClient(c *gin.Context, stream requester.StreamReaderIn
 
 	// 等待处理完成
 	<-done
+
+	return firstResponseTime
 }
 
 func responseMultipart(c *gin.Context, resp *http.Response) *types.OpenAIErrorWithStatusCode {
@@ -406,7 +425,7 @@ var (
 	quotaKeywords  = []string{"余额", "额度", "quota", "无可用渠道", "令牌"}
 )
 
-func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
+func FilterOpenAIErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) (errWithStatusCode types.OpenAIErrorWithStatusCode) {
 	newErr := types.OpenAIErrorWithStatusCode{}
 	if err != nil {
 		newErr = *err
@@ -415,7 +434,7 @@ func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) 
 	if newErr.StatusCode == http.StatusTooManyRequests {
 		newErr.OpenAIError.Message = "当前分组上游负载已饱和，请稍后再试"
 	}
-	statusCode := newErr.StatusCode
+
 	// 如果message中已经包含 request id: 则不再添加
 	if strings.Contains(newErr.Message, "(request id:") {
 		newErr.Message = requestIdRegex.ReplaceAllString(newErr.Message, "")
@@ -429,12 +448,16 @@ func relayResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) 
 		newErr.OpenAIError.Type = "system_error"
 		if utils.ContainsString(newErr.Message, quotaKeywords) {
 			newErr.Message = "上游负载已饱和，请稍后再试"
-			statusCode = http.StatusTooManyRequests
+			newErr.StatusCode = http.StatusTooManyRequests
 		}
 	}
 
-	c.JSON(statusCode, gin.H{
-		"error": newErr.OpenAIError,
+	return newErr
+}
+
+func relayResponseWithOpenAIErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) {
+	c.JSON(err.StatusCode, gin.H{
+		"error": err.OpenAIError,
 	})
 }
 

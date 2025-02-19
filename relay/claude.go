@@ -1,18 +1,13 @@
 package relay
 
 import (
-	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/image"
-	"one-api/common/logger"
 	"one-api/common/requester"
-	"one-api/metrics"
 	"one-api/providers/claude"
-	"one-api/relay/relay_util"
 	"one-api/types"
 
 	"github.com/gin-gonic/gin"
@@ -20,146 +15,89 @@ import (
 
 var AllowChannelType = []int{config.ChannelTypeAnthropic, config.ChannelTypeVertexAI, config.ChannelTypeBedrock}
 
-func RelaycClaudeOnly(c *gin.Context) {
-	request := &claude.ClaudeRequest{}
+type relayClaudeOnly struct {
+	relayBase
+	claudeRequest *claude.ClaudeRequest
+}
 
-	if err := common.UnmarshalBodyReusable(c, request); err != nil {
-		common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(err))
-		return
-	}
+func NewRelayClaudeOnly(c *gin.Context) *relayClaudeOnly {
 	c.Set("allow_channel_type", AllowChannelType)
+	relay := &relayClaudeOnly{}
+	relay.c = c
 
-	chatProvider, modelName, fail := GetClaudeChatInterface(c, request.Model)
-	if fail != nil {
-		common.AbortWithErr(c, http.StatusServiceUnavailable, claude.ErrorToClaudeErr(fail))
-		return
-	}
-
-	originalModel := request.Model
-	request.Model = modelName
-
-	channel := chatProvider.GetChannel()
-	originaPreCostType := channel.PreCost
-
-	promptTokens, tonkeErr := CountTokenMessages(request, originaPreCostType)
-	if tonkeErr != nil {
-		common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(tonkeErr))
-		return
-	}
-
-	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, request, originalModel)
-
-	if errWithCode == nil {
-		metrics.RecordProvider(c, 200)
-		return
-	}
-
-	apiErr := errWithCode.ToOpenAiError()
-
-	go processChannelRelayError(c.Request.Context(), channel.Id, channel.Name, apiErr, channel.Type)
-
-	retryTimes := config.RetryTimes
-	if done || !shouldRetry(c, apiErr, channel.Type) {
-		logger.LogError(c.Request.Context(), fmt.Sprintf("relay error happen, status code is %d, won't retry in this case", apiErr.StatusCode))
-		retryTimes = 0
-	}
-
-	for i := retryTimes; i > 0; i-- {
-		// 冻结通道
-		shouldCooldowns(c, channel, apiErr)
-		chatProvider, modelName, fail := GetClaudeChatInterface(c, originalModel)
-		if fail != nil {
-			continue
-		}
-		request.Model = modelName
-		channel = chatProvider.GetChannel()
-		logger.LogError(c.Request.Context(), fmt.Sprintf("using channel #%d(%s) to retry (remain times %d)", channel.Id, channel.Name, i))
-
-		if originaPreCostType != channel.PreCost {
-			originaPreCostType = channel.PreCost
-			promptTokens, tonkeErr = CountTokenMessages(request, originaPreCostType)
-			if tonkeErr != nil {
-				common.AbortWithErr(c, http.StatusBadRequest, claude.ErrorToClaudeErr(tonkeErr))
-				return
-			}
-		}
-
-		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, request, originalModel)
-		if errWithCode == nil {
-			metrics.RecordProvider(c, 200)
-			return
-		}
-
-		apiErr = errWithCode.ToOpenAiError()
-		go processChannelRelayError(c.Request.Context(), channel.Id, channel.Name, apiErr, channel.Type)
-		if done || !shouldRetry(c, apiErr, channel.Type) {
-			break
-		}
-	}
-
-	if errWithCode != nil {
-		if apiErr.StatusCode == http.StatusTooManyRequests {
-			apiErr.OpenAIError.Message = "当前分组上游负载已饱和，请稍后再试"
-		}
-		common.AbortWithErr(c, errWithCode.StatusCode, &errWithCode.ClaudeError)
-	}
+	return relay
 }
 
-func RelayClaudeHandler(c *gin.Context, promptTokens int, chatProvider claude.ClaudeChatInterface, request *claude.ClaudeRequest, originalModel string) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
-
-	usage := &types.Usage{
-		PromptTokens: promptTokens,
+func (r *relayClaudeOnly) setRequest() error {
+	r.claudeRequest = &claude.ClaudeRequest{}
+	if err := common.UnmarshalBodyReusable(r.c, r.claudeRequest); err != nil {
+		return err
 	}
-	chatProvider.SetUsage(usage)
+	r.originalModel = r.claudeRequest.Model
+	return nil
+}
 
-	quota := relay_util.NewQuota(c, request.Model, promptTokens)
-	if err := quota.PreQuotaConsumption(); err != nil {
-		return claude.OpenaiErrToClaudeErr(err), true
-	}
+func (r *relayClaudeOnly) getRequest() interface{} {
+	return r.claudeRequest
+}
 
-	errWithCode, done = SendClaude(c, chatProvider, request)
+func (r *relayClaudeOnly) IsStream() bool {
+	return r.claudeRequest.Stream
+}
 
-	if errWithCode != nil {
-		quota.Undo(c)
+func (r *relayClaudeOnly) getPromptTokens() (int, error) {
+	channel := r.provider.GetChannel()
+	return CountTokenMessages(r.claudeRequest, channel.PreCost)
+}
+
+func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
+	chatProvider, ok := r.provider.(claude.ClaudeChatInterface)
+	if !ok {
+		err = common.StringErrorWrapperLocal("channel not implemented", "channel_error", http.StatusServiceUnavailable)
+		done = true
 		return
 	}
 
-	quota.Consume(c, usage, request.Stream)
+	r.claudeRequest.Model = r.modelName
 
-	return
-}
-
-func SendClaude(c *gin.Context, chatProvider claude.ClaudeChatInterface, request *claude.ClaudeRequest) (errWithCode *claude.ClaudeErrorWithStatusCode, done bool) {
-	if request.Stream {
+	if r.claudeRequest.Stream {
 		var response requester.StreamReaderInterface[string]
-		response, errWithCode = chatProvider.CreateClaudeChatStream(request)
-		if errWithCode != nil {
+		response, err = chatProvider.CreateClaudeChatStream(r.claudeRequest)
+		if err != nil {
 			return
 		}
 
 		doneStr := func() string {
 			return ""
 		}
-		responseGeneralStreamClient(c, response, doneStr)
+		firstResponseTime := responseGeneralStreamClient(r.c, response, doneStr)
+		r.SetFirstResponseTime(firstResponseTime)
 	} else {
 		var response *claude.ClaudeResponse
-		response, errWithCode = chatProvider.CreateClaudeChat(request)
-		if errWithCode != nil {
+		response, err = chatProvider.CreateClaudeChat(r.claudeRequest)
+		if err != nil {
 			return
 		}
 
-		openErr := responseJsonClient(c, response)
+		openErr := responseJsonClient(r.c, response)
 
 		if openErr != nil {
-			errWithCode = claude.OpenaiErrToClaudeErr(openErr)
+			err = openErr
 		}
 	}
 
-	if errWithCode != nil {
+	if err != nil {
 		done = true
 	}
-
 	return
+}
+
+func (r *relayClaudeOnly) HandleError(err *types.OpenAIErrorWithStatusCode) {
+	newErr := FilterOpenAIErr(r.c, err)
+
+	claudeErr := claude.OpenaiErrToClaudeErr(err)
+
+	r.c.JSON(newErr.StatusCode, claudeErr.ClaudeError)
 }
 
 func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, error) {
@@ -207,18 +145,4 @@ func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, er
 	}
 
 	return tokenNum, nil
-}
-
-func GetClaudeChatInterface(c *gin.Context, modelName string) (claude.ClaudeChatInterface, string, *claude.ClaudeError) {
-	provider, modelName, fail := GetProvider(c, modelName)
-	if fail != nil {
-		return nil, "", claude.ErrorToClaudeErr(fail)
-	}
-
-	chatProvider, ok := provider.(claude.ClaudeChatInterface)
-	if !ok {
-		return nil, "", claude.ErrorToClaudeErr(errors.New("channel not implemented"))
-	}
-
-	return chatProvider, modelName, nil
 }

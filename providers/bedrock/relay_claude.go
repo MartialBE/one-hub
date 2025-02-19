@@ -2,13 +2,15 @@ package bedrock
 
 import (
 	"net/http"
+	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/providers/bedrock/category"
 	"one-api/providers/claude"
+	"one-api/types"
 )
 
-func (p *BedrockProvider) CreateClaudeChat(request *claude.ClaudeRequest) (*claude.ClaudeResponse, *claude.ClaudeErrorWithStatusCode) {
+func (p *BedrockProvider) CreateClaudeChat(request *claude.ClaudeRequest) (*claude.ClaudeResponse, *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getClaudeRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -19,7 +21,7 @@ func (p *BedrockProvider) CreateClaudeChat(request *claude.ClaudeRequest) (*clau
 	// // 发送请求
 	_, openaiErr := p.Requester.SendRequest(req, claudeResponse, false)
 	if openaiErr != nil {
-		return nil, claude.OpenaiErrToClaudeErr(openaiErr)
+		return nil, openaiErr
 	}
 
 	claude.ClaudeUsageToOpenaiUsage(&claudeResponse.Usage, p.GetUsage())
@@ -27,7 +29,7 @@ func (p *BedrockProvider) CreateClaudeChat(request *claude.ClaudeRequest) (*clau
 	return claudeResponse, nil
 }
 
-func (p *BedrockProvider) CreateClaudeChatStream(request *claude.ClaudeRequest) (requester.StreamReaderInterface[string], *claude.ClaudeErrorWithStatusCode) {
+func (p *BedrockProvider) CreateClaudeChatStream(request *claude.ClaudeRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getClaudeRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -44,27 +46,27 @@ func (p *BedrockProvider) CreateClaudeChatStream(request *claude.ClaudeRequest) 
 	// 发送请求
 	resp, openaiErr := p.Requester.SendRequestRaw(req)
 	if openaiErr != nil {
-		return nil, claude.OpenaiErrToClaudeErr(openaiErr)
+		return nil, openaiErr
 	}
 
 	stream, openaiErr := RequestStream(resp, chatHandler.HandlerStream)
 	if openaiErr != nil {
-		return nil, claude.OpenaiErrToClaudeErr(openaiErr)
+		return nil, openaiErr
 	}
 
 	return stream, nil
 }
 
-func (p *BedrockProvider) getClaudeRequest(request *claude.ClaudeRequest) (*http.Request, *claude.ClaudeErrorWithStatusCode) {
+func (p *BedrockProvider) getClaudeRequest(request *claude.ClaudeRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	var err error
 	p.Category, err = category.GetCategory(request.Model)
 	if err != nil || p.Category == nil {
-		return nil, claude.StringErrorWrapper("bedrock provider not found", "bedrock_err", http.StatusInternalServerError, true)
+		return nil, common.StringErrorWrapperLocal("bedrock provider not found", "bedrock_err", http.StatusInternalServerError)
 	}
 
 	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeChatCompletions)
 	if errWithCode != nil {
-		return nil, claude.StringErrorWrapper("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError, true)
+		return nil, common.StringErrorWrapperLocal("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError)
 	}
 
 	if request.Stream {
@@ -74,13 +76,13 @@ func (p *BedrockProvider) getClaudeRequest(request *claude.ClaudeRequest) (*http
 	// 获取请求地址
 	fullRequestURL := p.GetFullRequestURL(url, p.Category.ModelName)
 	if fullRequestURL == "" {
-		return nil, claude.StringErrorWrapper("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError, true)
+		return nil, common.StringErrorWrapperLocal("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError)
 	}
 
 	headers := p.GetRequestHeaders()
 
 	if headers == nil {
-		return nil, claude.StringErrorWrapper("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError, true)
+		return nil, common.StringErrorWrapperLocal("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError)
 	}
 
 	bedrockRequest := &category.ClaudeRequest{
@@ -93,7 +95,7 @@ func (p *BedrockProvider) getClaudeRequest(request *claude.ClaudeRequest) (*http
 	// 创建请求
 	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(bedrockRequest), p.Requester.WithHeader(headers))
 	if err != nil {
-		return nil, claude.StringErrorWrapper(err.Error(), "new_request_failed", http.StatusInternalServerError, true)
+		return nil, common.StringErrorWrapperLocal(err.Error(), "new_request_failed", http.StatusInternalServerError)
 	}
 
 	p.Sign(req)

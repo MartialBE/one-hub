@@ -18,10 +18,10 @@ type GeminiRelayStreamHandler struct {
 	key string
 }
 
-func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiChatResponse, *GeminiErrorWithStatusCode) {
+func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiChatResponse, *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
-		return nil, OpenaiErrToGeminiErr(errWithCode)
+		return nil, errWithCode
 	}
 	defer req.Body.Close()
 
@@ -29,7 +29,7 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 	// 发送请求
 	_, errWithCode = p.Requester.SendRequest(req, geminiResponse, false)
 	if errWithCode != nil {
-		return nil, OpenaiErrToGeminiErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	usage := p.GetUsage()
@@ -38,10 +38,10 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 	return geminiResponse, nil
 }
 
-func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (requester.StreamReaderInterface[string], *GeminiErrorWithStatusCode) {
+func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
-		return nil, OpenaiErrToGeminiErr(errWithCode)
+		return nil, errWithCode
 	}
 	defer req.Body.Close()
 
@@ -60,12 +60,12 @@ func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (req
 	// 发送请求
 	resp, errWithCode := p.Requester.SendRequestRaw(req)
 	if errWithCode != nil {
-		return nil, OpenaiErrToGeminiErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	stream, errWithCode := requester.RequestNoTrimStream(p.Requester, resp, chatHandler.HandlerStream)
 	if errWithCode != nil {
-		return nil, OpenaiErrToGeminiErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	return stream, nil

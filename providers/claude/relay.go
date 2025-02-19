@@ -19,10 +19,10 @@ type ClaudeRelayStreamHandler struct {
 	AddEvent bool
 }
 
-func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeResponse, *ClaudeErrorWithStatusCode) {
+func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeResponse, *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
-		return nil, OpenaiErrToClaudeErr(errWithCode)
+		return nil, errWithCode
 	}
 	defer req.Body.Close()
 
@@ -30,7 +30,7 @@ func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeRespon
 	// 发送请求
 	_, errWithCode = p.Requester.SendRequest(req, claudeResponse, false)
 	if errWithCode != nil {
-		return nil, OpenaiErrToClaudeErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	usage := p.GetUsage()
@@ -44,10 +44,10 @@ func (p *ClaudeProvider) CreateClaudeChat(request *ClaudeRequest) (*ClaudeRespon
 	return claudeResponse, nil
 }
 
-func (p *ClaudeProvider) CreateClaudeChatStream(request *ClaudeRequest) (requester.StreamReaderInterface[string], *ClaudeErrorWithStatusCode) {
+func (p *ClaudeProvider) CreateClaudeChatStream(request *ClaudeRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.getChatRequest(request)
 	if errWithCode != nil {
-		return nil, OpenaiErrToClaudeErr(errWithCode)
+		return nil, errWithCode
 	}
 	defer req.Body.Close()
 
@@ -60,12 +60,12 @@ func (p *ClaudeProvider) CreateClaudeChatStream(request *ClaudeRequest) (request
 	// 发送请求
 	resp, errWithCode := p.Requester.SendRequestRaw(req)
 	if errWithCode != nil {
-		return nil, OpenaiErrToClaudeErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	stream, errWithCode := requester.RequestNoTrimStream(p.Requester, resp, chatHandler.HandlerStream)
 	if errWithCode != nil {
-		return nil, OpenaiErrToClaudeErr(errWithCode)
+		return nil, errWithCode
 	}
 
 	return stream, nil
