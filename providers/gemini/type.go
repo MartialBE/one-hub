@@ -419,3 +419,29 @@ type GeminiErrors []*GeminiErrorResponse
 func (e *GeminiErrors) Error() *GeminiErrorResponse {
 	return (*e)[0]
 }
+
+type GeminiImageRequest struct {
+	Instances  []GeminiImageInstance `json:"instances"`
+	Parameters GeminiImageParameters `json:"parameters"`
+}
+
+type GeminiImageInstance struct {
+	Prompt string `json:"prompt"`
+}
+
+type GeminiImageParameters struct {
+	PersonGeneration string `json:"personGeneration,omitempty"`
+	AspectRatio      string `json:"aspectRatio,omitempty"`
+	SampleCount      int    `json:"sampleCount,omitempty"`
+}
+
+type GeminiImageResponse struct {
+	Predictions []GeminiImagePrediction `json:"predictions"`
+}
+
+type GeminiImagePrediction struct {
+	BytesBase64Encoded string `json:"bytesBase64Encoded"`
+	MimeType           string `json:"mimeType"`
+	RaiFilteredReason  string `json:"raiFilteredReason,omitempty"`
+	SafetyAttributes   any    `json:"safetyAttributes,omitempty"`
+}
