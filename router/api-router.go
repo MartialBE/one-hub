@@ -136,6 +136,8 @@ func SetApiRouter(router *gin.Engine) {
 			channelTagRoute.GET("/:tag", controller.GetChannelsTag)
 			channelTagRoute.PUT("/:tag", controller.UpdateChannelsTag)
 			channelTagRoute.DELETE("/:tag", controller.DeleteChannelsTag)
+			channelTagRoute.DELETE("/:tag/disabled", controller.DeleteDisabledChannelsTag)
+			channelTagRoute.PUT("/:tag/priority", controller.UpdateChannelsTagPriority)
 
 		}
 

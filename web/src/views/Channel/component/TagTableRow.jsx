@@ -16,7 +16,8 @@ import {
   DialogTitle,
   Button,
   Stack,
-  Collapse
+  Collapse,
+  TextField
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -29,6 +30,7 @@ import GroupLabel from './GroupLabel';
 import ChannelTable from './ChannelTable';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
+import { showError } from 'utils/common';
 
 export default function TagTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
   const { t } = useTranslation();
@@ -36,10 +38,26 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
   const [openDelete, setOpenDelete] = useState(false);
   const [openRow, setOpenRow] = useState(false);
   const theme = useTheme();
+  const [priorityValve, setPriority] = useState(0);
 
   let modelMap = [];
   modelMap = item.models.split(',');
   modelMap.sort();
+
+  const handlePriority = async (event) => {
+    const currentValue = parseInt(event.target.value);
+    if (isNaN(currentValue) || currentValue === priorityValve) {
+      return;
+    }
+
+    if (currentValue < 0) {
+      showError('优先级不能小于0');
+      return;
+    }
+
+    await manageChannel(item.tag, 'priority', currentValue);
+    setPriority(currentValue);
+  };
 
   const handleDeleteOpen = () => {
     handleCloseMenu();
@@ -90,6 +108,16 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
 
         <TableCell>
           <ModelsPopover model={item.models} />
+        </TableCell>
+
+        <TableCell>
+          <TextField
+            defaultValue={item.priority}
+            variant="standard"
+            onBlur={handlePriority}
+            type="number"
+            InputProps={{ inputProps: { min: 0 } }}
+          />
         </TableCell>
 
         <TableCell>

@@ -86,7 +86,7 @@ export default function ChannelTag() {
     setOpenModal(true);
   };
 
-  const manageChannel = async (id, action) => {
+  const manageChannel = async (id, action, value) => {
     const url = '/api/channel_tag/';
     let res;
 
@@ -95,6 +95,14 @@ export default function ChannelTag() {
         case 'delete':
           res = await API.delete(url + encodeURIComponent(id));
           break;
+        case 'priority':
+          res = await API.put(`${url + encodeURIComponent(id)}/priority`, {
+            type: 'priority',
+            value
+          });
+          break;
+        default:
+          return null;
       }
       const { success, message } = res.data;
       if (success) {
@@ -190,6 +198,7 @@ export default function ChannelTag() {
                 { id: 'type', label: t('channel_index.supplier'), disableSort: false },
                 { id: 'group', label: t('channel_index.group'), disableSort: true, width: '80px' },
                 { id: 'models', label: t('channel_index.model'), disableSort: false },
+                { id: 'priority', label: t('channel_index.priority'), disableSort: false },
                 { id: 'action', label: t('channel_index.actions'), disableSort: true }
               ]}
             />

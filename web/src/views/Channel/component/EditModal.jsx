@@ -398,7 +398,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   }, []);
 
   useEffect(() => {
-    setBatchAdd(false);
+    setBatchAdd(isTag);
     if (channelId) {
       loadChannel().then();
     } else {
@@ -760,47 +760,45 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   )}
                 </ButtonGroup>
               </Container>
-              {!isTag && (
-                <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
-                  {!batchAdd ? (
-                    <>
-                      <InputLabel htmlFor="channel-key-label">{customizeT(inputLabel.key)}</InputLabel>
-                      <OutlinedInput
-                        id="channel-key-label"
-                        label={customizeT(inputLabel.key)}
-                        type="text"
-                        value={values.key}
-                        name="key"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        inputProps={{}}
-                        aria-describedby="helper-text-channel-key-label"
-                      />
-                    </>
-                  ) : (
-                    <TextField
-                      multiline
+              <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
+                {!batchAdd ? (
+                  <>
+                    <InputLabel htmlFor="channel-key-label">{customizeT(inputLabel.key)}</InputLabel>
+                    <OutlinedInput
                       id="channel-key-label"
                       label={customizeT(inputLabel.key)}
+                      type="text"
                       value={values.key}
                       name="key"
                       onBlur={handleBlur}
                       onChange={handleChange}
+                      inputProps={{}}
                       aria-describedby="helper-text-channel-key-label"
-                      minRows={5}
-                      placeholder={customizeT(inputPrompt.key) + t('channel_edit.batchKeytip')}
                     />
-                  )}
+                  </>
+                ) : (
+                  <TextField
+                    multiline
+                    id="channel-key-label"
+                    label={customizeT(inputLabel.key)}
+                    value={values.key}
+                    name="key"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    aria-describedby="helper-text-channel-key-label"
+                    minRows={5}
+                    placeholder={customizeT(inputPrompt.key) + t('channel_edit.batchKeytip')}
+                  />
+                )}
 
-                  {touched.key && errors.key ? (
-                    <FormHelperText error id="helper-tex-channel-key-label">
-                      {errors.key}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-key-label"> {customizeT(inputPrompt.key)} </FormHelperText>
-                  )}
-                </FormControl>
-              )}
+                {touched.key && errors.key ? (
+                  <FormHelperText error id="helper-tex-channel-key-label">
+                    {errors.key}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(inputPrompt.key)} </FormHelperText>
+                )}
+              </FormControl>
 
               {inputPrompt.model_mapping && (
                 <FormControl
