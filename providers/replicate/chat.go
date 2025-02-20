@@ -2,7 +2,6 @@ package replicate
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"one-api/common"
@@ -50,7 +49,10 @@ func (p *ReplicateProvider) CreateChatCompletion(request *types.ChatCompletionRe
 		return nil, errWithCode
 	}
 
-	replicateResponse = getPrediction(p, replicateResponse)
+	replicateResponse, err = getPrediction(p, replicateResponse)
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "prediction_failed", http.StatusInternalServerError)
+	}
 
 	return p.convertToChatOpenai(replicateResponse)
 }
@@ -117,7 +119,7 @@ func (p *ReplicateProvider) convertToChatOpenai(response *ReplicateResponse[[]st
 	}
 
 	openaiResponse := &types.ChatCompletionResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		ID:      response.ID,
 		Object:  "chat.completion",
 		Created: utils.GetTimestamp(),
 		Choices: []types.ChatCompletionChoice{choice},
@@ -209,7 +211,7 @@ func (h *ReplicateStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan cha
 			FinishReason: types.FinishReasonStop,
 		}
 
-		dataChan <- getStreamResponse(choice, h.ModelName)
+		dataChan <- getStreamResponse(h.ID, choice, h.ModelName)
 
 		errChan <- io.EOF
 		*rawLine = requester.StreamClosed
@@ -234,12 +236,12 @@ func (h *ReplicateStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan cha
 		},
 	}
 
-	dataChan <- getStreamResponse(choice, h.ModelName)
+	dataChan <- getStreamResponse(h.ID, choice, h.ModelName)
 }
 
-func getStreamResponse(choice types.ChatCompletionStreamChoice, modelName string) string {
+func getStreamResponse(id string, choice types.ChatCompletionStreamChoice, modelName string) string {
 	chatCompletion := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		ID:      id,
 		Object:  "chat.completion.chunk",
 		Created: utils.GetTimestamp(),
 		Model:   modelName,

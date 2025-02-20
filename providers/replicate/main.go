@@ -2,6 +2,7 @@ package replicate
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"one-api/common/requester"
@@ -79,17 +80,21 @@ func (p *ReplicateProvider) GetFullRequestURL(requestURL string, model string) s
 	return fmt.Sprintf("%s%s", baseURL, requestURL)
 }
 
-func getPrediction[T any](p *ReplicateProvider, response *ReplicateResponse[T]) *ReplicateResponse[T] {
+func getPrediction[T any](p *ReplicateProvider, response *ReplicateResponse[T]) (*ReplicateResponse[T], error) {
 	if response.Status == "succeeded" {
-		return response
+		return response, nil
 	}
 
 	predictionResponse := getPredictionResponse[T](p, response.ID)
 	if predictionResponse == nil {
-		return response
+		return response, errors.New("prediction response is nil")
 	}
 
-	return predictionResponse
+	if predictionResponse.Status == "failed" {
+		return nil, errors.New(predictionResponse.Error)
+	}
+
+	return predictionResponse, nil
 }
 
 func getPredictionResponse[T any](p *ReplicateProvider, predictionID string) *ReplicateResponse[T] {
@@ -110,7 +115,7 @@ func getPredictionResponse[T any](p *ReplicateProvider, predictionID string) *Re
 			return nil
 		}
 		p.Requester.SendRequest(req, replicateResponse, false)
-		if replicateResponse.Status == "succeeded" {
+		if replicateResponse.Status == "succeeded" || replicateResponse.Status == "failed" {
 			return replicateResponse
 		}
 		retry++

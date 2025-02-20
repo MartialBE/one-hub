@@ -38,6 +38,7 @@ type ReplicateResponse[T any] struct {
 	Model   string            `json:"model"`
 	Urls    ReplicateImageUrl `json:"urls"`
 	Status  string            `json:"status"` // starting / succeeded
+	Error   string            `json:"error,omitempty"`
 	Output  T                 `json:"output,omitempty"`
 	Metrics ReplicateMetrics  `json:"metrics,omitempty"`
 }

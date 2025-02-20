@@ -38,7 +38,10 @@ func (p *ReplicateProvider) CreateImageGenerations(request *types.ImageRequest) 
 		return nil, errWithCode
 	}
 
-	replicateResponse = getPrediction(p, replicateResponse)
+	replicateResponse, err = getPrediction(p, replicateResponse)
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "prediction_failed", http.StatusInternalServerError)
+	}
 
 	if replicateResponse.Output == "" {
 		replicateResponse.Output = replicateResponse.Urls.Stream
@@ -50,7 +53,7 @@ func (p *ReplicateProvider) CreateImageGenerations(request *types.ImageRequest) 
 }
 
 func convertFromIamgeOpenai(request *types.ImageRequest) *ReplicateRequest[ReplicateImageRequest] {
-	return &ReplicateRequest[ReplicateImageRequest]{
+	replicateRequest := &ReplicateRequest[ReplicateImageRequest]{
 		Input: ReplicateImageRequest{
 			Prompt:           request.Prompt,
 			OutputFormat:     request.ResponseFormat,
@@ -61,6 +64,7 @@ func convertFromIamgeOpenai(request *types.ImageRequest) *ReplicateRequest[Repli
 			PromptUpsampling: request.PromptUpsampling,
 		},
 	}
+	return replicateRequest
 }
 
 func (p *ReplicateProvider) convertToImageOpenai(response *ReplicateResponse[string]) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
