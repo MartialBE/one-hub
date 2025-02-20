@@ -7,6 +7,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -244,17 +245,18 @@ func (cc *ChannelsChooser) Load() {
 	var channels []*Channel
 	DB.Where("status = ?", config.ChannelStatusEnabled).Find(&channels)
 
-	abilities, err := GetAbilityChannelGroup()
-	if err != nil {
-		logger.SysError("get enabled abilities failed: " + err.Error())
-		return
-	}
-
 	newGroup := make(map[string]map[string][][]int)
 	newChannels := make(map[int]*ChannelChoice)
 	newMatch := make(map[string]bool)
 	newModelGroup := make(map[string]map[string]bool)
 
+	type groupModelKey struct {
+		group string
+		model string
+	}
+	channelGroups := make(map[groupModelKey]map[int64][]int)
+
+	// 处理每个channel
 	for _, channel := range channels {
 		if *channel.Weight == 0 {
 			channel.Weight = &config.DefaultChannelWeight
@@ -264,44 +266,78 @@ func (cc *ChannelsChooser) Load() {
 			CooldownsTime: 0,
 			Disable:       false,
 		}
-	}
 
-	for _, ability := range abilities {
-		if _, ok := newGroup[ability.Group]; !ok {
-			newGroup[ability.Group] = make(map[string][][]int)
-		}
+		// 处理groups和models
+		groups := strings.Split(channel.Group, ",")
+		models := strings.Split(channel.Models, ",")
 
-		if _, ok := newModelGroup[ability.Model]; !ok {
-			newModelGroup[ability.Model] = make(map[string]bool)
-		}
+		for _, group := range groups {
+			group = strings.TrimSpace(group)
+			if group == "" {
+				continue
+			}
 
-		if _, ok := newGroup[ability.Group][ability.Model]; !ok {
-			newGroup[ability.Group][ability.Model] = make([][]int, 0)
-		}
+			for _, model := range models {
+				model = strings.TrimSpace(model)
+				if model == "" {
+					continue
+				}
 
-		// 如果是以 *结尾的 model名称
-		if strings.HasSuffix(ability.Model, "*") {
-			if _, ok := newMatch[ability.Model]; !ok {
-				newMatch[ability.Model] = true
+				key := groupModelKey{group: group, model: model}
+				if _, ok := channelGroups[key]; !ok {
+					channelGroups[key] = make(map[int64][]int)
+				}
+
+				// 按priority分组存储channelId
+				priority := *channel.Priority
+				channelGroups[key][priority] = append(channelGroups[key][priority], channel.Id)
+
+				// 处理通配符模型
+				if strings.HasSuffix(model, "*") {
+					newMatch[model] = true
+				}
+
+				// 初始化ModelGroup
+				if _, ok := newModelGroup[model]; !ok {
+					newModelGroup[model] = make(map[string]bool)
+				}
+				newModelGroup[model][group] = true
 			}
 		}
-
-		var priorityIds []int
-		// 逗号分割 ability.ChannelId
-		channelIds := strings.Split(ability.ChannelIds, ",")
-		for _, channelId := range channelIds {
-			priorityIds = append(priorityIds, utils.String2Int(channelId))
-		}
-
-		newGroup[ability.Group][ability.Model] = append(newGroup[ability.Group][ability.Model], priorityIds)
-		newModelGroup[ability.Model][ability.Group] = true
 	}
 
+	// 构建最终的newGroup结构
+	for key, priorityMap := range channelGroups {
+		// 初始化group和model的map
+		if _, ok := newGroup[key.group]; !ok {
+			newGroup[key.group] = make(map[string][][]int)
+		}
+
+		// 获取所有优先级并排序（从大到小）
+		var priorities []int64
+		for priority := range priorityMap {
+			priorities = append(priorities, priority)
+		}
+		sort.Slice(priorities, func(i, j int) bool {
+			return priorities[i] > priorities[j]
+		})
+
+		// 按优先级顺序构建[][]int
+		var channelsList [][]int
+		for _, priority := range priorities {
+			channelsList = append(channelsList, priorityMap[priority])
+		}
+
+		newGroup[key.group][key.model] = channelsList
+	}
+
+	// 构建newMatchList
 	newMatchList := make([]string, 0, len(newMatch))
 	for match := range newMatch {
 		newMatchList = append(newMatchList, match)
 	}
 
+	// 更新ChannelsChooser
 	cc.Lock()
 	cc.Rule = newGroup
 	cc.Channels = newChannels

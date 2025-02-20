@@ -140,10 +140,6 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
-		err = db.AutoMigrate(&Ability{})
-		if err != nil {
-			return err
-		}
 		err = db.AutoMigrate(&Log{})
 		if err != nil {
 			return err

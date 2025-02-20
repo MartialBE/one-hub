@@ -77,11 +77,13 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.Group != "" {
-		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE "+quotePostgresField("group")+" = ?)", params.Group)
+		groupKey := quotePostgresField("group")
+		db = db.Where("( "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" = ?)",
+			"%,"+params.Group+",%", params.Group+",%", "%,"+params.Group, params.Group)
 	}
 
 	if params.Models != "" {
-		db = db.Where("id IN (SELECT channel_id FROM abilities WHERE model LIKE ? GROUP BY channel_id)", "%"+params.Models+"%")
+		db = db.Where("models LIKE ?", "%"+params.Models+"%")
 	}
 
 	if params.Other != "" {
@@ -133,19 +135,12 @@ func DeleteChannelTag(channelId int) error {
 }
 
 func BatchInsertChannels(channels []Channel) error {
-	var err error
-	err = DB.Omit("UsedQuota").Create(&channels).Error
+	err := DB.Omit("UsedQuota").Create(&channels).Error
 	if err != nil {
 		return err
 	}
-	for _, channel_ := range channels {
-		err = channel_.AddAbilities()
-		if err != nil {
-			return err
-		}
-	}
 
-	go ChannelGroup.Load()
+	ChannelGroup.Load()
 	return nil
 }
 
@@ -218,15 +213,9 @@ func (channel *Channel) GetModelMapping() string {
 }
 
 func (channel *Channel) Insert() error {
-	var err error
-	err = DB.Omit("UsedQuota").Create(channel).Error
-	if err != nil {
-		return err
-	}
-	err = channel.AddAbilities()
-
+	err := DB.Omit("UsedQuota").Create(channel).Error
 	if err == nil {
-		go ChannelGroup.Load()
+		ChannelGroup.Load()
 	}
 
 	return err
@@ -255,7 +244,6 @@ func (channel *Channel) UpdateRaw(overwrite bool) error {
 		return err
 	}
 	DB.Model(channel).First(channel, "id = ?", channel.Id)
-	err = channel.UpdateAbilities()
 	return err
 }
 
@@ -280,14 +268,9 @@ func (channel *Channel) UpdateBalance(balance float64) {
 }
 
 func (channel *Channel) Delete() error {
-	var err error
-	err = DB.Delete(channel).Error
-	if err != nil {
-		return err
-	}
-	err = channel.DeleteAbilities()
+	err := DB.Delete(channel).Error
 	if err == nil {
-		go ChannelGroup.Load()
+		ChannelGroup.Load()
 	}
 	return err
 }
@@ -307,14 +290,7 @@ func (channel *Channel) StatusToStr() string {
 
 func UpdateChannelStatusById(id int, status int) {
 	tx := DB.Begin()
-
-	err := UpdateAbilityStatus(tx, id, status == config.ChannelStatusEnabled)
-	if err != nil {
-		logger.SysError("failed to update ability status: " + err.Error())
-		tx.Rollback()
-		return
-	}
-	err = tx.Model(&Channel{}).Where("id = ?", id).Update("status", status).Error
+	err := tx.Model(&Channel{}).Where("id = ?", id).Update("status", status).Error
 	if err != nil {
 		logger.SysError("failed to update channel status: " + err.Error())
 		tx.Rollback()
@@ -343,8 +319,6 @@ func updateChannelUsedQuota(id int, quota int) {
 
 func DeleteDisabledChannel() (int64, error) {
 	result := DB.Where("status = ? or status = ?", config.ChannelStatusAutoDisabled, config.ChannelStatusManuallyDisabled).Delete(&Channel{})
-	// 同时删除Ability
-	DB.Where("enabled = ?", false).Delete(&Ability{})
 	return result.RowsAffected, result.Error
 }
 
