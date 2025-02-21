@@ -162,7 +162,7 @@ func BatchUpdateChannelsAzureApi(params *BatchChannelsParams) (int64, error) {
 	}
 
 	if db.RowsAffected > 0 {
-		go ChannelGroup.Load()
+		ChannelGroup.Load()
 	}
 	return db.RowsAffected, nil
 }
@@ -191,7 +191,7 @@ func BatchDelModelChannels(params *BatchChannelsParams) (int64, error) {
 	}
 
 	if count > 0 {
-		go ChannelGroup.Load()
+		ChannelGroup.Load()
 	}
 
 	return count, nil
@@ -232,7 +232,7 @@ func (channel *Channel) Update(overwrite bool) error {
 	err := channel.UpdateRaw(overwrite)
 
 	if err == nil {
-		go ChannelGroup.Load()
+		ChannelGroup.Load()
 	}
 
 	return err
