@@ -71,7 +71,7 @@ export default function ChannelList() {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
-  const [orderBy, setOrderBy] = useState('id');
+  const [orderBy, setOrderBy] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
@@ -196,7 +196,7 @@ export default function ChannelList() {
   // 处理刷新
   const handleRefresh = async (reset) => {
     if (reset) {
-      setOrderBy('id');
+      setOrderBy('');
       setOrder('desc');
       setToolBarValue(originalKeyword);
       setSearchKeyword(originalKeyword);

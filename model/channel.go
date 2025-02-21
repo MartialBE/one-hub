@@ -51,6 +51,7 @@ var allowedChannelOrderFields = map[string]bool{
 	"response_time": true,
 	"balance":       true,
 	"priority":      true,
+	"weight":        true,
 }
 
 type SearchChannelsParams struct {
@@ -104,6 +105,11 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 
 	if params.FilterTag {
 		db = db.Where("tag = ''")
+	}
+
+	// set default channel order
+	if params.Order == "" {
+		params.Order = "-priority,-weight,name"
 	}
 
 	return PaginateAndOrder(db, &params.PaginationParams, &channels, allowedChannelOrderFields)
