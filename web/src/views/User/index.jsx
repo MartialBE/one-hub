@@ -16,7 +16,7 @@ import UsersTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
-import { ITEMS_PER_PAGE } from 'constants';
+import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
 import EditeModal from './component/EditModal';
 
 import { useTranslation } from 'react-i18next';
@@ -228,7 +228,7 @@ export default function Users() {
           count={listCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
+          rowsPerPageOptions={PAGE_SIZE_OPTIONS}
           onRowsPerPageChange={handleChangeRowsPerPage}
           showFirstButton
           showLastButton

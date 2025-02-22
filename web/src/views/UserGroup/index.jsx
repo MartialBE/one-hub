@@ -14,7 +14,7 @@ import { Button, Card, Stack, Container, Typography } from '@mui/material';
 import UserGroupTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import { ITEMS_PER_PAGE } from 'constants';
+import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
 import EditeModal from './component/EditModal';
 import { Icon } from '@iconify/react';
 
@@ -206,7 +206,7 @@ export default function UserGroup() {
           count={listCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
+          rowsPerPageOptions={PAGE_SIZE_OPTIONS}
           onRowsPerPageChange={handleChangeRowsPerPage}
           showFirstButton
           showLastButton

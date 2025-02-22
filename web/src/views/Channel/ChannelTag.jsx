@@ -13,7 +13,7 @@ import { Card, Stack, Typography } from '@mui/material';
 import TagTableRow from './component/TagTableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
-import { ITEMS_PER_PAGE } from 'constants';
+import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
 import { useTranslation } from 'react-i18next';
 // import TableToolBar from 'ui-component/TableToolBar';
 
@@ -221,7 +221,7 @@ export default function ChannelTag() {
           count={listCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
+          rowsPerPageOptions={PAGE_SIZE_OPTIONS}
           onRowsPerPageChange={handleChangeRowsPerPage}
           showFirstButton
           showLastButton

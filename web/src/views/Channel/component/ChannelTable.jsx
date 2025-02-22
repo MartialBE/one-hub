@@ -9,7 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import ChannelTableRow from './TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
-import { ITEMS_PER_PAGE } from 'constants';
+import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
 import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess, trims } from 'utils/common';
@@ -171,7 +171,7 @@ export default function ChannelTable({ tag }) {
             count={listCount}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            rowsPerPageOptions={[10, 25, 30]}
+            rowsPerPageOptions={PAGE_SIZE_OPTIONS}
             onRowsPerPageChange={handleChangeRowsPerPage}
             showFirstButton
             showLastButton
