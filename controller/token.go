@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
@@ -90,6 +91,7 @@ func GetPlaygroundToken(c *gin.Context) {
 }
 
 func AddToken(c *gin.Context) {
+	userId := c.GetInt("id")
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
 	if err != nil {
@@ -107,16 +109,18 @@ func AddToken(c *gin.Context) {
 		return
 	}
 
-	if token.Group != "" && model.GlobalUserGroupRatio.GetBySymbol(token.Group) == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "分组不存在",
-		})
-		return
+	if token.Group != "" {
+		err = validateTokenGroup(token.Group, userId)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+		}
 	}
 
 	cleanToken := model.Token{
-		UserId: c.GetInt("id"),
+		UserId: userId,
 		Name:   token.Name,
 		// Key:            utils.GenerateKey(),
 		CreatedTime:    utils.GetTimestamp(),
@@ -201,12 +205,15 @@ func UpdateToken(c *gin.Context) {
 		}
 	}
 
-	if cleanToken.Group != token.Group && token.Group != "" && model.GlobalUserGroupRatio.GetBySymbol(token.Group) == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "分组不存在",
-		})
-		return
+	if cleanToken.Group != token.Group && token.Group != "" {
+		err = validateTokenGroup(token.Group, userId)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	if statusOnly != "" {
@@ -232,4 +239,22 @@ func UpdateToken(c *gin.Context) {
 		"message": "",
 		"data":    cleanToken,
 	})
+}
+
+func validateTokenGroup(tokenGroup string, userId int) error {
+	userGroup, _ := model.CacheGetUserGroup(userId)
+	if userGroup == "" {
+		return errors.New("获取用户组信息失败")
+	}
+
+	groupRatio := model.GlobalUserGroupRatio.GetBySymbol(tokenGroup)
+	if groupRatio == nil {
+		return errors.New("无效的用户组")
+	}
+
+	if !groupRatio.Public && userGroup != tokenGroup {
+		return errors.New("当前用户组无权使用指定的分组")
+	}
+
+	return nil
 }
