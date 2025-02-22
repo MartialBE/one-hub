@@ -329,6 +329,6 @@ type ChannelStatistics struct {
 }
 
 func GetStatisticsChannel() (statistics []*ChannelStatistics, err error) {
-	err = DB.Table("channels").Select("count(*) as total_channels, status").Group("status").Scan(&statistics).Error
+	err = DB.Model(&Channel{}).Select("count(*) as total_channels, status").Group("status").Scan(&statistics).Error
 	return statistics, err
 }
