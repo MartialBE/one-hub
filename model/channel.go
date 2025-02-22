@@ -107,11 +107,6 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 		db = db.Where("tag = ''")
 	}
 
-	// set default channel order
-	if params.Order == "" {
-		params.Order = "-priority,-weight,name"
-	}
-
 	return PaginateAndOrder(db, &params.PaginationParams, &channels, allowedChannelOrderFields)
 }
 
