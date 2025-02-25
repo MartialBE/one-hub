@@ -86,6 +86,9 @@ const typeConfig = {
     modelGroup: 'Google PaLM'
   },
   14: {
+    inputLabel: {
+      provider_models_list: '从Claude获取模型列表'
+    },
     input: {
       models: [
         'claude-instant-1.2',

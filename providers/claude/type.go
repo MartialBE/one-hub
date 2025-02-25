@@ -174,3 +174,12 @@ type ContentBlock struct {
 	Input any    `json:"input,omitempty"`
 	Text  string `json:"text,omitempty"`
 }
+
+type ModelListResponse struct {
+	Data []Model `json:"data"`
+}
+
+type Model struct {
+	Type string `json:"type"`
+	ID   string `json:"id"`
+}

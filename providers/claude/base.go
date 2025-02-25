@@ -32,6 +32,7 @@ func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
 		BaseURL:         "https://api.anthropic.com",
 		ChatCompletions: "/v1/messages",
+		ModelList:       "/v1/models",
 	}
 }
 
