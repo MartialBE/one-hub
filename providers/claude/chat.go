@@ -31,6 +31,7 @@ type ClaudeStreamHandler struct {
 }
 
 func (p *ClaudeProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	request.OneOtherArg = p.GetOtherArg()
 	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -53,6 +54,7 @@ func (p *ClaudeProvider) CreateChatCompletion(request *types.ChatCompletionReque
 }
 
 func (p *ClaudeProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	request.OneOtherArg = p.GetOtherArg()
 	claudeRequest, errWithCode := ConvertFromChatOpenai(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -179,7 +181,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	}
 
 	// 如果是3-7 默认开启thinking
-	if strings.Contains(request.Model, "claude-3-7-sonnet") {
+	if strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking" {
 		if claudeRequest.MaxTokens == 0 {
 			claudeRequest.MaxTokens = 8096
 		}

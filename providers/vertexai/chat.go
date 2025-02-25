@@ -9,6 +9,7 @@ import (
 )
 
 func (p *VertexAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	request.OneOtherArg = p.GetOtherArg()
 	// 发送请求
 	response, errWithCode := p.Send(request)
 	if errWithCode != nil {
@@ -21,6 +22,7 @@ func (p *VertexAIProvider) CreateChatCompletion(request *types.ChatCompletionReq
 }
 
 func (p *VertexAIProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	request.OneOtherArg = p.GetOtherArg()
 	// 发送请求
 	response, errWithCode := p.Send(request)
 	if errWithCode != nil {
