@@ -29,7 +29,7 @@ func (r *relayModerations) setRequest() error {
 		r.request.Model = "text-moderation-stable"
 	}
 
-	r.originalModel = r.request.Model
+	r.setOriginalModel(r.request.Model)
 
 	return nil
 }

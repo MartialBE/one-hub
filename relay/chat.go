@@ -44,7 +44,7 @@ func (r *relayChat) setRequest() error {
 		return errors.New("the 'stream_options' parameter is only allowed when 'stream' is enabled")
 	}
 
-	r.originalModel = r.chatRequest.Model
+	r.setOriginalModel(r.chatRequest.Model)
 
 	return nil
 }

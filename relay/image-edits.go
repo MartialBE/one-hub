@@ -38,7 +38,7 @@ func (r *relayImageEdits) setRequest() error {
 		r.request.Size = "1024x1024"
 	}
 
-	r.originalModel = r.request.Model
+	r.setOriginalModel(r.request.Model)
 
 	return nil
 }

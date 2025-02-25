@@ -74,6 +74,7 @@ type BaseProvider struct {
 	Context       *gin.Context
 	Channel       *model.Channel
 	Requester     *requester.HTTPRequester
+	OtherArg      string
 }
 
 // 获取基础URL
@@ -203,4 +204,12 @@ func (p *BaseProvider) GetSupportedAPIUri(relayMode int) (url string, err *types
 
 func (p *BaseProvider) GetRequester() *requester.HTTPRequester {
 	return p.Requester
+}
+
+func (p *BaseProvider) GetOtherArg() string {
+	return p.OtherArg
+}
+
+func (p *BaseProvider) SetOtherArg(otherArg string) {
+	p.OtherArg = otherArg
 }

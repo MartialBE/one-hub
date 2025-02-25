@@ -52,7 +52,7 @@ func (r *relayGeminiOnly) setRequest() error {
 	}
 	r.geminiRequest.Model = modelList[0]
 	r.geminiRequest.Stream = isStream
-	r.originalModel = r.geminiRequest.Model
+	r.setOriginalModel(r.geminiRequest.Model)
 
 	return nil
 }

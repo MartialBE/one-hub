@@ -33,7 +33,7 @@ func (r *relayClaudeOnly) setRequest() error {
 	if err := common.UnmarshalBodyReusable(r.c, r.claudeRequest); err != nil {
 		return err
 	}
-	r.originalModel = r.claudeRequest.Model
+	r.setOriginalModel(r.claudeRequest.Model)
 	return nil
 }
 

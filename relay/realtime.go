@@ -54,7 +54,7 @@ func ChatRealtime(c *gin.Context) {
 		},
 		userConn: userConn,
 	}
-	relay.originalModel = modelName
+	relay.setOriginalModel(modelName)
 
 	if !relay.getProvider() {
 		return

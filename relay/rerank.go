@@ -82,7 +82,7 @@ func (r *relayRerank) setRequest() error {
 		return err
 	}
 
-	r.originalModel = r.request.Model
+	r.setOriginalModel(r.request.Model)
 
 	return nil
 }

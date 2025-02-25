@@ -41,7 +41,7 @@ func (r *relayImageGenerations) setRequest() error {
 		r.request.Quality = "standard"
 	}
 
-	r.originalModel = r.request.Model
+	r.setOriginalModel(r.request.Model)
 
 	return nil
 }
