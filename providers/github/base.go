@@ -26,7 +26,7 @@ func (f GithubProviderFactory) Create(channel *model.Channel) base.ProviderInter
 
 func getGithubConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:         "https://models.inference.ai.azure.com",
+		BaseURL:         "https://models.github.ai/inference",
 		ChatCompletions: "/chat/completions",
 		Embeddings:      "/embeddings",
 	}
