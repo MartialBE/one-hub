@@ -384,10 +384,11 @@ func (f *ChatCompletionToolCallsFunction) Split(c *ChatCompletionStreamChoice, s
 }
 
 type ChatCompletionStreamChoiceDelta struct {
-	Content      string                           `json:"content,omitempty"`
-	Role         string                           `json:"role,omitempty"`
-	FunctionCall *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
-	ToolCalls    []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
+	Content          string                           `json:"content,omitempty"`
+	Role             string                           `json:"role,omitempty"`
+	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
+	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
+	ReasoningContent string                           `json:"reasoning_content,omitempty"`
 }
 
 func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {

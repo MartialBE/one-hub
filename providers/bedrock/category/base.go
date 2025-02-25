@@ -53,6 +53,7 @@ func GetModelName(modelName string) string {
 		"apac.claude-3-5-sonnet-20240620": "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
 		"apac.claude-3-haiku-20240307":    "apac.anthropic.claude-3-haiku-20240307-v1:0",
 		//base model id
+		"claude-3-7-sonnet-20250219": "anthropic.claude-3-7-sonnet-20250219-v1:0",
 		"claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0",
 		"claude-3-5-sonnet-20241022": "anthropic.claude-3-5-sonnet-20241022-v2:0",
 		"claude-3-opus-20240229":     "anthropic.claude-3-opus-20240229-v1:0",
