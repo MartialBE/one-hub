@@ -52,6 +52,7 @@ type ChatCompletionMessage struct {
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ToolCallID       string                           `json:"tool_call_id,omitempty"`
 	Audio            any                              `json:"audio,omitempty"`
+	Reasoning        string                           `json:"reasoning,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -215,8 +216,8 @@ type ChatCompletionRequest struct {
 	Audio               *ChatAudio                    `json:"audio,omitempty"`
 	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
 	Prediction          any                           `json:"prediction,omitempty"`
-
-	OneOtherArg string `json:"-"`
+	IncludeReasoning    bool                          `json:"include_reasoning,omitempty"`
+	OneOtherArg         string                        `json:"-"`
 }
 
 func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {
@@ -391,6 +392,7 @@ type ChatCompletionStreamChoiceDelta struct {
 	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
+	Reasoning        string                           `json:"reasoning,omitempty"`
 }
 
 func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {
