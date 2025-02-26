@@ -28,51 +28,51 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           git describe --tags > VERSION
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22.4.1
-      - name: Cache Node modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            web/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Build Frontend
-        env:
-          CI: ""
-        run: |
-          export VERSION=$(cat VERSION)
-          cd web
-          yarn install
-          VITE_APP_VERSION=$VERSION yarn run build
-          cd ..
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.18.0"
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Build Backend (amd64)
-        run: |
-          go mod download
-          go build -ldflags "-s -w -X 'one-api/common/config.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-amd64
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 22.4.1
+#      - name: Cache Node modules
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            web/node_modules
+#            ~/.cache/yarn
+#          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+#          restore-keys: |
+#            ${{ runner.os }}-node-
+#      - name: Build Frontend
+#        env:
+#          CI: ""
+#        run: |
+#          export VERSION=$(cat VERSION)
+#          cd web
+#          yarn install
+#          VITE_APP_VERSION=$VERSION yarn run build
+#          cd ..
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ">=1.18.0"
+#      - name: Cache Go modules
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            ~/go/pkg/mod
+#            ~/.cache/go-build
+#          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+#          restore-keys: |
+#            ${{ runner.os }}-go-
+#      - name: Build Backend (amd64)
+#        run: |
+#          go mod download
+#          go build -ldflags "-s -w -X 'one-api/common/config.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-amd64
 
-      - name: Build Backend (arm64)
-        run: |
-          sudo rm /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update
-          sudo apt-get install gcc-aarch64-linux-gnu
-          CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X 'one-api/common/config.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-arm64
+#      - name: Build Backend (arm64)
+#        run: |
+#          sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+#          sudo apt-get update
+#          sudo apt-get install gcc-aarch64-linux-gnu
+#          CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X 'one-api/common/config.Version=$(cat VERSION)' -extldflags '-static'" -o one-api-arm64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -103,7 +103,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           build-args: |
             COMMIT_SHA=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           push: true
