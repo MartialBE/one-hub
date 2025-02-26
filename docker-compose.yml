@@ -5,8 +5,9 @@ services:
     image: martialbe/one-api:latest
     container_name: one-hub
     restart: always
-    ports:
-      - "3000:3000"
+    network_mode: "host"
+#    ports:
+#      - "3000:3000"
     volumes:
       - ./data:/data
     environment:
