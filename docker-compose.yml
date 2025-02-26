@@ -23,6 +23,8 @@ services:
 #    depends_on:
 #      - redis
 #      - db
+    command:
+      - "--config=/data/config.yaml"
     healthcheck:
       test:
         [
