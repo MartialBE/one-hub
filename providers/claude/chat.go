@@ -128,6 +128,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		Temperature:   request.Temperature,
 		TopP:          request.TopP,
 		Stream:        request.Stream,
+		Thinking:      (*Thinking)(request.Thinking),
 	}
 
 	var prevUserMessage bool
@@ -181,16 +182,18 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	}
 
 	// 如果是3-7 默认开启thinking
-	if strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking" {
+	if claudeRequest.Thinking != nil || (strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking") {
 		if claudeRequest.MaxTokens == 0 {
 			claudeRequest.MaxTokens = 8096
 		}
 		// BudgetTokens 为 max_tokens 的 80%
-		claudeRequest.Thinking = &Thinking{
-			Type:         "enabled",
-			BudgetTokens: int(float64(claudeRequest.MaxTokens) * 0.8),
+		if claudeRequest.Thinking == nil {
+			claudeRequest.Thinking = &Thinking{
+				Type:         "enabled",
+				BudgetTokens: int(float64(claudeRequest.MaxTokens) * 0.8),
+			}
 		}
-
+		claudeRequest.Temperature = nil
 		claudeRequest.TopP = nil
 	}
 

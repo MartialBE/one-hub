@@ -215,8 +215,14 @@ type ChatCompletionRequest struct {
 	Audio               *ChatAudio                    `json:"audio,omitempty"`
 	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
 	Prediction          any                           `json:"prediction,omitempty"`
+	Thinking            *Thinking                     `json:"thinking,omitempty"`
 
 	OneOtherArg string `json:"-"`
+}
+
+type Thinking struct {
+	Type         string `json:"type,omitempty"`
+	BudgetTokens int    `json:"budget_tokens,omitempty"`
 }
 
 func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {
