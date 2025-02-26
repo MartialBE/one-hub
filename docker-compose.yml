@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   one-hub:
-    image: martialbe/one-api:latest
+    image: registry.si.icu/sijinhui/one-hub
     container_name: one-hub
     restart: always
     network_mode: "host"
