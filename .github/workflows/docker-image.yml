@@ -90,8 +90,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: docker.io
-          username: ${{ vars.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }} # Replace with your Docker Hub password secret
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  # 修改这里
+          password: ${{ secrets.DOCKERHUB_TOKEN }}     # 修改这里
 
       - name: Docker meta
         id: meta
@@ -99,8 +99,8 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_HUB_REPO }}
-            docker.io/${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_HUB_REPO }}
+            ghcr.io/${{ github.repository_owner }}/${{ vars.DOCKER_HUB_REPO || github.event.repository.name }}
+            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_HUB_REPO || github.event.repository.name }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=dev,enable=${{ github.ref == 'refs/heads/main' }}
