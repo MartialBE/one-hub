@@ -58,12 +58,17 @@ func (p *ReplicateProvider) CreateChatCompletion(request *types.ChatCompletionRe
 }
 
 func convertFromChatOpenai(request *types.ChatCompletionRequest) *ReplicateRequest[ReplicateChatRequest] {
-
 	systemPrompt := ""
 	prompt := ""
+	var imageUrl string
 
+	// 设置最小 MaxTokens 为 1024
 	if request.MaxTokens == 0 && request.MaxCompletionTokens > 0 {
 		request.MaxTokens = request.MaxCompletionTokens
+	}
+	// 确保最小 token 不小于 1024
+	if request.MaxTokens < 1024 {
+		request.MaxTokens = 1024
 	}
 
 	for _, msg := range request.Messages {
@@ -75,27 +80,34 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *ReplicateReque
 		prompt += msg.Role + ": \n"
 		openaiContent := msg.ParseContent()
 		for _, content := range openaiContent {
-			if content.Type != types.ContentTypeText {
-				continue
+			if content.Type == types.ContentTypeText {
+				prompt += content.Text
+			} else if content.Type == types.ContentTypeImageURL {
+				// 处理图片URL
+				imageUrl = content.ImageURL.URL
 			}
-			prompt += content.Text
 		}
 		prompt += "\n"
 	}
 
 	prompt += "assistant: \n"
 
+	// 设置默认的图片分辨率
+	defaultMaxImageResolution := 0.5
+	
 	return &ReplicateRequest[ReplicateChatRequest]{
 		Stream: request.Stream,
 		Input: ReplicateChatRequest{
-			TopP:             request.TopP,
-			MaxTokens:        request.MaxTokens,
-			MinTokens:        0,
-			Temperature:      request.Temperature,
-			SystemPrompt:     systemPrompt,
-			Prompt:           prompt,
-			PresencePenalty:  request.PresencePenalty,
-			FrequencyPenalty: request.FrequencyPenalty,
+			TopP:               request.TopP,
+			MaxTokens:          request.MaxTokens,
+			MinTokens:          0,
+			Temperature:        request.Temperature,
+			SystemPrompt:       systemPrompt,
+			Prompt:             prompt,
+			PresencePenalty:    request.PresencePenalty,
+			FrequencyPenalty:   request.FrequencyPenalty,
+			Image:              imageUrl,
+			MaxImageResolution: &defaultMaxImageResolution,
 		},
 	}
 }
