@@ -25,6 +25,7 @@ type ReplicateChatRequest struct {
 	TopK             float64  `json:"top_k,omitempty"`
 	TopP             *float64 `json:"top_p,omitempty"`
 	Prompt           string   `json:"prompt"`
+  Image            string   `json:"image,omitempty"` 
 	MaxTokens        int      `json:"max_tokens,omitempty"`
 	MinTokens        int      `json:"min_tokens,omitempty"`
 	Temperature      *float64 `json:"temperature,omitempty"`
