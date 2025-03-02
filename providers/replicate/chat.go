@@ -92,22 +92,20 @@ func convertFromChatOpenai(request *types.ChatCompletionRequest) *ReplicateReque
 
 	prompt += "assistant: \n"
 
-	// 设置默认的图片分辨率
-	defaultMaxImageResolution := 0.5
-	
+	// 移除 defaultMaxImageResolution 声明
+
 	return &ReplicateRequest[ReplicateChatRequest]{
 		Stream: request.Stream,
 		Input: ReplicateChatRequest{
-			TopP:               request.TopP,
-			MaxTokens:          request.MaxTokens,
-			MinTokens:          0,
-			Temperature:        request.Temperature,
-			SystemPrompt:       systemPrompt,
-			Prompt:             prompt,
-			PresencePenalty:    request.PresencePenalty,
-			FrequencyPenalty:   request.FrequencyPenalty,
-			Image:              imageUrl,
-			MaxImageResolution: &defaultMaxImageResolution,
+			TopP:             request.TopP,
+			MaxTokens:        request.MaxTokens,
+			MinTokens:        0,
+			Temperature:      request.Temperature,
+			SystemPrompt:     systemPrompt,
+			Prompt:           prompt,
+			PresencePenalty:  request.PresencePenalty,
+			FrequencyPenalty: request.FrequencyPenalty,
+			Image:            imageUrl,
 		},
 	}
 }
