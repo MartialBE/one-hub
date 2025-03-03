@@ -268,8 +268,13 @@ func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
 			if err != nil {
 				return nil, common.ErrorWrapper(err, "image_url_invalid", http.StatusBadRequest)
 			}
+			claudeType := "image"
+
+			if mimeType == "application/pdf" {
+				claudeType = "document"
+			}
 			content = append(content, MessageContent{
-				Type: "image",
+				Type: claudeType,
 				Source: &ContentSource{
 					Type:      "base64",
 					MediaType: mimeType,

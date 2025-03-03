@@ -68,6 +68,7 @@ type ResContent struct {
 	Thinking  string `json:"thinking,omitempty"`
 	Signature string `json:"signature,omitempty"`
 	Delta     string `json:"delta,omitempty"`
+	Citations any    `json:"citations,omitempty"`
 }
 
 func (g *ResContent) ToOpenAITool() *types.ChatCompletionToolCalls {
@@ -86,8 +87,9 @@ func (g *ResContent) ToOpenAITool() *types.ChatCompletionToolCalls {
 
 type ContentSource struct {
 	Type      string `json:"type"`
-	MediaType string `json:"media_type"`
-	Data      string `json:"data"`
+	MediaType string `json:"media_type,omitempty"`
+	Data      string `json:"data,omitempty"`
+	Url       string `json:"url,omitempty"`
 }
 
 type MessageContent struct {
@@ -171,6 +173,7 @@ type Delta struct {
 	StopSequence string `json:"stop_sequence,omitempty"`
 	Thinking     string `json:"thinking,omitempty"`
 	Signature    string `json:"signature,omitempty"`
+	Citations    any    `json:"citations,omitempty"`
 }
 
 type ClaudeStreamResponse struct {
