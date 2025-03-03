@@ -95,7 +95,7 @@ func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 func (r *relayClaudeOnly) HandleError(err *types.OpenAIErrorWithStatusCode) {
 	newErr := FilterOpenAIErr(r.c, err)
 
-	claudeErr := claude.OpenaiErrToClaudeErr(err)
+	claudeErr := claude.OpenaiErrToClaudeErr(&newErr)
 
 	r.c.JSON(newErr.StatusCode, claudeErr.ClaudeError)
 }

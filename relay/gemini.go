@@ -110,7 +110,7 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 func (r *relayGeminiOnly) HandleError(err *types.OpenAIErrorWithStatusCode) {
 	newErr := FilterOpenAIErr(r.c, err)
 
-	geminiErr := gemini.OpenaiErrToGeminiErr(err)
+	geminiErr := gemini.OpenaiErrToGeminiErr(&newErr)
 
 	r.c.JSON(newErr.StatusCode, geminiErr.GeminiErrorResponse)
 }
