@@ -183,7 +183,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	// 如果是3-7 默认开启thinking
 	if strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking" {
 		if claudeRequest.MaxTokens == 0 {
-			claudeRequest.MaxTokens = 8096
+			claudeRequest.MaxTokens = 8192
 		}
 		// BudgetTokens 为 max_tokens 的 80%
 		claudeRequest.Thinking = &Thinking{
