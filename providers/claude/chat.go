@@ -184,7 +184,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	// 如果是3-7 默认开启thinking
 	if claudeRequest.Thinking != nil || (strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking") {
 		if claudeRequest.MaxTokens == 0 {
-			claudeRequest.MaxTokens = 8096
+			claudeRequest.MaxTokens = 8192
 		}
 		// BudgetTokens 为 max_tokens 的 80%
 		if claudeRequest.Thinking == nil {
@@ -271,8 +271,13 @@ func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
 			if err != nil {
 				return nil, common.ErrorWrapper(err, "image_url_invalid", http.StatusBadRequest)
 			}
+			claudeType := "image"
+
+			if mimeType == "application/pdf" {
+				claudeType = "document"
+			}
 			content = append(content, MessageContent{
-				Type: "image",
+				Type: claudeType,
 				Source: &ContentSource{
 					Type:      "base64",
 					MediaType: mimeType,

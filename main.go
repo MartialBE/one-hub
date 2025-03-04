@@ -12,6 +12,7 @@ import (
 	"one-api/common/oidc"
 	"one-api/common/redis"
 	"one-api/common/requester"
+	"one-api/common/search"
 	"one-api/common/storage"
 	"one-api/common/telegram"
 	"one-api/controller"
@@ -76,6 +77,7 @@ func main() {
 	notify.InitNotifier()
 	cron.InitCron()
 	storage.InitStorage()
+	search.InitSearcher()
 
 	initHttpServer()
 }

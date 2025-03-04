@@ -100,3 +100,9 @@ storage: # 存储设置 (可选,主要用于图片生成，有些供应商不提
 metrics:
   user: "" # metrics 用户名
   password: "" # metrics 密码
+
+search:
+  searxng:
+    url: "" # searxng 地址 关键词请用{query}， 例如 "http://127.0.0.1:8080/search?category_general=1&safesearch=2&q={query}&format=json&engines=bing,google"
+  tavily:
+    key: "" # tavily 密钥
