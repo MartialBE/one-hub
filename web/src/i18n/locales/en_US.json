@@ -696,6 +696,11 @@
         "info": "Configure audio rates. The configuration format is JSON, with keys as model names and values as input-output token rates. For example: {\"gpt-4o-audio-preview\": {\"input_audio_tokens_ratio\": 40, \"output_audio_tokens_ratio\": 20}, \"gpt-4o-mini-audio-preview\": {\"input_audio_tokens_ratio\": 67, \"output_audio_tokens_ratio\": 34}}",
         "save": "Save audio token settings",
         "title": "Audio token settings"
+      },
+      "disableChannelKeywordsSettings": {
+        "info": "Disable channel keywords, one keyword per line.",
+        "save": "Save disabled channel keyword settings",
+        "title": "Disable channel keyword settings"
       }
     },
     "otherSettings": {

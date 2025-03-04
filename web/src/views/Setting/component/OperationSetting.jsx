@@ -42,7 +42,8 @@ const OperationSetting = () => {
     CFWorkerImageKey: '',
     AudioTokenJson: '',
     ClaudeAPIEnabled: '',
-    GeminiAPIEnabled: ''
+    GeminiAPIEnabled: '',
+    DisableChannelKeywords: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -203,6 +204,11 @@ const OperationSetting = () => {
             return;
           }
           await updateOption('AudioTokenJson', inputs.AudioTokenJson);
+        }
+        break;
+      case 'DisableChannelKeywords':
+        if (originInputs.DisableChannelKeywords !== inputs.DisableChannelKeywords) {
+          await updateOption('DisableChannelKeywords', inputs.DisableChannelKeywords);
         }
         break;
     }
@@ -690,6 +696,35 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.audioTokenSettings.save')}
+            </Button>
+          </Stack>
+        </Stack>
+      </SubCard>
+
+      <SubCard title={t('setting_index.operationSettings.disableChannelKeywordsSettings.title')}>
+        <Stack spacing={2}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControl fullWidth>
+              <TextField
+                multiline
+                maxRows={15}
+                id="disableChannelKeywords"
+                label={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
+                value={inputs.DisableChannelKeywords}
+                name="DisableChannelKeywords"
+                onChange={handleInputChange}
+                minRows={5}
+                placeholder={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
+                disabled={loading}
+              />
+            </FormControl>
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('DisableChannelKeywords').then();
+              }}
+            >
+              {t('setting_index.operationSettings.disableChannelKeywordsSettings.save')}
             </Button>
           </Stack>
         </Stack>

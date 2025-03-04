@@ -61,6 +61,8 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.4.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0 // indirect
+	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

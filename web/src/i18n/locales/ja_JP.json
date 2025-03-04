@@ -696,6 +696,11 @@
         "info": "オーディオ倍率を設定します。JSON形式で、キーはモデル名であり、値は入力および出力のオーディオトークンの倍率です。例：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
         "save": "オーディオトークン設定を保存します",
         "title": "オーディオトークンの設定"
+      },
+      "disableChannelKeywordsSettings": {
+        "info": "キーワードを1行ずつ入力して、禁止ワードリストを設定してください。",
+        "save": "無効なチャネルキーワード設定を保存します",
+        "title": "チャネルキーワード設定を無効にする"
       }
     },
     "otherSettings": {
