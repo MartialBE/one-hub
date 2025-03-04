@@ -451,13 +451,16 @@ func FilterOpenAIErr(c *gin.Context, err *types.OpenAIErrorWithStatusCode) (errW
 	requestId := c.GetString(logger.RequestIdKey)
 	newErr.OpenAIError.Message = utils.MessageWithRequestId(newErr.OpenAIError.Message, requestId)
 
-	switch newErr.OpenAIError.Type {
-	case "new_api_error", "one_api_error", "shell_api_error":
+	if !newErr.LocalError && newErr.OpenAIError.Type == "one_hub_error" || strings.HasSuffix(newErr.OpenAIError.Type, "_api_error") {
 		newErr.OpenAIError.Type = "system_error"
 		if utils.ContainsString(newErr.Message, quotaKeywords) {
 			newErr.Message = "上游负载已饱和，请稍后再试"
 			newErr.StatusCode = http.StatusTooManyRequests
 		}
+	}
+
+	if code, ok := newErr.OpenAIError.Code.(string); ok && code == "bad_response_status_code" && !strings.Contains(newErr.OpenAIError.Message, "bad response status code") {
+		newErr.OpenAIError.Message = fmt.Sprintf("Provider API error: bad response status code %s", newErr.OpenAIError.Param)
 	}
 
 	return newErr
