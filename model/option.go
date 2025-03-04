@@ -96,6 +96,9 @@ func InitOptionMap() {
 
 	config.OptionMap["AudioTokenJson"] = GetDefaultAudioRatio()
 
+	config.OptionMap["GeminiAPIEnabled"] = strconv.FormatBool(config.GeminiAPIEnabled)
+	config.OptionMap["ClaudeAPIEnabled"] = strconv.FormatBool(config.ClaudeAPIEnabled)
+
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -165,6 +168,8 @@ var optionBoolMap = map[string]*bool{
 	"DisplayInCurrencyEnabled":       &config.DisplayInCurrencyEnabled,
 	"MjNotifyEnabled":                &config.MjNotifyEnabled,
 	"GitHubOldIdCloseEnabled":        &config.GitHubOldIdCloseEnabled,
+	"GeminiAPIEnabled":               &config.GeminiAPIEnabled,
+	"ClaudeAPIEnabled":               &config.ClaudeAPIEnabled,
 }
 
 var optionStringMap = map[string]*string{

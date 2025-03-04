@@ -40,7 +40,9 @@ const OperationSetting = () => {
     RechargeDiscount: '',
     CFWorkerImageUrl: '',
     CFWorkerImageKey: '',
-    AudioTokenJson: ''
+    AudioTokenJson: '',
+    ClaudeAPIEnabled: '',
+    GeminiAPIEnabled: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -337,6 +339,16 @@ const OperationSetting = () => {
               sx={{ marginLeft: '0px' }}
               label={t('setting_index.operationSettings.otherSettings.mjNotify')}
               control={<Checkbox checked={inputs.MjNotifyEnabled === 'true'} onChange={handleInputChange} name="MjNotifyEnabled" />}
+            />
+            <FormControlLabel
+              sx={{ marginLeft: '0px' }}
+              label={t('setting_index.operationSettings.otherSettings.claudeAPIEnabled')}
+              control={<Checkbox checked={inputs.ClaudeAPIEnabled === 'true'} onChange={handleInputChange} name="ClaudeAPIEnabled" />}
+            />
+            <FormControlLabel
+              sx={{ marginLeft: '0px' }}
+              label={t('setting_index.operationSettings.otherSettings.geminiAPIEnabled')}
+              control={<Checkbox checked={inputs.GeminiAPIEnabled === 'true'} onChange={handleInputChange} name="GeminiAPIEnabled" />}
             />
           </Stack>
           <Stack spacing={2}>
