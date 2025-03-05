@@ -10,6 +10,7 @@ import (
 
 type DisableChannelKeyword struct {
 	AcMachines *goahocorasick.Machine
+	ready      bool
 	mutex      sync.RWMutex
 }
 
@@ -59,6 +60,7 @@ func (d *DisableChannelKeyword) Load(keywords string) {
 		machine := new(goahocorasick.Machine)
 		if err := machine.Build(patterns); err == nil {
 			d.AcMachines = machine
+			d.ready = true
 		} else {
 			logger.SysError("failed to build Aho-Corasick machine: " + err.Error())
 		}
@@ -66,6 +68,10 @@ func (d *DisableChannelKeyword) Load(keywords string) {
 }
 
 func (d *DisableChannelKeyword) IsContains(message string) bool {
+	if !d.ready {
+		return false
+	}
+
 	d.mutex.RLock()
 	defer d.mutex.RUnlock()
 
