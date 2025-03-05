@@ -40,7 +40,10 @@ const OperationSetting = () => {
     RechargeDiscount: '',
     CFWorkerImageUrl: '',
     CFWorkerImageKey: '',
-    AudioTokenJson: ''
+    AudioTokenJson: '',
+    ClaudeAPIEnabled: '',
+    GeminiAPIEnabled: '',
+    DisableChannelKeywords: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -203,6 +206,11 @@ const OperationSetting = () => {
           await updateOption('AudioTokenJson', inputs.AudioTokenJson);
         }
         break;
+      case 'DisableChannelKeywords':
+        if (originInputs.DisableChannelKeywords !== inputs.DisableChannelKeywords) {
+          await updateOption('DisableChannelKeywords', inputs.DisableChannelKeywords);
+        }
+        break;
     }
 
     showSuccess('保存成功！');
@@ -337,6 +345,16 @@ const OperationSetting = () => {
               sx={{ marginLeft: '0px' }}
               label={t('setting_index.operationSettings.otherSettings.mjNotify')}
               control={<Checkbox checked={inputs.MjNotifyEnabled === 'true'} onChange={handleInputChange} name="MjNotifyEnabled" />}
+            />
+            <FormControlLabel
+              sx={{ marginLeft: '0px' }}
+              label={t('setting_index.operationSettings.otherSettings.claudeAPIEnabled')}
+              control={<Checkbox checked={inputs.ClaudeAPIEnabled === 'true'} onChange={handleInputChange} name="ClaudeAPIEnabled" />}
+            />
+            <FormControlLabel
+              sx={{ marginLeft: '0px' }}
+              label={t('setting_index.operationSettings.otherSettings.geminiAPIEnabled')}
+              control={<Checkbox checked={inputs.GeminiAPIEnabled === 'true'} onChange={handleInputChange} name="GeminiAPIEnabled" />}
             />
           </Stack>
           <Stack spacing={2}>
@@ -678,6 +696,35 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.audioTokenSettings.save')}
+            </Button>
+          </Stack>
+        </Stack>
+      </SubCard>
+
+      <SubCard title={t('setting_index.operationSettings.disableChannelKeywordsSettings.title')}>
+        <Stack spacing={2}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControl fullWidth>
+              <TextField
+                multiline
+                maxRows={15}
+                id="disableChannelKeywords"
+                label={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
+                value={inputs.DisableChannelKeywords}
+                name="DisableChannelKeywords"
+                onChange={handleInputChange}
+                minRows={5}
+                placeholder={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
+                disabled={loading}
+              />
+            </FormControl>
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('DisableChannelKeywords').then();
+              }}
+            >
+              {t('setting_index.operationSettings.disableChannelKeywordsSettings.save')}
             </Button>
           </Stack>
         </Stack>

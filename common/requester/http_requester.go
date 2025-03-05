@@ -202,18 +202,30 @@ func HandleErrorResp(resp *http.Response, toOpenAIError HttpErrorHandler, isPref
 	defer resp.Body.Close()
 
 	if toOpenAIError != nil {
-		errorResponse := toOpenAIError(resp)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err == nil {
+			resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+			errorResponse := toOpenAIError(resp)
 
-		if errorResponse != nil && errorResponse.Message != "" {
-			openAIErrorWithStatusCode.OpenAIError = *errorResponse
-			if isPrefix {
-				openAIErrorWithStatusCode.OpenAIError.Message = fmt.Sprintf("Provider API error: %s", openAIErrorWithStatusCode.OpenAIError.Message)
+			if errorResponse != nil && errorResponse.Message != "" {
+				if strings.HasPrefix(errorResponse.Message, "当前分组") {
+					openAIErrorWithStatusCode.StatusCode = http.StatusTooManyRequests
+				}
+
+				openAIErrorWithStatusCode.OpenAIError = *errorResponse
+				if isPrefix {
+					openAIErrorWithStatusCode.OpenAIError.Message = fmt.Sprintf("Provider API error: %s", openAIErrorWithStatusCode.OpenAIError.Message)
+				}
+			}
+
+			// 如果 errorResponse 为 nil，并且响应体为JSON，则将响应体转换为字符串
+			if errorResponse == nil && strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
+				openAIErrorWithStatusCode.OpenAIError.Message = string(bodyBytes)
 			}
 		}
 	}
 
 	if openAIErrorWithStatusCode.OpenAIError.Message == "" {
-		openAIErrorWithStatusCode.OpenAIError.Message = fmt.Sprintf("Provider API error: bad response status code %d", resp.StatusCode)
 		if isPrefix {
 			openAIErrorWithStatusCode.OpenAIError.Message = fmt.Sprintf("Provider API error: bad response status code %d", resp.StatusCode)
 		} else {

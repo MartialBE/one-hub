@@ -122,6 +122,12 @@ var RequestInterval time.Duration
 var BatchUpdateEnabled = false
 var BatchUpdateInterval = 5
 
+// Gemini
+var GeminiAPIEnabled = true
+
+// Claude
+var ClaudeAPIEnabled = true
+
 const (
 	RoleGuestUser  = 0
 	RoleCommonUser = 1

@@ -3,11 +3,11 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/notify"
 	"one-api/model"
 	"one-api/types"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,19 +23,6 @@ func shouldEnableChannel(err error, openAIErr *types.OpenAIErrorWithStatusCode) 
 		return false
 	}
 	return true
-}
-
-var containsKeywords = []string{
-	"Your credit balance is too low",                        // claude
-	"This organization has been disabled.",                  // openai
-	"You exceeded your current quota",                       // openai
-	"Permission denied",                                     // gcp
-	"Quota exceeded for quota metric",                       // gemini
-	"API key not valid",                                     // gemini
-	"The security token included in the request is invalid", //AWS
-	"Operation not allowed",                                 //AWS
-	"Your account is not authorized",                        //AWS
-	"your account balance is insufficient",                  // siliconflow
 }
 
 func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode) bool {
@@ -68,14 +55,7 @@ func ShouldDisableChannel(channelType int, err *types.OpenAIErrorWithStatusCode)
 		return true
 	}
 
-	message := err.OpenAIError.Message
-	for _, keyword := range containsKeywords {
-		if strings.Contains(message, keyword) {
-			return true
-		}
-	}
-
-	return false
+	return common.DisableChannelKeywordsInstance.IsContains(err.OpenAIError.Message)
 }
 
 // disable & notify

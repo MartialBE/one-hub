@@ -641,7 +641,9 @@
         },
         "mjNotify": "Midjourney 允許回調（會洩露伺服器 IP 地址）",
         "saveButton": "保存其他設置",
-        "title": "其他設置"
+        "title": "其他設置",
+        "claudeAPIEnabled": "是否開啟Claude API",
+        "geminiAPIEnabled": "是否開啟Gemini API"
       },
       "paymentSettings": {
         "alert": "支付設置： <br />1. 美元匯率：用於計算充值金額的美元金額 <br />2. 最低充值金額（美元）：最低充值金額，單位為美元，填寫整數 <br />3. 頁面都以美元為單位計算，實際用戶支付的貨幣，按照支付網關設置的貨幣進行轉換 <br />例如： A 網關設置貨幣為 CNY，用戶支付 100 美元，那麼實際支付金額為 100 * 美元匯率 <br />B 網關設置貨幣為 USD，用戶支付 100 美元，那麼實際支付金額為 100 美元",
@@ -694,6 +696,11 @@
         "info": "配置音頻倍率。配置格式為JSON，鍵為模型名稱，值為輸入輸出令牌倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
         "save": "保留音頻權杖設置",
         "title": "音頻令牌設置"
+      },
+      "disableChannelKeywordsSettings": {
+        "info": "配置停用通道關鍵字，每行一個關鍵字。",
+        "save": "保留停用通道關鍵字設置",
+        "title": "停用通道關鍵詞設置"
       }
     },
     "otherSettings": {

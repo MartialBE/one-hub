@@ -525,6 +525,8 @@
       "otherSettings": {
         "title": "其他设置",
         "mjNotify": "Midjourney 允许回调（会泄露服务器ip地址）",
+        "claudeAPIEnabled": "是否开启Claude API",
+        "geminiAPIEnabled": "是否开启Gemini API",
         "alert": "当用户使用vision模型并提供了图片链接时，我们的服务器需要下载这些图片并计算 tokens。为了在下载图片时保护服务器的 IP 地址不被泄露，可以在下方配置一个代理。这个代理配置使用的是 HTTP 或 SOCKS5 代理。如果你是个人用户，这个配置可以不用理会。代理格式为 http://127.0.0.1:1080 或 socks5://127.0.0.1:1080",
         "chatImageRequestProxy": {
           "label": "图片检测代理",
@@ -615,6 +617,11 @@
         "title": "音频令牌设置",
         "info": "配置音频倍率. 配置格式为JSON，键为模型名称，值为输入输出令牌倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
         "save": "保存音频令牌设置"
+      },
+      "disableChannelKeywordsSettings": {
+        "title": "禁用通道关键词设置",
+        "info": "配置禁用通道关键词，每行一个关键词。",
+        "save": "保存禁用通道关键词设置"
       }
     },
     "systemSettings": {

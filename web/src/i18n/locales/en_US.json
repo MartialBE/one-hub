@@ -641,7 +641,9 @@
         },
         "mjNotify": "Midjourney allows callbacks (will expose server IP address)",
         "saveButton": "Save Other Settings",
-        "title": "Other Settings"
+        "title": "Other Settings",
+        "claudeAPIEnabled": "Enable Claude API?",
+        "geminiAPIEnabled": "Enable Gemini API?"
       },
       "paymentSettings": {
         "alert": "Payment Settings: <br />1. USD Exchange Rate: Used to calculate the amount of recharge in USD <br />2. Minimum Recharge Amount (USD): Minimum recharge amount, in USD, enter an integer <br />3. All pages are calculated in USD, and the actual currency paid by the user is converted according to the currency set by the payment gateway <br />For example: A gateway sets the currency as CNY, the user pays 100 USD, then the actual payment amount is 100 * USD exchange rate <br />B gateway sets the currency as USD, the user pays 100 USD, then the actual payment amount is 100 USD",
@@ -694,6 +696,11 @@
         "info": "Configure audio rates. The configuration format is JSON, with keys as model names and values as input-output token rates. For example: {\"gpt-4o-audio-preview\": {\"input_audio_tokens_ratio\": 40, \"output_audio_tokens_ratio\": 20}, \"gpt-4o-mini-audio-preview\": {\"input_audio_tokens_ratio\": 67, \"output_audio_tokens_ratio\": 34}}",
         "save": "Save audio token settings",
         "title": "Audio token settings"
+      },
+      "disableChannelKeywordsSettings": {
+        "info": "Disable channel keywords, one keyword per line.",
+        "save": "Save disabled channel keyword settings",
+        "title": "Disable channel keyword settings"
       }
     },
     "otherSettings": {
