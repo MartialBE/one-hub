@@ -53,7 +53,7 @@ func Relay(c *gin.Context) {
 		// 冻结通道
 		shouldCooldowns(c, channel, apiErr)
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
-			continue
+			break
 		}
 
 		channel = relay.getProvider().GetChannel()
