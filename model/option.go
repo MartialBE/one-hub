@@ -101,6 +101,8 @@ func InitOptionMap() {
 
 	config.OptionMap["DisableChannelKeywords"] = common.GetDefaultDisableChannelKeywords()
 
+	config.OptionMap["RetryTimeOut"] = strconv.Itoa(config.RetryTimeOut)
+
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -150,6 +152,7 @@ var optionIntMap = map[string]*int{
 	"RetryCooldownSeconds": &config.RetryCooldownSeconds,
 	"PaymentMinAmount":     &config.PaymentMinAmount,
 	"OldTokenMaxId":        &config.OldTokenMaxId,
+	"RetryTimeOut":         &config.RetryTimeOut,
 }
 
 var optionBoolMap = map[string]*bool{

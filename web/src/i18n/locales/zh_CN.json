@@ -517,6 +517,10 @@
           "label": "重试间隔(秒)",
           "placeholder": "重试间隔(秒)"
         },
+        "retryTimeOut": {
+          "label": "重试超时时间(秒)",
+          "placeholder": "重试超时时间(秒)"
+        },
         "displayInCurrency": "以货币形式显示额度",
         "displayTokenStat": "Billing 相关 API 显示令牌额度而非用户额度",
         "approximateToken": "使用近似的方式估算 token 数以减少计算量",
