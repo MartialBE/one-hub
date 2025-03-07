@@ -281,7 +281,10 @@
       "original_output_price": "Original output price: ${{ price }} /M",
       "original_times_price": "Original price: ${{ times }} per time",
       "output_price": "Output: ${{ price }} /M",
-      "times_price": "${{ times }} / time"
+      "times_price": "${{ times }} / time",
+      "free": "Free",
+      "old_log": "old version log",
+      "illustrate": "* This record is the log recorded before the system upgrade"
     },
     "cachedReadTokens": "Cache read Tokens",
     "cachedWriteTokens": "Write tokens to cache (* {{ ratio }})"

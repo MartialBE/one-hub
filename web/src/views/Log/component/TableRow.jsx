@@ -289,9 +289,27 @@ function calculateTokens(item) {
 
 function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
   if (!item?.metadata?.input_ratio) {
-    return item.content;
+    let free = false;
+    if (item.quota === 0) {
+      free = true;
+    }
+    const tips = (
+      <>
+        <MetadataTypography>{item.content}</MetadataTypography>
+        {item.quota !== 0 && <MetadataTypography>{t('logPage.content.illustrate')}</MetadataTypography>}
+        <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
+      </>
+    );
+    return (
+      <Tooltip title={tips} placement="top" arrow>
+        <Stack direction="column" spacing={0.3}>
+          <Label color={free ? 'success' : 'secondary'} variant="soft">
+            {free ? t('logPage.content.free') : t('logPage.content.old_log')}
+          </Label>
+        </Stack>
+      </Tooltip>
+    );
   }
-
   const groupDiscount = item?.metadata?.group_ratio || 1;
 
   const priceType = item?.metadata?.price_type;
