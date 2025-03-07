@@ -463,7 +463,7 @@ const typeConfig = {
     },
     prompt: {
       key: '密钥信息请参考https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens',
-      base_url: 'https://models.github.ai/inference'
+      base_url: 'https://models.inference.ai.azure.com'
     },
     modelGroup: 'Github'
   },
