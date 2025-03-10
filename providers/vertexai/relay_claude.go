@@ -81,8 +81,10 @@ func (p *VertexAIProvider) getClaudeRequest(request *claude.ClaudeRequest) (*htt
 		headers["Accept"] = "text/event-stream"
 	}
 
+	copyRequest := *request
+
 	vertexaiRequest := &category.ClaudeRequest{
-		ClaudeRequest:    request,
+		ClaudeRequest:    &copyRequest,
 		AnthropicVersion: category.AnthropicVersion,
 	}
 	vertexaiRequest.Model = ""

@@ -234,7 +234,10 @@
       "original_output_price": "原输出价格: ${{ price }} /M",
       "original_times_price": "原价格: ${{ times }} / 次",
       "calculate_steps": "计算步骤: ",
-      "calculate_steps_tip": "PS：本系统按照积分计算，所有金额均为积分换算而来，1积分=$0.000002，最低消费为1积分，本计算步骤仅供参考，以实际扣费为准"
+      "calculate_steps_tip": "PS：本系统按照积分计算，所有金额均为积分换算而来，1积分=$0.000002，最低消费为1积分，本计算步骤仅供参考，以实际扣费为准",
+      "free": "免费",
+      "old_log": "旧版记录",
+      "illustrate": "* 本条记录为系统升级前所记录的log"
     }
   },
   "redemptionPage": {
@@ -516,6 +519,10 @@
         "retryCooldownSeconds": {
           "label": "重试间隔(秒)",
           "placeholder": "重试间隔(秒)"
+        },
+        "retryTimeOut": {
+          "label": "重试超时时间(秒)",
+          "placeholder": "重试超时时间(秒)"
         },
         "displayInCurrency": "以货币形式显示额度",
         "displayTokenStat": "Billing 相关 API 显示令牌额度而非用户额度",

@@ -282,7 +282,10 @@
       "original_output_price": "原輸出價格: ${{ price }} /M",
       "original_times_price": "原價格: ${{ times }} / 次",
       "output_price": "輸出: ${{ price }} /M",
-      "times_price": "${{ times }} / 次"
+      "times_price": "${{ times }} / 次",
+      "free":"免費",
+      "old_log": "舊版log",
+      "illustrate": "* 本筆記錄為系統升級前所記錄的log"
     },
     "cachedReadTokens": "緩存讀取Tokens",
     "cachedWriteTokens": "緩存寫入 Tokens"

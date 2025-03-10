@@ -281,7 +281,10 @@
       "original_output_price": "元の出力価格：${{ price }}/M",
       "original_times_price": "元の価格：${{ times }} / 回",
       "output_price": "出力: ${{ price }} /M",
-      "times_price": "${{ times }} / 回"
+      "times_price": "${{ times }} / 回",
+      "free": "無料",
+      "old_log": "旧バージョンのログ",
+      "illustrate": "* この記録はシステムアップグレード前のログであり"
     },
     "cachedReadTokens": "キャッシュからトークンを読み取ります（* {{ ratio }} )",
     "cachedWriteTokens": "トークンのキャッシュ書き込み（* {{ ratio }} ）"

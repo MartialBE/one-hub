@@ -3,16 +3,17 @@ package alipay
 import (
 	"context"
 	"fmt"
-	"github.com/smartwalle/alipay/v3"
 	"net/http"
 	"net/url"
 	sysconfig "one-api/common/config"
 	"one-api/payment/types"
 	"strconv"
+
+	"github.com/smartwalle/alipay/v3"
 )
 
 // handleTradePreCreate 处理支付宝当面付请求
-func (a *Alipay) handleTradePreCreate(config *types.PayConfig, alipayConfig *AlipayConfig) (*types.PayRequest, error) {
+func (a *Alipay) handleTradePreCreate(config *types.PayConfig) (*types.PayRequest, error) {
 	var p = alipay.TradePreCreate{}
 	p.OutTradeNo = config.TradeNo
 	p.TotalAmount = strconv.FormatFloat(config.Money, 'f', 2, 64)
@@ -23,7 +24,7 @@ func (a *Alipay) handleTradePreCreate(config *types.PayConfig, alipayConfig *Ali
 	ctx := context.Background()
 	alipayRes, err := client.TradePreCreate(ctx, p)
 	if err != nil {
-		return nil, fmt.Errorf("alipay trade precreate failed: %s", alipayRes.Msg)
+		return nil, fmt.Errorf("alipay trade precreate failed: %s", err.Error())
 	}
 	if !alipayRes.IsSuccess() {
 		return nil, fmt.Errorf("alipay trade precreate failed: %s", alipayRes.Msg)
@@ -42,7 +43,7 @@ func (a *Alipay) handleTradePreCreate(config *types.PayConfig, alipayConfig *Ali
 }
 
 // handlePagePay 处理支付宝网页支付请求
-func (a *Alipay) handlePagePay(config *types.PayConfig, alipayConfig *AlipayConfig) (*types.PayRequest, error) {
+func (a *Alipay) handlePagePay(config *types.PayConfig) (*types.PayRequest, error) {
 	var p = alipay.TradePagePay{}
 	p.OutTradeNo = config.TradeNo
 	p.TotalAmount = strconv.FormatFloat(config.Money, 'f', 2, 64)
@@ -71,7 +72,7 @@ func (a *Alipay) handlePagePay(config *types.PayConfig, alipayConfig *AlipayConf
 }
 
 // handlePagePay 处理支付宝手机网页支付请求
-func (a *Alipay) handleWapPay(config *types.PayConfig, alipayConfig *AlipayConfig) (*types.PayRequest, error) {
+func (a *Alipay) handleWapPay(config *types.PayConfig) (*types.PayRequest, error) {
 	var p = alipay.TradeWapPay{}
 	p.OutTradeNo = config.TradeNo
 	p.TotalAmount = strconv.FormatFloat(config.Money, 'f', 2, 64)

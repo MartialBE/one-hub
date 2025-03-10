@@ -52,11 +52,11 @@ func (a *Alipay) Pay(config *types.PayConfig, gatewayConfig string) (*types.PayR
 
 	switch alipayConfig.PayType {
 	case PagePay:
-		return a.handlePagePay(config, alipayConfig)
+		return a.handlePagePay(config)
 	case WapPay:
-		return a.handleWapPay(config, alipayConfig)
+		return a.handleWapPay(config)
 	default:
-		return a.handleTradePreCreate(config, alipayConfig)
+		return a.handleTradePreCreate(config)
 	}
 }
 

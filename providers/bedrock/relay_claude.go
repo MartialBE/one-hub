@@ -85,8 +85,10 @@ func (p *BedrockProvider) getClaudeRequest(request *claude.ClaudeRequest) (*http
 		return nil, common.StringErrorWrapperLocal("bedrock config error", "invalid_bedrock_config", http.StatusInternalServerError)
 	}
 
+	copyRequest := *request
+
 	bedrockRequest := &category.ClaudeRequest{
-		ClaudeRequest:    request,
+		ClaudeRequest:    &copyRequest,
 		AnthropicVersion: category.AnthropicVersion,
 	}
 	bedrockRequest.Model = ""

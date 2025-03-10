@@ -11,6 +11,7 @@ import (
 	"one-api/model"
 	"one-api/relay/relay_util"
 	"one-api/types"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,11 +50,20 @@ func Relay(c *gin.Context) {
 		retryTimes = 0
 	}
 
+	startTime := c.GetTime("requestStartTime")
+	timeout := time.Duration(config.RetryTimeOut) * time.Second
+
 	for i := retryTimes; i > 0; i-- {
 		// 冻结通道
 		shouldCooldowns(c, channel, apiErr)
+
+		if time.Since(startTime) > timeout {
+			apiErr = common.StringErrorWrapperLocal("重试超时，上游负载已饱和，请稍后再试", "system_error", http.StatusTooManyRequests)
+			break
+		}
+
 		if err := relay.setProvider(relay.getOriginalModel()); err != nil {
-			continue
+			break
 		}
 
 		channel = relay.getProvider().GetChannel()
