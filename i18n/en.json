@@ -753,7 +753,7 @@
   "用户": "User",
   "令牌": "Token",
   "耗时": "Duration",
-  "t/s：输出令牌的数量除以总生成时间，表示生成速度": "Generation speed (t/s): The number of output tokens divided by the total generation time.",
+  "t/s：输出Token的数量除以总生成时间，表示生成速度": "Generation speed (t/s): The number of output tokens divided by the total generation time.",
   "输入": "Input",
   "输出": "Output",
   "额度": "Quota",
