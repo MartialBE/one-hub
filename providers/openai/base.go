@@ -124,7 +124,8 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 			requestURL += fmt.Sprintf("?model=%s", modelName)
 		}
 
-		return fmt.Sprintf("%s%s", baseURL, requestURL)
+		//return fmt.Sprintf("%s%s", baseURL, requestURL)
+		return BuildFullURL(baseURL, requestURL)
 	}
 
 	if p.IsAzure {
