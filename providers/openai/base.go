@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/model"
 	"one-api/types"
+	"path"
+	"regexp"
 	"strings"
 
 	"one-api/providers/base"
@@ -121,7 +124,8 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 			requestURL += fmt.Sprintf("?model=%s", modelName)
 		}
 
-		return fmt.Sprintf("%s%s", baseURL, requestURL)
+		//return fmt.Sprintf("%s%s", baseURL, requestURL)
+		return BuildFullURL(baseURL, requestURL)
 	}
 
 	if p.IsAzure {
@@ -190,4 +194,48 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 	}
 
 	return req, nil
+}
+
+func BuildFullURL(baseURLStr, requestURLStr string) string {
+	base, err := url.Parse(baseURLStr)
+	if err != nil {
+		return ""
+	}
+
+	// 解析请求URL（分离路径和查询参数）
+	req, err := url.ParseRequestURI(requestURLStr)
+	if err != nil {
+		return ""
+	}
+
+	// 核心逻辑：检查路径中是否包含版本号段（如v3）
+	versionSegmentRegex := regexp.MustCompile(`^v\d+$`)
+	segments := strings.Split(strings.Trim(base.Path, "/"), "/")
+	hasVersion := false
+	for _, seg := range segments {
+		if versionSegmentRegex.MatchString(seg) {
+			hasVersion = true
+			break
+		}
+	}
+
+	requestPath := req.Path
+	if hasVersion {
+		// 移除requestURL开头的版本号（如/v1）
+		requestPath = regexp.MustCompile(`^/v\d+`).ReplaceAllString(requestPath, "")
+	}
+
+	// 智能合并路径
+	base.Path = path.Join(base.Path, strings.TrimPrefix(requestPath, "/"))
+
+	// 保留原始查询参数
+	if req.RawQuery != "" {
+		if base.RawQuery == "" {
+			base.RawQuery = req.RawQuery
+		} else {
+			base.RawQuery += "&" + req.RawQuery
+		}
+	}
+
+	return base.String()
 }
