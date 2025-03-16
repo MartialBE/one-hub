@@ -161,6 +161,7 @@ func UpdateChannelsTag(tag string, channel *Channel) error {
 			Group:        channel.Group,
 			Tag:          channel.Tag,
 			ModelMapping: channel.ModelMapping,
+			ModelHeaders: channel.ModelHeaders,
 			Proxy:        channel.Proxy,
 			TestModel:    channel.TestModel,
 			OnlyChat:     channel.OnlyChat,
