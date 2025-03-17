@@ -55,7 +55,7 @@ type OpenAIError struct {
 	Code       any    `json:"code,omitempty"`
 	Message    string `json:"message"`
 	Param      string `json:"param,omitempty"`
-	Type       string `json:"type"`
+	Type       string `json:"type,omitempty"`
 	InnerError any    `json:"innererror,omitempty"`
 }
 

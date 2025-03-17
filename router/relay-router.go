@@ -35,6 +35,7 @@ func setOpenAIRouter(router *gin.Engine) {
 	{
 		relayV1Router.POST("/completions", relay.Relay)
 		relayV1Router.POST("/chat/completions", relay.Relay)
+		relayV1Router.POST("/responses", relay.Relay)
 		// relayV1Router.POST("/edits", controller.Relay)
 		relayV1Router.POST("/images/generations", relay.Relay)
 		relayV1Router.POST("/images/edits", relay.Relay)
