@@ -19,7 +19,7 @@ type GeminiRelayStreamHandler struct {
 }
 
 func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiChatResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	req, errWithCode := p.getChatRequest(request, true)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -39,7 +39,7 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 }
 
 func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	req, errWithCode := p.getChatRequest(request, true)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}

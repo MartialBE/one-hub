@@ -40,7 +40,7 @@ func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		return nil, errWithCode
 	}
 
-	req, errWithCode := p.getChatRequest(geminiRequest)
+	req, errWithCode := p.getChatRequest(geminiRequest, false)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -68,7 +68,7 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		return nil, errWithCode
 	}
 
-	req, errWithCode := p.getChatRequest(geminiRequest)
+	req, errWithCode := p.getChatRequest(geminiRequest, false)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -92,7 +92,7 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerStream)
 }
 
-func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRelay bool) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url := "generateContent"
 	if geminiRequest.Stream {
 		url = "streamGenerateContent?alt=sse"
@@ -106,10 +106,16 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http
 		headers["Accept"] = "text/event-stream"
 	}
 
-	p.pluginHandle(geminiRequest)
+	var body any
+	if isRelay {
+		body = p.Context.Request.Body
+	} else {
+		p.pluginHandle(geminiRequest)
+		body = geminiRequest
+	}
 
 	// 创建请求
-	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(geminiRequest), p.Requester.WithHeader(headers))
+	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(body), p.Requester.WithHeader(headers))
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
