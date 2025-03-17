@@ -52,6 +52,7 @@ type ChatCompletionMessage struct {
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ToolCallID       string                           `json:"tool_call_id,omitempty"`
 	Audio            any                              `json:"audio,omitempty"`
+	Annotations      any                              `json:"annotations,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -216,7 +217,14 @@ type ChatCompletionRequest struct {
 	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
 	Prediction          any                           `json:"prediction,omitempty"`
 
+	WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
+
 	OneOtherArg string `json:"-"`
+}
+
+type WebSearchOptions struct {
+	SearchContextSize string `json:"search_context_size,omitempty"`
+	UserLocation      any    `json:"user_location,omitempty"`
 }
 
 func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {
