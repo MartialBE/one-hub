@@ -183,7 +183,7 @@ func (g *GeminiFunctionCall) ToOpenAITool() *types.ChatCompletionToolCalls {
 
 type GeminiChatContent struct {
 	Role  string       `json:"role,omitempty"`
-	Parts []GeminiPart `json:"parts"`
+	Parts []GeminiPart `json:"parts,omitempty"`
 }
 
 type GeminiChatSafetySettings struct {

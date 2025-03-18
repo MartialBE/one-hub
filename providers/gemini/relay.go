@@ -95,13 +95,13 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		return
 	}
 
-	if geminiResponse.UsageMetadata == nil || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
+	if geminiResponse.UsageMetadata == nil || (len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil) {
 		dataChan <- rawStr
 		return
 	}
 
 	lastType := "text"
-	if geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
+	if len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
 		lastType = "code"
 	}
 	if h.LastType != lastType {
