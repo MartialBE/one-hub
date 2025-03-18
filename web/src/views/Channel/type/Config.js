@@ -437,7 +437,7 @@ const typeConfig = {
   },
   45: {
     input: {
-      base_url: 'https://api.siliconflow.cn',
+      base_url: '',
       models: ['black-forest-labs/FLUX.1-dev', 'black-forest-labs/FLUX.1-schnell']
     },
     inputLabel: {
