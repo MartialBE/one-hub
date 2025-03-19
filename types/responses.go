@@ -139,5 +139,8 @@ func (u *ResponsesUsage) ToOpenAIUsage() *Usage {
 		CompletionTokensDetails: CompletionTokensDetails{
 			ReasoningTokens: u.OutputTokensDetails.ReasoningTokens,
 		},
+		PromptTokensDetails: PromptTokensDetails{
+			CachedTokens: u.InputTokensDetails.CachedTokens,
+		},
 	}
 }
