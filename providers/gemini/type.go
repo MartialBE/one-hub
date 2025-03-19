@@ -1,14 +1,29 @@
 package gemini
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"one-api/common"
 	"one-api/common/image"
+	"one-api/common/storage"
 	"one-api/common/utils"
 	"one-api/types"
+	"regexp"
 	"strings"
+
+	goahocorasick "github.com/anknown/ahocorasick"
 )
+
+const GeminiImageSymbol = "![one-hub-gemini-image]"
+
+var ImageSymbolAcMachines = &goahocorasick.Machine{}
+var imageRegex = regexp.MustCompile(`\!\[one-hub-gemini-image\]\((.*?)\)`)
+
+func init() {
+	ImageSymbolAcMachines.Build([][]rune{[]rune(GeminiImageSymbol)})
+}
 
 type GeminiChatRequest struct {
 	Model             string                     `json:"-"`
@@ -86,6 +101,26 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 			}
 			isTools = true
 			choice.Delta.ToolCalls = append(choice.Delta.ToolCalls, part.FunctionCall.ToOpenAITool())
+		} else if part.InlineData != nil {
+			if strings.HasPrefix(part.InlineData.MimeType, "image/") {
+				choice.Delta.Image = types.MultimediaData{
+					Data: part.InlineData.Data,
+				}
+				url := ""
+				imageData, err := base64.StdEncoding.DecodeString(part.InlineData.Data)
+				if err == nil {
+					url = storage.Upload(imageData, utils.GetUUID()+".png")
+				}
+				if url == "" {
+					url = "image upload err"
+				}
+				content = append(content, fmt.Sprintf("%s(%s)", GeminiImageSymbol, url))
+			}
+			//  else if strings.HasPrefix(part.InlineData.MimeType, "audio/") {
+			// 	choice.Message.Audio = types.MultimediaData{
+			// 		Data: part.InlineData.Data,
+			// 	}
+			// }
 		} else {
 			if part.ExecutableCode != nil {
 				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
@@ -135,6 +170,26 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 			}
 			useTools = true
 			choice.Message.ToolCalls = append(choice.Message.ToolCalls, part.FunctionCall.ToOpenAITool())
+		} else if part.InlineData != nil {
+			if strings.HasPrefix(part.InlineData.MimeType, "image/") {
+				choice.Message.Image = types.MultimediaData{
+					Data: part.InlineData.Data,
+				}
+				url := ""
+				imageData, err := base64.StdEncoding.DecodeString(part.InlineData.Data)
+				if err == nil {
+					url = storage.Upload(imageData, utils.GetUUID()+".png")
+				}
+				if url == "" {
+					url = "image upload err"
+				}
+				content = append(content, fmt.Sprintf("%s(%s)", GeminiImageSymbol, url))
+			}
+			//  else if strings.HasPrefix(part.InlineData.MimeType, "audio/") {
+			// 	choice.Message.Audio = types.MultimediaData{
+			// 		Data: part.InlineData.Data,
+			// 	}
+			// }
 		} else {
 			if part.ExecutableCode != nil {
 				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
@@ -237,6 +292,7 @@ type GeminiChatResponse struct {
 	Candidates     []GeminiChatCandidate    `json:"candidates"`
 	PromptFeedback GeminiChatPromptFeedback `json:"promptFeedback"`
 	UsageMetadata  *GeminiUsageMetadata     `json:"usageMetadata,omitempty"`
+	ModelVersion   string                   `json:"modelVersion,omitempty"`
 	Model          string                   `json:"model,omitempty"`
 	GeminiErrorResponse
 }
@@ -245,7 +301,9 @@ type GeminiUsageMetadata struct {
 	PromptTokenCount        int `json:"promptTokenCount"`
 	CandidatesTokenCount    int `json:"candidatesTokenCount"`
 	TotalTokenCount         int `json:"totalTokenCount"`
-	CachedContentTokenCount int `json:"cachedContentTokenCount"`
+	CachedContentTokenCount int `json:"cachedContentTokenCount,omitempty"`
+	PromptTokensDetails     any `json:"promptTokensDetails,omitempty"`
+	CandidatesTokensDetails any `json:"candidatesTokensDetails,omitempty"`
 }
 
 type GeminiChatCandidate struct {
@@ -256,6 +314,7 @@ type GeminiChatCandidate struct {
 	CitationMetadata      any                      `json:"citationMetadata,omitempty"`
 	TokenCount            int                      `json:"tokenCount,omitempty"`
 	GroundingAttributions []any                    `json:"groundingAttributions,omitempty"`
+	AvgLogprobs           any                      `json:"avgLogprobs,omitempty"`
 }
 
 type GeminiChatSafetyRating struct {
@@ -349,6 +408,39 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 			imageNum := 0
 			for _, openaiPart := range openaiMessagePart {
 				if openaiPart.Type == types.ContentTypeText {
+					imageSymbols := ImageSymbolAcMachines.MultiPatternSearch([]rune(openaiPart.Text), false)
+					if len(imageSymbols) > 0 {
+						textRunes := []rune(openaiPart.Text)
+						geminiImageSymbolRunesLen := len([]rune(GeminiImageSymbol))
+						// 提取图片地址
+						for _, match := range imageSymbols {
+							pos := match.Pos + geminiImageSymbolRunesLen
+
+							if pos < len(textRunes) && textRunes[pos] == '(' {
+								endPos := -1
+								for i := pos + 1; i < len(textRunes); i++ {
+									if textRunes[i] == ')' {
+										endPos = i
+										break
+									}
+								}
+								if endPos > 0 {
+									imageUrl := string(textRunes[pos+1 : endPos])
+									// 处理图片URL
+									mimeType, data, err := image.GetImageFromUrl(imageUrl)
+									if err == nil {
+										content.Parts = append(content.Parts, GeminiPart{
+											InlineData: &GeminiInlineData{
+												MimeType: mimeType,
+												Data:     data,
+											},
+										})
+									}
+								}
+							}
+						}
+					}
+
 					content.Parts = append(content.Parts, GeminiPart{
 						Text: openaiPart.Text,
 					})
