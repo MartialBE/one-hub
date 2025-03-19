@@ -96,6 +96,7 @@ storage: # 存储设置 (可选,主要用于图片生成，有些供应商不提
     bucketName: "" # Bucket名称，比如zerodeng-superai
     accessKeyId: "" # accessKeyId
     accessKeySecret: "" # accessKeySecret
+    expirationDays: 3
 
 metrics:
   user: "" # metrics 用户名
