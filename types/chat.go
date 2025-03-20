@@ -53,7 +53,7 @@ type ChatCompletionMessage struct {
 	ToolCallID       string                           `json:"tool_call_id,omitempty"`
 	Audio            any                              `json:"audio,omitempty"`
 	Annotations      any                              `json:"annotations,omitempty"`
-	Image            any                              `json:"image,omitempty"`
+	Image            []MultimediaData                 `json:"image,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -400,7 +400,7 @@ type ChatCompletionStreamChoiceDelta struct {
 	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
-	Image            any                              `json:"image,omitempty"`
+	Image            []MultimediaData                 `json:"image,omitempty"`
 }
 
 func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {

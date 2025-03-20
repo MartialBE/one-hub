@@ -93,6 +93,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 
 	var content []string
 	isTools := false
+	images := make([]types.MultimediaData, 0)
 
 	for _, part := range candidate.Content.Parts {
 		if part.FunctionCall != nil {
@@ -103,9 +104,9 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 			choice.Delta.ToolCalls = append(choice.Delta.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else if part.InlineData != nil {
 			if strings.HasPrefix(part.InlineData.MimeType, "image/") {
-				choice.Delta.Image = types.MultimediaData{
+				images = append(images, types.MultimediaData{
 					Data: part.InlineData.Data,
-				}
+				})
 				url := ""
 				imageData, err := base64.StdEncoding.DecodeString(part.InlineData.Data)
 				if err == nil {
@@ -130,6 +131,10 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 				content = append(content, part.Text)
 			}
 		}
+	}
+
+	if len(images) > 0 {
+		choice.Delta.Image = images
 	}
 
 	choice.Delta.Content = strings.Join(content, "\n")
@@ -162,6 +167,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 
 	var content []string
 	useTools := false
+	images := make([]types.MultimediaData, 0)
 
 	for _, part := range candidate.Content.Parts {
 		if part.FunctionCall != nil {
@@ -172,9 +178,10 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 			choice.Message.ToolCalls = append(choice.Message.ToolCalls, part.FunctionCall.ToOpenAITool())
 		} else if part.InlineData != nil {
 			if strings.HasPrefix(part.InlineData.MimeType, "image/") {
-				choice.Message.Image = types.MultimediaData{
+
+				images = append(images, types.MultimediaData{
 					Data: part.InlineData.Data,
-				}
+				})
 				url := ""
 				imageData, err := base64.StdEncoding.DecodeString(part.InlineData.Data)
 				if err == nil {
@@ -202,6 +209,10 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 	}
 
 	choice.Message.Content = strings.Join(content, "\n")
+
+	if len(images) > 0 {
+		choice.Message.Image = images
+	}
 
 	if useTools {
 		choice.FinishReason = types.FinishReasonToolCalls
@@ -410,10 +421,21 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 				if openaiPart.Type == types.ContentTypeText {
 					imageSymbols := ImageSymbolAcMachines.MultiPatternSearch([]rune(openaiPart.Text), false)
 					if len(imageSymbols) > 0 {
+						lastEndPos := 0 // 上一段文本的结束位置
 						textRunes := []rune(openaiPart.Text)
 						geminiImageSymbolRunesLen := len([]rune(GeminiImageSymbol))
 						// 提取图片地址
 						for _, match := range imageSymbols {
+							// 添加图片符号前面的文本，如果不为空且不仅包含换行符
+							if match.Pos > lastEndPos {
+								textSegment := string(textRunes[lastEndPos:match.Pos])
+								if !isEmptyOrOnlyNewlines(textSegment) {
+									content.Parts = append(content.Parts, GeminiPart{
+										Text: textSegment,
+									})
+								}
+							}
+
 							pos := match.Pos + geminiImageSymbolRunesLen
 
 							if pos < len(textRunes) && textRunes[pos] == '(' {
@@ -436,14 +458,26 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 											},
 										})
 									}
+									lastEndPos = endPos + 1
+								}
+							}
+
+							// 添加最后一个图片符号后面的文本，如果不为空且不仅包含换行符
+							if lastEndPos < len(textRunes) {
+								finalText := string(textRunes[lastEndPos:])
+								if !isEmptyOrOnlyNewlines(finalText) {
+									content.Parts = append(content.Parts, GeminiPart{
+										Text: finalText,
+									})
 								}
 							}
 						}
+					} else {
+						content.Parts = append(content.Parts, GeminiPart{
+							Text: openaiPart.Text,
+						})
 					}
 
-					content.Parts = append(content.Parts, GeminiPart{
-						Text: openaiPart.Text,
-					})
 				} else if openaiPart.Type == types.ContentTypeImageURL {
 					imageNum += 1
 					if imageNum > GeminiVisionMaxImageNum {
@@ -537,4 +571,9 @@ type GeminiImagePrediction struct {
 	MimeType           string `json:"mimeType"`
 	RaiFilteredReason  string `json:"raiFilteredReason,omitempty"`
 	SafetyAttributes   any    `json:"safetyAttributes,omitempty"`
+}
+
+func isEmptyOrOnlyNewlines(s string) bool {
+	trimmed := strings.TrimSpace(s)
+	return trimmed == ""
 }
