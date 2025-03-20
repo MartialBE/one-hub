@@ -271,6 +271,7 @@
     "totalOutputTokens": "Total output tokens",
     "typeLabel": "タイプ",
     "userLabel": "ユーザー",
+    "sourceIp": "Source IP",
     "content": {
       "calculate_steps": "計算手順:",
       "calculate_steps_tip": "PS：このシステムはポイントに基づいて計算され、すべての金額はポイント換算であり、1ポイント＝$0.000002です。最低消費額は1ポイントであり、この計算手順は参考用として提供されます。実際の料金が優先されます。",
@@ -871,7 +872,8 @@
     "taskIdPlaceholder": "タスクID",
     "tokenName": "トークン名",
     "type": "タイプ",
-    "username": "ユーザー名"
+    "username": "ユーザー名",
+    "sourceIp": "Source IP"
   },
   "task": "非同期タスク",
   "taskPage": {

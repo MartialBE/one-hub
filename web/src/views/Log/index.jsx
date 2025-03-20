@@ -32,7 +32,8 @@ export default function Log() {
     start_timestamp: 0,
     end_timestamp: dayjs().unix() + 3600,
     log_type: 0,
-    channel_id: ''
+    channel_id: '',
+    source_ip: ''
   };
 
   const [page, setPage] = useState(0);
@@ -220,6 +221,11 @@ export default function Log() {
                   {
                     id: 'quota',
                     label: t('logPage.quotaLabel'),
+                    disableSort: true
+                  },
+                  {
+                    id: 'source_ip',
+                    label: t('logPage.sourceIp'),
                     disableSort: true
                   },
                   {
