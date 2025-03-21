@@ -40,7 +40,7 @@ func (p *GeminiProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		return nil, errWithCode
 	}
 
-	req, errWithCode := p.getChatRequest(geminiRequest)
+	req, errWithCode := p.getChatRequest(geminiRequest, false)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -68,7 +68,7 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		return nil, errWithCode
 	}
 
-	req, errWithCode := p.getChatRequest(geminiRequest)
+	req, errWithCode := p.getChatRequest(geminiRequest, false)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -89,10 +89,10 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		key: channel.Key,
 	}
 
-	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerStream)
+	return requester.RequestStream(p.Requester, resp, chatHandler.HandlerStream)
 }
 
-func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
+func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRelay bool) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url := "generateContent"
 	if geminiRequest.Stream {
 		url = "streamGenerateContent?alt=sse"
@@ -106,10 +106,16 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest) (*http
 		headers["Accept"] = "text/event-stream"
 	}
 
-	p.pluginHandle(geminiRequest)
+	var body any
+	if isRelay {
+		body = p.Context.Request.Body
+	} else {
+		p.pluginHandle(geminiRequest)
+		body = geminiRequest
+	}
 
 	// 创建请求
-	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(geminiRequest), p.Requester.WithHeader(headers))
+	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(body), p.Requester.WithHeader(headers))
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
 	}
@@ -151,10 +157,15 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			},
 		},
 		GenerationConfig: GeminiChatGenerationConfig{
-			Temperature:     request.Temperature,
-			TopP:            request.TopP,
-			MaxOutputTokens: request.MaxTokens,
+			Temperature:        request.Temperature,
+			TopP:               request.TopP,
+			MaxOutputTokens:    request.MaxTokens,
+			ResponseModalities: request.Modalities,
 		},
+	}
+
+	if strings.HasPrefix(request.Model, "gemini-2.0-flash-exp") {
+		geminiRequest.GenerationConfig.ResponseModalities = []string{"Text", "Image"}
 	}
 
 	functions := request.GetFunctions()
@@ -370,12 +381,12 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 	}
 
 	// 和ExecutableCode的tokens共用，所以跳过
-	if geminiResponse.UsageMetadata == nil || len(geminiResponse.Candidates) == 0 || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
+	if geminiResponse.UsageMetadata == nil || len(geminiResponse.Candidates) == 0 || (len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil) {
 		return
 	}
 
 	lastType := "text"
-	if geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
+	if len(geminiResponse.Candidates) > 0 && len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
 		lastType = "code"
 	}
 

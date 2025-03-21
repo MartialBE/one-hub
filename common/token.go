@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -145,6 +146,96 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string, pr
 			tokenNum += GetTokenNum(tokenEncoder, *message.Name)
 		}
 	}
+	tokenNum += 3 // Every reply is primed with <|start|>assistant<|message|>
+	return tokenNum
+}
+
+func CountTokenInputMessages(input any, model string, preCostType int) int {
+
+	if preCostType == config.PreContNotAll {
+		return 0
+	}
+
+	tokenEncoder := GetTokenEncoder(model)
+	// Reference:
+	// https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
+	// https://github.com/pkoukk/tiktoken-go/issues/6
+	//
+	// Every message follows <|start|>{role/name}\n{content}<|end|>\n
+	var tokensPerMessage int
+	var tokensPerName int
+	if model == "gpt-3.5-turbo-0301" {
+		tokensPerMessage = 4
+		tokensPerName = -1 // If there's a name, the role is omitted
+	} else {
+		tokensPerMessage = 3
+		tokensPerName = 1
+	}
+	tokenNum := 0
+
+	content, ok := input.(string)
+	if ok {
+		tokenNum = GetTokenNum(tokenEncoder, content)
+		tokenNum += 3
+
+		return tokenNum
+	}
+
+	jsonStr, err := json.Marshal(input)
+	if err != nil {
+		logger.SysError("error marshalling input: " + err.Error())
+		return 0
+	}
+
+	var messages []types.ChatCompletionMessage
+	err = json.Unmarshal(jsonStr, &messages)
+	if err != nil {
+		logger.SysError("error unmarshalling input: " + err.Error())
+		return 0
+	}
+
+	for _, message := range messages {
+		tokenNum += tokensPerMessage
+		switch v := message.Content.(type) {
+		case string:
+			tokenNum += GetTokenNum(tokenEncoder, v)
+		case []any:
+			for _, it := range v {
+				m := it.(map[string]any)
+				switch m["type"] {
+				case "text":
+					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
+				case "image_url":
+					if preCostType == config.PreCostNotImage {
+						continue
+					}
+					imageUrl, ok := m["image_url"].(map[string]any)
+					if !ok {
+						continue
+					}
+					url := imageUrl["url"].(string)
+					detail := ""
+					if imageUrl["detail"] != nil {
+						detail = imageUrl["detail"].(string)
+					}
+					countImageTokens := getCountImageFun(model)
+					imageTokens, err := countImageTokens(url, detail, model)
+					if err != nil {
+						//Due to the excessive length of the error information, only extract and record the most critical part.
+						logger.SysError("error counting image tokens: " + err.Error())
+					} else {
+						tokenNum += imageTokens
+					}
+				}
+			}
+		}
+		tokenNum += GetTokenNum(tokenEncoder, message.Role)
+		if message.Name != nil {
+			tokenNum += tokensPerName
+			tokenNum += GetTokenNum(tokenEncoder, *message.Name)
+		}
+	}
+
 	tokenNum += 3 // Every reply is primed with <|start|>assistant<|message|>
 	return tokenNum
 }

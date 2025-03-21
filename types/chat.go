@@ -52,6 +52,8 @@ type ChatCompletionMessage struct {
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ToolCallID       string                           `json:"tool_call_id,omitempty"`
 	Audio            any                              `json:"audio,omitempty"`
+	Annotations      any                              `json:"annotations,omitempty"`
+	Image            []MultimediaData                 `json:"image,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -217,7 +219,14 @@ type ChatCompletionRequest struct {
 	Prediction          any                           `json:"prediction,omitempty"`
 	Thinking            *Thinking                     `json:"thinking,omitempty"`
 
+	WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
+
 	OneOtherArg string `json:"-"`
+}
+
+type WebSearchOptions struct {
+	SearchContextSize string `json:"search_context_size,omitempty"`
+	UserLocation      any    `json:"user_location,omitempty"`
 }
 
 type Thinking struct {
@@ -397,6 +406,7 @@ type ChatCompletionStreamChoiceDelta struct {
 	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
+	Image            []MultimediaData                 `json:"image,omitempty"`
 }
 
 func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {
@@ -449,4 +459,11 @@ func (c *ChatCompletionStreamResponse) GetResponseText() (responseText string) {
 type ChatAudio struct {
 	Voice  string `json:"voice"`
 	Format string `json:"format"`
+}
+
+type MultimediaData struct {
+	Data       string `json:"data"`
+	ExpiresAt  int64  `json:"expires_at,omitempty"`
+	ID         string `json:"id,omitempty"`
+	Transcript string `json:"transcript,omitempty"`
 }

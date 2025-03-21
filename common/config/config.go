@@ -36,4 +36,5 @@ func defaultConfig() {
 	viper.SetDefault("connect_timeout", 5)
 	viper.SetDefault("auto_price_updates", true)
 	viper.SetDefault("language", "zh_CN")
+	viper.SetDefault("favicon", "")
 }

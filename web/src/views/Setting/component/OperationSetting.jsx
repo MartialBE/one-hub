@@ -204,7 +204,7 @@ const OperationSetting = () => {
       case 'AudioTokenJson':
         if (originInputs.AudioTokenJson !== inputs.AudioTokenJson) {
           if (!verifyJSON(inputs.AudioTokenJson)) {
-            showError('音频令牌不是合法的 JSON 字符串');
+            showError('音频Token不是合法的 JSON 字符串');
             return;
           }
           await updateOption('AudioTokenJson', inputs.AudioTokenJson);

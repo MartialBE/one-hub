@@ -19,7 +19,7 @@ type GeminiRelayStreamHandler struct {
 }
 
 func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiChatResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	req, errWithCode := p.getChatRequest(request, true)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -39,7 +39,7 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 }
 
 func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getChatRequest(request)
+	req, errWithCode := p.getChatRequest(request, true)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -95,13 +95,13 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		return
 	}
 
-	if geminiResponse.UsageMetadata == nil || geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil {
+	if geminiResponse.UsageMetadata == nil || (len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil) {
 		dataChan <- rawStr
 		return
 	}
 
 	lastType := "text"
-	if geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
+	if len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
 		lastType = "code"
 	}
 	if h.LastType != lastType {

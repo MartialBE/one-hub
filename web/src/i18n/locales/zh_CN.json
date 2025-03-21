@@ -209,7 +209,7 @@
     "typeLabel": "类型",
     "modelLabel": "模型",
     "durationLabel": "耗时",
-    "durationTooltip": "t/s：输出令牌的数量除以总生成时间，表示生成速度",
+    "durationTooltip": "t/s：输出Token的数量除以总生成时间，表示生成速度",
     "inputLabel": "输入",
     "outputLabel": "输出",
     "quotaLabel": "额度",
@@ -224,6 +224,7 @@
     "cachedReadTokens": "缓存读取Tokens",
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
+    "sourceIp": "来源IP",
     "content": {
       "channel_group": "分组: {{ channel_group }}",
       "group_discount": "分组折扣: {{ discount }}",
@@ -308,7 +309,8 @@
     "channelIdPlaceholder": "渠道ID",
     "taskId": "任务ID",
     "taskIdPlaceholder": "任务ID",
-    "username": "用户名称"
+    "username": "用户名称",
+    "sourceIp": "来源IP"
   },
   "midjourneyPage": {
     "midjourney": "Midjourney",
@@ -621,9 +623,9 @@
         "save": "保存聊天链接设置"
       },
       "audioTokenSettings": {
-        "title": "音频令牌设置",
-        "info": "配置音频倍率. 配置格式为JSON，键为模型名称，值为输入输出令牌倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
-        "save": "保存音频令牌设置"
+        "title": "音频Token设置",
+        "info": "配置音频倍率. 配置格式为JSON，键为模型名称，值为输入输出Token倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
+        "save": "保存音频Token设置"
       },
       "disableChannelKeywordsSettings": {
         "title": "禁用通道关键词设置",

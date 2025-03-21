@@ -35,6 +35,7 @@ func setOpenAIRouter(router *gin.Engine) {
 	{
 		relayV1Router.POST("/completions", relay.Relay)
 		relayV1Router.POST("/chat/completions", relay.Relay)
+		relayV1Router.POST("/responses", relay.Relay)
 		// relayV1Router.POST("/edits", controller.Relay)
 		relayV1Router.POST("/images/generations", relay.Relay)
 		relayV1Router.POST("/images/edits", relay.Relay)
@@ -117,10 +118,9 @@ func setClaudeRouter(router *gin.Engine) {
 
 func setGeminiRouter(router *gin.Engine) {
 	relayGeminiRouter := router.Group("/gemini")
-	relayV1Router := relayGeminiRouter.Group("/v1beta")
-	relayV1Router.Use(middleware.APIEnabled("gemini"), middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
+	relayGeminiRouter.Use(middleware.APIEnabled("gemini"), middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
-		relayV1Router.POST("/models/:model", relay.Relay)
+		relayGeminiRouter.POST("/:version/models/:model", relay.Relay)
 	}
 }
 

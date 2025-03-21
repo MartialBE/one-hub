@@ -12,22 +12,22 @@ import (
 )
 
 type Log struct {
-	Id               int    `json:"id"`
-	UserId           int    `json:"user_id" gorm:"index"`
-	CreatedAt        int64  `json:"created_at" gorm:"bigint;index:idx_created_at_type"`
-	Type             int    `json:"type" gorm:"index:idx_created_at_type"`
-	Content          string `json:"content"`
-	Username         string `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
-	TokenName        string `json:"token_name" gorm:"index;default:''"`
-	ModelName        string `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
-	Quota            int    `json:"quota" gorm:"default:0"`
-	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`
-	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
-	ChannelId        int    `json:"channel_id" gorm:"index"`
-	RequestTime      int    `json:"request_time" gorm:"default:0"`
-	IsStream         bool   `json:"is_stream" gorm:"default:false"`
-
-	Metadata datatypes.JSONType[map[string]any] `json:"metadata" gorm:"type:json"`
+	Id               int                                `json:"id"`
+	UserId           int                                `json:"user_id" gorm:"index"`
+	CreatedAt        int64                              `json:"created_at" gorm:"bigint;index:idx_created_at_type"`
+	Type             int                                `json:"type" gorm:"index:idx_created_at_type"`
+	Content          string                             `json:"content"`
+	Username         string                             `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
+	TokenName        string                             `json:"token_name" gorm:"index;default:''"`
+	ModelName        string                             `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
+	Quota            int                                `json:"quota" gorm:"default:0"`
+	PromptTokens     int                                `json:"prompt_tokens" gorm:"default:0"`
+	CompletionTokens int                                `json:"completion_tokens" gorm:"default:0"`
+	ChannelId        int                                `json:"channel_id" gorm:"index"`
+	RequestTime      int                                `json:"request_time" gorm:"default:0"`
+	IsStream         bool                               `json:"is_stream" gorm:"default:false"`
+	SourceIp         string                             `json:"source_ip" gorm:"default:''"`
+	Metadata         datatypes.JSONType[map[string]any] `json:"metadata" gorm:"type:json"`
 
 	Channel *Channel `json:"channel" gorm:"foreignKey:Id;references:ChannelId"`
 }
@@ -71,8 +71,9 @@ func RecordConsumeLog(
 	content string,
 	requestTime int,
 	isStream bool,
-	metadata map[string]any) {
-	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, tokenName=%s, quota=%d, content=%s", userId, channelId, promptTokens, completionTokens, modelName, tokenName, quota, content))
+	metadata map[string]any,
+	sourceIp string) {
+	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, tokenName=%s, quota=%d, content=%s ,sourceIp=%s", userId, channelId, promptTokens, completionTokens, modelName, tokenName, quota, content, sourceIp))
 	if !config.LogConsumeEnabled {
 		return
 	}
@@ -93,6 +94,7 @@ func RecordConsumeLog(
 		ChannelId:        channelId,
 		RequestTime:      requestTime,
 		IsStream:         isStream,
+		SourceIp:         sourceIp,
 	}
 
 	if metadata != nil {
@@ -114,6 +116,7 @@ type LogsListParams struct {
 	Username       string `form:"username"`
 	TokenName      string `form:"token_name"`
 	ChannelId      int    `form:"channel_id"`
+	SourceIp       string `form:"source_ip"`
 }
 
 var allowedLogsOrderFields = map[string]bool{
@@ -123,6 +126,7 @@ var allowedLogsOrderFields = map[string]bool{
 	"token_name": true,
 	"model_name": true,
 	"type":       true,
+	"source_ip":  true,
 }
 
 func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
@@ -153,6 +157,9 @@ func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
 	}
 	if params.ChannelId != 0 {
 		tx = tx.Where("channel_id = ?", params.ChannelId)
+	}
+	if params.SourceIp != "" {
+		tx = tx.Where("source_ip = ?", params.SourceIp)
 	}
 
 	return PaginateAndOrder[Log](tx, &params.PaginationParams, &logs, allowedLogsOrderFields)

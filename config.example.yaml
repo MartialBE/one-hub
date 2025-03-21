@@ -7,6 +7,7 @@ session_secret: "" # 会话密钥，未设置则使用随机值。
 disable_token_encoders: false # 是否禁用 token 编码器计算tokens。启用后 内存占用可减少 40MB 左右，但是stream模式下tokens计算不准确
 trusted_header: "" # 可信头部，"CF-Connecting-IP" 用于 Cloudflare，"X-Appengine-Remote-Addr" 用于 Google App Engine，未设置则不使用。 可以解决一些代理问题，如获取用户真实IP
 language: "zh_CN" #国际化默认语言 目前支持`zh_CN`/`en_US`/ja_JP`/`zh_HK`
+favicon: "" # 设置favicon路径,可以是ico的URL，也可以是文件路径。前后端分离部署的请直接修改前端的favicon.ico文件
 logs:
   filename: "one-hub.log" # 日志文件名
   max_size: 100 # 日志文件最大大小，单位为 MB，默认为 100。
@@ -48,7 +49,7 @@ channel:
 relay_timeout: 0 # 中继请求超时时间，单位为秒，默认为 0。
 connect_timeout: 5 # 连接超时时间，单位为秒，默认为 5。
 
-# 默认程序启动时会联网下载一些通用的词元的编码，如：gpt-3.5-turbo，在一些网络环境不稳定，或者离线情况，可能会导致启动有问题，可以配置此目录缓存数据，可迁移到离线环境。
+# 默认程序启动时会联网下载一些通用的Token的编码，如：gpt-3.5-turbo，在一些网络环境不稳定，或者离线情况，可能会导致启动有问题，可以配置此目录缓存数据，可迁移到离线环境。
 tiktoken_cache_dir: ""
 # 目前该配置作用与 TIKTOKEN_CACHE_DIR 一致，但是优先级没有它高。
 data_gym_cache_dir: ""
@@ -96,6 +97,7 @@ storage: # 存储设置 (可选,主要用于图片生成，有些供应商不提
     bucketName: "" # Bucket名称，比如zerodeng-superai
     accessKeyId: "" # accessKeyId
     accessKeySecret: "" # accessKeySecret
+    expirationDays: 3
 
 metrics:
   user: "" # metrics 用户名
