@@ -2,6 +2,8 @@ name: one-api docker image
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
     paths-ignore:
