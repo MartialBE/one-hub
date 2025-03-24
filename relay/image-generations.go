@@ -5,7 +5,7 @@ import (
 	"one-api/common"
 	providersBase "one-api/providers/base"
 	"one-api/types"
-
+	"strings"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,12 +33,14 @@ func (r *relayImageGenerations) setRequest() error {
 		r.request.N = 1
 	}
 
-	if r.request.Size == "" {
-		r.request.Size = "1024x1024"
-	}
+	if strings.HasPrefix(r.request.Model, "dall-e") {
+		if r.request.Size == "" {
+			r.request.Size = "1024x1024"
+		}
 
-	if r.request.Quality == "" {
-		r.request.Quality = "standard"
+		if r.request.Quality == "" {
+			r.request.Quality = "standard"
+		}
 	}
 
 	r.setOriginalModel(r.request.Model)
