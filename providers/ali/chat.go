@@ -211,10 +211,11 @@ func (h *aliStreamHandler) handlerStream(rawLine *[]byte, dataChan chan string, 
 
 func (h *aliStreamHandler) convertToOpenaiStream(aliResponse *AliChatResponse, dataChan chan string) {
 	content := aliResponse.Output.Choices[0].Message.StringContent()
-
+	reasoningContent := aliResponse.Output.Choices[0].Message.ReasoningContent
 	var choice types.ChatCompletionStreamChoice
 	choice.Index = aliResponse.Output.Choices[0].Index
 	choice.Delta.Content = strings.TrimPrefix(content, h.lastStreamResponse)
+	choice.Delta.ReasoningContent = reasoningContent
 	if aliResponse.Output.Choices[0].FinishReason != "" {
 		if aliResponse.Output.Choices[0].FinishReason != "null" {
 			finishReason := aliResponse.Output.Choices[0].FinishReason
