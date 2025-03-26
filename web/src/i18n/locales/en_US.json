@@ -271,6 +271,7 @@
     "totalOutputTokens": "Total output tokens",
     "typeLabel": "Type",
     "userLabel": "User",
+    "sourceIp": "Source IP",
     "content": {
       "calculate_steps": "Calculation steps:",
       "calculate_steps_tip": "PS: This system calculates based on points, and all amounts are converted from points. 1 point = $0.000002, with a minimum spending of 1 point. This calculation is for reference only; actual charges may vary.",
@@ -871,7 +872,8 @@
     "taskIdPlaceholder": "Task ID",
     "tokenName": "Token Name",
     "type": "Type",
-    "username": "Username"
+    "username": "Username",
+    "sourceIp": "Source IP"
   },
   "task": "Asynchronous tasks",
   "taskPage": {

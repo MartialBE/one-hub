@@ -224,6 +224,7 @@
     "cachedReadTokens": "缓存读取Tokens",
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
+    "sourceIp": "来源IP",
     "content": {
       "channel_group": "分组: {{ channel_group }}",
       "group_discount": "分组折扣: {{ discount }}",
@@ -308,7 +309,8 @@
     "channelIdPlaceholder": "渠道ID",
     "taskId": "任务ID",
     "taskIdPlaceholder": "任务ID",
-    "username": "用户名称"
+    "username": "用户名称",
+    "sourceIp": "来源IP"
   },
   "midjourneyPage": {
     "midjourney": "Midjourney",

@@ -43,7 +43,7 @@ func (p *OpenAIProvider) CreateImageGenerations(request *types.ImageRequest) (*t
 
 func IsWithinRange(element string, value int) bool {
 	if _, ok := common.DalleGenerationImageAmounts[element]; !ok {
-		return false
+		return true
 	}
 	minCount := common.DalleGenerationImageAmounts[element][0]
 	maxCount := common.DalleGenerationImageAmounts[element][1]

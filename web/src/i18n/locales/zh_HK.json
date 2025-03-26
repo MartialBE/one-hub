@@ -272,6 +272,7 @@
     "totalOutputTokens": "計算輸出Tokens",
     "typeLabel": "類型",
     "userLabel": "用戶",
+    "sourceIp": "Source IP",
     "content": {
       "calculate_steps": "計算步驟:",
       "calculate_steps_tip": "PS：本系統按照積分計算，所有金額均為積分換算而來，1積分=$0.000002，最低消費為1積分，本計算步驟僅供參考，以實際扣費為準。",
@@ -871,7 +872,8 @@
     "taskIdPlaceholder": "任務ID",
     "tokenName": "令牌名稱",
     "type": "類型",
-    "username": "用戶名稱"
+    "username": "用戶名稱",
+    "sourceIp": "Source IP"
   },
   "task": "非同步任務",
   "taskPage": {
