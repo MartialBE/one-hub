@@ -30,10 +30,10 @@ type CohereProvider struct {
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:         "https://api.cohere.ai/v1",
-		ChatCompletions: "/chat",
-		ModelList:       "/models",
-		Rerank:          "/rerank",
+		BaseURL:         "https://api.cohere.ai",
+		ChatCompletions: "/v2/chat",
+		ModelList:       "/v1/models",
+		Rerank:          "/v1/rerank",
 	}
 }
 
@@ -74,13 +74,17 @@ func (p *CohereProvider) GetFullRequestURL(requestURL string) string {
 	return fmt.Sprintf("%s%s", baseURL, requestURL)
 }
 
-func convertRole(role string) string {
-	switch role {
-	case types.ChatMessageRoleSystem, types.ChatMessageRoleDeveloper:
-		return "SYSTEM"
-	case types.ChatMessageRoleAssistant:
-		return "CHATBOT"
+func convertFinishReason(finishReason string) string {
+	switch finishReason {
+	case "COMPLETE", "STOP_SEQUENCE":
+		return types.FinishReasonStop
+	case "MAX_TOKENS":
+		return types.FinishReasonLength
+	case "TOOL_CALL":
+		return types.FinishReasonToolCalls
+	case "ERROR":
+		return types.FinishReasonContentFilter
 	default:
-		return "USER"
+		return types.FinishReasonNull
 	}
 }

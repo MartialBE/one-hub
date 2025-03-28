@@ -8,9 +8,10 @@ toolchain go1.22.3
 require (
 	cloud.google.com/go/iam v1.1.11
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
+	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1
-	github.com/aws/smithy-go v1.20.1
+	github.com/aws/smithy-go v1.20.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/coocood/freecache v1.2.4
 	github.com/coreos/go-oidc/v3 v3.11.0
@@ -36,6 +37,7 @@ require (
 	github.com/samber/lo v1.44.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/smartwalle/alipay/v3 v3.2.21
+	github.com/sony/gobreaker v1.0.0
 	github.com/spf13/viper v1.18.2
 	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.9.0
@@ -61,7 +63,6 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.4.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0 // indirect
 	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect

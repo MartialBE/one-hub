@@ -1,8 +1,9 @@
 package cohere
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
@@ -14,8 +15,10 @@ import (
 )
 
 type CohereStreamHandler struct {
-	Usage   *types.Usage
-	Request *types.ChatCompletionRequest
+	Usage    *types.Usage
+	Request  *types.ChatCompletionRequest
+	msgID    string
+	startMsg bool
 }
 
 func (p *CohereProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
@@ -25,7 +28,7 @@ func (p *CohereProvider) CreateChatCompletion(request *types.ChatCompletionReque
 	}
 	defer req.Body.Close()
 
-	cohereResponse := &CohereResponse{}
+	cohereResponse := &ChatResponse{}
 	// 发送请求
 	_, errWithCode = p.Requester.SendRequest(req, cohereResponse, false)
 	if errWithCode != nil {
@@ -87,65 +90,44 @@ func (p *CohereProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 	return req, nil
 }
 
-func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*CohereRequest, *types.OpenAIErrorWithStatusCode) {
+func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*V2ChatRequest, *types.OpenAIErrorWithStatusCode) {
 	request.ClearEmptyMessages()
-	cohereRequest := CohereRequest{
+
+	cohereRequest := V2ChatRequest{
 		Model:            request.Model,
-		MaxTokens:        request.MaxTokens,
+		MaxTokens:        &request.MaxTokens,
 		Temperature:      request.Temperature,
-		Stream:           request.Stream,
 		P:                request.TopP,
-		K:                request.N,
+		K:                request.TopK,
 		Seed:             request.Seed,
-		StopSequences:    request.Stop,
 		FrequencyPenalty: request.FrequencyPenalty,
 		PresencePenalty:  request.PresencePenalty,
-	}
-
-	msgLen := len(request.Messages) - 1
-
-	for index, message := range request.Messages {
-		if index == msgLen {
-			cohereRequest.Message = message.StringContent()
-		} else {
-			cohereRequest.ChatHistory = append(cohereRequest.ChatHistory, ChatHistory{
-				Role:    convertRole(message.Role),
-				Message: message.StringContent(),
-			})
-		}
-
+		Stream:           request.Stream,
+		StopSequences:    request.Stop,
+		Tools:            request.Tools,
+		ResponseFormat:   request.ResponseFormat,
+		Messages:         request.Messages,
 	}
 
 	return &cohereRequest, nil
 }
 
-func ConvertToChatOpenai(provider base.ProviderInterface, response *CohereResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
-	aiError := errorHandle(&response.CohereError)
-	if aiError != nil {
-		errWithCode = &types.OpenAIErrorWithStatusCode{
-			OpenAIError: *aiError,
-			StatusCode:  http.StatusBadRequest,
-		}
-		return
-	}
-
+func ConvertToChatOpenai(provider base.ProviderInterface, response *ChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
 	choice := types.ChatCompletionChoice{
-		Index: 0,
-		Message: types.ChatCompletionMessage{
-			Role:    types.ChatMessageRoleAssistant,
-			Content: response.Text,
-		},
-		FinishReason: types.FinishReasonStop,
+		Index:        0,
+		Message:      *response.Message.ToChatCompletionMessage(),
+		FinishReason: convertFinishReason(response.FinishReason),
 	}
 	openaiResponse = &types.ChatCompletionResponse{
-		ID:      response.GenerationID,
+		ID:      response.Id,
 		Object:  "chat.completion",
 		Created: utils.GetTimestamp(),
 		Choices: []types.ChatCompletionChoice{choice},
 		Model:   request.Model,
 		Usage:   &types.Usage{},
 	}
-	*openaiResponse.Usage = usageHandle(&response.Meta.BilledUnits)
+
+	*openaiResponse.Usage = usageHandle(response.Usage.BilledUnits)
 
 	usage := provider.GetUsage()
 	*usage = *openaiResponse.Usage
@@ -155,6 +137,11 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *CohereRespon
 
 // 转换为OpenAI聊天流式请求体
 func (h *CohereStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
+	// 检测首条消息
+	if strings.HasPrefix(string(*rawLine), "event: message-start") {
+		h.startMsg = true
+		return
+	}
 	// 如果rawLine 前缀不为data:，则直接返回
 	if !strings.HasPrefix(string(*rawLine), "data: ") {
 		*rawLine = nil
@@ -162,15 +149,36 @@ func (h *CohereStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 	}
 
 	*rawLine = (*rawLine)[6:]
+	*rawLine = bytes.TrimSpace(*rawLine)
 
-	var cohereResponse CohereStreamResponse
-	err := json.Unmarshal(*rawLine, &cohereResponse)
-	if err != nil {
-		errChan <- common.ErrorToOpenAIError(err)
+	// 如果等于 DONE 则结束
+	if string(*rawLine) == "[DONE]" {
+		errChan <- io.EOF
+		*rawLine = requester.StreamClosed
 		return
 	}
 
-	if cohereResponse.EventType != "text-generation" && cohereResponse.EventType != "stream-end" {
+	var cohereResponse ChatStreamResponse
+	if h.startMsg {
+		h.startMsg = false
+		cohereResponse = ChatStreamResponse{
+			Type:  "message-start",
+			Index: 0,
+			Delta: &ChatEventDelta{
+				Message: &ChatEventDeltaMessage{
+					Role: "assistant",
+				},
+			},
+		}
+	} else {
+		err := json.Unmarshal(*rawLine, &cohereResponse)
+		if err != nil {
+			errChan <- common.ErrorToOpenAIError(err)
+			return
+		}
+	}
+
+	if cohereResponse.Type == "tool-call-end" || cohereResponse.Type == "citation-start" || cohereResponse.Type == "citation-end" {
 		*rawLine = nil
 		return
 	}
@@ -178,26 +186,41 @@ func (h *CohereStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 	h.convertToOpenaiStream(&cohereResponse, dataChan)
 }
 
-func (h *CohereStreamHandler) convertToOpenaiStream(cohereResponse *CohereStreamResponse, dataChan chan string) {
+func (h *CohereStreamHandler) convertToOpenaiStream(cohereResponse *ChatStreamResponse, dataChan chan string) {
 	choice := types.ChatCompletionStreamChoice{
 		Index: 0,
 	}
 
-	if cohereResponse.EventType == "stream-end" {
-		choice.FinishReason = types.FinishReasonStop
-		*h.Usage = usageHandle(&cohereResponse.Response.Meta.BilledUnits)
+	if h.msgID == "" && cohereResponse.Id != "" {
+		h.msgID = cohereResponse.Id
+	}
+
+	if cohereResponse.Type == "message-end" {
+		choice.FinishReason = convertFinishReason(cohereResponse.Delta.FinishReason)
+		*h.Usage = usageHandle(cohereResponse.Delta.Usage.BilledUnits)
 	} else {
-		choice.Delta = types.ChatCompletionStreamChoiceDelta{
-			Role:    types.ChatMessageRoleAssistant,
-			Content: cohereResponse.Text,
+		if cohereResponse.Delta == nil || cohereResponse.Delta.Message == nil {
+			return
 		}
 
-		h.Usage.CompletionTokens += common.CountTokenText(cohereResponse.Text, h.Request.Model)
+		delta := cohereResponse.Delta
+
+		choice.Delta = types.ChatCompletionStreamChoiceDelta{
+			Role:    delta.Message.Role,
+			Content: delta.Message.ToString(),
+		}
+
+		if delta.Message.ToolCalls != nil {
+			delta.Message.ToolCalls.Index = cohereResponse.Index
+			choice.Delta.ToolCalls = []*types.ChatCompletionToolCalls{delta.Message.ToolCalls}
+		}
+
+		h.Usage.CompletionTokens += common.CountTokenText(choice.Delta.Content, h.Request.Model)
 		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	}
 
 	chatCompletion := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		ID:      h.msgID,
 		Object:  "chat.completion.chunk",
 		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
@@ -208,7 +231,7 @@ func (h *CohereStreamHandler) convertToOpenaiStream(cohereResponse *CohereStream
 	dataChan <- string(responseBody)
 }
 
-func usageHandle(token *Tokens) types.Usage {
+func usageHandle(token *UsageBilledUnits) types.Usage {
 	usage := types.Usage{
 		PromptTokens:     token.InputTokens,
 		CompletionTokens: token.OutputTokens + token.SearchUnits + token.Classifications,

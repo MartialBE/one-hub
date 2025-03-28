@@ -108,7 +108,7 @@ func errorHandle(aliError *AliError) *types.OpenAIError {
 func (p *AliProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
 
-	if strings.HasPrefix(modelName, "qwen-vl") {
+	if strings.Contains(modelName, "-vl") {
 		requestURL = "/api/v1/services/aigc/multimodal-generation/generation"
 	}
 
