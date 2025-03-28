@@ -109,7 +109,7 @@ func (p *AliProvider) GetFullRequestURL(requestURL string, modelName string) str
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
 
 	// 定义需要特殊处理的多模态模型关键词列表
-	modelKeywords := []string{"-vl", "qvq", "vision", "Omni"}
+	modelKeywords := []string{"-vl", "qvq", "vision"}
 	for _, keyword := range modelKeywords {
 		if strings.Contains(modelName, keyword) {
 			requestURL = "/api/v1/services/aigc/multimodal-generation/generation"
