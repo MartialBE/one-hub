@@ -22,6 +22,11 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
   const { t } = useTranslation();
 
+  // 处理滚动事件，阻止冒泡
+  const handleScroll = (e) => {
+    e.stopPropagation();
+  };
+
   const drawer = (
     <>
       <Box sx={{ display: { xs: 'block', md: 'none' } }}>
@@ -30,46 +35,93 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
         </Box>
       </Box>
       <BrowserView>
-        <PerfectScrollbar
-          component="div"
-          style={{
+        <Box
+          onWheel={handleScroll}
+          onTouchMove={handleScroll}
+          sx={{
             height: !matchUpMd ? 'calc(100vh - 56px)' : 'calc(100vh - 88px)',
-            paddingLeft: '16px',
-            paddingRight: '16px'
+            overflowX: 'hidden',
+            mt: '0'
+          }}
+        >
+          <PerfectScrollbar
+            component="div"
+            options={{
+              wheelPropagation: false,
+              suppressScrollX: true
+            }}
+            style={{
+              height: '100%',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              paddingTop: '8px'
+            }}
+          >
+            <MenuList />
+            <MenuCard />
+            <Stack direction="row" justifyContent="center" sx={{ mb: 2, mt: 2 }}>
+              <Chip
+                label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
+                disabled
+                chipcolor="secondary"
+                size="small"
+                sx={{
+                  cursor: 'pointer',
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                  color: theme.palette.text.secondary,
+                  fontSize: '0.75rem',
+                  height: '24px',
+                  '& .MuiChip-label': {
+                    px: 1.5
+                  }
+                }}
+              />
+            </Stack>
+          </PerfectScrollbar>
+        </Box>
+      </BrowserView>
+      <MobileView>
+        <Box
+          onWheel={handleScroll}
+          onTouchMove={handleScroll}
+          sx={{
+            px: 2,
+            pt: 1,
+            height: 'calc(100vh - 56px)',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            }
           }}
         >
           <MenuList />
           <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
+          <Stack direction="row" justifyContent="center" sx={{ mb: 2, mt: 2 }}>
             <Chip
               label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
               disabled
               chipcolor="secondary"
               size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
-        </PerfectScrollbar>
-      </BrowserView>
-      <MobileView>
-        <Box sx={{ px: 2 }}>
-          <MenuList />
-          <MenuCard />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-            <Chip
-              label={import.meta.env.VITE_APP_VERSION || t('menu.unknownVersion')}
-              disabled
-              chipcolor="secondary"
-              size="small"
-              sx={{ cursor: 'pointer' }}
+              sx={{
+                cursor: 'pointer',
+                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                color: theme.palette.text.secondary,
+                fontSize: '0.75rem',
+                height: '24px',
+                '& .MuiChip-label': {
+                  px: 1.5
+                }
+              }}
             />
           </Stack>
         </Box>
       </MobileView>
     </>
   );
-
-  const container = window !== undefined ? () => window.document.body : undefined;
 
   return (
     <Box
@@ -81,7 +133,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
       aria-label="mailbox folders"
     >
       <Drawer
-        container={container}
+        container={window?.document.body}
         variant={matchUpMd ? 'persistent' : 'temporary'}
         anchor="left"
         open={drawerOpen}
@@ -91,10 +143,16 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             width: drawerWidth,
             background: theme.palette.background.default,
             color: theme.palette.text.primary,
-            borderRight: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.12)' : 'none',
+            borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+            transition: theme.transitions.create('width'),
+            boxSizing: 'border-box',
+            boxShadow: 'none',
+            borderRadius: 0,
             [theme.breakpoints.up('md')]: {
-              top: '88px'
-            }
+              top: '88px',
+              height: 'calc(100% - 88px)'
+            },
+            overflowX: 'hidden'
           }
         }}
         ModalProps={{ keepMounted: true }}

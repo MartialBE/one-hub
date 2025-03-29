@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -19,7 +19,6 @@ import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 const NavCollapse = ({ menu, level }) => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
-  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -27,9 +26,7 @@ const NavCollapse = ({ menu, level }) => {
   const handleClick = () => {
     setOpen(!open);
     setSelected(!selected ? menu.id : null);
-    if (menu?.id !== 'authentication') {
-      navigate(menu.children[0]?.url);
-    }
+    // 二级菜单展开/收起逻辑，无需自动跳转
   };
 
   const { pathname } = useLocation();
@@ -77,9 +74,9 @@ const NavCollapse = ({ menu, level }) => {
     }
   });
 
-  const Icon = menu.icon;
+  const IconComponent = menu.icon;
   const menuIcon = menu.icon ? (
-    <Icon strokeWidth={1.5} size="1.3rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+    <IconComponent strokeWidth={1.5} size="1.3rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
   ) : (
     <FiberManualRecordIcon
       sx={{
@@ -120,9 +117,25 @@ const NavCollapse = ({ menu, level }) => {
           }
         />
         {open ? (
-          <IconChevronUp stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+          <IconChevronUp
+            stroke={1.5}
+            size="1rem"
+            style={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              color: theme.palette.primary.main
+            }}
+          />
         ) : (
-          <IconChevronDown stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+          <IconChevronDown
+            stroke={1.5}
+            size="1rem"
+            style={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              color: theme.palette.primary.main
+            }}
+          />
         )}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>

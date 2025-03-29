@@ -5,65 +5,85 @@
 
 export default function themeTypography(theme) {
   return {
-    fontFamily: theme?.customization?.fontFamily,
-    h6: {
-      fontWeight: 500,
-      color: theme.heading,
-      fontSize: '0.75rem'
-    },
-    h5: {
-      fontSize: '0.875rem',
-      color: theme.heading,
-      fontWeight: 500
-    },
-    h4: {
-      fontSize: '1rem',
-      color: theme.heading,
-      fontWeight: 600
-    },
-    h3: {
-      fontSize: '1.25rem',
-      color: theme.heading,
-      fontWeight: 600
+    fontFamily:
+      theme?.customization?.fontFamily ||
+      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    h1: {
+      fontWeight: 600,
+      fontSize: '2rem',
+      lineHeight: 1.25,
+      letterSpacing: '-0.01em',
+      color: theme.heading
     },
     h2: {
+      fontWeight: 600,
       fontSize: '1.5rem',
-      color: theme.heading,
-      fontWeight: 700
+      lineHeight: 1.3,
+      letterSpacing: '0em',
+      color: theme.heading
     },
-    h1: {
-      fontSize: '2.125rem',
-      color: theme.heading,
-      fontWeight: 700
+    h3: {
+      fontWeight: 600,
+      fontSize: '1.25rem',
+      lineHeight: 1.4,
+      color: theme.heading
+    },
+    h4: {
+      fontWeight: 600,
+      fontSize: '1.125rem',
+      lineHeight: 1.4,
+      color: theme.heading
+    },
+    h5: {
+      fontWeight: 500,
+      fontSize: '1rem',
+      lineHeight: 1.5,
+      color: theme.heading
+    },
+    h6: {
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      lineHeight: 1.5,
+      color: theme.heading
     },
     subtitle1: {
       fontSize: '0.875rem',
+      lineHeight: 1.5,
       fontWeight: 500,
       color: theme.textDark
     },
     subtitle2: {
       fontSize: '0.75rem',
-      fontWeight: 400,
+      lineHeight: 1.5,
+      fontWeight: 500,
       color: theme.darkTextSecondary
-    },
-    caption: {
-      fontSize: '0.75rem',
-      color: theme.darkTextSecondary,
-      fontWeight: 400
     },
     body1: {
       fontSize: '0.875rem',
-      fontWeight: 400,
-      lineHeight: '1.334em'
-    },
-    body2: {
-      letterSpacing: '0em',
-      fontWeight: 400,
-      lineHeight: '1.5em',
+      lineHeight: 1.5,
       color: theme.darkTextPrimary
     },
+    body2: {
+      fontSize: '0.75rem',
+      lineHeight: 1.5,
+      color: theme.darkTextPrimary
+    },
+    caption: {
+      fontSize: '0.75rem',
+      lineHeight: 1.4,
+      color: theme.darkTextSecondary
+    },
+    overline: {
+      fontSize: '0.625rem',
+      fontWeight: 500,
+      lineHeight: 1.5,
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase',
+      color: theme.darkTextSecondary
+    },
     button: {
-      textTransform: 'capitalize'
+      textTransform: 'none',
+      fontWeight: 500
     },
     customInput: {
       marginTop: 1,
@@ -95,10 +115,12 @@ export default function themeTypography(theme) {
       width: '100%',
       minHeight: 'calc(100vh - 88px)',
       flexGrow: 1,
-      padding: '20px',
+      padding: '16px',
+      paddingBottom: '30px',
       marginTop: '88px',
-      marginRight: '20px',
-      borderRadius: `${theme?.customization?.borderRadius}px`
+      marginRight: '0',
+      marginBottom: '20px',
+      borderRadius: '0'
     },
     menuCaption: {
       fontSize: '0.875rem',
@@ -106,32 +128,32 @@ export default function themeTypography(theme) {
       color: theme.heading,
       padding: '6px',
       textTransform: 'capitalize',
-      marginTop: '10px'
+      marginTop: '8px'
     },
     subMenuCaption: {
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       fontWeight: 500,
       color: theme.darkTextSecondary,
       textTransform: 'capitalize'
     },
     commonAvatar: {
       cursor: 'pointer',
-      borderRadius: '8px'
+      borderRadius: '4px'
     },
     smallAvatar: {
-      width: '22px',
-      height: '22px',
-      fontSize: '1rem'
+      width: '24px',
+      height: '24px',
+      fontSize: '0.875rem'
     },
     mediumAvatar: {
-      width: '34px',
-      height: '34px',
-      fontSize: '1.2rem'
+      width: '32px',
+      height: '32px',
+      fontSize: '1rem'
     },
     largeAvatar: {
-      width: '44px',
-      height: '44px',
-      fontSize: '1.5rem'
+      width: '40px',
+      height: '40px',
+      fontSize: '1.25rem'
     },
     menuButton: {
       color: theme.menuButtonColor,

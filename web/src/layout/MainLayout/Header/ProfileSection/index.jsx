@@ -78,11 +78,9 @@ const ProfileSection = () => {
           backgroundColor: 'transparent',
           border: 'none',
           '&[aria-controls="menu-list-grow"], &:hover': {
-            boxShadow: '0 2px 14px 0 rgb(32 40 45 / 8%)',
             borderRadius: '50%',
-            '& svg': {
-              stroke: theme.palette.primary.light
-            }
+            backgroundColor: 'transparent',
+            boxShadow: 'none'
           },
           '& .MuiChip-label': {
             display: 'none'
@@ -94,7 +92,13 @@ const ProfileSection = () => {
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px !important',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              border: '2px solid transparent',
+              '&:hover': {
+                border: `2px solid ${theme.palette.primary.light}`,
+                boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px 0 rgba(0,0,0,0.2)' : '0 2px 8px 0 rgba(0,0,0,0.1)'
+              }
             }}
             ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}

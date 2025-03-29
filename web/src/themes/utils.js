@@ -21,3 +21,8 @@ export function varAlpha(color, opacity = 1) {
   // 返回带有透明度的RGBA颜色字符串
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
+
+// 创建渐变色样式
+export function createGradient(color1, color2) {
+  return `linear-gradient(to right, ${color1}, ${color2})`;
+}
