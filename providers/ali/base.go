@@ -108,8 +108,12 @@ func errorHandle(aliError *AliError) *types.OpenAIError {
 func (p *AliProvider) GetFullRequestURL(requestURL string, modelName string) string {
 	baseURL := strings.TrimSuffix(p.GetBaseURL(), "/")
 
-	if strings.Contains(modelName, "-vl") {
-		requestURL = "/api/v1/services/aigc/multimodal-generation/generation"
+	modelKeywords := strings.Split(VisionModelKeywords, ",")
+	for _, keyword := range modelKeywords {
+		if strings.Contains(modelName, keyword) {
+			requestURL = "/api/v1/services/aigc/multimodal-generation/generation"
+			break
+		}
 	}
 
 	return fmt.Sprintf("%s%s", baseURL, requestURL)

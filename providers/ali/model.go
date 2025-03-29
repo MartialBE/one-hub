@@ -7,6 +7,11 @@ import (
 	"one-api/providers/openai"
 )
 
+const (
+	// VisionModelKeywords 定义视觉模型的关键词
+	VisionModelKeywords = "-vl,qvq,vision"
+)
+
 func (p *AliProvider) GetModelList() ([]string, error) {
 	fullRequestURL := fmt.Sprintf("%s%s", OpenaiBaseURL, p.Config.ModelList)
 	headers := p.GetRequestHeaders()
