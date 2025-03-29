@@ -37,7 +37,6 @@ require (
 	github.com/samber/lo v1.44.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/smartwalle/alipay/v3 v3.2.21
-	github.com/sony/gobreaker v1.0.0
 	github.com/spf13/viper v1.18.2
 	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.9.0
