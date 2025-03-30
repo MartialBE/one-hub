@@ -9,7 +9,8 @@ import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
-
+import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
 import { Button, Card, Stack, Container, Typography, Box, Menu, MenuItem, Checkbox, ListItemText } from '@mui/material';
 import LogTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
@@ -21,6 +22,8 @@ import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from 'contexts/UserContext';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 export default function Log() {
   const { t } = useTranslation();
@@ -46,6 +49,8 @@ export default function Log() {
   const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const { userGroup } = useContext(UserContext);
+  const theme = useTheme();
+  const matchUpMd = useMediaQuery(theme.breakpoints.up('sm'));
 
   const [logs, setLogs] = useState([]);
   const userIsAdmin = isAdmin();
@@ -193,19 +198,39 @@ export default function Log() {
           }}
         >
           <Container>
-            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
-                {t('logPage.refreshButton')}
-              </Button>
+            {matchUpMd ? (
+              <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
+                <Button onClick={handleRefresh} size="small" startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
+                  {t('logPage.refreshButton')}
+                </Button>
 
-              <Button onClick={searchLogs} startIcon={<Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />}>
-                {t('logPage.searchButton')}
-              </Button>
+                <Button onClick={searchLogs} size="small" startIcon={<Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />}>
+                  {t('logPage.searchButton')}
+                </Button>
 
-              <Button onClick={handleColumnMenuOpen} startIcon={<Icon icon="solar:settings-bold-duotone" width={18} />}>
-                {t('logPage.columnSettings')}
-              </Button>
-            </ButtonGroup>
+                <Button onClick={handleColumnMenuOpen} size="small" startIcon={<Icon icon="solar:settings-bold-duotone" width={18} />}>
+                  {t('logPage.columnSettings')}
+                </Button>
+              </ButtonGroup>
+            ) : (
+              <Stack
+                direction="row"
+                spacing={1}
+                divider={<Divider orientation="vertical" flexItem />}
+                justifyContent="space-around"
+                alignItems="center"
+              >
+                <IconButton onClick={handleRefresh} size="small">
+                  <Icon icon="solar:refresh-bold-duotone" width={18} />
+                </IconButton>
+                <IconButton onClick={searchLogs} size="small">
+                  <Icon icon="solar:minimalistic-magnifer-line-duotone" width={18} />
+                </IconButton>
+                <IconButton onClick={handleColumnMenuOpen} size="small">
+                  <Icon icon="solar:settings-bold-duotone" width={18} />
+                </IconButton>
+              </Stack>
+            )}
 
             <Menu
               anchorEl={columnMenuAnchor}
