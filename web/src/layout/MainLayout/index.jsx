@@ -37,9 +37,9 @@ export const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open
   ),
   overflowY: 'auto',
   overflowX: 'hidden',
-  height: 'calc(100vh - 88px)',
+  height: 'calc(100vh - 64px)',
   paddingBottom: '30px',
-  marginTop: '88px',
+  marginTop: '64px',
   position: 'relative',
   scrollbarWidth: 'thin',
   '&::-webkit-scrollbar': {
@@ -113,7 +113,7 @@ const MainLayout = () => {
           width: '100%'
         }}
       >
-        <Toolbar sx={{ px: { xs: 1.5, sm: 2, md: 3 } }}>
+        <Toolbar sx={{ px: { xs: 1.5, sm: 2, md: 3 }, minHeight: '64px', height: '64px' }}>
           <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
         </Toolbar>
       </AppBar>

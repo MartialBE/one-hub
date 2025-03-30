@@ -26,7 +26,16 @@ const NavCollapse = ({ menu, level }) => {
   const handleClick = () => {
     setOpen(!open);
     setSelected(!selected ? menu.id : null);
-    // 二级菜单展开/收起逻辑，无需自动跳转
+    // 触发一个小延迟后的滚动容器重新计算
+    setTimeout(() => {
+      // 触发窗口的resize事件，让PerfectScrollbar重新计算
+      window.dispatchEvent(new Event('resize'));
+      // 找到当前滚动容器并进行滚动更新
+      const scrollContainer = document.querySelector('.ps--active-y');
+      if (scrollContainer?.ps) {
+        scrollContainer.ps.update();
+      }
+    }, 300); // 等待折叠动画完成
   };
 
   const { pathname } = useLocation();
@@ -95,7 +104,7 @@ const NavCollapse = ({ menu, level }) => {
           mb: 0.5,
           alignItems: 'flex-start',
           backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
-          py: level > 1 ? 1 : 1.25,
+          py: level > 1 ? 0.6 : 0.75,
           pl: `${level * 24}px`
         }}
         selected={selected === menu.id}
@@ -138,7 +147,33 @@ const NavCollapse = ({ menu, level }) => {
           />
         )}
       </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse
+        in={open}
+        timeout="auto"
+        unmountOnExit
+        onEntered={() => {
+          window.dispatchEvent(new Event('resize'));
+          // 找到当前滚动容器并立即更新
+          const scrollContainer = document.querySelector('.ps--active-y');
+          if (scrollContainer?.ps) {
+            scrollContainer.ps.update();
+          }
+        }}
+        onExited={() => {
+          window.dispatchEvent(new Event('resize'));
+          // 找到当前滚动容器并立即更新
+          const scrollContainer = document.querySelector('.ps--active-y');
+          if (scrollContainer?.ps) {
+            scrollContainer.ps.update();
+          }
+          // 触发第二次更新以确保所有变化都被捕获
+          setTimeout(() => {
+            if (scrollContainer?.ps) {
+              scrollContainer.ps.update();
+            }
+          }, 100);
+        }}
+      >
         <List
           component="div"
           disablePadding

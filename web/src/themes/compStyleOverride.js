@@ -394,22 +394,16 @@ export default function componentStyleOverrides(theme) {
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          overflowX: 'auto',
+          overflowY: 'auto',
+          borderRadius: '12px',
           boxShadow: 'none',
-          overflow: 'hidden',
-          width: '100%',
-          margin: 0,
-          padding: 0,
-          position: 'relative',
-          left: 0,
-          right: 0,
-          '& .MuiPaper-root': {
-            borderRadius: 0,
-            boxShadow: 'none'
-          },
-          '&.MuiPaper-root': {
-            borderRadius: 0
-          }
+          ...(theme.breakpoints && {
+            [theme.breakpoints.down('sm')]: {
+              maxWidth: '100%',
+              whiteSpace: 'nowrap'
+            }
+          })
         }
       }
     },
@@ -504,7 +498,7 @@ export default function componentStyleOverrides(theme) {
         root: {
           color: theme.textDark,
           borderTop: `1px dashed ${theme.tableBorderBottom}`,
-          overflow: 'visible',
+          overflow: 'auto',
           backgroundColor: theme.headBackgroundColor,
           minHeight: '56px',
           width: '100%',
@@ -513,6 +507,13 @@ export default function componentStyleOverrides(theme) {
           '& .MuiToolbar-root': {
             minHeight: '56px',
             padding: '0',
+            ...(theme.breakpoints && {
+              [theme.breakpoints.down('sm')]: {
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                padding: '8px 0'
+              }
+            }),
             '& > p:first-of-type': {
               fontSize: '0.875rem',
               color: theme.darkTextSecondary
@@ -536,6 +537,12 @@ export default function componentStyleOverrides(theme) {
         },
         actions: {
           marginLeft: '16px',
+          ...(theme.breakpoints && {
+            [theme.breakpoints.down('sm')]: {
+              marginLeft: '0',
+              marginTop: '8px'
+            }
+          }),
           '& .MuiIconButton-root': {
             padding: '8px',
             backgroundColor: theme.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
@@ -554,7 +561,12 @@ export default function componentStyleOverrides(theme) {
         displayedRows: {
           fontSize: '0.875rem',
           color: theme.darkTextSecondary,
-          margin: 0
+          margin: 0,
+          ...(theme.breakpoints && {
+            [theme.breakpoints.down('sm')]: {
+              margin: '8px 0'
+            }
+          })
         }
       }
     },
