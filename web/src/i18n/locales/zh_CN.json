@@ -122,7 +122,7 @@
     "disabled": "禁用",
     "speedTestDisabled": "测速禁用",
     "filterTags": "过滤标签",
-    "showAll": "显示全部",
+    "onlyTags": "仅显示标签",
     "batchAzureAPISuccess": "成功更新 {{count}} 条数据",
     "inputAPIVersion": "请输入api版本号",
     "selectAll": "全选",

@@ -139,7 +139,8 @@
     "unselectAll": "すべてを非選択にする",
     "updateEnabledBalance": "有効残高を更新",
     "usedBalance": "使用済み/残高",
-    "weight": "ウェイト"
+    "weight": "ウェイト",
+    "onlyTags": "タグのみ表示"
   },
   "channel_row": {
     "auto": "自動",

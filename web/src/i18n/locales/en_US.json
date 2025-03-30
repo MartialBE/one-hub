@@ -139,7 +139,8 @@
     "unselectAll": "Anti-select all",
     "updateEnabledBalance": "Update Enabled Balance",
     "usedBalance": "Used Balance/Remaining Balance",
-    "weight": "Weight"
+    "weight": "Weight",
+    "onlyTags": "Display tags only"
   },
   "channel_row": {
     "auto": "automatic",

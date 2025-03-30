@@ -140,7 +140,8 @@
     "unselectAll": "反全選",
     "updateEnabledBalance": "更新啟用餘額",
     "usedBalance": "已使用/餘額",
-    "weight": "權重"
+    "weight": "權重",
+    "onlyTags": "僅顯示標籤"
   },
   "channel_row": {
     "auto": "自動",
