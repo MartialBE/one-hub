@@ -109,7 +109,10 @@ const MainLayout = () => {
           boxShadow: 'none',
           borderBottom: 'none',
           transition: leftDrawerOpened ? theme.transitions.create('width') : 'none',
-          zIndex: theme.zIndex.drawer + 1,
+          zIndex: {
+            xs: matchDownMd && leftDrawerOpened ? 0 : theme.zIndex.drawer - 1,
+            md: theme.zIndex.drawer + 1
+          },
           width: '100%'
         }}
       >
