@@ -165,7 +165,38 @@
     "updateChannelBalance": "All enabled channel balances have been updated!",
     "updateOk": "update completed!",
     "weightTip": "Weight cannot be less than 1",
-    "check": "Check"
+    "check": "Check",
+    "batchAddIDRequired": "Please select at least one channel.",
+    "batchDelete": "Batch delete",
+    "batchDeleteConfirm": "Are you sure you want to delete the selected {{count}} channels? This action cannot be undone.",
+    "batchDeleteError": "Batch deletion failed: {{message}}",
+    "batchDeleteErrorTip": "Batch deletion error: {{message}}",
+    "batchDeleteSuccess": "Batch deletion successful!",
+    "batchDeleteTip": "Do you want to delete the selected channels in batch?",
+    "deleteTag": "Delete tag",
+    "deleteTagAndChannels": "Delete the tag and all its channels.",
+    "deleteTagConfirm": "Are you sure you want to delete the tag {{tag}} and all its channels? This action cannot be undone.",
+    "deleteTagError": "Failed to delete tag: {{message}}",
+    "deleteTagSuccess": "Tag {{tag}} deleted successfully",
+    "disable": "Disable",
+    "disableAllChannels": "Disable all channels",
+    "disableTagChannels": "Disable tag channel",
+    "enable": "Enable",
+    "enableAllChannels": "Enable all channels",
+    "enableTagChannels": "Enable tag channel",
+    "getTagChannelsError": "Failed to retrieve tag channel: {{message}}",
+    "getTagChannelsErrorTip": "Error getting tag channel: {{message}}",
+    "noTagChannels": "No tag channel found",
+    "priorityUpdateError": "Priority update failed: {{message}}",
+    "priorityUpdateSuccess": "Priority updated successfully",
+    "refreshList": "Refresh list",
+    "tag": "Tags",
+    "tagChannelList": "Tag channel list",
+    "tagChannelsConfirm": "Are you sure you want to {{action}} all channels under the tag {{tag}}?",
+    "tagChannelsError": "Channel {{action}} failed: {{message}}",
+    "tagChannelsSuccess": "The tag channel {{action}} is successful.",
+    "weightUpdateError": "Weight update failed: {{message}}",
+    "weightUpdateSuccess": "Weight update successful"
   },
   "common": {
     "again": "Retry ({{count}})",
@@ -201,7 +232,9 @@
     "unableServer": "Unable to connect to the server properly!",
     "unableServerTip": "New version available: {{version}}, please use the shortcut key Shift F5 to refresh the page",
     "unknown": "unknown",
-    "verificationCode": "Verification code"
+    "verificationCode": "Verification code",
+    "deleteError": "Deletion failed: {{message}}",
+    "deleteSuccess": "Delete successful!"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -607,6 +640,10 @@
         "topUpLink": {
           "label": "Top-up Link",
           "placeholder": "For example, the purchase link of the card issuing website"
+        },
+        "retryTimeOut": {
+          "label": "Retry Timeout (seconds)",
+          "placeholder": "Retry Timeout (seconds)"
         }
       },
       "logSettings": {

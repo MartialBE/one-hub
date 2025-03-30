@@ -166,7 +166,38 @@
     "updateChannelBalance": "已更新完畢所有已啟用通道餘額！",
     "updateOk": "更新成功！",
     "weightTip": "權重不能小於 1",
-    "check": "檢測"
+    "check": "檢測",
+    "batchAddIDRequired": "請至少選擇一個渠道",
+    "batchDelete": "批量刪除",
+    "batchDeleteConfirm": "確定要刪除選中的 {{count}} 個渠道嗎？此操作將無法復原。",
+    "batchDeleteError": "批量刪除失敗: {{message}}",
+    "batchDeleteErrorTip": "批量刪除出錯: {{message}}",
+    "batchDeleteSuccess": "批量刪除成功！",
+    "batchDeleteTip": "是否批量刪除所選渠道？",
+    "deleteTag": "刪除標籤",
+    "deleteTagAndChannels": "刪除標籤及其所有渠道",
+    "deleteTagConfirm": "確定要刪除標籤 {{tag}} 及其所有頻道嗎？此操作將無法恢復。",
+    "deleteTagError": "刪除標籤失敗: {{message}}",
+    "deleteTagSuccess": "標籤 {{tag}} 刪除成功",
+    "disable": "停用",
+    "disableAllChannels": "停用所有渠道",
+    "disableTagChannels": "停用標籤渠道",
+    "enable": "啟用",
+    "enableAllChannels": "啟用所有渠道",
+    "enableTagChannels": "啟用標籤渠道",
+    "getTagChannelsError": "獲取標籤渠道失敗: {{message}}",
+    "getTagChannelsErrorTip": "獲取標籤渠道出錯: {{message}}",
+    "noTagChannels": "未能找到標籤渠道",
+    "priorityUpdateError": "優先級更新失敗: {{message}}",
+    "priorityUpdateSuccess": "優先級更新成功",
+    "refreshList": "更新列表",
+    "tag": "標籤",
+    "tagChannelList": "標籤渠道列表",
+    "tagChannelsConfirm": "確定要{{action}}標籤 {{tag}} 下的所有渠道嗎？",
+    "tagChannelsError": "標籤渠道{{action}}失敗: {{message}}",
+    "tagChannelsSuccess": "標籤渠道{{action}}成功",
+    "weightUpdateError": "權重更新失敗: {{message}}",
+    "weightUpdateSuccess": "權重更新成功"
   },
   "common": {
     "again": "重試 ({{count}})",
@@ -202,7 +233,9 @@
     "unableServer": "無法正常連接至伺服器！",
     "unableServerTip": "新版本可用：{{version}}，請使用快捷鍵 Shift + F5 刷新頁面",
     "unknown": "未知",
-    "verificationCode": "驗證碼"
+    "verificationCode": "驗證碼",
+    "deleteError": "刪除失敗：{{message}}",
+    "deleteSuccess": "刪除成功！"
   },
   "dashboard": "儀表板",
   "dashboard_index": {
@@ -284,7 +317,7 @@
       "original_times_price": "原價格: ${{ times }} / 次",
       "output_price": "輸出: ${{ price }} /M",
       "times_price": "${{ times }} / 次",
-      "free":"免費",
+      "free": "免費",
       "old_log": "舊版log",
       "illustrate": "* 本筆記錄為系統升級前所記錄的log"
     },
@@ -607,6 +640,10 @@
         "topUpLink": {
           "label": "充值鏈接",
           "placeholder": "例如發卡網站的購買鏈接"
+        },
+        "retryTimeOut": {
+          "label": "重試超時時間(秒)",
+          "placeholder": "重試超時時間(秒)"
         }
       },
       "logSettings": {

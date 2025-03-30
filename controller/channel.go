@@ -233,3 +233,28 @@ func BatchDelModelChannels(c *gin.Context) {
 		"message": "更新成功",
 	})
 }
+
+func BatchDeleteChannel(c *gin.Context) {
+	var params model.BatchChannelsParams
+	err := c.ShouldBindJSON(&params)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	if params.Ids == nil || len(params.Ids) == 0 {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("ids不能为空"))
+		return
+	}
+
+	count, err := model.BatchDeleteChannel(params.Ids)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    count,
+	})
+}

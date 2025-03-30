@@ -515,37 +515,20 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 </Container>
               )}
 
-              {!isTag && inputPrompt.base_url && (
+              {inputPrompt.base_url && (
                 <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
-                  {!batchAdd ? (
-                    <>
-                      <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
-                      <OutlinedInput
-                        id="channel-base_url-label"
-                        label={customizeT(inputLabel.base_url)}
-                        type="text"
-                        value={values.base_url}
-                        name="base_url"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        inputProps={{}}
-                        aria-describedby="helper-text-channel-base_url-label"
-                      />
-                    </>
-                  ) : (
-                    <TextField
-                      multiline
-                      id="channel-base_url-label"
-                      label={customizeT(inputLabel.base_url)}
-                      value={values.base_url}
-                      name="base_url"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      aria-describedby="helper-text-channel-base_url-label"
-                      minRows={5}
-                      placeholder={customizeT(inputPrompt.base_url) + t('channel_edit.batchBaseurlTip')}
-                    />
-                  )}
+                  <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
+                  <OutlinedInput
+                    id="channel-base_url-label"
+                    label={customizeT(inputLabel.base_url)}
+                    type="text"
+                    value={values.base_url}
+                    name="base_url"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                    aria-describedby="helper-text-channel-base_url-label"
+                  />
 
                   {touched.base_url && errors.base_url ? (
                     <FormHelperText error id="helper-tex-channel-base_url-label">
@@ -722,6 +705,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
                   <Button
+                    size="small"
                     onClick={() => {
                       const modelString = values.models.map((model) => model.id).join(',');
                       copy(modelString);
@@ -731,6 +715,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   </Button>
                   <Button
                     disabled={hasTag}
+                    size="small"
                     onClick={() => {
                       setFieldValue('models', basicModels(values.type));
                     }}
@@ -739,6 +724,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   </Button>
                   <Button
                     disabled={hasTag}
+                    size="small"
                     onClick={() => {
                       setFieldValue('models', modelOptions);
                     }}
@@ -750,6 +736,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       <LoadingButton
                         loading={providerModelsLoad}
                         disabled={hasTag}
+                        size="small"
                         onClick={() => {
                           getProviderModels(values, setFieldValue);
                         }}
