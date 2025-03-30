@@ -39,7 +39,7 @@ const MinimalLayout = () => {
           overflow: 'auto',
           marginTop: { xs: '56px', sm: '64px' },
           backgroundColor: theme.palette.background.default,
-          padding: { xs: '16px', sm: '20px', md: '24px' },
+          // padding: { xs: '16px', sm: '20px', md: '24px' },
           position: 'relative',
           minHeight: `calc(100vh - ${matchDownSm ? '56px' : '64px'} - ${matchDownMd ? '80px' : '60px'})`,
           scrollbarWidth: 'thin',
