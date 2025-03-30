@@ -249,6 +249,9 @@
   "logPage": {
     "cachedTokens": "Cache Tokens",
     "channelLabel": "Channel",
+    "columnSettings": "Column Settings",
+    "selectColumns": "Select Columns",
+    "columnSelectAll": "Select All",
     "detailLabel": "Detail",
     "durationLabel": "Duration",
     "durationTooltip": "t/s: The number of output tokens divided by the total generation time, indicating the generation speed",

@@ -249,6 +249,9 @@
   "logPage": {
     "cachedTokens": "Cache Tokens",
     "channelLabel": "チャネル",
+    "columnSettings": "列設定",
+    "selectColumns": "列を選択",
+    "columnSelectAll": "すべて選択",
     "detailLabel": "詳細",
     "durationLabel": "時間",
     "durationTooltip": "t/s: 出力トークンの数を総生成時間で割った値であり、生成速度を示します。",

@@ -250,6 +250,9 @@
   "logPage": {
     "cachedTokens": "緩存Tokens",
     "channelLabel": "渠道",
+    "columnSettings": "列設置",
+    "selectColumns": "選擇列",
+    "columnSelectAll": "全選",
     "detailLabel": "詳情",
     "durationLabel": "耗時",
     "durationTooltip": "t/s：輸出Token的數量除以總生成時間，表示生成速度",
