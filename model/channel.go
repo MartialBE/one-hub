@@ -1,6 +1,8 @@
 package model
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
@@ -210,6 +212,19 @@ func BatchDelModelChannels(params *BatchChannelsParams) (int64, error) {
 	}
 
 	return count, nil
+}
+
+func (c *Channel) SetProxy() {
+	if c.Proxy == nil {
+		return
+	}
+
+	if strings.Contains(*c.Proxy, "%s") {
+		md5Str := md5.Sum([]byte(c.Key))
+		idStr := hex.EncodeToString(md5Str[:])
+		*c.Proxy = strings.Replace(*c.Proxy, "%s", idStr, 1)
+	}
+
 }
 
 func (channel *Channel) GetPriority() int64 {

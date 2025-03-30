@@ -258,6 +258,7 @@ func (cc *ChannelsChooser) Load() {
 
 	// 处理每个channel
 	for _, channel := range channels {
+		channel.SetProxy()
 		if *channel.Weight == 0 {
 			channel.Weight = &config.DefaultChannelWeight
 		}

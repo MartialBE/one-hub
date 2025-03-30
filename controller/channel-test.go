@@ -38,6 +38,7 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 	}
 
 	channelType := getModelType(testModel)
+	channel.SetProxy()
 
 	var url string
 	switch channelType {
