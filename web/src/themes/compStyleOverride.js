@@ -510,13 +510,13 @@ export default function componentStyleOverrides(theme) {
         root: {
           borderBottom: `1px dashed ${theme.tableBorderBottom}`,
           fontSize: '0.875rem',
-          padding: '16px 24px',
+          padding: '16px 12px',
           textAlign: 'center',
           '&:first-of-type': {
-            paddingLeft: '24px'
+            paddingLeft: '12px'
           },
           '&:last-of-type': {
-            paddingRight: '24px'
+            paddingRight: '12px'
           }
         },
         head: {
@@ -525,7 +525,7 @@ export default function componentStyleOverrides(theme) {
           color: theme.darkTextSecondary,
           borderBottom: 'none',
           whiteSpace: 'nowrap',
-          padding: '14px 24px',
+          padding: '14px 12px',
           textAlign: 'center'
         },
         body: {
@@ -602,6 +602,7 @@ export default function componentStyleOverrides(theme) {
           right: '6px'
         },
         actions: {
+          padding: '0 30px',
           marginLeft: '16px',
           ...(theme.breakpoints && {
             [theme.breakpoints.down('sm')]: {
