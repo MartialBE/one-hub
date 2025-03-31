@@ -124,7 +124,9 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 		if strings.HasPrefix(newModelName, "o1") || strings.HasPrefix(newModelName, "o3") {
 			testRequest.MaxCompletionTokens = 10
 		} else {
-			testRequest.MaxTokens = 10
+			if !strings.Contains(newModelName, "gemini-2") {
+				testRequest.MaxTokens = 10
+			}
 		}
 		response, openAIErrorWithStatusCode = chatProvider.CreateChatCompletion(testRequest)
 	default:
