@@ -3,6 +3,8 @@ package gemini
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"one-api/common"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -30,6 +32,10 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 	_, errWithCode = p.Requester.SendRequest(req, geminiResponse, false)
 	if errWithCode != nil {
 		return nil, errWithCode
+	}
+
+	if len(geminiResponse.Candidates) == 0 {
+		return nil, common.StringErrorWrapper("no candidates", "no_candidates", http.StatusInternalServerError)
 	}
 
 	usage := p.GetUsage()
