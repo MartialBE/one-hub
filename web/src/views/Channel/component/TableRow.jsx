@@ -105,7 +105,7 @@ function statusInfo(t, status) {
   }
 }
 
-export default function ChannelTableRow({ item, manageChannel, onRefresh, groupOptions }) {
+export default function ChannelTableRow({ item, manageChannel, onRefresh, groupOptions, modelOptions }) {
   const { t } = useTranslation();
   const popover = usePopover();
   const confirmDelete = useBoolean();
@@ -1267,6 +1267,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
         channelId={item.tag ? item.tag : item.id}
         groupOptions={groupOptions}
         isTag={item.tag}
+        modelOptions={modelOptions}
       />
 
       <Popover
@@ -1337,7 +1338,8 @@ ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
   onRefresh: PropTypes.func,
-  groupOptions: PropTypes.array
+  groupOptions: PropTypes.array,
+  modelOptions: PropTypes.array
 };
 
 function renderBalance(type, balance) {

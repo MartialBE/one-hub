@@ -79,6 +79,7 @@ export default function ChannelList() {
   const [channels, setChannels] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [tags, setTags] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
 
   const confirm = useBoolean();
   const [confirmTitle, setConfirmTitle] = useState('');
@@ -339,6 +340,31 @@ export default function ChannelList() {
     }
   };
 
+  const fetchModels = async () => {
+    try {
+      let res = await API.get(`/api/channel/models`);
+      const { data } = res.data;
+      // 先对data排序
+      data.sort((a, b) => {
+        const ownedByComparison = a.owned_by.localeCompare(b.owned_by);
+        if (ownedByComparison === 0) {
+          return a.id.localeCompare(b.id);
+        }
+        return ownedByComparison;
+      });
+      setModelOptions(
+        data.map((model) => {
+          return {
+            id: model.id,
+            group: model.owned_by
+          };
+        })
+      );
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
@@ -346,6 +372,7 @@ export default function ChannelList() {
   useEffect(() => {
     fetchGroups().then();
     fetchTags().then();
+    fetchModels().then();
   }, []);
 
   return (
@@ -482,6 +509,7 @@ export default function ChannelList() {
                   // setModalChannelId={setEditChannelId}
                   groupOptions={groupOptions}
                   onRefresh={handleRefresh}
+                  modelOptions={modelOptions}
                 />
               ))}
             </TableBody>
@@ -499,7 +527,14 @@ export default function ChannelList() {
           showLastButton
         />
       </Card>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} />
+      <EditeModal
+        open={openModal}
+        onCancel={handleCloseModal}
+        onOk={handleOkModal}
+        channelId={editChannelId}
+        groupOptions={groupOptions}
+        modelOptions={modelOptions}
+      />
       <BatchModal open={openBatchModal} setOpen={setOpenBatchModal} />
 
       <ConfirmDialog
