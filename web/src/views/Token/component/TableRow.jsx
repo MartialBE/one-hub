@@ -26,6 +26,9 @@ import Label from 'ui-component/Label';
 import { Icon } from '@iconify/react';
 import { IconCaretDownFilled } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+
 function createMenu(menuItems) {
   return (
     <>
@@ -62,6 +65,8 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
   const [statusSwitch, setStatusSwitch] = useState(item.status);
   const siteInfo = useSelector((state) => state.siteInfo);
   const chatLinks = getChatLinks();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleDeleteOpen = () => {
     handleCloseMenu();
@@ -207,14 +212,16 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
                   copy(`sk-${item.key}`, t('token_index.token'));
                 }}
               >
-                {t('token_index.copy')}
+                {isMobile ? <Icon icon="mdi:content-copy" /> : t('token_index.copy')}
               </Button>
               <Button size="small" onClick={(e) => handleOpenMenu(e, 'copy')}>
                 <IconCaretDownFilled size={'16px'} />
               </Button>
             </ButtonGroup>
             <ButtonGroup size="small" onClick={(e) => handleOpenMenu(e, 'link')} aria-label="split button">
-              <Button color="primary">{t('token_index.chat')}</Button>
+              <Button size="small" color="primary">
+                {isMobile ? <Icon icon="mdi:chat" /> : t('token_index.chat')}
+              </Button>
               <Button size="small">
                 <IconCaretDownFilled size={'16px'} />
               </Button>

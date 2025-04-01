@@ -93,7 +93,7 @@ const MenuCard = () => {
 
   return (
     <CardStyle>
-      <CardContent sx={{ p: 2 }}>
+      <CardContent sx={{ p: 2, pb: '8px !important' }}>
         <List sx={{ p: 0, m: 0 }}>
           <ListItem alignItems="flex-start" disableGutters sx={{ p: 0 }}>
             <ListItemAvatar sx={{ mt: 0 }}>

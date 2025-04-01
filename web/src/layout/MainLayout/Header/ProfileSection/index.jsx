@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import {
   Avatar,
-  Chip,
+  Box,
   ClickAwayListener,
   List,
   ListItemButton,
@@ -14,7 +14,9 @@ import {
   ListItemText,
   Paper,
   Popper,
-  Typography
+  Typography,
+  useMediaQuery,
+  Drawer
 } from '@mui/material';
 
 // project imports
@@ -37,6 +39,14 @@ const ProfileSection = () => {
   const customization = useSelector((state) => state.customization);
   const account = useSelector((state) => state.account);
   const { logout } = useLogin();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  console.log('Current device is mobile:', isMobile);
+
+  // 调试宽度
+  useEffect(() => {
+    console.log('Window width:', window.innerWidth, 'isMobile:', isMobile);
+  }, [isMobile]);
 
   const [open, setOpen] = useState(false);
   /**
@@ -55,118 +65,147 @@ const ProfileSection = () => {
   };
 
   const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
+    console.log('Toggle clicked - current menu state:', open);
+    setOpen(!open);
   };
 
-  const prevOpen = useRef(open);
-  useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
-    }
+  // 渲染移动端菜单内容
+  const renderMobileMenuContent = () => (
+    <Box sx={{ p: 0 }}>
+      <List>
+        <ListItemButton
+          onClick={() => {
+            navigate('/panel/profile');
+            setOpen(false);
+          }}
+        >
+          <ListItemIcon>
+            <Icon icon="solar:user-id-bold-duotone" width="1.5rem" />
+          </ListItemIcon>
+          <ListItemText primary={<Typography variant="body1">{t('setting')}</Typography>} />
+        </ListItemButton>
 
-    prevOpen.current = open;
-  }, [open]);
+        <ListItemButton
+          onClick={() => {
+            handleLogout();
+            setOpen(false);
+          }}
+        >
+          <ListItemIcon>
+            <Icon icon="solar:logout-3-bold-duotone" width="1.5rem" />
+          </ListItemIcon>
+          <ListItemText primary={<Typography variant="body1">{t('menu.signout')}</Typography>} />
+        </ListItemButton>
+      </List>
+    </Box>
+  );
+
+  // 渲染桌面端菜单
+  const renderDesktopMenu = () => (
+    <Popper
+      placement="bottom-end"
+      open={open}
+      anchorEl={anchorRef.current}
+      role={undefined}
+      transition
+      disablePortal
+      popperOptions={{
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [0, 14]
+            }
+          }
+        ]
+      }}
+      sx={{ zIndex: 1600 }}
+    >
+      {({ TransitionProps }) => (
+        <Transitions type="grow" position="top-right" in={open} {...TransitionProps}>
+          <Paper sx={{ width: 'auto', maxWidth: 350, overflow: 'hidden', borderRadius: '10px' }}>
+            <ClickAwayListener onClickAway={handleClose}>
+              <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
+                <List
+                  component="nav"
+                  sx={{
+                    width: '100%',
+                    bgcolor: 'background.paper',
+                    py: 1,
+                    '& .MuiListItemButton-root': {
+                      mt: 0.5,
+                      py: 0.5,
+                      px: 2,
+                      borderRadius: `${customization.borderRadius}px`
+                    }
+                  }}
+                >
+                  <ListItemButton
+                    onClick={() => {
+                      navigate('/panel/profile');
+                      setOpen(false);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Icon icon="solar:user-id-bold-duotone" width="1.3rem" />
+                    </ListItemIcon>
+                    <ListItemText primary={<Typography variant="body2">{t('setting')}</Typography>} />
+                  </ListItemButton>
+
+                  <ListItemButton onClick={handleLogout}>
+                    <ListItemIcon>
+                      <Icon icon="solar:logout-3-bold-duotone" width="1.3rem" />
+                    </ListItemIcon>
+                    <ListItemText primary={<Typography variant="body2">{t('menu.signout')}</Typography>} />
+                  </ListItemButton>
+                </List>
+              </MainCard>
+            </ClickAwayListener>
+          </Paper>
+        </Transitions>
+      )}
+    </Popper>
+  );
 
   return (
     <>
-      <Chip
-        sx={{
-          height: '48px',
-          alignItems: 'center',
-          borderRadius: '27px',
-          transition: 'all .2s ease-in-out',
-          backgroundColor: 'transparent',
-          border: 'none',
-          '&[aria-controls="menu-list-grow"], &:hover': {
-            boxShadow: '0 2px 14px 0 rgb(32 40 45 / 8%)',
-            borderRadius: '50%',
-            '& svg': {
-              stroke: theme.palette.primary.light
-            }
-          },
-          '& .MuiChip-label': {
-            display: 'none'
-          }
-        }}
-        icon={
-          <Avatar
-            src={account.user?.avatar_url || User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: '8px !important',
-              cursor: 'pointer'
-            }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        ref={anchorRef}
-        aria-controls={open ? 'menu-list-grow' : undefined}
-        aria-haspopup="true"
-        onClick={handleToggle}
-        color="primary"
-      />
-      <Popper
-        placement="bottom-end"
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 14]
-              }
-            }
-          ]
-        }}
-      >
-        {({ TransitionProps }) => (
-          <Transitions in={open} {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                  <List
-                    component="nav"
-                    sx={{
-                      width: '100%',
-                      maxWidth: 350,
-                      minWidth: 150,
-                      backgroundColor: theme.palette.background.paper,
-                      borderRadius: '10px',
-                      [theme.breakpoints.down('md')]: {
-                        minWidth: '100%'
-                      },
-                      '& .MuiListItemButton-root': {
-                        mt: 0.5
-                      }
-                    }}
-                  >
-                    <ListItemButton sx={{ borderRadius: `${customization.borderRadius}px` }} onClick={() => navigate('/panel/profile')}>
-                      <ListItemIcon>
-                        <Icon icon="solar:user-id-bold-duotone" width="1.3rem" />
-                      </ListItemIcon>
-                      <ListItemText primary={<Typography variant="body2">{t('setting')}</Typography>} />
-                    </ListItemButton>
+      {/* 用户头像按钮 */}
+      <Box component="div" onClick={handleToggle} sx={{ cursor: 'pointer' }}>
+        <Avatar
+          src={account.user?.avatar_url || User1}
+          sx={{
+            ...theme.typography.mediumAvatar,
+            cursor: 'pointer',
+            border: `2px solid ${theme.palette.primary.light}`
+          }}
+          ref={anchorRef}
+        />
+      </Box>
 
-                    <ListItemButton sx={{ borderRadius: `${customization.borderRadius}px` }} onClick={handleLogout}>
-                      <ListItemIcon>
-                        <Icon icon="solar:logout-3-bold-duotone" width="1.3rem" />
-                      </ListItemIcon>
-                      <ListItemText primary={<Typography variant="body2">{t('menu.signout')}</Typography>} />
-                    </ListItemButton>
-                  </List>
-                </MainCard>
-              </ClickAwayListener>
-            </Paper>
-          </Transitions>
-        )}
-      </Popper>
+      {/* 调试信息 */}
+      <Box sx={{ display: 'none' }}>
+        Device: {isMobile ? 'Mobile' : 'Desktop'}, Menu: {open ? 'Open' : 'Closed'}
+      </Box>
+
+      {/* 移动端使用Drawer */}
+      {isMobile ? (
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={handleClose}
+          PaperProps={{
+            sx: {
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16
+            }
+          }}
+          sx={{ zIndex: 1600 }}
+        >
+          {renderMobileMenuContent()}
+        </Drawer>
+      ) : (
+        renderDesktopMenu()
+      )}
     </>
   );
 };

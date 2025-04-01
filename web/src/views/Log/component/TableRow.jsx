@@ -61,7 +61,7 @@ function requestTSLabelOptions(request_ts) {
   return color;
 }
 
-export default function LogTableRow({ item, userIsAdmin, userGroup }) {
+export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibility }) {
   const { t } = useTranslation();
   let request_time = item.request_time / 1000;
   let request_time_str = request_time.toFixed(2) + ' S';
@@ -83,50 +83,64 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
   return (
     <>
       <TableRow tabIndex={item.id}>
-        <TableCell>{timestamp2string(item.created_at)}</TableCell>
+        {columnVisibility.created_at && <TableCell sx={{ p: '10px 8px' }}>{timestamp2string(item.created_at)}</TableCell>}
 
-        {userIsAdmin && <TableCell>{(item.channel_id || '') + ' ' + (item.channel?.name ? '(' + item.channel.name + ')' : '')}</TableCell>}
-        {userIsAdmin && (
-          <TableCell>
+        {userIsAdmin && columnVisibility.channel_id && (
+          <TableCell sx={{ p: '10px 8px' }}>
+            {(item.channel_id || '') + ' ' + (item.channel?.name ? '(' + item.channel.name + ')' : '')}
+          </TableCell>
+        )}
+        {userIsAdmin && columnVisibility.user_id && (
+          <TableCell sx={{ p: '10px 8px' }}>
             <Label color="default" variant="outlined" copyText={item.username}>
               {item.username}
             </Label>
           </TableCell>
         )}
 
-        <TableCell>
-          {item?.metadata?.group_name ? (
-            <Label color="default" variant="soft">
-              {userGroup[item.metadata.group_name]?.name || '跟随用户'}
-            </Label>
-          ) : (
-            ''
-          )}
-        </TableCell>
-        <TableCell>
-          {item.token_name && (
-            <Label color="default" variant="soft" copyText={item.token_name}>
-              {item.token_name}
-            </Label>
-          )}
-        </TableCell>
-        <TableCell>{renderType(item.type)}</TableCell>
-        <TableCell>{viewModelName(item.model_name, item.is_stream)}</TableCell>
+        {columnVisibility.group && (
+          <TableCell sx={{ p: '10px 8px' }}>
+            {item?.metadata?.group_name ? (
+              <Label color="default" variant="soft">
+                {userGroup[item.metadata.group_name]?.name || '跟随用户'}
+              </Label>
+            ) : (
+              ''
+            )}
+          </TableCell>
+        )}
+        {columnVisibility.token_name && (
+          <TableCell sx={{ p: '10px 8px' }}>
+            {item.token_name && (
+              <Label color="default" variant="soft" copyText={item.token_name}>
+                {item.token_name}
+              </Label>
+            )}
+          </TableCell>
+        )}
+        {columnVisibility.type && <TableCell sx={{ p: '10px 8px' }}>{renderType(item.type)}</TableCell>}
+        {columnVisibility.model_name && <TableCell sx={{ p: '10px 8px' }}>{viewModelName(item.model_name, item.is_stream)}</TableCell>}
 
-        <TableCell>
-          <Stack direction="column" spacing={0.5}>
-            <Label color={requestTimeLabelOptions(request_time)}>
-              {item.request_time == 0 ? '无' : request_time_str} {first_time_str ? ' / ' + first_time_str : ''}
-            </Label>
+        {columnVisibility.duration && (
+          <TableCell sx={{ p: '10px 8px' }}>
+            <Stack direction="column" spacing={0.5}>
+              <Label color={requestTimeLabelOptions(request_time)}>
+                {item.request_time == 0 ? '无' : request_time_str} {first_time_str ? ' / ' + first_time_str : ''}
+              </Label>
 
-            {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}>{request_ts_str}</Label>}
-          </Stack>
-        </TableCell>
-        <TableCell>{viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails)}</TableCell>
-        <TableCell>{item.completion_tokens || ''}</TableCell>
-        <TableCell>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>
-        <TableCell>{item.source_ip || ''}</TableCell>
-        <TableCell>{viewLogContent(item, t, totalInputTokens, totalOutputTokens)}</TableCell>
+              {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}>{request_ts_str}</Label>}
+            </Stack>
+          </TableCell>
+        )}
+        {columnVisibility.message && (
+          <TableCell sx={{ p: '10px 8px' }}>{viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails)}</TableCell>
+        )}
+        {columnVisibility.completion && <TableCell sx={{ p: '10px 8px' }}>{item.completion_tokens || ''}</TableCell>}
+        {columnVisibility.quota && <TableCell sx={{ p: '10px 8px' }}>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>}
+        {columnVisibility.source_ip && <TableCell sx={{ p: '10px 8px' }}>{item.source_ip || ''}</TableCell>}
+        {columnVisibility.detail && (
+          <TableCell sx={{ p: '10px 8px' }}>{viewLogContent(item, t, totalInputTokens, totalOutputTokens)}</TableCell>
+        )}
       </TableRow>
     </>
   );
@@ -135,7 +149,8 @@ export default function LogTableRow({ item, userIsAdmin, userGroup }) {
 LogTableRow.propTypes = {
   item: PropTypes.object,
   userIsAdmin: PropTypes.bool,
-  userGroup: PropTypes.object
+  userGroup: PropTypes.object,
+  columnVisibility: PropTypes.object
 };
 
 function viewModelName(model_name, isStream) {

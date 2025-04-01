@@ -139,7 +139,8 @@
     "unselectAll": "Anti-select all",
     "updateEnabledBalance": "Update Enabled Balance",
     "usedBalance": "Used Balance/Remaining Balance",
-    "weight": "Weight"
+    "weight": "Weight",
+    "onlyTags": "Display tags only"
   },
   "channel_row": {
     "auto": "automatic",
@@ -165,7 +166,38 @@
     "updateChannelBalance": "All enabled channel balances have been updated!",
     "updateOk": "update completed!",
     "weightTip": "Weight cannot be less than 1",
-    "check": "Check"
+    "check": "Check",
+    "batchAddIDRequired": "Please select at least one channel.",
+    "batchDelete": "Batch delete",
+    "batchDeleteConfirm": "Are you sure you want to delete the selected {{count}} channels? This action cannot be undone.",
+    "batchDeleteError": "Batch deletion failed: {{message}}",
+    "batchDeleteErrorTip": "Batch deletion error: {{message}}",
+    "batchDeleteSuccess": "Batch deletion successful!",
+    "batchDeleteTip": "Do you want to delete the selected channels in batch?",
+    "deleteTag": "Delete tag",
+    "deleteTagAndChannels": "Delete the tag and all its channels.",
+    "deleteTagConfirm": "Are you sure you want to delete the tag {{tag}} and all its channels? This action cannot be undone.",
+    "deleteTagError": "Failed to delete tag: {{message}}",
+    "deleteTagSuccess": "Tag {{tag}} deleted successfully",
+    "disable": "Disable",
+    "disableAllChannels": "Disable all channels",
+    "disableTagChannels": "Disable tag channel",
+    "enable": "Enable",
+    "enableAllChannels": "Enable all channels",
+    "enableTagChannels": "Enable tag channel",
+    "getTagChannelsError": "Failed to retrieve tag channel: {{message}}",
+    "getTagChannelsErrorTip": "Error getting tag channel: {{message}}",
+    "noTagChannels": "No tag channel found",
+    "priorityUpdateError": "Priority update failed: {{message}}",
+    "priorityUpdateSuccess": "Priority updated successfully",
+    "refreshList": "Refresh list",
+    "tag": "Tags",
+    "tagChannelList": "Tag channel list",
+    "tagChannelsConfirm": "Are you sure you want to {{action}} all channels under the tag {{tag}}?",
+    "tagChannelsError": "Channel {{action}} failed: {{message}}",
+    "tagChannelsSuccess": "The tag channel {{action}} is successful.",
+    "weightUpdateError": "Weight update failed: {{message}}",
+    "weightUpdateSuccess": "Weight update successful"
   },
   "common": {
     "again": "Retry ({{count}})",
@@ -201,7 +233,9 @@
     "unableServer": "Unable to connect to the server properly!",
     "unableServerTip": "New version available: {{version}}, please use the shortcut key Shift F5 to refresh the page",
     "unknown": "unknown",
-    "verificationCode": "Verification code"
+    "verificationCode": "Verification code",
+    "deleteError": "Deletion failed: {{message}}",
+    "deleteSuccess": "Delete successful!"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -249,6 +283,9 @@
   "logPage": {
     "cachedTokens": "Cache Tokens",
     "channelLabel": "Channel",
+    "columnSettings": "Column Settings",
+    "selectColumns": "Select Columns",
+    "columnSelectAll": "Select All",
     "detailLabel": "Detail",
     "durationLabel": "Duration",
     "durationTooltip": "t/s: The number of output tokens divided by the total generation time, indicating the generation speed",
@@ -607,6 +644,10 @@
         "topUpLink": {
           "label": "Top-up Link",
           "placeholder": "For example, the purchase link of the card issuing website"
+        },
+        "retryTimeOut": {
+          "label": "Retry Timeout (seconds)",
+          "placeholder": "Retry Timeout (seconds)"
         }
       },
       "logSettings": {
@@ -1062,7 +1103,6 @@
   "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启": "When using the code execution function, the calculation of tokens is inaccurate after it is turned on. It is recommended that individuals use it to turn it on.",
   "使用网页搜索功能，对用户输入的内容进行搜索": "Use the web search function to search for content entered by the user",
   "其他参数": "Other parameters",
-  "单独设置代理地址，支持http和socks5，例如：http://127.0.0.1:1080": "Set the proxy address separately, support http and socks5, for example: http://127.0.0.1:1080",
   "可空，请输入中转API地址，例如通过cloudflare中转": "Can be left empty, please enter the transfer API address, for example, through cloudflare transfer",
   "启用": "enable",
   "地址填写Suno-API部署的地址": "Address: Fill in the address of Suno-API deployment",
@@ -1145,5 +1185,8 @@
   "price": "Price",
   "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。在B模型加前缀+，表示使用传入模型计费，例如：+gpt-3": {
     "5-turbo": "Model mapping relationship: For example, when a user requests Model A, the actual model forwarded to the channel is Model B. Adding a prefix \"+\" to Model B indicates using the incoming model for billing purposes, for example: +gpt-3.5-turbo"
+  },
+  "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
+    "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "Set the proxy address separately, supporting both http and socks5, for example: http://127.0.0.1:1080. You can use `%s` as a session identifier placeholder in the proxy address. When a placeholder is detected in the program, it will be replaced with a unique session identifier generated based on the Key."
   }
 }

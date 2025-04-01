@@ -225,11 +225,14 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
               }
             }}
           >
-            <MenuItem key={1} value={false}>
-              {t('channel_index.showAll')}
+            <MenuItem key={0} value={0}>
+              {t('channel_index.all')}
             </MenuItem>
-            <MenuItem key={2} value={true}>
+            <MenuItem key={1} value={1}>
               {t('channel_index.filterTags')}
+            </MenuItem>
+            <MenuItem key={2} value={2}>
+              {t('channel_index.onlyTags')}
             </MenuItem>
           </Select>
         </FormControl>

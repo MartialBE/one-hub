@@ -1,6 +1,8 @@
 package model
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
@@ -57,54 +59,70 @@ var allowedChannelOrderFields = map[string]bool{
 type SearchChannelsParams struct {
 	Channel
 	PaginationParams
-	FilterTag bool `json:"filter_tag" form:"filter_tag"`
+	FilterTag int `json:"filter_tag" form:"filter_tag"`
 }
 
 func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error) {
 	var channels []*Channel
 
 	db := DB.Omit("key")
+	tagDB := DB.Model(&Channel{}).Select("Max(id) as id").Where("tag != ''").Group("tag")
 
 	if params.Type != 0 {
 		db = db.Where("type = ?", params.Type)
+		tagDB = tagDB.Where("type = ?", params.Type)
 	}
 
 	if params.Status != 0 {
 		db = db.Where("status = ?", params.Status)
+		tagDB = tagDB.Where("status = ?", params.Status)
 	}
 
 	if params.Name != "" {
 		db = db.Where("name LIKE ?", "%"+params.Name+"%")
+		tagDB = tagDB.Where("tag LIKE ?", "%"+params.Name+"%")
 	}
 
 	if params.Group != "" {
 		groupKey := quotePostgresField("group")
 		db = db.Where("( "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" = ?)",
 			"%,"+params.Group+",%", params.Group+",%", "%,"+params.Group, params.Group)
+		tagDB = tagDB.Where("( "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" LIKE ? OR "+groupKey+" = ?)",
+			"%,"+params.Group+",%", params.Group+",%", "%,"+params.Group, params.Group)
 	}
 
 	if params.Models != "" {
 		db = db.Where("models LIKE ?", "%"+params.Models+"%")
+		tagDB = tagDB.Where("models LIKE ?", "%"+params.Models+"%")
 	}
 
 	if params.Other != "" {
 		db = db.Where("other LIKE ?", params.Other+"%")
+		tagDB = tagDB.Where("other LIKE ?", params.Other+"%")
 	}
 
 	if params.Key != "" {
 		db = db.Where(quotePostgresField("key")+" = ?", params.Key)
+		tagDB = tagDB.Where(quotePostgresField("key")+" = ?", params.Key)
 	}
 
 	if params.TestModel != "" {
 		db = db.Where("test_model LIKE ?", params.TestModel+"%")
+		tagDB = tagDB.Where("test_model LIKE ?", params.TestModel+"%")
 	}
 
 	if params.Tag != "" {
 		db = db.Where("tag = ?", params.Tag)
+		tagDB = tagDB.Where("tag = ?", params.Tag)
 	}
 
-	if params.FilterTag {
+	switch params.FilterTag {
+	case 1:
 		db = db.Where("tag = ''")
+	case 2:
+		db = db.Where("id IN (?)", tagDB)
+	default:
+		db = db.Where("tag = '' OR id IN (?)", tagDB)
 	}
 
 	return PaginateAndOrder(db, &params.PaginationParams, &channels, allowedChannelOrderFields)
@@ -118,8 +136,7 @@ func GetAllChannels() ([]*Channel, error) {
 
 func GetChannelById(id int) (*Channel, error) {
 	channel := Channel{Id: id}
-	var err error = nil
-	err = DB.First(&channel, "id = ?", id).Error
+	err := DB.First(&channel, "id = ?", id).Error
 
 	return &channel, err
 }
@@ -133,6 +150,11 @@ func GetChannelsByTag(tag string) ([]*Channel, error) {
 func DeleteChannelTag(channelId int) error {
 	err := DB.Model(&Channel{}).Where("id = ?", channelId).Update("tag", "").Error
 	return err
+}
+
+func BatchDeleteChannel(ids []int) (int64, error) {
+	result := DB.Where("id IN ?", ids).Delete(&Channel{})
+	return result.RowsAffected, result.Error
 }
 
 func BatchInsertChannels(channels []Channel) error {
@@ -190,6 +212,19 @@ func BatchDelModelChannels(params *BatchChannelsParams) (int64, error) {
 	}
 
 	return count, nil
+}
+
+func (c *Channel) SetProxy() {
+	if c.Proxy == nil {
+		return
+	}
+
+	if strings.Contains(*c.Proxy, "%s") {
+		md5Str := md5.Sum([]byte(c.Key))
+		idStr := hex.EncodeToString(md5Str[:])
+		*c.Proxy = strings.Replace(*c.Proxy, "%s", idStr, 1)
+	}
+
 }
 
 func (channel *Channel) GetPriority() int64 {

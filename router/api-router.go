@@ -127,17 +127,19 @@ func SetApiRouter(router *gin.Engine) {
 			channelRoute.DELETE("/disabled", controller.DeleteDisabledChannel)
 			channelRoute.DELETE("/:id/tag", controller.DeleteChannelTag)
 			channelRoute.DELETE("/:id", controller.DeleteChannel)
+			channelRoute.DELETE("/batch", controller.BatchDeleteChannel)
 		}
 		channelTagRoute := apiRouter.Group("/channel_tag")
 		channelTagRoute.Use(middleware.AdminAuth())
 		{
 			channelTagRoute.GET("/_all", controller.GetChannelsTagAllList)
-			channelTagRoute.GET("/", controller.GetChannelsTagList)
+			channelTagRoute.GET("/:tag/list", controller.GetChannelsTagList)
 			channelTagRoute.GET("/:tag", controller.GetChannelsTag)
 			channelTagRoute.PUT("/:tag", controller.UpdateChannelsTag)
 			channelTagRoute.DELETE("/:tag", controller.DeleteChannelsTag)
 			channelTagRoute.DELETE("/:tag/disabled", controller.DeleteDisabledChannelsTag)
 			channelTagRoute.PUT("/:tag/priority", controller.UpdateChannelsTagPriority)
+			channelTagRoute.PUT("/:tag/status/:status", controller.ChangeChannelsTagStatus)
 
 		}
 

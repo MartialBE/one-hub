@@ -1,10 +1,15 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { showInfo, showError } from 'utils/common';
+import { showInfo, showError, showSuccess } from 'utils/common';
 import { API } from 'utils/api';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTranslation } from 'react-i18next';
+import { useBoolean } from 'src/hooks/use-boolean';
+import ConfirmDialog from 'ui-component/confirm-dialog';
+import EditeModal from './EditModal';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import { usePopover } from 'hooks/use-popover';
 
 import {
   Popover,
@@ -25,11 +30,20 @@ import {
   TextField,
   Stack,
   Menu,
-  Box
+  Box,
+  Switch,
+  InputAdornment,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableHead,
+  Checkbox,
+  TablePagination,
+  MenuList
 } from '@mui/material';
 
 import Label from 'ui-component/Label';
-import TableSwitch from 'ui-component/Switch';
+// import TableSwitch from 'ui-component/Switch';
 
 import ResponseTimeLabel from './ResponseTimeLabel';
 import GroupLabel from './GroupLabel';
@@ -91,15 +105,36 @@ function statusInfo(t, status) {
   }
 }
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
+export default function ChannelTableRow({ item, manageChannel, onRefresh, groupOptions, modelOptions }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(null);
+  const popover = usePopover();
+  const confirmDelete = useBoolean();
+  const check = useBoolean();
+  const updateBalanceOption = useBoolean();
+
   const [openTest, setOpenTest] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  // const [openDelete, setOpenDelete] = useState(false);
   const [openCheck, setOpenCheck] = useState(false);
   const [statusSwitch, setStatusSwitch] = useState(item.status);
-  const [priorityValve, setPriority] = useState(item.priority);
-  const [weightValve, setWeight] = useState(item.weight);
+
+  const [priority, setPriority] = useState(item.priority);
+  const [weight, setWeight] = useState(item.weight);
+  const tagDeleteConfirm = useBoolean();
+  const quickEdit = useBoolean();
+  const [totalTagChannels, setTotalTagChannels] = useState(0);
+  const [isTagChannelsLoading, setIsTagChannelsLoading] = useState(false);
+  const [tagChannels, setTagChannels] = useState([]);
+  const [selectedChannels, setSelectedChannels] = useState([]);
+  const [currentTestingChannel, setCurrentTestingChannel] = useState(null);
+  const [tagPage, setTagPage] = useState(0);
+  const [tagRowsPerPage, setTagRowsPerPage] = useState(10);
+  const tagModelPopover = usePopover();
+
+  const batchConfirm = useBoolean();
+
+  const tagStatusConfirm = useBoolean();
+  const [statusChangeAction, setStatusChangeAction] = useState('');
+
   const [responseTimeData, setResponseTimeData] = useState({ test_time: item.test_time, response_time: item.response_time });
   const [itemBalance, setItemBalance] = useState(item.balance);
 
@@ -108,26 +143,129 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   modelMap = item.models.split(',');
   modelMap.sort();
 
-  const handleDeleteOpen = () => {
-    handleCloseMenu();
-    setOpenDelete(true);
+  const fetchTagChannels = useCallback(async () => {
+    if (!item.tag) return;
+
+    try {
+      setIsTagChannelsLoading(true);
+      const response = await API.get(`/api/channel_tag/${item.tag}/list`);
+      if (response.data.success) {
+        const data = response.data.data || [];
+        setTagChannels(data);
+        setTotalTagChannels(data.length);
+      } else {
+        showError(t('channel_row.getTagChannelsError', { message: response.data.message }));
+      }
+    } catch (error) {
+      showError(t('channel_row.getTagChannelsErrorTip', { message: error.message }));
+    } finally {
+      setIsTagChannelsLoading(false);
+    }
+  }, [item.tag, t]);
+
+  const handleChangeTagPage = (event, newPage) => {
+    setTagPage(newPage);
   };
 
-  const handleDeleteClose = () => {
-    setOpenDelete(false);
+  const handleChangeTagRowsPerPage = (event) => {
+    setTagRowsPerPage(parseInt(event.target.value, 10));
+    setTagPage(0);
   };
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
+  const handleToggleChannel = (channelId) => {
+    setSelectedChannels((prev) => (prev.includes(channelId) ? prev.filter((id) => id !== channelId) : [...prev, channelId]));
   };
+
+  const handleToggleAll = () => {
+    if (selectedChannels.length === tagChannels.length) {
+      setSelectedChannels([]);
+    } else {
+      setSelectedChannels(tagChannels.map((channel) => channel.id));
+    }
+  };
+
+  const handleTagChannelStatus = async (channelId, currentStatus) => {
+    const newStatus = currentStatus === 1 ? 2 : 1;
+    const { success } = await manageChannel(channelId, 'status', newStatus);
+    if (success) {
+      // 更新本地状态
+      setTagChannels((prev) => prev.map((channel) => (channel.id === channelId ? { ...channel, status: newStatus } : channel)));
+    }
+  };
+
+  // 处理子渠道的优先级变更
+  const handleTagChannelPriorityChange = (channelId, value) => {
+    // 更新本地UI状态
+    setTagChannels((prev) => prev.map((c) => (c.id === channelId ? { ...c, priority: value } : c)));
+  };
+
+  const handleTagChannelTest = async (channel) => {
+    const models = channel.models.split(',');
+    if (models.length === 1) {
+      // 如果只有一个模型，直接测速
+      const testModel = models[0];
+      const { success, time } = await manageChannel(channel.id, 'test', testModel);
+      if (success) {
+        showInfo(t('channel_row.modelTestSuccess', { channel: channel.name, model: testModel, time: time.toFixed(2) }));
+        // 更新本地状态
+        setTagChannels((prev) =>
+          prev.map((c) =>
+            c.id === channel.id
+              ? {
+                  ...c,
+                  test_time: Date.now() / 1000,
+                  response_time: time * 1000
+                }
+              : c
+          )
+        );
+      }
+    } else {
+      // 多个模型，显示模型列表
+      setCurrentTestingChannel(channel);
+      tagModelPopover.onOpen();
+    }
+  };
+
+  const handleBatchDelete = async () => {
+    if (!selectedChannels.length) {
+      showError(t('channel_row.batchAddIDRequired'));
+      return;
+    }
+
+    batchConfirm.onTrue();
+  };
+
+  const executeBatchDelete = async () => {
+    try {
+      // 这里需要实现批量删除的API调用
+      const { success, message } = await manageChannel(0, 'batch_delete', selectedChannels, false);
+      if (success) {
+        showInfo(t('channel_row.batchDeleteSuccess'));
+        setSelectedChannels([]);
+        fetchTagChannels(); // 重新获取数据
+        onRefresh(false); // 刷新父组件数据
+      } else {
+        showError(t('channel_row.batchDeleteError', { message }));
+      }
+    } catch (error) {
+      showError(t('channel_row.batchDeleteErrorTip', { message: error.message }));
+    }
+  };
+
+  useEffect(() => {
+    if (openRow && item.tag) {
+      fetchTagChannels();
+    }
+  }, [openRow, item.tag, fetchTagChannels]);
 
   const handleTestModel = (event) => {
     setOpenTest(event.currentTarget);
   };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+  const handleDeleteRow = useCallback(async () => {
+    await manageChannel(item.id, 'delete', '');
+  }, [manageChannel, item.id]);
 
   const handleStatus = async () => {
     const switchVlue = statusSwitch === 1 ? 2 : 1;
@@ -135,36 +273,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     if (success) {
       setStatusSwitch(switchVlue);
     }
-  };
-
-  const handlePriority = async (event) => {
-    const currentValue = parseInt(event.target.value);
-    if (isNaN(currentValue) || currentValue === priorityValve) {
-      return;
-    }
-
-    if (currentValue < 0) {
-      showError(t('channel_row.priorityTip'));
-      return;
-    }
-
-    await manageChannel(item.id, 'priority', currentValue);
-    setPriority(currentValue);
-  };
-
-  const handleWeight = async (event) => {
-    const currentValue = parseInt(event.target.value);
-    if (isNaN(currentValue) || currentValue === weightValve) {
-      return;
-    }
-
-    if (currentValue < 1) {
-      showError(t('channel_row.weightTip'));
-      return;
-    }
-
-    await manageChannel(item.id, 'weight', currentValue);
-    setWeight(currentValue);
   };
 
   const handleResponseTime = async (modelName) => {
@@ -185,11 +293,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
   };
 
-  const handleDeleteTag = async () => {
-    handleCloseMenu();
-    await manageChannel(item.id, 'delete_tag', '');
-  };
-
   const updateChannelBalance = async () => {
     try {
       const res = await API.get(`/api/channel/update_balance/${item.id}`);
@@ -206,11 +309,6 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
     }
   };
 
-  const handleDelete = async () => {
-    handleCloseMenu();
-    await manageChannel(item.id, 'delete', '');
-  };
-
   useEffect(() => {
     setStatusSwitch(item.status);
     setPriority(item.priority);
@@ -222,20 +320,48 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
   return (
     <>
       <TableRow tabIndex={item.id}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpenRow(!openRow)}>
-            {openRow ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+        <TableCell sx={{ minWidth: 50, textAlign: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+            <IconButton aria-label="expand row" size="small" onClick={() => setOpenRow(!openRow)}>
+              {openRow ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+            {item.tag ? (
+              <Label color="primary" variant="soft" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                {t('channel_row.tag')}
+              </Label>
+            ) : (
+              item.id
+            )}
+          </Box>
         </TableCell>
-
-        <TableCell>{item.id}</TableCell>
-        <TableCell>{item.name}</TableCell>
+        <TableCell sx={{ minWidth: 100, maxWidth: 220, overflow: 'hidden' }}>
+          {item.tag ? (
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: 'primary.main',
+                maxWidth: 100,
+                display: 'block'
+              }}
+            >
+              {item.tag}
+            </Typography>
+          ) : (
+            <Typography
+              variant="subtitle1"
+              sx={{
+                maxWidth: 100,
+                lineHeight: 1.4
+              }}
+            >
+              {item.name}
+            </Typography>
+          )}
+        </TableCell>
 
         <TableCell>
           <GroupLabel group={item.group} />
         </TableCell>
-
-        <TableCell>{item.tag && <Label key={item.tag}>{item.tag}</Label>}</TableCell>
 
         <TableCell>
           {!CHANNEL_OPTIONS[item.type] ? (
@@ -248,115 +374,255 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
             </Label>
           )}
         </TableCell>
-        <TableCell>
-          <TableSwitch id={`switch-${item.id}`} checked={statusSwitch === 1} onChange={handleStatus} />
-          {statusInfo(t, statusSwitch)}
+
+        <TableCell align="center" sx={{ minWidth: 90 }}>
+          {!item.tag && (
+            <Stack direction="column" alignItems="center" spacing={0.5}>
+              <Switch checked={statusSwitch === 1} onChange={handleStatus} size="small" />
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: statusSwitch === 1 ? 600 : 400,
+                  color: statusSwitch === 1 ? 'success.main' : 'text.secondary'
+                }}
+              >
+                {statusInfo(t, statusSwitch)}
+              </Typography>
+            </Stack>
+          )}
+          {item.tag && (
+            <Stack direction="row" spacing={1} justifyContent="center">
+              <Tooltip title={t('channel_row.enableAllChannels')} placement="top">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setStatusChangeAction('enable');
+                    tagStatusConfirm.onTrue();
+                  }}
+                  sx={{ color: 'success.main' }}
+                >
+                  <Icon icon="mdi:power" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('channel_row.disableAllChannels')} placement="top">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setStatusChangeAction('disable');
+                    tagStatusConfirm.onTrue();
+                  }}
+                  sx={{ color: 'error.main' }}
+                >
+                  <Icon icon="mdi:power-off" />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          )}
         </TableCell>
 
-        <TableCell>
-          <ResponseTimeLabel
-            test_time={responseTimeData.test_time}
-            response_time={responseTimeData.response_time}
-            handle_action={handleResponseTime}
-          />
+        <TableCell sx={{ minWidth: 90, textAlign: 'center' }}>
+          {!item.tag && (
+            <ResponseTimeLabel
+              test_time={responseTimeData.test_time}
+              response_time={responseTimeData.response_time}
+              handle_action={handleResponseTime}
+            />
+          )}
         </TableCell>
         {/* <TableCell>
           
         </TableCell> */}
         <TableCell>
-          {renderQuota(item.used_quota)}
-          <Tooltip title={t('channel_row.clickUpdateQuota')} placement="top" onClick={updateChannelBalance}>
-            {renderBalance(item.type, itemBalance)}
-          </Tooltip>
-        </TableCell>
-        <TableCell>
-          <TextField
-            id={`priority-${item.id}`}
-            onBlur={handlePriority}
-            type="number"
-            label={t('channel_index.priority')}
-            variant="standard"
-            defaultValue={item.priority}
-            inputProps={{ min: '0' }}
-          />
-        </TableCell>
-        <TableCell>
-          <TextField
-            id={`weight-${item.id}`}
-            onBlur={handleWeight}
-            type="number"
-            label={t('channel_index.weight')}
-            variant="standard"
-            defaultValue={item.weight}
-            inputProps={{ min: '1' }}
-          />
+          {!item.tag && (
+            <Stack spacing={0.5} alignItems="center">
+              <Typography variant="body1">{renderQuota(item.used_quota)}</Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'success.main',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+                onClick={updateChannelBalance}
+              >
+                {renderBalance(item.type, itemBalance)}
+              </Typography>
+            </Stack>
+          )}
         </TableCell>
 
+        <TableCell colSpan={item.tag ? 2 : 1}>
+          <Box sx={{ display: 'flex' }}>
+            <TextField
+              id={`priority-${item.id}`}
+              type="number"
+              label={t('channel_index.priority')}
+              variant="outlined"
+              size="small"
+              value={priority}
+              onChange={(e) => setPriority(Number(e.target.value))}
+              inputProps={{
+                min: '0'
+              }}
+              sx={{ width: '90px' }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        // 确保在提交时检查是否有变化
+                        if (priority !== item.priority) {
+                          const isTag = !!item.tag;
+                          const channelId = isTag ? item.tag : item.id;
+                          manageChannel(channelId, 'priority', priority, isTag)
+                            .then(({ success }) => {
+                              if (success) {
+                                item.priority = priority;
+                                showInfo(t('channel_row.priorityUpdateSuccess'));
+                              }
+                            })
+                            .catch((error) => {
+                              showError(t('channel_row.priorityUpdateError', { message: error.message }));
+                            });
+                        }
+                      }}
+                    >
+                      <Icon icon="mdi:check" />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Box>
+        </TableCell>
+
+        {!item.tag && (
+          <TableCell>
+            <Box sx={{ display: 'flex' }}>
+              <TextField
+                id={`weight-${item.id}`}
+                type="number"
+                label={t('channel_index.weight')}
+                variant="outlined"
+                size="small"
+                value={weight}
+                onChange={(e) => setWeight(Number(e.target.value))}
+                inputProps={{
+                  min: '1'
+                }}
+                sx={{ width: '90px' }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => {
+                          // 确保在提交时检查是否有变化
+                          if (weight !== item.weight) {
+                            manageChannel(item.id, 'weight', weight)
+                              .then(({ success }) => {
+                                if (success) {
+                                  item.weight = weight;
+                                  showInfo(t('channel_row.weightUpdateSuccess'));
+                                }
+                              })
+                              .catch((error) => {
+                                showError(t('channel_row.weightUpdateError', { message: error.message }));
+                              });
+                          }
+                        }}
+                      >
+                        <Icon icon="mdi:check" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Box>
+          </TableCell>
+        )}
+
         <TableCell>
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
-            <Tooltip title={t('channel_row.onlyChat')} placement="top">
-              <Button
-                id="test-model-button"
+          <Stack direction="row" justifyContent="right" alignItems="right" spacing={1}>
+            {!item.tag && (
+              <IconButton
+                size="small"
+                onClick={handleTestModel}
                 aria-controls={openTest ? 'test-model-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={openTest ? 'true' : undefined}
-                variant="outlined"
-                disableElevation
-                onClick={handleTestModel}
-                endIcon={<KeyboardArrowDownIcon />}
-                size="small"
+                sx={{ color: 'info.main' }}
               >
-                {t('channel_row.test')}
-              </Button>
+                <Icon icon="mdi:speedometer" />
+              </IconButton>
+            )}
+
+            <Tooltip title={t('common.edit')} placement="top" arrow>
+              <IconButton onClick={quickEdit.onTrue} size="small">
+                <Icon icon="solar:pen-bold" />
+              </IconButton>
             </Tooltip>
-            <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>
-              <Icon icon="solar:menu-dots-circle-bold-duotone" />
-            </IconButton>
+            {!item.tag && (
+              <IconButton onClick={popover.onOpen} size="small">
+                <Icon icon="eva:more-vertical-fill" />
+              </IconButton>
+            )}
+
+            {item.tag && (
+              <Tooltip title={t('channel_row.deleteTagAndChannels')} placement="top">
+                <IconButton sx={{ color: 'error.main' }} onClick={tagDeleteConfirm.onTrue} size="small">
+                  <Icon icon="solar:trash-bin-trash-bold" />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         </TableCell>
       </TableRow>
 
       <Popover
-        open={!!open}
-        anchorEl={open}
-        onClose={handleCloseMenu}
+        open={popover.open}
+        anchorEl={popover.anchorEl}
+        onClose={() => {
+          popover.onClose();
+          // 如果在关闭后没有进一步操作，重置当前渠道
+          if (!check.value && !confirmDelete.value && !updateBalanceOption.value) {
+            setCurrentTestingChannel(null);
+          }
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
           sx: { minWidth: 140 }
         }}
       >
-        {!hideEdit && (
-          <MenuItem
-            onClick={() => {
-              handleCloseMenu();
-              handleOpenModal();
-              setModalChannelId(item.id);
-            }}
-          >
-            <Icon icon="solar:pen-bold-duotone" style={{ marginRight: '16px' }} />
-            {t('common.edit')}
-          </MenuItem>
-        )}
-
         <MenuItem
           onClick={() => {
-            handleCloseMenu();
-            manageChannel(item.id, 'copy');
+            popover.onClose();
+            manageChannel(currentTestingChannel ? currentTestingChannel.id : item.id, 'copy');
           }}
         >
           <Icon icon="solar:copy-bold-duotone" style={{ marginRight: '16px' }} />
           {t('token_index.copy')}
         </MenuItem>
-        <MenuItem onClick={() => setOpenCheck(true)}>
+        <MenuItem
+          onClick={() => {
+            setOpenCheck(true);
+            popover.onClose();
+          }}
+        >
           <Icon icon="solar:checklist-minimalistic-bold" style={{ marginRight: '16px' }} />
           {t('channel_row.check')}
         </MenuItem>
-        {CHANNEL_OPTIONS[item.type]?.url && (
+
+        {CHANNEL_OPTIONS[currentTestingChannel ? currentTestingChannel?.type : item.type]?.url && (
           <MenuItem
             onClick={() => {
-              handleCloseMenu();
-              window.open(CHANNEL_OPTIONS[item.type].url);
+              popover.onClose();
+              window.open(CHANNEL_OPTIONS[currentTestingChannel ? currentTestingChannel?.type : item.type].url);
             }}
           >
             <Icon icon="solar:global-line-duotone" style={{ marginRight: '16px' }} />
@@ -364,13 +630,25 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           </MenuItem>
         )}
 
-        {item.tag && (
-          <MenuItem onClick={handleDeleteTag} sx={{ color: 'error.main' }}>
+        {currentTestingChannel && (
+          <MenuItem
+            onClick={() => {
+              popover.onClose();
+              manageChannel(currentTestingChannel.id, 'delete_tag', '');
+            }}
+            sx={{ color: 'error.main' }}
+          >
             <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
             {t('channel_row.delTag')}
           </MenuItem>
         )}
-        <MenuItem onClick={handleDeleteOpen} sx={{ color: 'error.main' }}>
+        <MenuItem
+          onClick={() => {
+            popover.onClose();
+            confirmDelete.onTrue();
+          }}
+          sx={{ color: 'error.main' }}
+        >
           <Icon icon="solar:trash-bin-trash-bold-duotone" style={{ marginRight: '16px' }} />
           {t('common.delete')}
         </MenuItem>
@@ -398,20 +676,57 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
           </MenuItem>
         ))}
       </StyledMenu>
-      <TableRow>
+      <TableRow
+        sx={{
+          '&:hover': {
+            backgroundColor: 'transparent !important'
+          },
+          '&.MuiTableRow-hover:hover': {
+            backgroundColor: 'transparent !important'
+          }
+        }}
+      >
         <TableCell style={{ paddingBottom: 0, paddingTop: 0, textAlign: 'left' }} colSpan={20}>
           <Collapse in={openRow} timeout="auto" unmountOnExit>
-            <Grid container spacing={1}>
+            <Grid container spacing={1} sx={{ py: 2 }}>
               <Grid item xs={12}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
-                  <Typography variant="h6" gutterBottom component="div">
-                    {t('channel_row.canModels')}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                    m: 1,
+                    p: 0,
+                    bgcolor: 'background.neutral',
+                    borderRadius: 1,
+                    alignItems: 'center'
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    component="div"
+                    sx={{
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                      mr: 1,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Icon icon="mdi:cube-outline" sx={{ mr: 0.5 }} /> {t('channel_row.canModels')}
                   </Typography>
                   {modelMap.map((model) => (
                     <Label
-                      variant="outlined"
+                      variant="soft"
                       color="primary"
                       key={model}
+                      sx={{
+                        py: 0.75,
+                        px: 1.5,
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        '&:hover': { opacity: 0.8 }
+                      }}
                       onClick={() => {
                         copy(model, t('channel_index.modelName'));
                       }}
@@ -421,16 +736,39 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                   ))}
                 </Box>
               </Grid>
+
               {item.test_model && (
-                <Grid item xs={12}>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
-                    <Typography variant="h6" gutterBottom component="div">
-                      {t('channel_row.testModels') + ':'}
+                <Grid xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      m: 1,
+                      px: 1,
+                      py: 0.5,
+                      bgcolor: 'background.neutral',
+                      borderRadius: 1,
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Icon icon="mdi:speedometer" sx={{ mr: 0.5 }} /> {t('channel_row.testModels') + ':'}
                     </Typography>
                     <Label
-                      variant="outlined"
-                      color="default"
+                      variant="soft"
+                      color="info"
                       key={item.test_model}
+                      sx={{ fontSize: '0.75rem', cursor: 'pointer' }}
                       onClick={() => {
                         copy(item.test_model, t('channel_row.testModels'));
                       }}
@@ -440,26 +778,71 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                   </Box>
                 </Grid>
               )}
+
               {item.proxy && (
-                <Grid item xs={12}>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
-                    <Typography variant="h6" gutterBottom component="div">
-                      {t('channel_row.proxy')}
+                <Grid xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      m: 1,
+                      px: 1,
+                      py: 0.5,
+                      bgcolor: 'background.neutral',
+                      borderRadius: 1,
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Icon icon="mdi:web" sx={{ mr: 0.5 }} /> {t('channel_row.proxy')}
                     </Typography>
-                    {item.proxy}
+                    <Typography variant="body2">{item.proxy}</Typography>
                   </Box>
                 </Grid>
               )}
+
               {item.other && (
-                <Grid item xs={12}>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
-                    <Typography variant="h6" gutterBottom component="div">
-                      {t('channel_row.otherArg') + ':'}
+                <Grid xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      m: 1,
+                      px: 1,
+                      py: 0.5,
+                      bgcolor: 'background.neutral',
+                      borderRadius: 1,
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Icon icon="mdi:cog-outline" sx={{ mr: 0.5 }} /> {t('channel_row.otherArg')}
                     </Typography>
                     <Label
-                      variant="outlined"
+                      variant="soft"
                       color="default"
                       key={item.other}
+                      sx={{ fontSize: '0.75rem', cursor: 'pointer' }}
                       onClick={() => {
                         copy(item.other, t('channel_row.otherArg'));
                       }}
@@ -469,25 +852,487 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                   </Box>
                 </Grid>
               )}
+              {item.tag && (
+                <Grid xs={12}>
+                  <Box sx={{ m: 1, mt: 2 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight="bold"
+                          sx={{
+                            borderLeft: '3px solid',
+                            borderColor: 'primary.main',
+                            pl: 1.5,
+                            py: 0.5
+                          }}
+                        >
+                          {t('channel_row.tagChannelList')} ({totalTagChannels})
+                        </Typography>
+                        <Tooltip title={t('channel_row.refreshList')} placement="top">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                              setIsTagChannelsLoading(true);
+                              fetchTagChannels().finally(() => {
+                                setIsTagChannelsLoading(false);
+                              });
+                            }}
+                          >
+                            <Icon icon="mdi:refresh" width={18} height={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+
+                      {selectedChannels.length > 0 && (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          startIcon={<Icon icon="solar:trash-bin-trash-bold" />}
+                          onClick={handleBatchDelete}
+                          size="small"
+                        >
+                          {t('channel_row.batchDelete')} ({selectedChannels.length})
+                        </Button>
+                      )}
+                    </Stack>
+
+                    {isTagChannelsLoading ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : tagChannels.length === 0 ? (
+                      <Typography variant="body2" sx={{ py: 2, textAlign: 'center', color: 'text.secondary' }}>
+                        {t('channel_row.noTagChannels')}
+                      </Typography>
+                    ) : (
+                      <Box>
+                        <Box
+                          sx={{
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                            boxShadow: '0 0 8px rgba(0,0,0,0.05)'
+                          }}
+                        >
+                          <PerfectScrollbar sx={{ maxHeight: 400 }}>
+                            <Table size="small" sx={{ '& .MuiTableCell-root': { py: 1, px: 1.5 } }}>
+                              <TableHead sx={{ bgcolor: 'background.neutral' }}>
+                                <TableRow>
+                                  <TableCell padding="checkbox" sx={{ pl: 1, width: '40px', textAlign: 'center' }}>
+                                    <Checkbox
+                                      indeterminate={selectedChannels.length > 0 && selectedChannels.length < tagChannels.length}
+                                      checked={tagChannels.length > 0 && selectedChannels.length === tagChannels.length}
+                                      onChange={handleToggleAll}
+                                      size="small"
+                                    />
+                                  </TableCell>
+                                  <TableCell sx={{ width: '20%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.name')}
+                                  </TableCell>
+                                  <TableCell sx={{ width: '15%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.status')}
+                                  </TableCell>
+                                  <TableCell sx={{ width: '15%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.usedBalance')}
+                                  </TableCell>
+                                  <TableCell sx={{ width: '15%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.responseTime')}
+                                  </TableCell>
+                                  <TableCell sx={{ width: '25%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.priority')}
+                                  </TableCell>
+                                  <TableCell sx={{ width: '10%', textAlign: 'center', fontWeight: 600 }}>
+                                    {t('channel_index.actions')}
+                                  </TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {tagChannels.slice(tagPage * tagRowsPerPage, tagPage * tagRowsPerPage + tagRowsPerPage).map((channel) => (
+                                  <TableRow key={channel.id} hover>
+                                    <TableCell padding="checkbox" sx={{ pl: 1, textAlign: 'center' }}>
+                                      <Checkbox
+                                        checked={selectedChannels.includes(channel.id)}
+                                        onChange={() => handleToggleChannel(channel.id)}
+                                        size="small"
+                                      />
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: 'center' }}>
+                                      <Typography variant="body2" noWrap title={channel.name} sx={{ fontWeight: 500 }}>
+                                        {channel.id} - {channel.name}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: 'center' }}>
+                                      <Stack direction="row" alignItems="center" spacing={0.5} justifyContent="center">
+                                        <Switch
+                                          checked={channel.status === 1}
+                                          onChange={() => handleTagChannelStatus(channel.id, channel.status)}
+                                          size="small"
+                                        />
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            fontWeight: channel.status === 1 ? 600 : 400,
+                                            color: channel.status === 1 ? 'success.main' : 'text.secondary'
+                                          }}
+                                        >
+                                          {statusInfo(t, channel.status)}
+                                          {/* {CHANNEL_STATUS_MAP[channel.status]?.label || '未知'} */}
+                                        </Typography>
+                                      </Stack>
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: 'center' }}>
+                                      <Tooltip title={t('channel_row.clickUpdateQuota')} placement="top">
+                                        <Box sx={{ cursor: 'pointer' }} onClick={() => manageChannel(channel.id, 'update_balance')}>
+                                          <Stack direction="column" spacing={0.5} alignItems="center" justifyContent="center">
+                                            <Typography
+                                              variant="body2"
+                                              sx={{
+                                                fontSize: '0.8rem',
+                                                fontWeight: 500,
+                                                '&:hover': { textDecoration: 'underline' }
+                                              }}
+                                            >
+                                              {renderQuota(channel.used_quota)}
+                                            </Typography>
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                color: 'success.main',
+                                                fontWeight: 600
+                                              }}
+                                            >
+                                              ${channel.balance}
+                                            </Typography>
+                                          </Stack>
+                                        </Box>
+                                      </Tooltip>
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: 'center' }}>
+                                      <ResponseTimeLabel test_time={channel.test_time} response_time={channel.response_time} />
+                                    </TableCell>
+
+                                    <TableCell sx={{ textAlign: 'center' }}>
+                                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                        <TextField
+                                          id={`priority-${channel.id}`}
+                                          type="number"
+                                          label="优先级"
+                                          variant="standard"
+                                          value={channel.priority}
+                                          onChange={(e) => handleTagChannelPriorityChange(channel.id, Number(e.target.value))}
+                                          inputProps={{
+                                            min: '0',
+                                            style: { padding: '4px', fontSize: '0.85rem' }
+                                          }}
+                                          sx={{
+                                            width: '90px',
+                                            '.MuiInputBase-root': {
+                                              minHeight: '30px'
+                                            },
+                                            '.MuiInputLabel-root': {
+                                              fontSize: '0.75rem',
+                                              fontWeight: 500
+                                            }
+                                          }}
+                                          InputProps={{
+                                            endAdornment: (
+                                              <InputAdornment position="end">
+                                                <IconButton
+                                                  size="small"
+                                                  sx={{ p: 0.5 }}
+                                                  color="primary"
+                                                  edge="end"
+                                                  onClick={() => {
+                                                    try {
+                                                      // 直接使用当前渠道对象和UI状态中的优先级值
+                                                      const channelId = channel.id;
+                                                      const newPriority = channel.priority;
+
+                                                      // 直接发送请求更新优先级，不再进行二次检查
+                                                      manageChannel(channelId, 'priority', newPriority)
+                                                        .then(({ success }) => {
+                                                          if (success) {
+                                                            // 成功后更新本地状态（虽然没必要，因为UI状态已经是新值了）
+                                                            showSuccess(t('channel_row.priorityUpdateSuccess'));
+                                                          }
+                                                        })
+                                                        .catch((error) => {
+                                                          showError(t('channel_row.priorityUpdateError', { message: error.message }));
+                                                        });
+                                                    } catch (error) {
+                                                      showError(t('channel_row.priorityUpdateError', { message: error.message }));
+                                                    }
+                                                  }}
+                                                >
+                                                  <Icon icon="mdi:check" width={16} height={16} />
+                                                </IconButton>
+                                              </InputAdornment>
+                                            )
+                                          }}
+                                        />
+                                      </Box>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                      <Stack direction="row" spacing={1} justifyContent="center">
+                                        <Tooltip title={t('channel_row.testModels')} placement="top">
+                                          <IconButton
+                                            size="small"
+                                            sx={{ p: 0.5, color: 'info.main' }}
+                                            onClick={(event) => {
+                                              handleTagChannelTest(channel);
+                                              // 记录点击位置用于弹出模型列表
+                                              if (channel.models.split(',').length > 1) {
+                                                tagModelPopover.onOpen(event);
+                                              }
+                                            }}
+                                          >
+                                            <Icon icon="mdi:speedometer" width={18} height={18} />
+                                          </IconButton>
+                                        </Tooltip>
+
+                                        <Tooltip title={t('channel_index.actions')} placement="top">
+                                          <IconButton
+                                            size="small"
+                                            sx={{ p: 0.5 }}
+                                            onClick={(event) => {
+                                              // 设置当前操作的渠道
+                                              setCurrentTestingChannel(channel);
+                                              // 打开更多操作菜单
+                                              popover.onOpen(event);
+                                            }}
+                                          >
+                                            <Icon icon="eva:more-vertical-fill" width={18} height={18} />
+                                          </IconButton>
+                                        </Tooltip>
+                                      </Stack>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </PerfectScrollbar>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
+                          <TablePagination
+                            component="div"
+                            count={tagChannels.length}
+                            page={tagPage}
+                            onPageChange={handleChangeTagPage}
+                            rowsPerPage={tagRowsPerPage}
+                            onRowsPerPageChange={handleChangeTagRowsPerPage}
+                            rowsPerPageOptions={[10, 25, 50, 100]}
+                            labelRowsPerPage="每页行数:"
+                            labelDisplayedRows={({ from, to, count }) => `${from}-${to} 共 ${count}`}
+                            sx={{
+                              '.MuiTablePagination-toolbar': {
+                                minHeight: '40px',
+                                pl: 1
+                              },
+                              '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+                                fontSize: '0.75rem'
+                              },
+                              '.MuiTablePagination-select': {
+                                padding: '0 8px'
+                              }
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                </Grid>
+              )}
             </Grid>
           </Collapse>
         </TableCell>
       </TableRow>
-      <Dialog open={openDelete} onClose={handleDeleteClose}>
+      <Dialog open={confirmDelete.value} onClose={confirmDelete.onFalse}>
         <DialogTitle>{t('channel_row.delChannel')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('channel_row.delChannelInfo')} {item.name}？
+            {t('common.deleteConfirm', { title: currentTestingChannel ? currentTestingChannel.name : item.name })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteClose}>{t('token_index.close')}</Button>
-          <Button onClick={handleDelete} sx={{ color: 'error.main' }} autoFocus>
+          <Button onClick={confirmDelete.onFalse}>{t('token_index.close')}</Button>
+          <Button
+            onClick={() => {
+              if (currentTestingChannel) {
+                // 处理子渠道删除
+                manageChannel(currentTestingChannel.id, 'delete', '')
+                  .then(({ success }) => {
+                    if (success) {
+                      // 从本地列表中移除
+                      setTagChannels((prev) => prev.filter((c) => c.id !== currentTestingChannel.id));
+                      // 减少总数
+                      setTotalTagChannels((prev) => prev - 1);
+                      // 重置当前选中的渠道
+                      setCurrentTestingChannel(null);
+                      showSuccess(t('common.deleteSuccess'));
+                    }
+                  })
+                  .catch((error) => {
+                    showError(t('common.deleteError', { message: error.message }));
+                  });
+              } else {
+                // 处理主渠道删除
+                handleDeleteRow();
+              }
+              confirmDelete.onFalse();
+            }}
+            sx={{ color: 'error.main' }}
+            autoFocus
+          >
             {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
-      <ChannelCheck item={item} open={openCheck} onClose={() => setOpenCheck(false)} />
+      <ChannelCheck item={currentTestingChannel || item} open={openCheck} onClose={() => setOpenCheck(false)} />
+
+      <ConfirmDialog
+        open={tagDeleteConfirm.value}
+        onClose={tagDeleteConfirm.onFalse}
+        title={t('channel_row.deleteTag')}
+        content={t('channel_row.deleteTagConfirm', { tag: item.tag })}
+        action={
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              manageChannel(item.tag, 'delete', '', true)
+                .then(({ success }) => {
+                  if (success) {
+                    showInfo(t('channel_row.deleteTagSuccess', { tag: item.tag }));
+                    onRefresh(false); // 刷新父组件数据
+                  }
+                })
+                .catch((error) => {
+                  showError(t('channel_row.deleteTagError', { message: error.message }));
+                });
+              tagDeleteConfirm.onFalse();
+            }}
+          >
+            {t('common.delete')}
+          </Button>
+        }
+      />
+
+      <ConfirmDialog
+        open={tagStatusConfirm.value}
+        onClose={tagStatusConfirm.onFalse}
+        title={statusChangeAction === 'enable' ? t('channel_row.enableTagChannels') : t('channel_row.disableTagChannels')}
+        content={t('channel_row.tagChannelsConfirm', {
+          action: statusChangeAction === 'enable' ? t('channel_row.enable') : t('channel_row.disable'),
+          tag: item.tag
+        })}
+        action={
+          <Button
+            variant="contained"
+            color={statusChangeAction === 'enable' ? 'success' : 'error'}
+            onClick={() => {
+              manageChannel(item.tag, 'tag_change_status', statusChangeAction, false)
+                .then(({ success }) => {
+                  if (success) {
+                    showInfo(
+                      t('channel_row.tagChannelsSuccess', {
+                        action: statusChangeAction === 'enable' ? t('channel_row.enable') : t('channel_row.disable')
+                      })
+                    );
+                    onRefresh(false); // 刷新父组件数据
+                  }
+                })
+                .catch((error) => {
+                  showError(
+                    t('channel_row.tagChannelsError', {
+                      action: statusChangeAction === 'enable' ? t('channel_row.enable') : t('channel_row.disable'),
+                      message: error.message
+                    })
+                  );
+                });
+              tagStatusConfirm.onFalse();
+            }}
+          >
+            {t('common.submit')}
+          </Button>
+        }
+      />
+
+      <EditeModal
+        open={quickEdit.value}
+        onCancel={quickEdit.onFalse}
+        onOk={() => {
+          onRefresh(false);
+          quickEdit.onFalse();
+        }}
+        channelId={item.tag ? item.tag : item.id}
+        groupOptions={groupOptions}
+        isTag={item.tag}
+        modelOptions={modelOptions}
+      />
+
+      <Popover
+        open={tagModelPopover.open}
+        anchorEl={tagModelPopover.anchorEl}
+        onClose={tagModelPopover.onClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: { minWidth: 140 }
+        }}
+      >
+        <MenuList>
+          {currentTestingChannel &&
+            currentTestingChannel.models.split(',').map((model) => (
+              <MenuItem
+                key={`tag-test-model-${model}`}
+                onClick={() => {
+                  manageChannel(currentTestingChannel.id, 'test', model).then(({ success, time }) => {
+                    if (success) {
+                      showSuccess(t('channel_row.modelTestSuccess', { channel: currentTestingChannel.name, model, time: time.toFixed(2) }));
+                      // 更新本地状态
+                      setTagChannels((prev) =>
+                        prev.map((c) =>
+                          c.id === currentTestingChannel.id
+                            ? {
+                                ...c,
+                                test_time: Date.now() / 1000,
+                                response_time: time * 1000
+                              }
+                            : c
+                        )
+                      );
+                    }
+                  });
+                  tagModelPopover.onClose();
+                }}
+              >
+                {model}
+              </MenuItem>
+            ))}
+        </MenuList>
+      </Popover>
+
+      <ConfirmDialog
+        open={batchConfirm.value}
+        onClose={batchConfirm.onFalse}
+        title={t('channel_row.batchDelete')}
+        content={t('channel_row.batchDeleteConfirm', { count: selectedChannels.length })}
+        action={
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              executeBatchDelete();
+              batchConfirm.onFalse();
+            }}
+          >
+            {t('common.delete')}
+          </Button>
+        }
+      />
     </>
   );
 }
@@ -495,30 +1340,18 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
 ChannelTableRow.propTypes = {
   item: PropTypes.object,
   manageChannel: PropTypes.func,
-  handleOpenModal: PropTypes.func,
-  setModalChannelId: PropTypes.func,
-  hideEdit: PropTypes.bool
+  onRefresh: PropTypes.func,
+  groupOptions: PropTypes.array,
+  modelOptions: PropTypes.array
 };
 
 function renderBalance(type, balance) {
   switch (type) {
     case 28: // Deepseek
-      return (
-        <span>
-          <br />¥{balance}
-        </span>
-      );
+      return <>¥{balance}</>;
     case 45: // Deepseek
-      return (
-        <span>
-          <br />¥{balance}
-        </span>
-      );
+      return <>¥{balance}</>;
     default:
-      return (
-        <span>
-          <br />${balance.toFixed(2)}
-        </span>
-      );
+      return <>${balance.toFixed(2)}</>;
   }
 }

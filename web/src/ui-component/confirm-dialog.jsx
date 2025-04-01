@@ -19,7 +19,7 @@ export default function ConfirmDialog({ open, title, action, content, onClose, .
       <DialogActions>
         {action}
 
-        <Button variant="contained" color="error" onClick={onClose}>
+        <Button variant="contained" color="inherit" onClick={onClose}>
           {t('common.cancel')}
         </Button>
       </DialogActions>

@@ -140,7 +140,8 @@
     "unselectAll": "反全選",
     "updateEnabledBalance": "更新啟用餘額",
     "usedBalance": "已使用/餘額",
-    "weight": "權重"
+    "weight": "權重",
+    "onlyTags": "僅顯示標籤"
   },
   "channel_row": {
     "auto": "自動",
@@ -166,7 +167,38 @@
     "updateChannelBalance": "已更新完畢所有已啟用通道餘額！",
     "updateOk": "更新成功！",
     "weightTip": "權重不能小於 1",
-    "check": "檢測"
+    "check": "檢測",
+    "batchAddIDRequired": "請至少選擇一個渠道",
+    "batchDelete": "批量刪除",
+    "batchDeleteConfirm": "確定要刪除選中的 {{count}} 個渠道嗎？此操作將無法復原。",
+    "batchDeleteError": "批量刪除失敗: {{message}}",
+    "batchDeleteErrorTip": "批量刪除出錯: {{message}}",
+    "batchDeleteSuccess": "批量刪除成功！",
+    "batchDeleteTip": "是否批量刪除所選渠道？",
+    "deleteTag": "刪除標籤",
+    "deleteTagAndChannels": "刪除標籤及其所有渠道",
+    "deleteTagConfirm": "確定要刪除標籤 {{tag}} 及其所有頻道嗎？此操作將無法恢復。",
+    "deleteTagError": "刪除標籤失敗: {{message}}",
+    "deleteTagSuccess": "標籤 {{tag}} 刪除成功",
+    "disable": "停用",
+    "disableAllChannels": "停用所有渠道",
+    "disableTagChannels": "停用標籤渠道",
+    "enable": "啟用",
+    "enableAllChannels": "啟用所有渠道",
+    "enableTagChannels": "啟用標籤渠道",
+    "getTagChannelsError": "獲取標籤渠道失敗: {{message}}",
+    "getTagChannelsErrorTip": "獲取標籤渠道出錯: {{message}}",
+    "noTagChannels": "未能找到標籤渠道",
+    "priorityUpdateError": "優先級更新失敗: {{message}}",
+    "priorityUpdateSuccess": "優先級更新成功",
+    "refreshList": "更新列表",
+    "tag": "標籤",
+    "tagChannelList": "標籤渠道列表",
+    "tagChannelsConfirm": "確定要{{action}}標籤 {{tag}} 下的所有渠道嗎？",
+    "tagChannelsError": "標籤渠道{{action}}失敗: {{message}}",
+    "tagChannelsSuccess": "標籤渠道{{action}}成功",
+    "weightUpdateError": "權重更新失敗: {{message}}",
+    "weightUpdateSuccess": "權重更新成功"
   },
   "common": {
     "again": "重試 ({{count}})",
@@ -202,7 +234,9 @@
     "unableServer": "無法正常連接至伺服器！",
     "unableServerTip": "新版本可用：{{version}}，請使用快捷鍵 Shift + F5 刷新頁面",
     "unknown": "未知",
-    "verificationCode": "驗證碼"
+    "verificationCode": "驗證碼",
+    "deleteError": "刪除失敗：{{message}}",
+    "deleteSuccess": "刪除成功！"
   },
   "dashboard": "儀表板",
   "dashboard_index": {
@@ -250,6 +284,9 @@
   "logPage": {
     "cachedTokens": "緩存Tokens",
     "channelLabel": "渠道",
+    "columnSettings": "列設置",
+    "selectColumns": "選擇列",
+    "columnSelectAll": "全選",
     "detailLabel": "詳情",
     "durationLabel": "耗時",
     "durationTooltip": "t/s：輸出Token的數量除以總生成時間，表示生成速度",
@@ -284,7 +321,7 @@
       "original_times_price": "原價格: ${{ times }} / 次",
       "output_price": "輸出: ${{ price }} /M",
       "times_price": "${{ times }} / 次",
-      "free":"免費",
+      "free": "免費",
       "old_log": "舊版log",
       "illustrate": "* 本筆記錄為系統升級前所記錄的log"
     },
@@ -607,6 +644,10 @@
         "topUpLink": {
           "label": "充值鏈接",
           "placeholder": "例如發卡網站的購買鏈接"
+        },
+        "retryTimeOut": {
+          "label": "重試超時時間(秒)",
+          "placeholder": "重試超時時間(秒)"
         }
       },
       "logSettings": {
@@ -1062,7 +1103,6 @@
   "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启": "使用代碼執行功能，開啟後，計算tokens不準確，建議個人使用開啟",
   "使用网页搜索功能，对用户输入的内容进行搜索": "使用網頁搜索功能，對用戶輸入的內容進行搜索",
   "其他参数": "其他參數",
-  "单独设置代理地址，支持http和socks5，例如：http://127.0.0.1:1080": "單獨設置代理地址，支持http和socks5，例如：http://127.0.0.1:1080",
   "可空，请输入中转API地址，例如通过cloudflare中转": "可空，請輸入中轉API地址，例如通過cloudflare中轉",
   "启用": "啟用",
   "地址填写Suno-API部署的地址": "地址填寫Suno-API部署的地址",
@@ -1145,5 +1185,8 @@
   "price": "價格",
   "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。在B模型加前缀+，表示使用传入模型计费，例如：+gpt-3": {
     "5-turbo": "模型映射關係：例如用戶請求A模型，實際轉發給渠道的模型為B。在B模型加前綴+，表示使用傳入模型計費，例如：+gpt-3.5-turbo"
+  },
+  "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
+    "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "單獨設置代理地址，支持http和socks5，例如：http://127.0.0.1:1080,代理地址中可以通過 `%s` 作為會話標識佔位符，程式中檢測到有占位符會根據Key生成唯一會話標識符進行替換"
   }
 }

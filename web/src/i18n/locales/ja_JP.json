@@ -139,7 +139,8 @@
     "unselectAll": "すべてを非選択にする",
     "updateEnabledBalance": "有効残高を更新",
     "usedBalance": "使用済み/残高",
-    "weight": "ウェイト"
+    "weight": "ウェイト",
+    "onlyTags": "タグのみ表示"
   },
   "channel_row": {
     "auto": "自動",
@@ -165,7 +166,38 @@
     "updateChannelBalance": "有効になっているすべてのチャンネルバランスが更新されました。",
     "updateOk": "アップデート完了！",
     "weightTip": "重みは 1 未満にはできません",
-    "check": "検出"
+    "check": "検出",
+    "batchAddIDRequired": "少なくとも1つのチャネルを選択してください",
+    "batchDelete": "一括削除",
+    "batchDeleteConfirm": "選択された {{count}} 個のチャネルを削除しますか？この操作は取り消せません。",
+    "batchDeleteError": "一括削除に失敗しました：{{message}}",
+    "batchDeleteErrorTip": "一括削除エラー：{{message}}",
+    "batchDeleteSuccess": "一括削除しました！",
+    "batchDeleteTip": "選択したチャネルを一括削除しますか？",
+    "deleteTag": "タグを削除します。",
+    "deleteTagAndChannels": "タグとそのすべてのチャネルを削除します。",
+    "deleteTagConfirm": "タグ {{tag}} およびそのすべてのチャネルを削除してもよろしいですか？この操作は取り消せません。",
+    "deleteTagError": "タグの削除に失敗しました：{{message}}",
+    "deleteTagSuccess": "タグ {{tag}} が削除されました",
+    "disable": "無効",
+    "disableAllChannels": "すべてのチャネルを無効にする",
+    "disableTagChannels": "タグチャネルを無効にする",
+    "enable": "有効",
+    "enableAllChannels": "すべてのチャネルを有効にする",
+    "enableTagChannels": "タグチャネルを有効にする",
+    "getTagChannelsError": "タグチャネルの取得に失敗しました：{{message}}",
+    "getTagChannelsErrorTip": "タグチャネルの取得中にエラーが発生しました：{{message}}",
+    "noTagChannels": "タグチャネルが見つかりません",
+    "priorityUpdateError": "優先度の更新に失敗しました：{{message}}",
+    "priorityUpdateSuccess": "優先度が更新されました",
+    "refreshList": "リストを更新する",
+    "tag": "タグ",
+    "tagChannelList": "タグチャネルリスト",
+    "tagChannelsConfirm": "すべてのチャネルで{{action}}タグ{{tag}}を確認しますか？",
+    "tagChannelsError": "アクション{{action}}のラベルチャネルが失敗しました: {{message}}",
+    "tagChannelsSuccess": "タグチャネル{{action}}が成功しました",
+    "weightUpdateError": "重みの更新に失敗しました：{{message}}",
+    "weightUpdateSuccess": "重みが更新されました"
   },
   "common": {
     "again": "再試行 ({{count}})",
@@ -201,7 +233,9 @@
     "unableServer": "サーバーに正しく接続できません!",
     "unableServerTip": "新しいバージョンが利用可能です: {{version}}、ショートカット キー Shift F5 を使用してページを更新してください",
     "unknown": "未知",
-    "verificationCode": "検証コード"
+    "verificationCode": "検証コード",
+    "deleteError": "削除に失敗しました：{{message}}",
+    "deleteSuccess": "削除しました！"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -249,6 +283,9 @@
   "logPage": {
     "cachedTokens": "Cache Tokens",
     "channelLabel": "チャネル",
+    "columnSettings": "列設定",
+    "selectColumns": "列を選択",
+    "columnSelectAll": "すべて選択",
     "detailLabel": "詳細",
     "durationLabel": "時間",
     "durationTooltip": "t/s: 出力トークンの数を総生成時間で割った値であり、生成速度を示します。",
@@ -607,6 +644,10 @@
         "topUpLink": {
           "label": "チャージリンク",
           "placeholder": "例えば、カード発行ウェブサイトの購入リンク"
+        },
+        "retryTimeOut": {
+          "label": "再試行のタイムアウト時間（秒）",
+          "placeholder": "再試行のタイムアウト時間（秒）"
         }
       },
       "logSettings": {
@@ -1062,7 +1103,6 @@
   "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启": "コード実行機能を使用する場合、オンにするとトークンの計算が不正確になるため、個人で使用することを推奨します。",
   "使用网页搜索功能，对用户输入的内容进行搜索": "Web検索機能を使用して、ユーザーが入力したコンテンツを検索します。",
   "其他参数": "その他のパラメータ",
-  "单独设置代理地址，支持http和socks5，例如：http://127.0.0.1:1080": "プロキシ アドレスを個別に設定し、http と Socks5 をサポートします。例: http://127.0.0.1:1080",
   "可空，请输入中转API地址，例如通过cloudflare中转": "空のままにすることもできます。たとえば、cloudflare 転送を通じて転送 API アドレスを入力してください。",
   "启用": "有効にする",
   "地址填写Suno-API部署的地址": "アドレス: Suno-API デプロイメントのアドレスを入力します。",
@@ -1145,5 +1185,8 @@
   "price": "価格",
   "模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。在B模型加前缀+，表示使用传入模型计费，例如：+gpt-3": {
     "5-turbo": "モデルマッピング関係：例えば、ユーザーがAモデルをリクエストした場合、実際にチャンネルに転送されるのはBモデルです。 Bモデルにプレフィックス+を付けて、入力されたモデルを使用して課金することを示します。 例：+gpt-3.5-turbo"
+  },
+  "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
+    "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "単独のプロキシアドレスを設定し、httpおよびsocks5をサポートします。例：http://127.0.0.1:1080。プロキシアドレスには`％s`をセッション識別子のプレースホルダとして使用できます。プログラムがプレースホルダを検出すると、Keyに基づいて一意のセッション識別子を生成して置換します。"
   }
 }

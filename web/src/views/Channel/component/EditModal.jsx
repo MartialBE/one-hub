@@ -73,7 +73,7 @@ const getValidationSchema = (t) =>
     model_headers: Yup.array()
   });
 
-const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {
+const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, modelOptions }) => {
   const { t } = useTranslation();
   const { t: customizeT } = useCustomizeT();
   const theme = useTheme();
@@ -81,7 +81,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const [initialInput, setInitialInput] = useState(defaultConfig.input);
   const [inputLabel, setInputLabel] = useState(defaultConfig.inputLabel); //
   const [inputPrompt, setInputPrompt] = useState(defaultConfig.prompt);
-  const [modelOptions, setModelOptions] = useState([]);
   const [batchAdd, setBatchAdd] = useState(false);
   const [providerModelsLoad, setProviderModelsLoad] = useState(false);
   const [hasTag, setHasTag] = useState(false);
@@ -175,31 +174,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
       showError(error.message);
     }
     setProviderModelsLoad(false);
-  };
-
-  const fetchModels = async () => {
-    try {
-      let res = await API.get(`/api/channel/models`);
-      const { data } = res.data;
-      // 先对data排序
-      data.sort((a, b) => {
-        const ownedByComparison = a.owned_by.localeCompare(b.owned_by);
-        if (ownedByComparison === 0) {
-          return a.id.localeCompare(b.id);
-        }
-        return ownedByComparison;
-      });
-      setModelOptions(
-        data.map((model) => {
-          return {
-            id: model.id,
-            group: model.owned_by
-          };
-        })
-      );
-    } catch (error) {
-      showError(error.message);
-    }
   };
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
@@ -394,20 +368,19 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   };
 
   useEffect(() => {
-    fetchModels().then();
-  }, []);
-
-  useEffect(() => {
-    setBatchAdd(isTag);
-    if (channelId) {
-      loadChannel().then();
-    } else {
-      setHasTag(false);
-      initChannel(1);
-      setInitialInput({ ...defaultConfig.input, is_edit: false });
+    if (open) {
+      setBatchAdd(isTag);
+      if (channelId) {
+        loadChannel().then();
+      } else {
+        setHasTag(false);
+        initChannel(1);
+        setInitialInput({ ...defaultConfig.input, is_edit: false });
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId]);
+  }, [channelId, open]);
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
@@ -515,37 +488,20 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 </Container>
               )}
 
-              {!isTag && inputPrompt.base_url && (
+              {inputPrompt.base_url && (
                 <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
-                  {!batchAdd ? (
-                    <>
-                      <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
-                      <OutlinedInput
-                        id="channel-base_url-label"
-                        label={customizeT(inputLabel.base_url)}
-                        type="text"
-                        value={values.base_url}
-                        name="base_url"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        inputProps={{}}
-                        aria-describedby="helper-text-channel-base_url-label"
-                      />
-                    </>
-                  ) : (
-                    <TextField
-                      multiline
-                      id="channel-base_url-label"
-                      label={customizeT(inputLabel.base_url)}
-                      value={values.base_url}
-                      name="base_url"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      aria-describedby="helper-text-channel-base_url-label"
-                      minRows={5}
-                      placeholder={customizeT(inputPrompt.base_url) + t('channel_edit.batchBaseurlTip')}
-                    />
-                  )}
+                  <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
+                  <OutlinedInput
+                    id="channel-base_url-label"
+                    label={customizeT(inputLabel.base_url)}
+                    type="text"
+                    value={values.base_url}
+                    name="base_url"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    inputProps={{}}
+                    aria-describedby="helper-text-channel-base_url-label"
+                  />
 
                   {touched.base_url && errors.base_url ? (
                     <FormHelperText error id="helper-tex-channel-base_url-label">
@@ -722,6 +678,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
                   <Button
+                    size="small"
                     onClick={() => {
                       const modelString = values.models.map((model) => model.id).join(',');
                       copy(modelString);
@@ -731,6 +688,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   </Button>
                   <Button
                     disabled={hasTag}
+                    size="small"
                     onClick={() => {
                       setFieldValue('models', basicModels(values.type));
                     }}
@@ -739,6 +697,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   </Button>
                   <Button
                     disabled={hasTag}
+                    size="small"
                     onClick={() => {
                       setFieldValue('models', modelOptions);
                     }}
@@ -750,6 +709,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       <LoadingButton
                         loading={providerModelsLoad}
                         disabled={hasTag}
+                        size="small"
                         onClick={() => {
                           getProviderModels(values, setFieldValue);
                         }}
@@ -1052,5 +1012,6 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   groupOptions: PropTypes.array,
-  isTag: PropTypes.bool
+  isTag: PropTypes.bool,
+  modelOptions: PropTypes.array
 };

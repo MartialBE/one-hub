@@ -7,7 +7,13 @@ import colors from 'assets/scss/_themes-vars.module.scss';
 import componentStyleOverrides from './compStyleOverride';
 import themePalette from './palette';
 import themeTypography from './typography';
-import { varAlpha } from './utils';
+import { varAlpha, createGradient } from './utils';
+
+// 创建自定义渐变背景色
+const customGradients = {
+  primary: createGradient(colors.primaryMain, colors.primaryDark),
+  secondary: createGradient(colors.secondaryMain, colors.secondaryDark)
+};
 
 /**
  * Represent theme style and structure as per Material-UI
@@ -19,6 +25,7 @@ export const theme = (customization) => {
   const options = customization.theme === 'light' ? GetLightOption() : GetDarkOption();
   const themeOption = {
     colors: color,
+    gradients: customGradients,
     ...options,
     customization
   };
@@ -29,13 +36,30 @@ export const theme = (customization) => {
     mixins: {
       toolbar: {
         minHeight: '48px',
-        padding: '16px',
+        padding: '8px 16px',
         '@media (min-width: 600px)': {
           minHeight: '48px'
         }
       }
     },
-    typography: themeTypography(themeOption)
+    shape: {
+      borderRadius: themeOption?.customization?.borderRadius || 12
+    },
+    typography: themeTypography(themeOption),
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 960,
+        lg: 1280,
+        xl: 1920
+      }
+    },
+    zIndex: {
+      modal: 1300,
+      snackbar: 1400,
+      tooltip: 1500
+    }
   };
 
   const themes = createTheme(themeOptions);
@@ -51,22 +75,22 @@ function GetDarkOption() {
   return {
     mode: 'dark',
     heading: color.darkTextTitle,
-    paper: color.darkLevel2,
-    backgroundDefault: color.darkPaper,
-    background: color.darkBackground,
-    darkTextPrimary: color.darkTextDark,
-    darkTextSecondary: color.darkPrimaryLight,
-    textDark: color.darkTextTitle,
+    paper: '#1A1D23',
+    backgroundDefault: '#13151A',
+    background: '#1E2128',
+    darkTextPrimary: '#E0E4EC',
+    darkTextSecondary: '#A9B2C3',
+    textDark: '#F8F9FC',
     menuSelected: color.primary200,
-    menuSelectedBack: varAlpha(color.primaryMain, 0.16),
-    divider: color.darkDivider,
-    borderColor: color.darkBorderColor,
-    menuButton: color.darkLevel1,
+    menuSelectedBack: varAlpha(color.primaryMain, 0.12),
+    divider: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    menuButton: '#292D36',
     menuButtonColor: color.primaryMain,
-    menuChip: color.darkLevel1,
-    headBackgroundColor: color.darkTableHeader,
-    headBackgroundColorHover: varAlpha(color.darkTableHeader, 0.4),
-    tableBorderBottom: color.darkDivider
+    menuChip: '#292D36',
+    headBackgroundColor: '#25282F',
+    headBackgroundColorHover: varAlpha('#25282F', 0.08),
+    tableBorderBottom: 'rgba(255, 255, 255, 0.08)'
   };
 }
 
@@ -74,22 +98,22 @@ function GetLightOption() {
   const color = colors;
   return {
     mode: 'light',
-    heading: color.grey900,
-    paper: color.paper,
-    backgroundDefault: color.paper,
-    background: color.primaryLight,
-    darkTextPrimary: color.grey700,
-    darkTextSecondary: color.grey500,
-    textDark: color.grey900,
+    heading: '#202939',
+    paper: '#FFFFFF',
+    backgroundDefault: '#F5F7FA',
+    background: '#F8FAFD',
+    darkTextPrimary: '#3E4555',
+    darkTextSecondary: '#6C7A92',
+    textDark: '#252F40',
     menuSelected: color.primaryMain,
     menuSelectedBack: varAlpha(color.primary200, 0.08),
-    divider: color.grey200,
-    borderColor: color.grey300,
-    menuButton: varAlpha(color.primary200, 0.2),
+    divider: '#E9EDF5',
+    borderColor: '#E0E6ED',
+    menuButton: varAlpha(color.primary200, 0.12),
     menuButtonColor: color.primaryMain,
-    menuChip: color.primaryLight,
-    headBackgroundColor: color.tableBackground,
-    headBackgroundColorHover: varAlpha(color.darkTableHeader, 0.08),
-    tableBorderBottom: color.tableBorderBottom
+    menuChip: '#EEF2F6',
+    headBackgroundColor: '#F5F7FA',
+    headBackgroundColorHover: varAlpha('#F5F7FA', 0.12),
+    tableBorderBottom: '#E9EDF5'
   };
 }
