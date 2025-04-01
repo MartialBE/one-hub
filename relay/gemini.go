@@ -50,6 +50,7 @@ func (r *relayGeminiOnly) setRequest() error {
 	if err := common.UnmarshalBodyReusable(r.c, r.geminiRequest); err != nil {
 		return err
 	}
+	r.geminiRequest.SetJsonRaw(r.c)
 	r.geminiRequest.Model = modelList[0]
 	r.geminiRequest.Stream = isStream
 	r.setOriginalModel(r.geminiRequest.Model)
