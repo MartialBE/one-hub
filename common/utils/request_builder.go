@@ -19,6 +19,8 @@ func RequestBuilder(
 	if body != nil {
 		if v, ok := body.(io.Reader); ok {
 			bodyReader = v
+		} else if v, ok := body.([]byte); ok {
+			bodyReader = bytes.NewBuffer(v)
 		} else {
 			var reqBytes []byte
 			reqBytes, err = json.Marshal(body)

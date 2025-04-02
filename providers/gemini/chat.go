@@ -108,7 +108,7 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRela
 
 	var body any
 	if isRelay {
-		body = p.Context.Request.Body
+		body = geminiRequest.GetJsonRaw()
 	} else {
 		p.pluginHandle(geminiRequest)
 		body = geminiRequest
