@@ -116,7 +116,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 
 ## 交流群
 
-<img src="https://github.com/MartialBE/one-hub/assets/42402987/9b608d39-70ae-4b2e-be49-09afab6bd536" width="300">
+<img src="https://github.com/user-attachments/assets/d1395dac-bc97-481d-af40-ac47e6a00158" width="300">
 
 ## 其他
 
