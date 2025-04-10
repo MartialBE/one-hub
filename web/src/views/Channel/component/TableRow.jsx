@@ -708,7 +708,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                     sx={{
                       fontWeight: 600,
                       color: 'text.secondary',
-                      mr: 1,
+                      // mr: 1,
                       display: 'flex',
                       alignItems: 'center'
                     }}
@@ -721,11 +721,11 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                       color="primary"
                       key={model}
                       sx={{
-                        py: 0.75,
-                        px: 1.5,
+                        // py: 0.75,
+                        // px: 1.5,
                         fontSize: '0.75rem',
                         cursor: 'pointer',
-                        '&:hover': { opacity: 0.8 }
+                        // '&:hover': { opacity: 0.8 }
                       }}
                       onClick={() => {
                         copy(model, t('channel_index.modelName'));
