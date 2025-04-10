@@ -8,6 +8,7 @@ on:
       - "v*"
     paths-ignore:
       - "README.md"
+      - "README.en.md"
       - "docs/**"
 
 jobs:
