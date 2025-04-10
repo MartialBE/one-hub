@@ -39,7 +39,8 @@ _This project is based on [one-api](https://github.com/songquanpeng/one-api) and
 
 If you find that a new model is missing, please update the newly added model in `Backend-Model Price-Update Price`
 
-[Demo Site](https://one-api-martialbe.vercel.app/)
+[Demo Site](https://one-hub.xiao5.info/)
+[Documentation](https://one-hub-doc.vercel.app/)
 
 </div>
 
@@ -67,10 +68,6 @@ If you find that a new model is missing, please update the newly added model in 
 - Support payment
 - Support configuring user group RPM
 - Support `Prometheus` monitoring
-
-## Documentation
-
-Please refer to the [documentation](https://github.com/MartialBE/one-hub/wiki).
 
 ## Current Supported Providers
 

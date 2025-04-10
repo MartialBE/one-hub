@@ -7,7 +7,7 @@ hero:
   actions:
     - theme: brand
       text: 开始使用
-      link: /markdown-examples
+      link: /deployment/index
     - theme: alt
       text: 项目地址
       link: https://github.com/MartialBE/one-hub
