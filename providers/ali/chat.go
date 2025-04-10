@@ -123,7 +123,15 @@ func (p *AliProvider) convertFromChatOpenai(request *types.ChatCompletionRequest
 	messages := make([]AliMessage, 0, len(request.Messages))
 	for i := 0; i < len(request.Messages); i++ {
 		message := request.Messages[i]
-		if !strings.HasPrefix(request.Model, "qwen-vl") {
+		modelKeywords := strings.Split(VisionModelKeywords, ",")
+		isVisionModel := false
+		for _, keyword := range modelKeywords {
+			if strings.Contains(request.Model, keyword) {
+				isVisionModel = true
+				break
+			}
+		}
+		if !isVisionModel {
 			messages = append(messages, AliMessage{
 				Content: message.StringContent(),
 				Role:    strings.ToLower(message.Role),
