@@ -16,15 +16,15 @@ features:
   - title: 部署
     icon: 🚀
     details: 部署One Hub
-    link: /docs/about/introduction
+    link: /deployment/index
   - title: 使用方法
     icon: 📖
     details: 使用One Hub
-    link: /docs/use/api
+    link: /use/index
   - title: 常见问题
     icon: 💬
     details: 常见问题
-    link: /docs/use/api
+    link: /use/FAQ
 ---
 
 ::: tip 说明
