@@ -65,7 +65,7 @@ Usage of ./dist/one-api:
         print version and exit
 ```
 
-根据[使用方法](Usage)进行具体的项目配置。 <!-- 该部分需要补充，请MartialBE进行修改 -->
+根据[使用方法](/use/index)进行具体的项目配置。
 
 ## Docker 构建
 

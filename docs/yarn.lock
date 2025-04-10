@@ -1310,6 +1310,7 @@ __metadata:
   dependencies:
     markdown-it-mathjax3: "npm:^4.3.2"
     vitepress: "npm:^1.6.3"
+    vue: "npm:^3.5.13"
   languageName: unknown
   linkType: soft
 

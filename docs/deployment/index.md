@@ -203,7 +203,7 @@ docker-compose ps
    ./one-api --port 3000 --log-dir ./logs
    ```
 
-4. **访问应用**：在浏览器中访问 [http://localhost:3000/](http://localhost:3000/) 并登录。初始账号用户名为 `root`，密码为 `123456`。
+4. **访问应用**：在浏览器中访问 `http://localhost:3000` 并登录。初始账号用户名为 `root`，密码为 `123456`。
 
 5. **重新编译**：如果需要重新编译，可以使用以下命令：
 
