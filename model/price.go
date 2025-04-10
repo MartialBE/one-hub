@@ -88,23 +88,21 @@ func (price *Price) GetOutput() float64 {
 }
 
 func (price *Price) GetExtraRatio(key string) float64 {
-	if key == "cached_tokens_ratio" {
-		return DefaultCacheRatios
-	}
-
 	if ratio, ok := price.ExtraRatios[key]; ok {
 		return ratio
 	}
 
-	if key == "cached_write_ratio" {
+	switch key {
+	case "cached_tokens_ratio":
+		return DefaultCacheRatios
+	case "cached_write_ratio":
 		return DefaultCachedWriteRatio
-	}
-
-	if key == "cached_read_ratio" {
+	case "cached_read_ratio":
 		return DefaultCachedReadRatio
+	default:
+		return DefaultAudioRatio
 	}
 
-	return DefaultAudioRatio
 }
 
 func (price *Price) FetchInputCurrencyPrice(rate float64) string {
