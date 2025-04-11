@@ -35,6 +35,9 @@ func defaultConfig() {
 	viper.SetDefault("global.web_rate_limit", 100)
 	viper.SetDefault("connect_timeout", 5)
 	viper.SetDefault("auto_price_updates", true)
+	viper.SetDefault("auto_price_updates_mode", "system")
+	viper.SetDefault("auto_price_updates_interval", 1440)
+	viper.SetDefault("update_price_service", "https://raw.githubusercontent.com/MartialBE/one-api/prices/prices.json")
 	viper.SetDefault("language", "zh_CN")
 	viper.SetDefault("favicon", "")
 }

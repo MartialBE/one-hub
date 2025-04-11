@@ -22,12 +22,27 @@ import Label from 'ui-component/Label';
 
 export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
   const { t } = useTranslation();
-  const [url, setUrl] = useState('https://raw.githubusercontent.com/MartialBE/one-api/prices/prices.json');
+  const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [newPricing, setNewPricing] = useState([]);
   const [addModel, setAddModel] = useState([]);
   const [diffModel, setDiffModel] = useState([]);
+
+  useEffect(() => {
+    const fetchUpdateUrl = async () => {
+      try {
+        const res = await API.get('/api/prices/updateService');
+        if (res.data?.data) {
+          setUrl(res.data.data);
+        }
+      } catch (err) {
+        console.error(err);
+        setUrl('https://raw.githubusercontent.com/MartialBE/one-api/prices/prices.json');
+      }
+    };
+    fetchUpdateUrl();
+  }, []);
 
   const handleCheckUpdates = async () => {
     setLoading(true);
@@ -41,6 +56,7 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
         setNewPricing(responseData);
       }
     } catch (err) {
+      showError(err.message);
       console.error(err);
     }
     setLoading(false);
@@ -115,12 +131,12 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
       <Divider />
       <DialogContent>
         <Grid container justifyContent="center" alignItems="center" spacing={2}>
-          <Grid item xs={12} md={10}>
+          <Grid item xs={12} md={9}>
             <FormControl fullWidth component="fieldset">
               <TextField label={t('CheckUpdatesTable.url')} variant="outlined" value={url} onChange={(e) => setUrl(e.target.value)} />
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={3}>
             <LoadingButton variant="contained" color="primary" onClick={handleCheckUpdates} loading={loading}>
               {t('CheckUpdatesTable.fetchData')}
             </LoadingButton>
