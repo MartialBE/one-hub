@@ -251,7 +251,21 @@ func CountTokenRerankMessages(messages types.RerankRequest, model string, preCos
 	tokenNum += GetTokenNum(tokenEncoder, messages.Query)
 
 	for _, document := range messages.Documents {
-		tokenNum += GetTokenNum(tokenEncoder, document)
+		docStr, ok := document.(string)
+		if ok {
+			tokenNum += GetTokenNum(tokenEncoder, docStr)
+		} else {
+			docMultimodal, ok := document.(map[string]string)
+			if ok {
+				text := docMultimodal["text"]
+				if text != "" {
+					tokenNum += GetTokenNum(tokenEncoder, text)
+				} else {
+					// 意思意思加点
+					tokenNum += 10
+				}
+			}
+		}
 	}
 
 	return tokenNum

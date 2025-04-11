@@ -8,6 +8,11 @@ import (
 )
 
 func (p *SiliconflowProvider) CreateRerank(request *types.RerankRequest) (*types.RerankResponse, *types.OpenAIErrorWithStatusCode) {
+	documents, err := request.GetDocumentsList()
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "invalid_documents", http.StatusBadRequest)
+	}
+
 	url, errWithCode := p.GetSupportedAPIUri(config.RelayModeRerank)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -22,7 +27,7 @@ func (p *SiliconflowProvider) CreateRerank(request *types.RerankRequest) (*types
 	// 获取请求头
 	headers := p.GetRequestHeaders()
 
-	rerankReq := getRerankRequest(request)
+	rerankReq := getRerankRequest(request, documents)
 
 	// 创建请求
 	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(rerankReq), p.Requester.WithHeader(headers))
@@ -42,13 +47,13 @@ func (p *SiliconflowProvider) CreateRerank(request *types.RerankRequest) (*types
 	return p.ConvertToRerank(cResponse, request)
 }
 
-func getRerankRequest(request *types.RerankRequest) *RerankRequest {
+func getRerankRequest(request *types.RerankRequest, documents []string) *RerankRequest {
 	return &RerankRequest{
 		Model:           request.Model,
 		Query:           request.Query,
 		TopN:            request.TopN,
 		ReturnDocuments: true,
-		Documents:       request.Documents,
+		Documents:       documents,
 	}
 }
 
