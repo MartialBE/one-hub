@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
-const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
+const Sidebar = ({ drawerOpen, drawerToggle, window: windowProp }) => {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
   const { t } = useTranslation();
@@ -213,7 +213,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
       aria-label="mailbox folders"
     >
       <Drawer
-        container={window?.document.body}
+        container={windowProp?.document.body}
         variant={matchUpMd ? 'persistent' : 'temporary'}
         anchor="left"
         open={drawerOpen}

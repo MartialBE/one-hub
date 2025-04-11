@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -40,13 +40,6 @@ const ProfileSection = () => {
   const account = useSelector((state) => state.account);
   const { logout } = useLogin();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  console.log('Current device is mobile:', isMobile);
-
-  // 调试宽度
-  useEffect(() => {
-    console.log('Window width:', window.innerWidth, 'isMobile:', isMobile);
-  }, [isMobile]);
 
   const [open, setOpen] = useState(false);
   /**
