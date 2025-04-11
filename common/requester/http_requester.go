@@ -130,9 +130,9 @@ func (r *HTTPRequester) SendRequestRaw(req *http.Request) (*http.Response, *type
 // 获取流式响应
 func RequestStream[T streamable](requester *HTTPRequester, resp *http.Response, handlerPrefix HandlerPrefix[T]) (*streamReader[T], *types.OpenAIErrorWithStatusCode) {
 	// 如果返回的头是json格式 说明有错误
-	if strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
-		return nil, HandleErrorResp(resp, requester.ErrorHandler, requester.IsOpenAI)
-	}
+	// if strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
+	// 	return nil, HandleErrorResp(resp, requester.ErrorHandler, requester.IsOpenAI)
+	// }
 
 	stream := &streamReader[T]{
 		reader:        bufio.NewReader(resp.Body),
