@@ -1,7 +1,6 @@
 package config
 
 import (
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,9 +28,6 @@ var DisplayInCurrencyEnabled = true
 // Any options with "Secret", "Token" in its key won't be return by GetOptions
 
 var SessionSecret = uuid.New().String()
-
-var OptionMap map[string]string
-var OptionMapRWMutex sync.RWMutex
 
 var ItemsPerPage = 10
 var MaxRecentItems = 100
