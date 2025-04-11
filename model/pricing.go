@@ -3,12 +3,16 @@ package model
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"net/http"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -31,7 +35,7 @@ type BatchPrices struct {
 // NewPricing creates a new Pricing instance
 func NewPricing() {
 	logger.SysLog("Initializing Pricing")
-
+	logger.SysLog("Update Price Mode:" + viper.GetString("auto_price_updates_mode"))
 	PricingInstance = &Pricing{
 		Prices: make(map[string]*Price),
 		Match:  make([]string, 0),
@@ -45,7 +49,7 @@ func NewPricing() {
 	}
 
 	// 初始化时，需要检测是否有更新
-	if viper.GetBool("auto_price_updates") || len(PricingInstance.Prices) == 0 {
+	if viper.GetString("auto_price_updates_mode") == "system" && (viper.GetBool("auto_price_updates") || len(PricingInstance.Prices) == 0) {
 		logger.SysLog("Checking for pricing updates")
 		prices := GetDefaultPrice()
 		PricingInstance.SyncPricing(prices, false)
@@ -204,16 +208,97 @@ func (p *Pricing) SyncPricing(pricing []*Price, overwrite bool) error {
 	return err
 }
 
+func UpdatePriceByPriceService() error {
+	updatePriceMode := viper.GetString("auto_price_updates_mode")
+	if updatePriceMode == "system" {
+		// 使用程序内置更新
+		return nil
+	}
+	prices, err := GetPriceByPriceService()
+	if err != nil {
+		return err
+	}
+	if updatePriceMode == "add" {
+		// 仅仅新增
+		p := &Pricing{
+			Prices: make(map[string]*Price),
+			Match:  make([]string, 0),
+		}
+		err := p.Init()
+		if err != nil {
+			logger.SysError("Failed to initialize Pricing:" + err.Error())
+			return err
+		}
+		err = p.SyncPriceWithoutOverwrite(prices)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if updatePriceMode == "overwrite" {
+		// 覆盖所有
+		p := &Pricing{
+			Prices: make(map[string]*Price),
+			Match:  make([]string, 0),
+		}
+		err := p.Init()
+		if err != nil {
+			logger.SysError("Failed to initialize Pricing:" + err.Error())
+			return err
+		}
+		err = p.SyncPriceWithOverwrite(prices)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return errors.New("更新模式错误，更新模式仅能选择：add、overwrite、system，详见配置文件auto_price_updates_mode部分的说明")
+}
+
+func GetPriceByPriceService() ([]*Price, error) {
+	api := viper.GetString("update_price_service")
+	if api == "" {
+		return nil, errors.New("update_price_service is not configured")
+	}
+	logger.SysLog("Start Update Price,Prices Service URL：" + api)
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	resp, err := client.Get(api)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch prices from service: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %v", err)
+	}
+	var result struct {
+		Data []*Price `json:"data"`
+	}
+	// 尝试解析为带data字段的格式
+	if err := json.Unmarshal(body, &result); err == nil && len(result.Data) > 0 {
+		logger.SysLog(fmt.Sprintf("成功解析带data字段的数据，共获取到 %d 个价格配置", len(result.Data)))
+		return result.Data, nil
+	}
+	// 如果不是带data字段的格式，尝试直接解析为数组
+	var prices []*Price
+	if err := json.Unmarshal(body, &prices); err != nil {
+		return nil, fmt.Errorf("failed to parse price data: %v", err)
+	}
+	logger.SysLog(fmt.Sprintf("成功解析数组格式数据，共获取到 %d 个价格配置", len(prices)))
+	return prices, nil
+}
+
 // SyncPriceWithOverwrite syncs the pricing data with overwrite
 func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	tx := DB.Begin()
-
+	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个", len(p.Prices)))
 	err := DeleteAllPrices(tx)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-
 	err = InsertPrices(tx, pricing)
 
 	if err != nil {
@@ -222,14 +307,14 @@ func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	}
 
 	tx.Commit()
-
+	logger.SysLog(fmt.Sprintf("本次复写加新增 %d 个价格配置", len(pricing)))
 	return p.Init()
 }
 
 // SyncPriceWithoutOverwrite syncs the pricing data without overwrite
 func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*Price) error {
 	var newPrices []*Price
-
+	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个", len(p.Prices)))
 	for _, price := range pricing {
 		if _, ok := p.Prices[price.Model]; !ok {
 			newPrices = append(newPrices, price)
@@ -249,7 +334,7 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*Price) error {
 	}
 
 	tx.Commit()
-
+	logger.SysLog(fmt.Sprintf("本次新增 %d 个价格配置", len(newPrices)))
 	return p.Init()
 }
 

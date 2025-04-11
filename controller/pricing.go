@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"github.com/spf13/viper"
 	"net/http"
 	"net/url"
 	"one-api/common"
@@ -191,6 +192,15 @@ func SyncPricing(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
+		"message": "",
+	})
+}
+
+func GetUpdatePriceService(c *gin.Context) {
+	updatePriceService := viper.GetString("update_price_service")
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    updatePriceService,
 		"message": "",
 	})
 }
