@@ -21,7 +21,7 @@ export const getPageSize = (pageKey, defaultSize = ITEMS_PER_PAGE) => {
     }
     return defaultSize;
   } catch (error) {
-    console.error('get page size error:', error);
+    console.error('Error while getting page size:', error);
     return defaultSize;
   }
 };
@@ -36,11 +36,22 @@ export const savePageSize = (pageKey, size) => {
     let pageSizes = {};
     const pageSizesStr = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
     if (pageSizesStr) {
-      pageSizes = JSON.parse(pageSizesStr);
+      try {
+        pageSizes = JSON.parse(pageSizesStr);
+      } catch (parseError) {
+        console.error('Failed to parse page size data from localStorage, resetting data:', parseError);
+      }
     }
     pageSizes[pageKey] = size;
     localStorage.setItem(PAGE_SIZE_STORAGE_KEY, JSON.stringify(pageSizes));
   } catch (error) {
-    console.error('save page size error:', error);
+    console.error('Error while saving page size:', error);
+    try {
+      const singlePageData = {};
+      singlePageData[pageKey] = size;
+      localStorage.setItem(PAGE_SIZE_STORAGE_KEY, JSON.stringify(singlePageData));
+    } catch (fallbackError) {
+      console.error('Failed to save single page size settings:', fallbackError);
+    }
   }
 };
