@@ -24,7 +24,7 @@ export const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open
   borderRadius: 0,
   backgroundColor: theme.palette.background.default,
   transition: theme.transitions.create(
-    'margin',
+    ['margin', 'width'],
     open
       ? {
           easing: theme.transitions.easing.easeOut,
@@ -55,7 +55,9 @@ export const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open
   },
   [theme.breakpoints.up('md')]: {
     marginLeft: open ? 0 : -(drawerWidth - 20),
-    width: `calc(100% - ${drawerWidth}px)`
+    width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3)
   },
   [theme.breakpoints.down('md')]: {
     marginLeft: '0',
