@@ -156,7 +156,12 @@ export default function Users() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('userPage.users')}</Typography>
+        <Typography variant="h2">
+          {t('userPage.users')}
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            User
+          </Typography>
+        </Typography>
 
         <Button
           variant="contained"

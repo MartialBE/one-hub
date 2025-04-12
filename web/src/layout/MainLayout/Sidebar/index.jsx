@@ -143,20 +143,18 @@ const Sidebar = ({ drawerOpen, drawerToggle, window: windowProp }) => {
               }
             }}
           >
-            {!matchUpMd && (
-              <Box
-                sx={{
-                  px: 2,
-                  pt: 2.5,
-                  pb: 1.5,
-                  mt: 0.5,
-                  display: 'flex',
-                  justifyContent: 'center'
-                }}
-              >
-                <LogoSection />
-              </Box>
-            )}
+            <Box
+              sx={{
+                px: 2,
+                pt: 2.5,
+                pb: 1.5,
+                mt: 0.5,
+                display: 'flex',
+                justifyContent: 'flex-start'
+              }}
+            >
+              <LogoSection />
+            </Box>
 
             <Box
               sx={{

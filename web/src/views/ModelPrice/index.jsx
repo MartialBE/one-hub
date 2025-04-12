@@ -178,8 +178,11 @@ export default function ModelPrice() {
 
   return (
     <Stack spacing={3} sx={{ padding: theme.spacing(3) }}>
-      <Typography variant="h4" color="textPrimary">
+      <Typography variant="h2">
         {t('modelpricePage.availableModels')}
+        <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+          Available Models
+        </Typography>
       </Typography>
 
       <Card sx={{ p: 2, backgroundColor: theme.palette.background.paper }}>

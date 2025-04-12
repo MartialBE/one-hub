@@ -378,7 +378,12 @@ export default function ChannelList() {
   return (
     <AdminContainer>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('channel_index.channel')}</Typography>
+        <Typography variant="h2">
+          {t('channel_index.channel')}
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            Channel
+          </Typography>
+        </Typography>
 
         <ButtonGroup variant="contained" aria-label="outlined small primary button group">
           <Button color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />} onClick={() => handleOpenModal(0)}>
