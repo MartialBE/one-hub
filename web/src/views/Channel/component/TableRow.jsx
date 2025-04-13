@@ -54,6 +54,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy, renderQuota } from 'utils/common';
 import { ChannelCheck } from './ChannelCheck';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -127,7 +128,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   const [selectedChannels, setSelectedChannels] = useState([]);
   const [currentTestingChannel, setCurrentTestingChannel] = useState(null);
   const [tagPage, setTagPage] = useState(0);
-  const [tagRowsPerPage, setTagRowsPerPage] = useState(10);
+  const [tagRowsPerPage, setTagRowsPerPage] = useState(() => getPageSize('channelTag'));
   const tagModelPopover = usePopover();
 
   const batchConfirm = useBoolean();
@@ -168,8 +169,10 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   };
 
   const handleChangeTagRowsPerPage = (event) => {
-    setTagRowsPerPage(parseInt(event.target.value, 10));
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setTagRowsPerPage(newRowsPerPage);
     setTagPage(0);
+    savePageSize('channelTag', newRowsPerPage);
   };
 
   const handleToggleChannel = (channelId) => {
@@ -1123,7 +1126,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                             onPageChange={handleChangeTagPage}
                             rowsPerPage={tagRowsPerPage}
                             onRowsPerPageChange={handleChangeTagRowsPerPage}
-                            rowsPerPageOptions={[10, 25, 50, 100]}
+                            rowsPerPageOptions={PAGE_SIZE_OPTIONS}
                             labelRowsPerPage="每页行数:"
                             labelDisplayedRows={({ from, to, count }) => `${from}-${to} 共 ${count}`}
                             sx={{
