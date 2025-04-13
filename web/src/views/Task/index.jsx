@@ -16,7 +16,7 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/TableToolBar';
 import { API } from 'utils/api';
 import { isAdmin } from 'utils/common';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,7 @@ export default function Task() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('task'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
@@ -59,8 +59,10 @@ export default function Task() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('task', newRowsPerPage);
   };
 
   const searchLogs = async () => {

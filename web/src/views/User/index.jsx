@@ -16,7 +16,7 @@ import UsersTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
 import { API } from 'utils/api';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import EditeModal from './component/EditModal';
 
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ export default function Users() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('user'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -49,8 +49,10 @@ export default function Users() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('user', newRowsPerPage);
   };
 
   const searchUsers = async (event) => {

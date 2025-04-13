@@ -15,7 +15,7 @@ import LogTableRow from './component/OrderTableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/OrderTableToolBar';
 import { API } from 'utils/api';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 
@@ -35,7 +35,7 @@ export default function Order() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('created_at');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('paymentOrder'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
@@ -57,8 +57,10 @@ export default function Order() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('paymentOrder', newRowsPerPage);
   };
 
   const searchLogs = async () => {

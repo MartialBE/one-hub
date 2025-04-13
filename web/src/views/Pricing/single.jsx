@@ -21,6 +21,7 @@ import { showError, showSuccess, trims } from 'utils/common';
 import { API } from 'utils/api';
 import { ValueFormatter, priceType } from './component/util';
 import { useTranslation } from 'react-i18next';
+import { getPageSize, savePageSize } from 'constants';
 
 function validation(t, row, rows) {
   if (row.model === '') {
@@ -328,8 +329,11 @@ const Single = ({ ownedby, prices, reloadData }) => {
         rows={rows}
         columns={modelRatioColumns}
         editMode="row"
-        initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
+        initialState={{ pagination: { paginationModel: { pageSize: getPageSize('pricing', 20) }}}}
         pageSizeOptions={[20, 30, 50, 100]}
+        onPaginationModelChange={(model) => {
+          savePageSize('pricing', model.pageSize);
+        }}
         disableRowSelectionOnClick
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}

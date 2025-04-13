@@ -9,7 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import ChannelTableRow from './TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { fetchChannelData } from '../ChannelList';
 import { API } from 'utils/api';
 import { showError, showSuccess, trims } from 'utils/common';
@@ -20,7 +20,7 @@ export default function ChannelTable({ tag }) {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('channelTag'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [channels, setChannels] = useState([]);
@@ -39,8 +39,10 @@ export default function ChannelTable({ tag }) {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('channelTag', newRowsPerPage);
   };
 
   // 处理刷新
