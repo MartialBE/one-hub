@@ -112,6 +112,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   const confirmDelete = useBoolean();
   const check = useBoolean();
   const updateBalanceOption = useBoolean();
+  const changeKeyConfirm = useBoolean();
 
   const [openTest, setOpenTest] = useState(false);
   // const [openDelete, setOpenDelete] = useState(false);
@@ -143,6 +144,8 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   let modelMap = [];
   modelMap = item.models.split(',');
   modelMap.sort();
+
+  const [newKey, setNewKey] = useState('');
 
   const fetchTagChannels = useCallback(async () => {
     if (!item.tag) return;
@@ -592,7 +595,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
         onClose={() => {
           popover.onClose();
           // 如果在关闭后没有进一步操作，重置当前渠道
-          if (!check.value && !confirmDelete.value && !updateBalanceOption.value) {
+          if (!check.value && !confirmDelete.value && !updateBalanceOption.value && !changeKeyConfirm.value) {
             setCurrentTestingChannel(null);
           }
         }}
@@ -632,6 +635,18 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
             {t('channel_row.channelWeb')}
           </MenuItem>
         )}
+
+        <MenuItem
+          onClick={() => {
+            popover.onClose();
+            // 设置初始值为当前渠道的密钥
+            setNewKey(currentTestingChannel ? currentTestingChannel.key : item.key);
+            changeKeyConfirm.onTrue();
+          }}
+        >
+          <Icon icon="solar:key-bold-duotone" style={{ marginRight: '16px' }} />
+          {t('channel_row.changeKey')}
+        </MenuItem>
 
         {currentTestingChannel && (
           <MenuItem
@@ -1336,6 +1351,102 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
           </Button>
         }
       />
+
+      <Dialog open={changeKeyConfirm.value} onClose={changeKeyConfirm.onFalse} maxWidth="md" fullWidth>
+        <DialogTitle>{t('channel_row.changeKey')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            {t('channel_row.changeKeyTip', { name: currentTestingChannel ? currentTestingChannel.name : item.name })}
+          </DialogContentText>
+          <TextField
+            margin="dense"
+            id="current-key"
+            label={t('channel_row.currentKey')}
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={currentTestingChannel ? currentTestingChannel.key : item.key}
+            InputProps={{
+              readOnly: true,
+              endAdornment: (
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    copy(currentTestingChannel ? currentTestingChannel.key : item.key, t('channel_row.currentKey'));
+                  }}
+                >
+                  <Icon icon="solar:copy-bold-duotone" />
+                </IconButton>
+              )
+            }}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="key"
+            label={t('channel_row.newKey')}
+            type="text"
+            fullWidth
+            multiline
+            minRows={3}
+            variant="outlined"
+            value={newKey}
+            onChange={(e) => setNewKey(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={changeKeyConfirm.onFalse}>{t('common.cancel')}</Button>
+          <Button
+            onClick={() => {
+              if (!newKey) {
+                showError(t('channel_row.keyRequired'));
+                return;
+              }
+              const channelId = currentTestingChannel ? currentTestingChannel.id : item.id;
+              
+              // 创建一个包含密钥的对象来更新
+              const updateData = {
+                id: channelId,
+                key: newKey
+              };
+              
+              // 使用PUT请求更新渠道
+              API.put('/api/channel/', updateData)
+                .then((res) => {
+                  if (res && res.data) {
+                    const { success, message } = res.data;
+                    if (success) {
+                      showSuccess(t('channel_row.keyChangeSuccess'));
+                      onRefresh(false); // 刷新列表
+                      
+                      // 更新本地密钥状态
+                      if (currentTestingChannel) {
+                        currentTestingChannel.key = newKey;
+                      } else {
+                        item.key = newKey;
+                      }
+                    } else {
+                      showError(message || t('channel_row.keyChangeError', { message: '请求失败' }));
+                    }
+                  } else {
+                    showError(t('channel_row.keyChangeError', { message: '无响应数据' }));
+                  }
+                })
+                .catch((error) => {
+                  const errorMessage = error.response?.data?.message || error.message || '未知错误';
+                  showError(t('channel_row.keyChangeError', { message: errorMessage }));
+                })
+                .finally(() => {
+                  changeKeyConfirm.onFalse();
+                });
+            }}
+            color="primary"
+          >
+            {t('common.submit')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
