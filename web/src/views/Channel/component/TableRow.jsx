@@ -1361,7 +1361,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
             autoFocus
             margin="dense"
             id="sub-channel-name"
-            label={t('channel_index.name')}
+            label={t('channel_index.channelName')}
             type="text"
             fullWidth
             variant="outlined"
