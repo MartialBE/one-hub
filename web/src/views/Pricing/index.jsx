@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Tab, Box, Card, Alert, Stack, Button } from '@mui/material';
+import { Tabs, Tab, Box, Card, Alert, Stack, Button, Typography, ButtonGroup } from '@mui/material';
 import { Icon } from '@iconify/react';
 import Single from './single';
 import Multiple from './multiple';
@@ -185,6 +185,31 @@ const Pricing = () => {
 
   return (
     <Stack spacing={3}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Typography variant="h2">
+          模型价格
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            Price
+          </Typography>
+        </Typography>
+
+        <ButtonGroup variant="contained" aria-label="outlined small primary button group">
+          <Button color="primary" onClick={() => handleOpenaddModal(null)} startIcon={<Icon icon="solar:add-circle-line-duotone" />}>
+            {t('pricingPage.newButton')}
+          </Button>
+          <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" />}>
+            {t('pricingPage.refreshButton')}
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenModal(true);
+            }}
+          >
+            {t('pricingPage.updatePricesButton')}
+          </Button>
+        </ButtonGroup>
+      </Stack>
+
       <Alert severity="info">
         <b>{t('pricingPage.currencyInfo1')}</b>
         {t('pricingPage.currencyInfo2')}
@@ -213,27 +238,7 @@ const Pricing = () => {
           <b>{t('pricingPage.errPricesWarning')}</b>：{errPrices}
         </Alert>
       )}
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={5} spacing={2}>
-        <Button
-          variant="contained"
-          onClick={() => handleOpenaddModal(null)}
-          color="primary"
-          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
-        >
-          {t('pricingPage.newButton')}
-        </Button>
-        <Button variant="contained" onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" />}>
-          {t('pricingPage.refreshButton')}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setOpenModal(true);
-          }}
-        >
-          {t('pricingPage.updatePricesButton')}
-        </Button>
-      </Stack>
+
       <EditeModal
         open={openaddModal}
         onCancel={handleCloseModal}

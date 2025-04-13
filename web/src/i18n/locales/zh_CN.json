@@ -60,7 +60,16 @@
     "balance": "余额",
     "used": "已使用",
     "calls": "调用次数",
-    "unknown": "未知"
+    "unknown": "未知",
+    "week_model_statistics": "近七日模型统计",
+    "week_consumption_log": "近七日消费日志",
+    "date": "日期",
+    "request_count": "请求次数",
+    "amount": "金额",
+    "tokens": "Tokens(输入/输出)",
+    "cache_tokens": "CacheTokens",
+    "request_time": "请求时间(s)",
+    "loading": "加载中..."
   },
   "analytics_index": {
     "startTime": "开始时间",
