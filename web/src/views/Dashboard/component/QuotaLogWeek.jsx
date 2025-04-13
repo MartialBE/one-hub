@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { API } from 'utils/api';
-import { showError, calculateQuota } from 'utils/common';
+import { calculateQuota } from 'utils/common';
 import { getLastSevenDays } from 'utils/chart';
 import { useTranslation } from 'react-i18next';
 import SubCard from 'ui-component/cards/SubCard';
@@ -10,13 +10,15 @@ const QuotaLogWeek = () => {
   const [logData, setLogData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
+  const [isHasData, setIsHasData] = useState(false);
 
   useEffect(() => {
     const fetchLogData = async () => {
       try {
         const res = await API.get('/api/user/dashboard');
-        const { success, message, data } = res.data;
+        const { success, data } = res.data;
         if (success && data) {
+          setIsHasData(true);
           // 处理数据，按日期分组
           const lastSevenDays = getLastSevenDays();
           const processedData = lastSevenDays.map((date) => {
@@ -41,7 +43,7 @@ const QuotaLogWeek = () => {
 
           setLogData(processedData);
         } else {
-          showError(message);
+          setIsHasData(false);
         }
         setIsLoading(false);
       } catch (error) {
@@ -72,6 +74,14 @@ const QuotaLogWeek = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center">
                   <Typography variant="body2">{t('dashboard_index.loading')}</Typography>
+                </TableCell>
+              </TableRow>
+            ) : !isHasData ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography variant="h4" color={'#697586'}>
+                    {t('dashboard_index.no_data')}
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (

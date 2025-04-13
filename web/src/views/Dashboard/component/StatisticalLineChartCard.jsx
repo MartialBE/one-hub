@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography, Divider } from '@mui/material';
 
 // third-party
 import Chart from 'react-apexcharts';
@@ -132,7 +132,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
       {isLoading ? (
         <SkeletonTotalOrderCard />
       ) : (
-        <CardWrapper border={false} content={false}>
+        <CardWrapper border={false} content={false} sx={{ height: '100%' }}>
           <Box
             sx={{
               p: 2.5,
@@ -162,7 +162,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                 >
                   {title}
                 </Typography>
-
+                <Divider sx={{ mt: 1.5, mb: 1.5 }} />
                 {lastDayValue !== undefined && (
                   <Box
                     sx={{
@@ -185,11 +185,11 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               display: 'flex',
                               alignItems: 'center',
                               color: 'text.secondary',
-                              fontSize: '12px'
+                              fontSize: '14px'
                             }}
                           >
                             0%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '12px' }}>
+                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
                               相比昨日
                             </Box>
                           </Typography>
@@ -204,7 +204,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               display: 'flex',
                               alignItems: 'center',
                               color: 'error.main',
-                              fontSize: '12px'
+                              fontSize: '14px'
                             }}
                           >
                             <Box
@@ -218,7 +218,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               ↓
                             </Box>
                             100%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '12px' }}>
+                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
                               相比昨日
                             </Box>
                           </Typography>
@@ -233,7 +233,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               display: 'flex',
                               alignItems: 'center',
                               color: 'success.main',
-                              fontSize: '12px'
+                              fontSize: '14px'
                             }}
                           >
                             <Box
@@ -247,7 +247,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               ↑
                             </Box>
                             100%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '12px' }}>
+                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
                               相比昨日
                             </Box>
                           </Typography>
@@ -264,7 +264,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               display: 'flex',
                               alignItems: 'center',
                               color: 'success.main',
-                              fontSize: '12px'
+                              fontSize: '14px'
                             }}
                           >
                             <Box
@@ -278,7 +278,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               ↑
                             </Box>
                             {`${percentChange}%`}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '12px' }}>
+                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
                               相比昨日
                             </Box>
                           </Typography>
@@ -293,7 +293,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               display: 'flex',
                               alignItems: 'center',
                               color: 'error.main',
-                              fontSize: '12px'
+                              fontSize: '14px'
                             }}
                           >
                             <Box
@@ -307,7 +307,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                               ↓
                             </Box>
                             {`${percentChange}%`}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '12px' }}>
+                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
                               相比昨日
                             </Box>
                           </Typography>
@@ -342,6 +342,7 @@ StatisticalLineChartCard.propTypes = {
   title: PropTypes.string,
   chartData: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   todayValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  lastDayValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   type: PropTypes.string
 };
 

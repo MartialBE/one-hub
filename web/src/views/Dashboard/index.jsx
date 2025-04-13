@@ -71,7 +71,7 @@ const Dashboard = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
-          <Grid item lg={4} xs={12}>
+          <Grid item lg={4} xs={12} sx={{ height: '160' }}>
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_requests')}
@@ -81,7 +81,7 @@ const Dashboard = () => {
               lastDayValue={requestChart?.lastDayValue}
             />
           </Grid>
-          <Grid item lg={4} xs={12}>
+          <Grid item lg={4} xs={12} sx={{ height: '160' }}>
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_consumption')}
@@ -91,7 +91,7 @@ const Dashboard = () => {
               lastDayValue={quotaChart?.lastDayValue}
             />
           </Grid>
-          <Grid item lg={4} xs={12}>
+          <Grid item lg={4} xs={12} sx={{ height: '160' }}>
             <StatisticalLineChartCard
               isLoading={isLoading}
               title={t('dashboard_index.today_tokens')}
