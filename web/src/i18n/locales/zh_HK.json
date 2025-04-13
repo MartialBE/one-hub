@@ -524,7 +524,11 @@
     "saveOk": "保存成功",
     "type": "類型",
     "typeCheck": "類型只能是tokens或times",
-    "typeErr": "類型錯誤"
+    "typeErr": "類型錯誤",
+    "locked_title": "鎖定價格",
+    "locked": "鎖定價格",
+    "unlocked": "未鎖定價格",
+    "lockedTip": "價格鎖定後無法通過價格更新伺服器和程序覆蓋。如果您所配置的價格希望隨程序或價格伺服器同步更新，請勿鎖定"
   },
   "profile": "個人設定",
   "profilePage": {

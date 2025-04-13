@@ -71,6 +71,11 @@ export default function PricesTableRow({ item, managePrices, handleOpenModal, ow
         <TableCell>{ValueFormatter(item.input)}</TableCell>
         <TableCell>{ValueFormatter(item.output)}</TableCell>
         <TableCell>{item.models.length}</TableCell>
+        <TableCell>
+          <Label color={item.locked ? 'error' : 'success'} variant="outlined">
+            {item.locked ? t('pricing_edit.locked') : t('pricing_edit.unlocked')}
+          </Label>
+        </TableCell>
 
         <TableCell onClick={(event) => event.stopPropagation()}>
           <IconButton onClick={handleOpenMenu} sx={{ color: 'rgb(99, 115, 129)' }}>

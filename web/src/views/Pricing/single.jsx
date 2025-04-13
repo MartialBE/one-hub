@@ -155,7 +155,8 @@ const Single = ({ ownedby, prices, reloadData }) => {
           newRow.input === oldRows.input &&
           newRow.output === oldRows.output &&
           newRow.type === oldRows.type &&
-          newRow.channel_type === oldRows.channel_type
+          newRow.channel_type === oldRows.channel_type &&
+          newRow.locked === oldRows.locked
         ) {
           return resolve(oldRows);
         }
@@ -228,6 +229,16 @@ const Single = ({ ownedby, prices, reloadData }) => {
         type: 'number',
         editable: true,
         valueFormatter: (params) => ValueFormatter(params.value)
+      },
+      {
+        field: 'locked',
+        sortable: true,
+        headerName: t('pricing_edit.locked_title'),
+        flex: 0.5,
+        minWidth: 100,
+        type: 'boolean',
+        editable: true,
+        valueFormatter: (params) => (params.value ? t('pricing_edit.locked') : t('pricing_edit.unlocked'))
       },
       {
         field: 'actions',

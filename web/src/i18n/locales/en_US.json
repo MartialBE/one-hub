@@ -524,7 +524,11 @@
     "saveOk": "Saved successfully",
     "type": "type",
     "typeCheck": "The type can only be tokens or times",
-    "typeErr": "type error"
+    "typeErr": "type error",
+    "locked_title": "Lock price",
+    "locked": "Locked price",
+    "unlocked": "Unlocked price",
+    "lockedTip": "Price locked cannot be overridden by price updates on the server or program"
   },
   "profile": "Profile",
   "profilePage": {
