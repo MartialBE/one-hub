@@ -439,6 +439,8 @@
     "channelType": "供应商",
     "availableModels": "可用模型",
     "group": "分组",
+    "free": "免费",
+    "RPM": "API速率",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
     "rate": "倍率",
