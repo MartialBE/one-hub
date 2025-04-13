@@ -196,6 +196,15 @@ func OIDCAuth(c *gin.Context) {
 		return
 	}
 
+	// 检测邀请码
+	var inviterId int
+	affCode := c.Query("aff")
+	if affCode != "" {
+		inviterId, _ = model.GetUserIdByAffCode(affCode)
+	}
+	if inviterId > 0 {
+		user.InviterId = inviterId
+	}
 	// 填充用户信息并创建账户
 	user.Username = userName.(string)
 	if email, ok := claims["email"]; ok && email != nil {
