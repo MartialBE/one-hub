@@ -112,7 +112,6 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   const confirmDelete = useBoolean();
   const check = useBoolean();
   const updateBalanceOption = useBoolean();
-  const changeKeyConfirm = useBoolean();
 
   const [openTest, setOpenTest] = useState(false);
   // const [openDelete, setOpenDelete] = useState(false);
@@ -123,6 +122,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   const [weight, setWeight] = useState(item.weight);
   const tagDeleteConfirm = useBoolean();
   const quickEdit = useBoolean();
+  const simpleChannelEdit = useBoolean();
   const [totalTagChannels, setTotalTagChannels] = useState(0);
   const [isTagChannelsLoading, setIsTagChannelsLoading] = useState(false);
   const [tagChannels, setTagChannels] = useState([]);
@@ -146,6 +146,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   modelMap.sort();
 
   const [newKey, setNewKey] = useState('');
+  const [channelName, setChannelName] = useState('');
 
   const fetchTagChannels = useCallback(async () => {
     if (!item.tag) return;
@@ -595,7 +596,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
         onClose={() => {
           popover.onClose();
           // 如果在关闭后没有进一步操作，重置当前渠道
-          if (!check.value && !confirmDelete.value && !updateBalanceOption.value && !changeKeyConfirm.value) {
+          if (!check.value && !confirmDelete.value && !updateBalanceOption.value) {
             setCurrentTestingChannel(null);
           }
         }}
@@ -635,18 +636,6 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
             {t('channel_row.channelWeb')}
           </MenuItem>
         )}
-
-        <MenuItem
-          onClick={() => {
-            popover.onClose();
-            // 设置初始值为当前渠道的密钥
-            setNewKey(currentTestingChannel ? currentTestingChannel.key : item.key);
-            changeKeyConfirm.onTrue();
-          }}
-        >
-          <Icon icon="solar:key-bold-duotone" style={{ marginRight: '16px' }} />
-          {t('channel_row.changeKey')}
-        </MenuItem>
 
         {currentTestingChannel && (
           <MenuItem
@@ -1111,6 +1100,21 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                                           </IconButton>
                                         </Tooltip>
 
+                                        <Tooltip title={t('common.edit')} placement="top">
+                                          <IconButton
+                                            size="small"
+                                            sx={{ p: 0.5, color: 'primary.main' }}
+                                            onClick={() => {
+                                              setCurrentTestingChannel(channel);
+                                              setChannelName(channel.name);
+                                              setNewKey(channel.key);
+                                              simpleChannelEdit.onTrue();
+                                            }}
+                                          >
+                                            <Icon icon="solar:pen-bold" width={18} height={18} />
+                                          </IconButton>
+                                        </Tooltip>
+
                                         <Tooltip title={t('channel_index.actions')} placement="top">
                                           <IconButton
                                             size="small"
@@ -1352,40 +1356,26 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
         }
       />
 
-      <Dialog open={changeKeyConfirm.value} onClose={changeKeyConfirm.onFalse} maxWidth="md" fullWidth>
-        <DialogTitle>{t('channel_row.changeKey')}</DialogTitle>
+      {/* 添加子渠道的简化编辑对话框 */}
+      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} maxWidth="md" fullWidth>
+        <DialogTitle>{t('common.edit')}</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            {t('channel_row.changeKeyTip', { name: currentTestingChannel ? currentTestingChannel.name : item.name })}
-          </DialogContentText>
-          <TextField
-            margin="dense"
-            id="current-key"
-            label={t('channel_row.currentKey')}
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={currentTestingChannel ? currentTestingChannel.key : item.key}
-            InputProps={{
-              readOnly: true,
-              endAdornment: (
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    copy(currentTestingChannel ? currentTestingChannel.key : item.key, t('channel_row.currentKey'));
-                  }}
-                >
-                  <Icon icon="solar:copy-bold-duotone" />
-                </IconButton>
-              )
-            }}
-            sx={{ mb: 2 }}
-          />
           <TextField
             autoFocus
             margin="dense"
-            id="key"
-            label={t('channel_row.newKey')}
+            id="sub-channel-name"
+            label={t('channel_index.name')}
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
+            sx={{ mb: 2, mt: 1 }}
+          />
+          <TextField
+            margin="dense"
+            id="sub-channel-key"
+            label={t('channel_row.key')}
             type="text"
             fullWidth
             multiline
@@ -1396,18 +1386,25 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={changeKeyConfirm.onFalse}>{t('common.cancel')}</Button>
+          <Button onClick={simpleChannelEdit.onFalse}>{t('common.cancel')}</Button>
           <Button
             onClick={() => {
-              if (!newKey) {
+              if (!channelName.trim()) {
+                showError(t('channel_edit.requiredName'));
+                return;
+              }
+              if (!newKey.trim()) {
                 showError(t('channel_row.keyRequired'));
                 return;
               }
-              const channelId = currentTestingChannel ? currentTestingChannel.id : item.id;
               
-              // 创建一个包含密钥的对象来更新
+              // 确保这里使用currentTestingChannel的ID，因为这是子渠道
+              const channelId = currentTestingChannel.id;
+              
+              // 创建一个包含名称和密钥的对象来更新
               const updateData = {
                 id: channelId,
+                name: channelName,
                 key: newKey
               };
               
@@ -1417,28 +1414,30 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                   if (res && res.data) {
                     const { success, message } = res.data;
                     if (success) {
-                      showSuccess(t('channel_row.keyChangeSuccess'));
-                      onRefresh(false); // 刷新列表
+                      showSuccess(t('channel_edit.editSuccess'));
                       
-                      // 更新本地密钥状态
-                      if (currentTestingChannel) {
-                        currentTestingChannel.key = newKey;
-                      } else {
-                        item.key = newKey;
-                      }
+                      // 更新本地状态
+                      setTagChannels((prev) =>
+                        prev.map((c) =>
+                          c.id === channelId ? { ...c, name: channelName, key: newKey } : c
+                        )
+                      );
+                      
+                      onRefresh(false); // 刷新父组件数据
                     } else {
-                      showError(message || t('channel_row.keyChangeError', { message: '请求失败' }));
+                      showError(message || t('channel_edit.editError'));
                     }
                   } else {
-                    showError(t('channel_row.keyChangeError', { message: '无响应数据' }));
+                    showError(t('channel_edit.editError'));
                   }
                 })
                 .catch((error) => {
                   const errorMessage = error.response?.data?.message || error.message || '未知错误';
-                  showError(t('channel_row.keyChangeError', { message: errorMessage }));
+                  showError(t('channel_edit.editError', { message: errorMessage }));
                 })
                 .finally(() => {
-                  changeKeyConfirm.onFalse();
+                  simpleChannelEdit.onFalse();
+                  setCurrentTestingChannel(null);
                 });
             }}
             color="primary"
