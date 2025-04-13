@@ -293,13 +293,29 @@ func GetPriceByPriceService() ([]*Price, error) {
 // SyncPriceWithOverwrite syncs the pricing data with overwrite
 func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	tx := DB.Begin()
-	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个", len(p.Prices)))
-	err := DeleteAllPrices(tx)
+	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个(包含locked价格)", len(p.Prices)))
+	err := DeleteAllPricesNotLock(tx)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	err = InsertPrices(tx, pricing)
+	var newPrices []*Price
+	// 覆盖所有
+
+	for _, price := range pricing {
+		if _, ok := p.Prices[price.Model]; !ok {
+			newPrices = append(newPrices, price)
+		} else {
+			if !p.Prices[price.Model].Locked {
+				newPrices = append(newPrices, price)
+			}
+		}
+	}
+	if len(newPrices) == 0 {
+		return nil
+	}
+
+	err = InsertPrices(tx, newPrices)
 
 	if err != nil {
 		tx.Rollback()
@@ -307,7 +323,7 @@ func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	}
 
 	tx.Commit()
-	logger.SysLog(fmt.Sprintf("本次复写加新增 %d 个价格配置", len(pricing)))
+	logger.SysLog(fmt.Sprintf("本次复写加新增 %d 个价格配置", len(newPrices)))
 	return p.Init()
 }
 

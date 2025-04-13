@@ -32,7 +32,7 @@ const QuotaLogWeek = () => {
             return {
               date,
               requests: totalRequests,
-              amount: calculateQuota(totalAmount),
+              amount: calculateQuota(totalAmount,6),
               tokens: `${totalInputTokens}/${totalOutputTokens}`,
               cacheTokens: 0, // 假设默认为0，如果API返回了相关数据则使用实际值
               duration: (totalDuration / 1000).toFixed(3)
