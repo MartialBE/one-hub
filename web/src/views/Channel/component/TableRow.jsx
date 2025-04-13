@@ -1354,7 +1354,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
       />
 
       {/* 添加子渠道的简化编辑对话框 */}
-      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} fullWidth maxWidth="xs" >
+      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} fullWidth maxWidth="md" >
         <DialogTitle>{t('common.edit')}</DialogTitle>
         <DialogContent>
           <TextField
