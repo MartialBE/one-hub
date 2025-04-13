@@ -145,9 +145,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   modelMap = item.models.split(',');
   modelMap.sort();
 
-  const [newKey, setNewKey] = useState('');
-  const [channelName, setChannelName] = useState('');
-
+  const [editedChannel, setEditedChannel] = useState({});
   const fetchTagChannels = useCallback(async () => {
     if (!item.tag) return;
 
@@ -1106,8 +1104,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                                             sx={{ p: 0.5, color: 'primary.main' }}
                                             onClick={() => {
                                               setCurrentTestingChannel(channel);
-                                              setChannelName(channel.name);
-                                              setNewKey(channel.key);
+                                              setEditedChannel({name: channel.name, key: channel.key})
                                               simpleChannelEdit.onTrue();
                                             }}
                                           >
@@ -1357,7 +1354,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
       />
 
       {/* 添加子渠道的简化编辑对话框 */}
-      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} maxWidth="md" fullWidth>
+      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} fullWidth maxWidth="xs" >
         <DialogTitle>{t('common.edit')}</DialogTitle>
         <DialogContent>
           <TextField
@@ -1368,8 +1365,8 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
             type="text"
             fullWidth
             variant="outlined"
-            value={channelName}
-            onChange={(e) => setChannelName(e.target.value)}
+            value={editedChannel.name}
+            onChange={(e) => setEditedChannel({...editedChannel, name: e.target.value})}
             sx={{ mb: 2, mt: 1 }}
           />
           <TextField
@@ -1381,19 +1378,19 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
             multiline
             minRows={3}
             variant="outlined"
-            value={newKey}
-            onChange={(e) => setNewKey(e.target.value)}
+            value={editedChannel.key}
+            onChange={(e) => setEditedChannel({...editedChannel, key: e.target.value})}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={simpleChannelEdit.onFalse}>{t('common.cancel')}</Button>
-          <Button
+          <Button variant="contained" color="primary"
             onClick={() => {
-              if (!channelName.trim()) {
+              if (!editedChannel?.name?.trim()) {
                 showError(t('channel_edit.requiredName'));
                 return;
               }
-              if (!newKey.trim()) {
+              if (!editedChannel?.key?.trim()) {
                 showError(t('channel_row.keyRequired'));
                 return;
               }
@@ -1404,8 +1401,8 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
               // 创建一个包含名称和密钥的对象来更新
               const updateData = {
                 id: channelId,
-                name: channelName,
-                key: newKey
+                name: editedChannel.name,
+                key: editedChannel.key
               };
               
               // 使用PUT请求更新渠道
@@ -1419,7 +1416,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                       // 更新本地状态
                       setTagChannels((prev) =>
                         prev.map((c) =>
-                          c.id === channelId ? { ...c, name: channelName, key: newKey } : c
+                          c.id === channelId ? { ...c, name: editedChannel.name, key: editedChannel.key } : c
                         )
                       );
                       
@@ -1440,7 +1437,6 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                   setCurrentTestingChannel(null);
                 });
             }}
-            color="primary"
           >
             {t('common.submit')}
           </Button>
