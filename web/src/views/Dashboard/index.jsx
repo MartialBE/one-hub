@@ -6,7 +6,7 @@ import ApexCharts from 'ui-component/chart/ApexCharts';
 import SupportModels from './component/SupportModels';
 import { getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
-import { showError, calculateQuota, renderNumber } from 'utils/common';
+import { showError, calculateQuota } from 'utils/common';
 import UserCard from 'ui-component/cards/UserCard';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from 'contexts/UserContext';
