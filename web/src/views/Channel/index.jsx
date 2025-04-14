@@ -423,7 +423,7 @@ export default function ChannelList() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
                 <Button onClick={() => handleRefresh(true)} startIcon={<Icon icon="solar:refresh-circle-bold-duotone" width={18} />}>

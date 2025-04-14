@@ -208,7 +208,7 @@ export default function Token() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('token_index.refresh')}
