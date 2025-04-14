@@ -97,10 +97,10 @@ const QuickStartCard = () => {
                       color: 'white',
                       '&:hover': {
                         backgroundColor: '#00838F',
-                        boxShadow: '0 0 10px 0 rgba(3, 119, 94, 0.5)'
+                        boxShadow: '0 0 10px 0 #00838F'
                       },
                       textTransform: 'none',
-                      boxShadow: '0 0 15px 0 rgba(3, 119, 94, 0.5)'
+                      boxShadow: '0 0 10px 0 #00838F'
                     }}
                   >
                     {option.name}
