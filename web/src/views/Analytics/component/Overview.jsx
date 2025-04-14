@@ -101,7 +101,7 @@ export default function Overview() {
               <TextField type="number" label="用户ID" value={userId} onChange={(e) => setUserId(Number(e.target.value))} fullWidth />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} sx={{ display: 'flex' }}>
               <Button variant="contained" onClick={handleSearch} fullWidth>
                 搜索
               </Button>
