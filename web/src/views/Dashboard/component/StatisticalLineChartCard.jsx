@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Grid, Typography, Divider } from '@mui/material';
@@ -10,6 +9,8 @@ import Chart from 'react-apexcharts';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
+import { useTranslation } from 'react-i18next';
+import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   borderRadius: '16px',
@@ -104,7 +105,7 @@ const getChartOptions = (theme, type = 'default') => {
 
 const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, lastDayValue, type = 'default' }) => {
   const theme = useTheme();
-
+  const { t } = useTranslation();
   const customChartData = chartData
     ? {
         ...chartData,
@@ -176,143 +177,44 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                       const todayValueNum = parseFloat((todayValue || '0').toString().replace('$', ''));
                       const lastDayValueNum = parseFloat((lastDayValue || '0').toString().replace('$', ''));
 
-                      // 如果两者都为0，不显示变化
-                      if (todayValueNum === 0 && lastDayValueNum === 0) {
-                        return (
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'text.secondary',
-                              fontSize: '14px'
-                            }}
-                          >
-                            0%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
-                              相比昨日
-                            </Box>
-                          </Typography>
-                        );
-                      }
-                      // 如果今天为0但昨天有值，显示下降100%
-                      else if (todayValueNum === 0 && lastDayValueNum > 0) {
-                        return (
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'error.main',
-                              fontSize: '14px'
-                            }}
-                          >
-                            <Box
-                              component="span"
-                              sx={{
-                                mr: 0.5,
-                                transform: 'rotate(45deg)',
-                                display: 'inline-flex'
-                              }}
-                            >
-                              ↓
-                            </Box>
-                            100%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
-                              相比昨日
-                            </Box>
-                          </Typography>
-                        );
-                      }
-                      // 如果今天有值但昨天为0，显示增长
-                      else if (todayValueNum > 0 && lastDayValueNum === 0) {
-                        return (
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'success.main',
-                              fontSize: '14px'
-                            }}
-                          >
-                            <Box
-                              component="span"
-                              sx={{
-                                mr: 0.5,
-                                transform: 'rotate(-45deg)',
-                                display: 'inline-flex'
-                              }}
-                            >
-                              ↑
-                            </Box>
-                            100%{' '}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
-                              相比昨日
-                            </Box>
-                          </Typography>
-                        );
-                      }
-                      // 正常比较
-                      else if (todayValueNum >= lastDayValueNum) {
-                        const percentChange = Math.round(((todayValueNum - lastDayValueNum) / lastDayValueNum) * 100);
+                      // 计算变化百分比
+                      const getPercentChange = () => {
+                        if (todayValueNum === 0 && lastDayValueNum === 0) return 0;
+                        if (todayValueNum === 0 && lastDayValueNum > 0) return -100;
+                        if (todayValueNum > 0 && lastDayValueNum === 0) return 100;
+                        return Math.round(((todayValueNum - lastDayValueNum) / lastDayValueNum) * 100);
+                      };
 
-                        return (
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'success.main',
-                              fontSize: '14px'
-                            }}
-                          >
-                            <Box
-                              component="span"
-                              sx={{
-                                mr: 0.5,
-                                transform: 'rotate(-45deg)',
-                                display: 'inline-flex'
-                              }}
-                            >
-                              ↑
-                            </Box>
-                            {`${percentChange}%`}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
-                              相比昨日
-                            </Box>
-                          </Typography>
-                        );
-                      } else {
-                        const percentChange = Math.round(((lastDayValueNum - todayValueNum) / lastDayValueNum) * 100);
+                      const percentChange = getPercentChange();
+                      const isIncrease = percentChange >= 0;
+                      const color = isIncrease ? 'error.main' : 'success.main';
+                      const Icon = isIncrease ? IconTrendingUp : IconTrendingDown;
 
-                        return (
-                          <Typography
+                      return (
+                        <Typography
+                          component="span"
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            color,
+                            fontSize: '14px'
+                          }}
+                        >
+                          <Box component="span" sx={{ ml: 0.5, color: color, fontSize: '14px' }}>
+                            {t('dashboard_index.ComparedWithYesterday')}
+                          </Box>
+                          <Box
                             component="span"
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'error.main',
-                              fontSize: '14px'
+                              mr: 0.5,
+                              display: 'inline-flex'
                             }}
                           >
-                            <Box
-                              component="span"
-                              sx={{
-                                mr: 0.5,
-                                transform: 'rotate(45deg)',
-                                display: 'inline-flex'
-                              }}
-                            >
-                              ↓
-                            </Box>
-                            {`${percentChange}%`}
-                            <Box component="span" sx={{ ml: 0.5, color: 'text.secondary', fontSize: '14px' }}>
-                              相比昨日
-                            </Box>
-                          </Typography>
-                        );
-                      }
+                            <Icon />
+                          </Box>
+                          {`${Math.abs(percentChange)}%`}
+                        </Typography>
+                      );
                     })()}
                   </Box>
                 )}
