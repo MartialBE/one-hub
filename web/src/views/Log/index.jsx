@@ -204,7 +204,7 @@ export default function Log() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
                 <Button onClick={handleRefresh} size="small" startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
