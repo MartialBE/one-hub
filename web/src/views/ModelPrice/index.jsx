@@ -222,10 +222,15 @@ export default function ModelPrice() {
                   </Stack>
                   <Stack spacing={1}>
                     <Typography variant="body2" color="text.secondary">
-                      {t('modelpricePage.rate')}: {group.ratio > 0 ? group.ratio : t('modelpricePage.free')}
+                      {t('modelpricePage.rate')}：{' '}
+                      {group.ratio > 0 ? (
+                        <Label color={group.ratio > 1 ? 'warning' : 'info'}>x{group.ratio}</Label>
+                      ) : (
+                        <Label color="success">{t('modelpricePage.free')}</Label>
+                      )}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {t('modelpricePage.RPM')}: {group.api_rate}
+                      {t('modelpricePage.RPM')}：<Label color="info">{group.api_rate} RPM</Label>
                     </Typography>
                   </Stack>
                 </Stack>

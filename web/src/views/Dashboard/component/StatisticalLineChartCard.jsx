@@ -10,8 +10,8 @@ import Chart from 'react-apexcharts';
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
 import { useTranslation } from 'react-i18next';
-import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
-
+import { IconTrendingDown, IconTrendingUp, IconEqual } from '@tabler/icons-react';
+import { renderNumber } from 'utils/common';
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   borderRadius: '16px',
   border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
@@ -151,7 +151,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                     mb: 0.5
                   }}
                 >
-                  {todayValue || '0'}
+                  {renderNumber(todayValue || 0)}
                 </Typography>
 
                 <Typography
@@ -185,10 +185,15 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                         return Math.round(((todayValueNum - lastDayValueNum) / lastDayValueNum) * 100);
                       };
 
+
                       const percentChange = getPercentChange();
                       const isIncrease = percentChange >= 0;
-                      const color = isIncrease ? 'error.main' : 'success.main';
-                      const Icon = isIncrease ? IconTrendingUp : IconTrendingDown;
+                      let color = isIncrease ? 'error.main' : 'success.main';
+                      let Icon = isIncrease ? IconTrendingUp : IconTrendingDown;
+                      if (percentChange === 0) {
+                        color = 'info.main';
+                        Icon = IconEqual;
+                      }
 
                       return (
                         <Typography
@@ -206,7 +211,8 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
                           <Box
                             component="span"
                             sx={{
-                              mr: 0.5,
+                              mr: 1,
+                              ml: 1,
                               display: 'inline-flex'
                             }}
                           >
@@ -223,7 +229,7 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
               <Grid item xs={6}>
                 <Box
                   sx={{
-                    height: '60px',
+                    height: '70px',
                     position: 'relative',
                     mr: 1
                   }}

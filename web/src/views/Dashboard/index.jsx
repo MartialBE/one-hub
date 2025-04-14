@@ -6,7 +6,7 @@ import ApexCharts from 'ui-component/chart/ApexCharts';
 import SupportModels from './component/SupportModels';
 import { getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
-import { showError, calculateQuota, renderNumber } from 'utils/common';
+import { showError, calculateQuota } from 'utils/common';
 import UserCard from 'ui-component/cards/UserCard';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from 'contexts/UserContext';
@@ -292,17 +292,17 @@ function getLineCardOption(lineDataGroup, field) {
     case 'RequestCount':
       // chartData = generateLineChartOptions(lineData, '次');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = renderNumber(todayValue);
+      todayValue = parseFloat(todayValue);
       break;
     case 'Quota':
       // chartData = generateLineChartOptions(lineData, '美元');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = '$' + renderNumber(todayValue);
+      todayValue = '$' + parseFloat(todayValue);
       break;
     case 'PromptTokens':
       // chartData = generateLineChartOptions(lineData, '');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = renderNumber(todayValue);
+      todayValue = parseFloat(todayValue);
       break;
   }
 
