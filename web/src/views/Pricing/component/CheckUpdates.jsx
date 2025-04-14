@@ -62,7 +62,7 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
     setLoading(false);
   };
 
-  const syncPricing = async (overwrite) => {
+  const syncPricing = async (updateMode) => {
     setUpdateLoading(true);
     if (!newPricing.length) {
       showError(t('CheckUpdatesTable.pleaseFetchData'));
@@ -70,14 +70,13 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
       return;
     }
 
-    if (!overwrite && !addModel.length) {
+    if (updateMode === 'add' && !addModel.length) {
       showError(t('CheckUpdatesTable.noNewModels'));
       setUpdateLoading(false);
       return;
     }
     try {
-      overwrite = overwrite ? 'true' : 'false';
-      const res = await API.post('/api/prices/sync?overwrite=' + overwrite, newPricing);
+      const res = await API.post('/api/prices/sync?updateMode=' + updateMode, newPricing);
       const { success, message } = res.data;
       if (success) {
         showSuccess(t('CheckUpdatesTable.operationCompleted'));
@@ -143,8 +142,18 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
           </Grid>
           {newPricing.length > 0 && (
             <Grid item xs={12}>
-              {!addModel.length && !diffModel.length && <Alert severity="success">{t('CheckUpdatesTable.noUpdates')}</Alert>}
-
+              <Alert severity="info" marginBottom={1}>
+                {t('CheckUpdatesTable.priceServerTotal') + ': ' + newPricing.length} <br />
+                {t('CheckUpdatesTable.newModels') + ': ' + addModel.length} <br />
+                {t('CheckUpdatesTable.priceChangeModels') + ': ' + diffModel.length}
+              </Alert>
+              {!addModel.length && !diffModel.length && (
+                <>
+                  <br />
+                  <Alert severity="success">{t('CheckUpdatesTable.noUpdates')}</Alert>
+                </>
+              )}
+              <br />
               {addModel.length > 0 && (
                 <Alert severity="warning">
                   {t('CheckUpdatesTable.newModels')}：
@@ -171,26 +180,37 @@ export const CheckUpdates = ({ open, onCancel, onOk, row }) => {
               <Alert severity="warning">
                 {t('CheckUpdatesTable.note')}:{t('CheckUpdatesTable.overwriteOrAddOnly')}
               </Alert>
-              <Stack direction="row" justifyContent="center" spacing={1} flexWrap="wrap">
+              <Stack direction="row" justifyContent="center" spacing={1} flexWrap="wrap" marginTop={2}>
+                {/* 只新增 */}
                 <LoadingButton
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    syncPricing(true);
+                    syncPricing('add');
                   }}
                   loading={updateLoading}
                 >
-                  {t('CheckUpdatesTable.overwriteData')}
+                  {t('CheckUpdatesTable.updateModeAdd')}
                 </LoadingButton>
                 <LoadingButton
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    syncPricing(false);
+                    syncPricing('update');
                   }}
                   loading={updateLoading}
                 >
-                  {t('CheckUpdatesTable.addNewOnly')}
+                  {t('CheckUpdatesTable.updateModeUpdate')}
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    syncPricing('overwrite');
+                  }}
+                  loading={updateLoading}
+                >
+                  {t('CheckUpdatesTable.updateModeOverwrite')}
                 </LoadingButton>
               </Stack>
             </Grid>

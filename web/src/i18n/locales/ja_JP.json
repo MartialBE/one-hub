@@ -18,7 +18,11 @@
     "pleaseFetchData": "まずデータを取得してください",
     "priceChangeModels": "価格変更モデル（参考用。自分で価格を変更した場合は無視してください）",
     "to": "から",
-    "url": "URL"
+    "url": "URL",
+    "priceServerTotal": "価格サーバー総数",
+    "updateModeAdd": "新規追加のみ",
+    "updateModeUpdate": "価格変更のみ",
+    "updateModeOverwrite": "上書き"
   },
   "Header 配置": "ヘッダー構成",
   "about": {

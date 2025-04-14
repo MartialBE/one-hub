@@ -20,6 +20,15 @@ import (
 // PricingInstance is the Pricing instance
 var PricingInstance *Pricing
 
+type PriceUpdateMode string
+
+const (
+	PriceUpdateModeSystem    PriceUpdateMode = "system"
+	PriceUpdateModeAdd       PriceUpdateMode = "add"
+	PriceUpdateModeOverwrite PriceUpdateMode = "overwrite"
+	PriceUpdateModeUpdate    PriceUpdateMode = "update"
+)
+
 // Pricing is a struct that contains the pricing data
 type Pricing struct {
 	sync.RWMutex
@@ -52,7 +61,7 @@ func NewPricing() {
 	if viper.GetString("auto_price_updates_mode") == "system" && (viper.GetBool("auto_price_updates") || len(PricingInstance.Prices) == 0) {
 		logger.SysLog("Checking for pricing updates")
 		prices := GetDefaultPrice()
-		PricingInstance.SyncPricing(prices, false)
+		PricingInstance.SyncPricing(prices, "system")
 		logger.SysLog("Pricing initialized")
 	}
 }
@@ -197,20 +206,31 @@ func (p *Pricing) DeletePrice(modelName string) error {
 }
 
 // SyncPricing syncs the pricing data
-func (p *Pricing) SyncPricing(pricing []*Price, overwrite bool) error {
+func (p *Pricing) SyncPricing(pricing []*Price, mode string) error {
+	logger.SysLog("prices update mode：" + mode)
 	var err error
-	if overwrite {
-		err = p.SyncPriceWithOverwrite(pricing)
-	} else {
+	switch mode {
+	case string(PriceUpdateModeSystem):
 		err = p.SyncPriceWithoutOverwrite(pricing)
+		return err
+	case string(PriceUpdateModeUpdate):
+		err = p.SyncPriceOnlyUpdate(pricing)
+		return err
+	case string(PriceUpdateModeOverwrite):
+		err = p.SyncPriceWithOverwrite(pricing)
+		return err
+	case string(PriceUpdateModeAdd):
+		err = p.SyncPriceWithoutOverwrite(pricing)
+		return err
+	default:
+		err = p.SyncPriceWithoutOverwrite(pricing)
+		return err
 	}
-
-	return err
 }
 
 func UpdatePriceByPriceService() error {
 	updatePriceMode := viper.GetString("auto_price_updates_mode")
-	if updatePriceMode == "system" {
+	if updatePriceMode == string(PriceUpdateModeSystem) {
 		// 使用程序内置更新
 		return nil
 	}
@@ -218,7 +238,7 @@ func UpdatePriceByPriceService() error {
 	if err != nil {
 		return err
 	}
-	if updatePriceMode == "add" {
+	if updatePriceMode == string(PriceUpdateModeAdd) {
 		// 仅仅新增
 		p := &Pricing{
 			Prices: make(map[string]*Price),
@@ -235,7 +255,7 @@ func UpdatePriceByPriceService() error {
 		}
 		return nil
 	}
-	if updatePriceMode == "overwrite" {
+	if updatePriceMode == string(PriceUpdateModeOverwrite) {
 		// 覆盖所有
 		p := &Pricing{
 			Prices: make(map[string]*Price),
@@ -252,9 +272,27 @@ func UpdatePriceByPriceService() error {
 		}
 		return nil
 	}
+	if updatePriceMode == string(PriceUpdateModeUpdate) {
+		// 只更新现有数据
+		p := &Pricing{
+			Prices: make(map[string]*Price),
+			Match:  make([]string, 0),
+		}
+		err := p.Init()
+		if err != nil {
+			logger.SysError("Failed to initialize Pricing:" + err.Error())
+			return err
+		}
+		err = p.SyncPriceOnlyUpdate(prices)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 	return errors.New("更新模式错误，更新模式仅能选择：add、overwrite、system，详见配置文件auto_price_updates_mode部分的说明")
 }
 
+// GetPriceByPriceService 只插入系统没有的数据
 func GetPriceByPriceService() ([]*Price, error) {
 	api := viper.GetString("update_price_service")
 	if api == "" {
@@ -290,7 +328,7 @@ func GetPriceByPriceService() ([]*Price, error) {
 	return prices, nil
 }
 
-// SyncPriceWithOverwrite syncs the pricing data with overwrite
+// SyncPriceWithOverwrite 删除系统所有数据并插入所有查询到的新数据 不含lock的数据
 func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	tx := DB.Begin()
 	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个(包含locked价格)", len(p.Prices)))
@@ -303,6 +341,7 @@ func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	// 覆盖所有
 
 	for _, price := range pricing {
+		// 取出系统存在并且非lock的价格到new price
 		if _, ok := p.Prices[price.Model]; !ok {
 			newPrices = append(newPrices, price)
 		} else {
@@ -323,15 +362,52 @@ func (p *Pricing) SyncPriceWithOverwrite(pricing []*Price) error {
 	}
 
 	tx.Commit()
-	logger.SysLog(fmt.Sprintf("本次复写加新增 %d 个价格配置", len(newPrices)))
+	logger.SysLog(fmt.Sprintf("本次修改加新增 %d 个价格配置", len(newPrices)))
 	return p.Init()
 }
 
-// SyncPriceWithoutOverwrite syncs the pricing data without overwrite
+// SyncPriceOnlyUpdate 只更新系统现有的数据 不含lock的数据
+func (p *Pricing) SyncPriceOnlyUpdate(pricing []*Price) error {
+	tx := DB.Begin()
+	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个(包含locked价格)", len(p.Prices)))
+	var newPrices []*Price
+	var newPricesName []string
+	//系统内存在并且非lock的模型价格加入new price
+	for _, price := range pricing {
+		if p, ok := p.Prices[price.Model]; ok && !p.Locked {
+			newPrices = append(newPrices, price)
+			newPricesName = append(newPricesName, price.Model)
+		}
+	}
+	if len(newPrices) == 0 {
+		return nil
+	}
+	logger.SysLog(fmt.Sprintf("系统内需要更新 %d 个模型价格", len(newPrices)))
+	// 删除需要更新的模型价格
+	err := DeletePricesByModelNameAndNotLock(tx, newPricesName)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = InsertPrices(tx, newPrices)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	logger.SysLog(fmt.Sprintf("本次更新修改 %d 个价格配置", len(newPrices)))
+	return p.Init()
+}
+
+// SyncPriceWithoutOverwrite 只插入系统没有的数据
 func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*Price) error {
 	var newPrices []*Price
 	logger.SysLog(fmt.Sprintf("系统内已有价格配置 %d 个", len(p.Prices)))
 	for _, price := range pricing {
+		// 将系统内不存在的价格加入new prices
 		if _, ok := p.Prices[price.Model]; !ok {
 			newPrices = append(newPrices, price)
 		}

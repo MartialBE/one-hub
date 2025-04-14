@@ -50,7 +50,11 @@ func InitCron() {
 	autoPriceUpdates := viper.GetBool("auto_price_updates")
 	autoPriceUpdatesMode := viper.GetString("auto_price_updates_mode")
 
-	if autoPriceUpdates && autoPriceUpdatesInterval > 0 && (autoPriceUpdatesMode == "add" || autoPriceUpdatesMode == "overwrite") {
+	if autoPriceUpdates &&
+		autoPriceUpdatesInterval > 0 &&
+		(autoPriceUpdatesMode == string(model.PriceUpdateModeAdd) ||
+			autoPriceUpdatesMode == string(model.PriceUpdateModeOverwrite) ||
+			autoPriceUpdatesMode == string(model.PriceUpdateModeUpdate)) {
 		// 指定时间周期更新价格表
 		err := scheduler.Manager.AddJob(
 			"update_pricing_by_service",
