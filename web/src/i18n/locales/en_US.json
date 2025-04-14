@@ -18,7 +18,11 @@
     "pleaseFetchData": "Please fetch data first",
     "priceChangeModels": "Price Change Models (for reference only, ignore if you have modified the prices yourself)",
     "to": "to",
-    "url": "URL"
+    "url": "URL",
+    "priceServerTotal": "Price Server Total",
+    "updateModeAdd": "Add Only",
+    "updateModeUpdate": "Update Only",
+    "updateModeOverwrite": "Overwrite All"
   },
   "Header 配置": "Header configuration",
   "about": {

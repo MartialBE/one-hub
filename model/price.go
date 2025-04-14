@@ -151,6 +151,12 @@ func DeleteAllPricesNotLock(tx *gorm.DB) error {
 	return err
 }
 
+// 只删除指定的未lock的数据
+func DeletePricesByModelNameAndNotLock(tx *gorm.DB, models []string) error {
+	err := tx.Where("locked = ? and model IN (?)", false, models).Delete(&Price{}).Error
+	return err
+}
+
 func (price *Price) Delete() error {
 	return DB.Where("model = ?", price.Model).Delete(&Price{}).Error
 }
