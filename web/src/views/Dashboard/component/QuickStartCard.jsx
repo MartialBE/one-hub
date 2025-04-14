@@ -17,40 +17,14 @@ const QuickStartCard = () => {
   const chatLinks = siteInfo.chat_links && siteInfo.chat_links != '' ? JSON.parse(siteInfo.chat_links) : [];
   const baseServer = siteInfo.server_address;
 
-  const initChatOptions = useCallback(
-    (key) => {
-      if (chatLinks.length > 0) {
-        let server = '';
-        if (baseServer) {
-          server = baseServer;
-        } else {
-          server = window.location.host;
-        }
-        server = encodeURIComponent(server);
-        const useKey = 'sk-' + key;
-
-        const newQuickStartOptions = [];
-        const newLocalOptions = [];
-
-        chatLinks.forEach((item) => {
-          var url = replaceChatPlaceholders(item.url, useKey, server);
-          if (item.url.startsWith('http')) {
-            newQuickStartOptions.push({
-              icon: <IconMessageChatbot />,
-              title: item.name,
-              url: url
-            });
-          } else {
-            newLocalOptions.push({
-              icon: <IconAppWindow />,
-              title: item.name,
-              url: url
-            });
-          }
-        });
-      }
+  const getProcessedUrl = useCallback(
+    (url, key) => {
+      let server = baseServer || window.location.host;
+      server = encodeURIComponent(server);
+      const useKey = 'sk-' + key;
+      return replaceChatPlaceholders(url, useKey, server);
     },
-    [chatLinks, baseServer]
+    [baseServer]
   );
 
   const handleClick = async (url) => {
@@ -60,8 +34,7 @@ const QuickStartCard = () => {
         const { success, message, data } = res.data;
         if (success) {
           setKey(data);
-          initChatOptions(data);
-          window.open(replaceChatPlaceholders(url, 'sk-' + data, encodeURIComponent(baseServer || window.location.host)), '_blank');
+          window.open(getProcessedUrl(url, data), '_blank');
         } else {
           console.log('message', message);
         }
@@ -69,7 +42,7 @@ const QuickStartCard = () => {
         console.error('Failed to get token:', error);
       }
     } else {
-      window.open(url, '_blank');
+      window.open(getProcessedUrl(url, key), '_blank');
     }
   };
 
