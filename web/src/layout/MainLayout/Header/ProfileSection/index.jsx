@@ -169,7 +169,9 @@ const ProfileSection = () => {
           sx={{
             ...theme.typography.mediumAvatar,
             cursor: 'pointer',
-            border: `2px solid ${theme.palette.primary.light}`
+            border: `2px solid ${theme.palette.primary.dark}`,
+            width: '50px',
+            height: '50px'
           }}
           ref={anchorRef}
         />
