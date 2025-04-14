@@ -37,12 +37,13 @@ const InviteCard = () => {
     <Box component="div">
       <SubCard
         sx={{
-          background: theme.palette.primary.dark
+          background: theme.palette.primary.dark,
+          height: '150'
         }}
       >
-        <Stack justifyContent="center" alignItems={'flex-start'} padding={'40px 24px 0px'} spacing={3}>
+        <Stack justifyContent="center" alignItems={'flex-start'} padding={'0px 24px 0px'} spacing={3}>
           <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <img src={inviteImage} alt="invite" width={'250px'} />
+            <img src={inviteImage} alt="invite" width={'150px'} />
           </Container>
         </Stack>
       </SubCard>

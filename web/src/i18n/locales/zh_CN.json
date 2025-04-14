@@ -69,7 +69,10 @@
     "tokens": "Tokens(输入/输出)",
     "cache_tokens": "CacheTokens",
     "request_time": "请求时间(s)",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "quickStart": "快速开始",
+    "quickStartTip": "当您点击下面按钮时，系统会自动创建一个sys_playground的令牌",
+    "ComparedWithYesterday": "相比昨日"
   },
   "analytics_index": {
     "startTime": "开始时间",

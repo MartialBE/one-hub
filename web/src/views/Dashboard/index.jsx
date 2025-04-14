@@ -13,6 +13,7 @@ import { UserContext } from 'contexts/UserContext';
 import Label from 'ui-component/Label';
 import InviteCard from './component/InviteCard';
 import QuotaLogWeek from './component/QuotaLogWeek';
+import QuickStartCard from './component/QuickStartCard';
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
@@ -66,9 +67,11 @@ const Dashboard = () => {
 
   return (
     <Grid container spacing={gridSpacing}>
+      {/* 支持的模型   */}
       <Grid item xs={12}>
         <SupportModels />
       </Grid>
+      {/* 今日请求、消费、token */}
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={4} xs={12} sx={{ height: '160' }}>
@@ -107,12 +110,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={8} xs={12}>
+            {/* 7日模型消费统计 */}
             <ApexCharts isLoading={isLoading} chartDatas={statisticalData} title={t('dashboard_index.week_model_statistics')} />
             <Box mt={2}>
+              {/* 7日消费统计 */}
               <QuotaLogWeek />
             </Box>
           </Grid>
+
           <Grid item lg={4} xs={12}>
+            {/* 用户信息 */}
             <UserCard>
               <Box
                 sx={{
@@ -177,6 +184,10 @@ const Dashboard = () => {
                 </Box>
               </Box>
             </UserCard>
+            <Box mt={2}>
+              <QuickStartCard />
+            </Box>
+            {/* 邀请 */}
             <Box mt={2}>
               <InviteCard />
             </Box>
@@ -251,15 +262,7 @@ function getLineCardOption(lineDataGroup, field) {
   let todayValue = 0;
   let lastDayValue = 0;
   let chartData = null;
-  
-  // 获取当前日期和昨天的日期（YYYY-MM-DD格式）
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-  
+
   let lineData = lineDataGroup.map((item) => {
     let tmp = {
       x: item.date,
@@ -274,15 +277,16 @@ function getLineCardOption(lineDataGroup, field) {
         break;
     }
 
-    // 根据日期判断是否为今天或昨天的数据
-    if (item.date === todayStr) {
-      todayValue = tmp.y;
-    }
-    if (item.date === yesterdayStr) {
-      lastDayValue = tmp.y;
-    }
     return tmp;
   });
+
+  // 获取今天和昨天的数据
+  if (lineData.length > 1) {
+    todayValue = lineData[lineData.length - 1].y;
+    if (lineData.length > 2) {
+      lastDayValue = lineData[lineData.length - 2].y;
+    }
+  }
 
   switch (field) {
     case 'RequestCount':
