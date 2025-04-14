@@ -17,7 +17,7 @@ const QuickStartCard = () => {
   const [localOptions, setLocalOptions] = useState([]);
   const theme = useTheme();
   const siteInfo = useSelector((state) => state.siteInfo);
-  const chatLinks = siteInfo.chat_links ? JSON.parse(siteInfo.chat_links) : [];
+  const chatLinks = siteInfo.chat_links && siteInfo.chat_links != '' ? JSON.parse(siteInfo.chat_links) : [];
   const baseServer = siteInfo.server_address;
 
   const loadTokens = useCallback(async () => {
