@@ -292,17 +292,17 @@ function getLineCardOption(lineDataGroup, field) {
     case 'RequestCount':
       // chartData = generateLineChartOptions(lineData, '次');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = renderNumber(todayValue);
+      todayValue = parseFloat(todayValue);
       break;
     case 'Quota':
       // chartData = generateLineChartOptions(lineData, '美元');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = '$' + renderNumber(todayValue);
+      todayValue = '$' + parseFloat(todayValue);
       break;
     case 'PromptTokens':
       // chartData = generateLineChartOptions(lineData, '');
       lastDayValue = parseFloat(lastDayValue);
-      todayValue = renderNumber(todayValue);
+      todayValue = parseFloat(todayValue);
       break;
   }
 
