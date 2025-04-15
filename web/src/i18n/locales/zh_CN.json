@@ -18,6 +18,8 @@
   "task": "异步任务",
   "operation": "运营",
   "paySetting": "支付设置",
+  "invite_count": "邀请人数",
+  "invite_reward": "邀请奖励",
   "menu": {
     "home": "首页",
     "about": "关于",
@@ -648,6 +650,18 @@
         "title": "禁用通道关键词设置",
         "info": "配置禁用通道关键词，每行一个关键词。",
         "save": "保存禁用通道关键词设置"
+      },
+      "safetySettings": {
+        "title": "系统安全设置",
+        "enableSafe": "开启 Prompt 安全检查",
+        "safeToolName": {
+          "label": "安全检查工具"
+        },
+        "safeKeyWords": {
+          "label": "关键词列表",
+          "placeholder": "请输入关键词，每行一个"
+        },
+        "save": "保存设置"
       }
     },
     "systemSettings": {

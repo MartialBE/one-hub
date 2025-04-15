@@ -4,11 +4,13 @@ import Card from '@mui/material/Card';
 import userAvatar from 'assets/images/users/user-round.svg';
 import userBackground from 'assets/images/users/background-1.webp';
 import { useSelector } from 'react-redux';
-
+// material-ui
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 export default function UserCard({ children }) {
   const account = useSelector((state) => state.account);
+  const theme = useTheme();
   return (
     <Card
       sx={{
@@ -50,8 +52,9 @@ export default function UserCard({ children }) {
           src={account.user?.avatar_url || userAvatar}
           sx={{
             width: '100%',
-            height: '100%'
-            // bgcolor: '#1a2027'
+            height: '100%',
+            border: `2px solid ${theme.palette.primary.dark}`,
+            bgcolor: '#1a2027'
           }}
         />
       </Box>

@@ -128,6 +128,15 @@ func InitOptionMap() {
 
 	config.GlobalOption.RegisterInt("RetryTimeOut", &config.RetryTimeOut)
 
+	config.GlobalOption.RegisterBool("EnableSafe", &config.EnableSafe)
+	config.GlobalOption.RegisterString("SafeToolName", &config.SafeToolName)
+	config.GlobalOption.RegisterCustom("SafeKeyWords", func() string {
+		return strings.Join(config.SafeKeyWords, "\n")
+	}, func(value string) error {
+		config.SafeKeyWords = strings.Split(value, "\n")
+		return nil
+	}, "")
+
 	loadOptionsFromDatabase()
 }
 

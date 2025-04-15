@@ -1,4 +1,6 @@
 {
+  "invite_count": "邀請人數",
+  "invite_reward": "邀請獎勵",
   "AZURE_OPENAI_ENDPOINT": "AZURE_OPENAI_ENDPOINT",
   "CheckUpdatesTable": {
     "addNewOnly": "僅添加新增",
@@ -765,6 +767,18 @@
         "info": "配置停用通道關鍵字，每行一個關鍵字。",
         "save": "保留停用通道關鍵字設置",
         "title": "停用通道關鍵詞設置"
+      },
+      "safetySettings": {
+        "title": "系統安全設置",
+        "enableSafe": "開啟 Prompt 安全檢查",
+        "safeToolName": {
+          "label": "安全檢查工具"
+        },
+        "safeKeyWords": {
+          "label": "關鍵詞列表",
+          "placeholder": "請輸入關鍵詞，每行一個"
+        },
+        "save": "保存設置"
       }
     },
     "otherSettings": {

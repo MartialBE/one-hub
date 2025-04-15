@@ -3,7 +3,9 @@ package relay
 import (
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	providersBase "one-api/providers/base"
+	"one-api/safty"
 	"one-api/types"
 	"strings"
 
@@ -45,6 +47,18 @@ func (r *relayEmbeddings) send() (err *types.OpenAIErrorWithStatusCode, done boo
 		err = common.StringErrorWrapperLocal("channel not implemented", "channel_error", http.StatusServiceUnavailable)
 		done = true
 		return
+	}
+
+	// 内容审查
+	if config.EnableSafe {
+		if r.request.Input != nil {
+			CheckResult, _ := safty.CheckContent(r.request)
+			if !CheckResult.IsSafe {
+				err = common.StringErrorWrapperLocal(CheckResult.Reason, CheckResult.Code, http.StatusBadRequest)
+				done = true
+				return
+			}
+		}
 	}
 
 	r.request.Model = r.modelName

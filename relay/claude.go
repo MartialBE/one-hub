@@ -8,6 +8,7 @@ import (
 	"one-api/common/image"
 	"one-api/common/requester"
 	"one-api/providers/claude"
+	"one-api/safty"
 	"one-api/types"
 
 	"github.com/gin-gonic/gin"
@@ -59,6 +60,19 @@ func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 	}
 
 	r.claudeRequest.Model = r.modelName
+	// 内容审查
+	if config.EnableSafe {
+		for _, message := range r.claudeRequest.Messages {
+			if message.Content != nil {
+				CheckResult, _ := safty.CheckContent(message.Content)
+				if !CheckResult.IsSafe {
+					err = common.StringErrorWrapperLocal(CheckResult.Reason, CheckResult.Code, http.StatusBadRequest)
+					done = true
+					return
+				}
+			}
+		}
+	}
 
 	if r.claudeRequest.Stream {
 		var response requester.StreamReaderInterface[string]

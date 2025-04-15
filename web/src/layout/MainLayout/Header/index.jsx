@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useLocation } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -8,7 +9,7 @@ import { Box, IconButton, Stack } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
-import ProfileSection from './ProfileSection';
+import Profile from './Profile';
 import ThemeButton from 'ui-component/ThemeButton';
 import I18nButton from 'ui-component/i18nButton';
 import { NoticeButton } from 'ui-component/notice';
@@ -18,16 +19,20 @@ import { NoticeButton } from 'ui-component/notice';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
-const Header = ({ handleLeftDrawerToggle }) => {
+const Header = ({ handleLeftDrawerToggle, toggleProfileDrawer }) => {
   const theme = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const location = useLocation();
+  
+  // 检查当前路径是否为面板/控制台页面
+  const isConsoleRoute = location.pathname.startsWith('/panel');
 
   return (
     <>
       {/* logo & toggler button */}
       <Box
         sx={{
-          width: 228,
+          width: isDrawerOpen ? 255 : 150,
           display: 'flex',
           alignItems: 'center',
           [theme.breakpoints.down('md')]: {
@@ -44,7 +49,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
           color="inherit"
           aria-label="menu"
           sx={{
-            width: '38px',
+            width: '38',
             height: '38px',
             borderRadius: '8px',
             backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
@@ -74,14 +79,15 @@ const Header = ({ handleLeftDrawerToggle }) => {
         <NoticeButton />
         <ThemeButton />
         <I18nButton />
-        <ProfileSection />
+        {isConsoleRoute && <Profile toggleProfileDrawer={toggleProfileDrawer} />}
       </Stack>
     </>
   );
 };
 
 Header.propTypes = {
-  handleLeftDrawerToggle: PropTypes.func
+  handleLeftDrawerToggle: PropTypes.func,
+  toggleProfileDrawer: PropTypes.func
 };
 
 export default Header;
