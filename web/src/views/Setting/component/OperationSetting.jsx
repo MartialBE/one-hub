@@ -1,6 +1,19 @@
 import { useState, useEffect, useContext } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
-import { Stack, FormControl, InputLabel, OutlinedInput, Checkbox, Button, FormControlLabel, TextField, Alert } from '@mui/material';
+import {
+  Stack,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  Checkbox,
+  Button,
+  FormControlLabel,
+  TextField,
+  Alert,
+  Select,
+  MenuItem,
+  Chip
+} from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -44,26 +57,39 @@ const OperationSetting = () => {
     AudioTokenJson: '',
     ClaudeAPIEnabled: '',
     GeminiAPIEnabled: '',
-    DisableChannelKeywords: ''
+    DisableChannelKeywords: '',
+    EnableSafe: '',
+    SafeToolName: '',
+    SafeKeyWords: '',
+    safeTools: []
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
   let [historyTimestamp, setHistoryTimestamp] = useState(now.getTime() / 1000 - 30 * 24 * 3600); // a month ago new Date().getTime() / 1000 + 3600
   const loadStatus = useContext(LoadStatusContext);
+  const [safeToolsLoading, setSafeToolsLoading] = useState(true);
 
   const getOptions = async () => {
     try {
       const res = await API.get('/api/option/');
       const { success, message, data } = res.data;
       if (success) {
-        let newInputs = {};
+        let newInputs = { ...inputs }; // 保留现有的 inputs 内容，包括 safeTools
         data.forEach((item) => {
           if (item.key === 'RechargeDiscount') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);
           }
+          if (item.key === 'SafeKeyWords' && typeof item.value === 'string' && item.value.startsWith('[')) {
+            try {
+              item.value = JSON.parse(item.value);
+            } catch (e) {
+              console.error('解析SafeKeyWords失败:', e);
+            }
+          }
           newInputs[item.key] = item.value;
         });
-        setInputs(newInputs);
+        // 确保不会覆盖 safeTools
+        setInputs((prev) => ({ ...newInputs, safeTools: prev.safeTools }));
         setOriginInputs(newInputs);
       } else {
         showError(message);
@@ -73,8 +99,36 @@ const OperationSetting = () => {
     }
   };
 
+  const getSafeTools = async () => {
+    setSafeToolsLoading(true);
+    try {
+      const res = await API.get('/api/option/safe_tools');
+      const { success, message, data } = res.data;
+      if (success) {
+        setInputs((prev) => {
+          const newInputs = {
+            ...prev,
+            safeTools: data
+          };
+          return newInputs;
+        });
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      console.error('获取安全工具列表失败:', error);
+      showError('获取安全工具列表失败');
+    } finally {
+      setSafeToolsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getOptions().then();
+    const initData = async () => {
+      await getSafeTools();
+      await getOptions();
+    };
+    initData();
   }, []);
 
   const updateOption = async (key, value) => {
@@ -114,110 +168,158 @@ const OperationSetting = () => {
     }
   };
 
+  const handleTextFieldChange = (event) => {
+    const { name, value } = event.target;
+    setInputs((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const submitConfig = async (group) => {
-    switch (group) {
-      case 'monitor':
-        if (originInputs['ChannelDisableThreshold'] !== inputs.ChannelDisableThreshold) {
-          await updateOption('ChannelDisableThreshold', inputs.ChannelDisableThreshold);
-        }
-        if (originInputs['QuotaRemindThreshold'] !== inputs.QuotaRemindThreshold) {
-          await updateOption('QuotaRemindThreshold', inputs.QuotaRemindThreshold);
-        }
-        break;
-      case 'chatlinks':
-        if (originInputs['ChatLinks'] !== inputs.ChatLinks) {
-          if (!verifyJSON(inputs.ChatLinks)) {
-            showError('links不是合法的 JSON 字符串');
+    setLoading(true);
+    try {
+      switch (group) {
+        case 'monitor':
+          if (originInputs['ChannelDisableThreshold'] !== inputs.ChannelDisableThreshold) {
+            await updateOption('ChannelDisableThreshold', inputs.ChannelDisableThreshold);
+          }
+          if (originInputs['QuotaRemindThreshold'] !== inputs.QuotaRemindThreshold) {
+            await updateOption('QuotaRemindThreshold', inputs.QuotaRemindThreshold);
+          }
+          break;
+        case 'chatlinks':
+          if (originInputs['ChatLinks'] !== inputs.ChatLinks) {
+            if (!verifyJSON(inputs.ChatLinks)) {
+              showError('links不是合法的 JSON 字符串');
+              return;
+            }
+            await updateOption('ChatLinks', inputs.ChatLinks);
+          }
+          break;
+        case 'quota':
+          if (originInputs['QuotaForNewUser'] !== inputs.QuotaForNewUser) {
+            await updateOption('QuotaForNewUser', inputs.QuotaForNewUser);
+          }
+          if (originInputs['QuotaForInvitee'] !== inputs.QuotaForInvitee) {
+            await updateOption('QuotaForInvitee', inputs.QuotaForInvitee);
+          }
+          if (originInputs['QuotaForInviter'] !== inputs.QuotaForInviter) {
+            await updateOption('QuotaForInviter', inputs.QuotaForInviter);
+          }
+          if (originInputs['PreConsumedQuota'] !== inputs.PreConsumedQuota) {
+            await updateOption('PreConsumedQuota', inputs.PreConsumedQuota);
+          }
+          break;
+        case 'general':
+          if (inputs.QuotaPerUnit < 0 || inputs.RetryTimes < 0 || inputs.RetryCooldownSeconds < 0 || inputs.RetryTimeOut < 0) {
+            showError('单位额度、重试次数、冷却时间、重试超时时间不能为负数');
             return;
           }
-          await updateOption('ChatLinks', inputs.ChatLinks);
-        }
-        break;
-      case 'quota':
-        if (originInputs['QuotaForNewUser'] !== inputs.QuotaForNewUser) {
-          await updateOption('QuotaForNewUser', inputs.QuotaForNewUser);
-        }
-        if (originInputs['QuotaForInvitee'] !== inputs.QuotaForInvitee) {
-          await updateOption('QuotaForInvitee', inputs.QuotaForInvitee);
-        }
-        if (originInputs['QuotaForInviter'] !== inputs.QuotaForInviter) {
-          await updateOption('QuotaForInviter', inputs.QuotaForInviter);
-        }
-        if (originInputs['PreConsumedQuota'] !== inputs.PreConsumedQuota) {
-          await updateOption('PreConsumedQuota', inputs.PreConsumedQuota);
-        }
-        break;
-      case 'general':
-        if (inputs.QuotaPerUnit < 0 || inputs.RetryTimes < 0 || inputs.RetryCooldownSeconds < 0 || inputs.RetryTimeOut < 0) {
-          showError('单位额度、重试次数、冷却时间、重试超时时间不能为负数');
-          return;
-        }
 
-        if (originInputs['TopUpLink'] !== inputs.TopUpLink) {
-          await updateOption('TopUpLink', inputs.TopUpLink);
-        }
-        if (originInputs['ChatLink'] !== inputs.ChatLink) {
-          await updateOption('ChatLink', inputs.ChatLink);
-        }
-        if (originInputs['QuotaPerUnit'] !== inputs.QuotaPerUnit) {
-          await updateOption('QuotaPerUnit', inputs.QuotaPerUnit);
-        }
-        if (originInputs['RetryTimes'] !== inputs.RetryTimes) {
-          await updateOption('RetryTimes', inputs.RetryTimes);
-        }
-        if (originInputs['RetryCooldownSeconds'] !== inputs.RetryCooldownSeconds) {
-          await updateOption('RetryCooldownSeconds', inputs.RetryCooldownSeconds);
-        }
-        if (originInputs['RetryTimeOut'] !== inputs.RetryTimeOut) {
-          await updateOption('RetryTimeOut', inputs.RetryTimeOut);
-        }
-        break;
-      case 'other':
-        if (originInputs['ChatImageRequestProxy'] !== inputs.ChatImageRequestProxy) {
-          await updateOption('ChatImageRequestProxy', inputs.ChatImageRequestProxy);
-        }
+          if (originInputs['TopUpLink'] !== inputs.TopUpLink) {
+            await updateOption('TopUpLink', inputs.TopUpLink);
+          }
+          if (originInputs['ChatLink'] !== inputs.ChatLink) {
+            await updateOption('ChatLink', inputs.ChatLink);
+          }
+          if (originInputs['QuotaPerUnit'] !== inputs.QuotaPerUnit) {
+            await updateOption('QuotaPerUnit', inputs.QuotaPerUnit);
+          }
+          if (originInputs['RetryTimes'] !== inputs.RetryTimes) {
+            await updateOption('RetryTimes', inputs.RetryTimes);
+          }
+          if (originInputs['RetryCooldownSeconds'] !== inputs.RetryCooldownSeconds) {
+            await updateOption('RetryCooldownSeconds', inputs.RetryCooldownSeconds);
+          }
+          if (originInputs['RetryTimeOut'] !== inputs.RetryTimeOut) {
+            await updateOption('RetryTimeOut', inputs.RetryTimeOut);
+          }
+          break;
+        case 'other':
+          if (originInputs['ChatImageRequestProxy'] !== inputs.ChatImageRequestProxy) {
+            await updateOption('ChatImageRequestProxy', inputs.ChatImageRequestProxy);
+          }
 
-        if (originInputs['CFWorkerImageUrl'] !== inputs.CFWorkerImageUrl) {
-          await updateOption('CFWorkerImageUrl', inputs.CFWorkerImageUrl);
-        }
+          if (originInputs['CFWorkerImageUrl'] !== inputs.CFWorkerImageUrl) {
+            await updateOption('CFWorkerImageUrl', inputs.CFWorkerImageUrl);
+          }
 
-        if (originInputs['CFWorkerImageKey'] !== inputs.CFWorkerImageKey) {
-          await updateOption('CFWorkerImageKey', inputs.CFWorkerImageKey);
-        }
+          if (originInputs['CFWorkerImageKey'] !== inputs.CFWorkerImageKey) {
+            await updateOption('CFWorkerImageKey', inputs.CFWorkerImageKey);
+          }
 
-        break;
-      case 'payment':
-        if (originInputs['PaymentUSDRate'] !== inputs.PaymentUSDRate) {
-          await updateOption('PaymentUSDRate', inputs.PaymentUSDRate);
-        }
-        if (originInputs['PaymentMinAmount'] !== inputs.PaymentMinAmount) {
-          await updateOption('PaymentMinAmount', inputs.PaymentMinAmount);
-        }
-        if (originInputs['RechargeDiscount'] !== inputs.RechargeDiscount) {
-          if (!verifyJSON(inputs.RechargeDiscount)) {
-            showError('固定金额充值折扣不是合法的 JSON 字符串');
+          break;
+        case 'payment':
+          if (originInputs['PaymentUSDRate'] !== inputs.PaymentUSDRate) {
+            await updateOption('PaymentUSDRate', inputs.PaymentUSDRate);
+          }
+          if (originInputs['PaymentMinAmount'] !== inputs.PaymentMinAmount) {
+            await updateOption('PaymentMinAmount', inputs.PaymentMinAmount);
+          }
+          if (originInputs['RechargeDiscount'] !== inputs.RechargeDiscount) {
+            try {
+              if (!verifyJSON(inputs.RechargeDiscount)) {
+                showError('固定金额充值折扣不是合法的 JSON 字符串');
+                return;
+              }
+              await updateOption('RechargeDiscount', inputs.RechargeDiscount);
+            } catch (error) {
+              showError('固定金额充值折扣处理失败: ' + error.message);
+              return;
+            }
+          }
+          break;
+        case 'AudioTokenJson':
+          if (originInputs.AudioTokenJson !== inputs.AudioTokenJson) {
+            try {
+              if (!verifyJSON(inputs.AudioTokenJson)) {
+                // 尝试转换为JSON
+                const audioTokens = inputs.AudioTokenJson.split('\n').filter((line) => line.trim() !== '');
+                await updateOption('AudioTokenJson', JSON.stringify(audioTokens));
+              } else {
+                await updateOption('AudioTokenJson', inputs.AudioTokenJson);
+              }
+            } catch (error) {
+              showError('音频Token不是合法的 JSON 字符串: ' + error.message);
+              return;
+            }
+          }
+          break;
+        case 'DisableChannelKeywords':
+          if (originInputs.DisableChannelKeywords !== inputs.DisableChannelKeywords) {
+            // DisableChannelKeywords 已经是字符串格式，无需解析
+            await updateOption('DisableChannelKeywords', inputs.DisableChannelKeywords);
+          }
+          break;
+        case 'safety':
+          try {
+            if (originInputs.EnableSafe !== inputs.EnableSafe) {
+              await updateOption('EnableSafe', inputs.EnableSafe);
+            }
+            if (originInputs.SafeToolName !== inputs.SafeToolName) {
+              await updateOption('SafeToolName', inputs.SafeToolName);
+            }
+            if (originInputs.SafeKeyWords !== inputs.SafeKeyWords) {
+              await updateOption('SafeKeyWords', inputs.SafeKeyWords);
+            }
+          } catch (error) {
+            console.error('安全设置提交错误:', error);
+            showError(`安全设置保存失败: ${error.message || '未知错误'}`);
+            setLoading(false);
             return;
           }
-          await updateOption('RechargeDiscount', inputs.RechargeDiscount);
-        }
-        break;
-      case 'AudioTokenJson':
-        if (originInputs.AudioTokenJson !== inputs.AudioTokenJson) {
-          if (!verifyJSON(inputs.AudioTokenJson)) {
-            showError('音频Token不是合法的 JSON 字符串');
-            return;
-          }
-          await updateOption('AudioTokenJson', inputs.AudioTokenJson);
-        }
-        break;
-      case 'DisableChannelKeywords':
-        if (originInputs.DisableChannelKeywords !== inputs.DisableChannelKeywords) {
-          await updateOption('DisableChannelKeywords', inputs.DisableChannelKeywords);
-        }
-        break;
+          break;
+      }
+
+      await getOptions();
+      await getSafeTools();
+      showSuccess('保存成功！');
+    } catch (error) {
+      showError('保存失败：' + (error.message || '未知错误'));
+    } finally {
+      setLoading(false);
     }
-
-    showSuccess('保存成功！');
   };
 
   const deleteHistoryLogs = async () => {
@@ -649,7 +751,7 @@ const OperationSetting = () => {
                 label={t('setting_index.operationSettings.paymentSettings.discount.label')}
                 value={inputs.RechargeDiscount}
                 name="RechargeDiscount"
-                onChange={handleInputChange}
+                onChange={handleTextFieldChange}
                 aria-describedby="helper-text-channel-RechargeDiscount-label"
                 minRows={5}
                 placeholder={t('setting_index.operationSettings.paymentSettings.discount.placeholder')}
@@ -699,7 +801,7 @@ const OperationSetting = () => {
                 label={t('setting_index.operationSettings.audioTokenSettings.info')}
                 value={inputs.AudioTokenJson}
                 name="AudioTokenJson"
-                onChange={handleInputChange}
+                onChange={handleTextFieldChange}
                 minRows={5}
                 placeholder={t('setting_index.operationSettings.audioTokenSettings.info')}
                 disabled={loading}
@@ -728,7 +830,7 @@ const OperationSetting = () => {
                 label={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
                 value={inputs.DisableChannelKeywords}
                 name="DisableChannelKeywords"
-                onChange={handleInputChange}
+                onChange={handleTextFieldChange}
                 minRows={5}
                 placeholder={t('setting_index.operationSettings.disableChannelKeywordsSettings.info')}
                 disabled={loading}
@@ -741,6 +843,101 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.disableChannelKeywordsSettings.save')}
+            </Button>
+          </Stack>
+        </Stack>
+      </SubCard>
+
+      <SubCard title={t('setting_index.operationSettings.safetySettings.title')}>
+        <Stack spacing={2}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControlLabel
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <span>{t('setting_index.operationSettings.safetySettings.enableSafe')}</span>
+                  <Chip
+                    label="Beta"
+                    size="small"
+                    color="error"
+                    sx={{
+                      height: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      backgroundColor: 'red',
+                      color: 'white'
+                    }}
+                  />
+                </Stack>
+              }
+              control={
+                <Checkbox
+                  checked={inputs.EnableSafe === 'true'}
+                  onChange={(e) => {
+                    console.log('Checkbox changed:', e.target.checked);
+                    const newValue = e.target.checked ? 'true' : 'false';
+                    console.log('Setting EnableSafe to:', newValue);
+                    setInputs((prev) => ({
+                      ...prev,
+                      EnableSafe: newValue
+                    }));
+                  }}
+                />
+              }
+            />
+
+            <FormControl fullWidth>
+              <InputLabel htmlFor="SafeToolName">{t('setting_index.operationSettings.safetySettings.safeToolName.label')}</InputLabel>
+              <Select
+                id="SafeToolName"
+                name="SafeToolName"
+                value={inputs.SafeToolName || ''}
+                label={t('setting_index.operationSettings.safetySettings.safeToolName.label')}
+                disabled={loading || safeToolsLoading}
+                onChange={(e) => {
+                  setInputs((prev) => ({
+                    ...prev,
+                    SafeToolName: e.target.value
+                  }));
+                }}
+              >
+                {safeToolsLoading && <MenuItem value="">加载中...</MenuItem>}
+                {!safeToolsLoading && (!inputs.safeTools || inputs.safeTools.length === 0) && <MenuItem value="">暂无安全工具</MenuItem>}
+                {inputs.safeTools &&
+                  inputs.safeTools.map((tool) => (
+                    <MenuItem key={tool} value={tool}>
+                      {tool}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <TextField
+                multiline
+                maxRows={15}
+                id="SafeKeyWords"
+                label={t('setting_index.operationSettings.safetySettings.safeKeyWords.label')}
+                value={Array.isArray(inputs.SafeKeyWords) ? inputs.SafeKeyWords.join('\n') : inputs.SafeKeyWords}
+                name="SafeKeyWords"
+                onChange={handleTextFieldChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.stopPropagation();
+                  }
+                }}
+                minRows={5}
+                placeholder={t('setting_index.operationSettings.safetySettings.safeKeyWords.placeholder')}
+                disabled={loading}
+              />
+            </FormControl>
+
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('safety').then();
+              }}
+            >
+              {t('setting_index.operationSettings.safetySettings.save')}
             </Button>
           </Stack>
         </Stack>

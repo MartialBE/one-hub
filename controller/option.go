@@ -6,6 +6,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/utils"
 	"one-api/model"
+	"one-api/safty"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,15 @@ func GetOptions(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    options,
+	})
+	return
+}
+
+func GetSafeTools(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    safty.GetAllSafeToolsName(),
 	})
 	return
 }

@@ -50,6 +50,9 @@ func GetStatus(c *gin.Context) {
 			"PaymentUSDRate":      config.PaymentUSDRate,
 			"PaymentMinAmount":    config.PaymentMinAmount,
 			"RechargeDiscount":    config.RechargeDiscount,
+			"EnableSafe":          config.EnableSafe,
+			"SafeToolName":        config.SafeToolName,
+			"SafeKeyWords":        config.SafeKeyWords,
 		},
 	})
 }

@@ -7,9 +7,11 @@ import (
 	"math"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/common/utils"
 	providersBase "one-api/providers/base"
+	"one-api/safty"
 	"one-api/types"
 	"time"
 
@@ -78,6 +80,19 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 	}
 
 	r.chatRequest.Model = r.modelName
+	// 内容审查
+	if config.EnableSafe {
+		for _, message := range r.chatRequest.Messages {
+			if message.Content != nil {
+				CheckResult, _ := safty.CheckContent(message.Content)
+				if !CheckResult.IsSafe {
+					err = common.StringErrorWrapperLocal(CheckResult.Reason, CheckResult.Code, http.StatusBadRequest)
+					done = true
+					return
+				}
+			}
+		}
+	}
 
 	if r.chatRequest.Stream {
 		var response requester.StreamReaderInterface[string]

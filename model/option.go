@@ -119,7 +119,7 @@ func InitOptionMap() {
 	config.GlobalOption.RegisterBool("GeminiAPIEnabled", &config.GeminiAPIEnabled)
 	config.GlobalOption.RegisterBool("ClaudeAPIEnabled", &config.ClaudeAPIEnabled)
 
-	config.GlobalOption.RegisterCustom("DisableChannelKeywords", func() string {
+	config.GlobalOption.RegisterCustom("DisableChannelKeywordsDisableChannelKeywords", func() string {
 		return common.DisableChannelKeywordsInstance.GetKeywords()
 	}, func(value string) error {
 		common.DisableChannelKeywordsInstance.Load(value)
@@ -127,6 +127,15 @@ func InitOptionMap() {
 	}, common.GetDefaultDisableChannelKeywords())
 
 	config.GlobalOption.RegisterInt("RetryTimeOut", &config.RetryTimeOut)
+
+	config.GlobalOption.RegisterBool("EnableSafe", &config.EnableSafe)
+	config.GlobalOption.RegisterString("SafeToolName", &config.SafeToolName)
+	config.GlobalOption.RegisterCustom("SafeKeyWords", func() string {
+		return strings.Join(config.SafeKeyWords, "\n")
+	}, func(value string) error {
+		config.SafeKeyWords = strings.Split(value, "\n")
+		return nil
+	}, "")
 
 	loadOptionsFromDatabase()
 }

@@ -7,9 +7,11 @@ import (
 	"math"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/common/utils"
 	providersBase "one-api/providers/base"
+	"one-api/safty"
 	"one-api/types"
 	"time"
 
@@ -66,6 +68,18 @@ func (r *relayCompletions) send() (err *types.OpenAIErrorWithStatusCode, done bo
 	}
 
 	r.request.Model = r.modelName
+
+	// 内容审查
+	if config.EnableSafe {
+		if r.request.Prompt != nil {
+			CheckResult, _ := safty.CheckContent(r.request.Prompt)
+			if !CheckResult.IsSafe {
+				err = common.StringErrorWrapperLocal(CheckResult.Reason, CheckResult.Code, http.StatusBadRequest)
+				done = true
+				return
+			}
+		}
+	}
 
 	if r.request.Stream {
 		var response requester.StreamReaderInterface[string]
