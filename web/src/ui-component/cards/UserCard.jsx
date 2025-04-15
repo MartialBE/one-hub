@@ -54,7 +54,7 @@ export default function UserCard({ children }) {
             width: '100%',
             height: '100%',
             border: `2px solid ${theme.palette.primary.dark}`,
-            // bgcolor: '#1a2027'
+            bgcolor: '#1a2027'
           }}
         />
       </Box>

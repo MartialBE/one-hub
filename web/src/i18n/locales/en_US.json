@@ -1,4 +1,6 @@
 {
+  "invite_count": "Invite Count",
+  "invite_reward": "Invite Reward",
   "AZURE_OPENAI_ENDPOINT": "AZURE_OPENAI_ENDPOINT",
   "CheckUpdatesTable": {
     "addNewOnly": "Add New Only",

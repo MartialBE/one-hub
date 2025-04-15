@@ -1,4 +1,6 @@
 {
+  "invite_count": "邀請人數",
+  "invite_reward": "邀請獎勵",
   "AZURE_OPENAI_ENDPOINT": "AZURE_OPENAI_ENDPOINT",
   "CheckUpdatesTable": {
     "addNewOnly": "僅添加新增",

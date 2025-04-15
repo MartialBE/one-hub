@@ -18,6 +18,8 @@
   "task": "异步任务",
   "operation": "运营",
   "paySetting": "支付设置",
+  "invite_count": "邀请人数",
+  "invite_reward": "邀请奖励",
   "menu": {
     "home": "首页",
     "about": "关于",
