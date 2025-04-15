@@ -13,12 +13,15 @@
     "note": "注意",
     "operationCompleted": "操作成功完成！",
     "outputMultiplierChanged": "輸出倍率由",
-    "overwriteData": "覆蓋數據",
+    "updateModeAdd": "只新增",
+    "updateModeUpdate" :"只更新",
+    "updateModeOverwrite" : "覆蓋所有",
     "overwriteOrAddOnly": "你可以選擇覆蓋或者僅添加新增，如果你選擇覆蓋，將會刪除你自己添加的模型價格，完全使用遠程配置，如果你選擇僅添加新增，將只會添加新增模型的價格",
     "pleaseFetchData": "請先獲取數據",
     "priceChangeModels": "價格變動模型（僅供參考，如果你自己修改了對應模型的價格請忽略）",
     "to": "變為",
-    "url": "URL"
+    "url": "URL",
+    "priceServerTotal": "價格服務器總數"
   },
   "Header 配置": "Header 配置",
   "about": {
@@ -252,7 +255,19 @@
     "today_requests": "今日請求",
     "today_tokens": "今日Token",
     "unknown": "未知",
-    "used": "已使用"
+    "used": "已使用",
+    "week_model_statistics": "近七日模型統計",
+    "week_consumption_log": "近七日消費日志",
+    "date": "日期",
+    "request_count": "請求次數",
+    "amount": "金額",
+    "tokens": "Tokens(輸入/輸出)",
+    "cache_tokens": "CacheTokens",
+    "request_time": "請求時間(s)",
+    "loading": "加載中...",
+    "quickStart": "快速開始",
+    "quickStartTip": "當您點擊下面按鈕時，系統會自動創建一個sys_playground的令牌",
+    "ComparedWithYesterday": "相比昨日"
   },
   "description": "一站式的 OpenAI 接口\n整合各種 API 訪問方式\n一鍵部署，開箱即用",
   "echo 映射": "echo 映射",
@@ -524,7 +539,11 @@
     "saveOk": "保存成功",
     "type": "類型",
     "typeCheck": "類型只能是tokens或times",
-    "typeErr": "類型錯誤"
+    "typeErr": "類型錯誤",
+    "locked_title": "鎖定價格",
+    "locked": "鎖定價格",
+    "unlocked": "未鎖定價格",
+    "lockedTip": "價格鎖定後無法通過價格更新伺服器和程序覆蓋。如果您所配置的價格希望隨程序或價格伺服器同步更新，請勿鎖定"
   },
   "profile": "個人設定",
   "profilePage": {

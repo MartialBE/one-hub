@@ -79,6 +79,10 @@ LOGS_FILENAME="one-hub.log"
 16. `SQLITE_BUSY_TIMEOUT`：SQLite 锁等待超时设置，单位为毫秒，默认 `3000`。
 17. `TG_BOT_API_KEY`： 你的 Telegram bot 的 API 密钥。你可以在 [BotFather](https://t.me/BotFather) 获取这个密钥。
 18. `TG_WEBHOOK_SECRET`：（可选）你的 webhook 密钥。你可以自定义这个密钥。如果设置了这个密钥，将使用`webhook`的方式接收消息，否则使用轮询（Polling）的方式。
-19. `AUTO_PRICE_UPDATES`：自动更新价格，可选值为 `true` 和 `false`，未设置则默认为 `true`。开启后每次启动程序时，会检测数据库中的数据和程序中默认模型价格，如果数据库中的模型价格有缺失将会自动同步到数据库中。 开启带来的问题：你删不掉程序默认的模型价格，删除后，重启又回来了，这个选项适合跟官网一致价格的用户使用。
-20. `USER_TOKEN_SECRET` ： 设置用户令牌签名密钥，必填，大于 32 位以上， 设置后请勿修改，否则会导致用户令牌失效。
-21. `HASHIDS_SALT` ：Sqids 字母表，用于混淆用户令牌信息， 可空，如为空则使用默认字母表`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`，如设置，则需要保证字母表中无重复字符。
+19. `USER_TOKEN_SECRET` ： 设置用户令牌签名密钥，必填，大于 32 位以上， 设置后请勿修改，否则会导致用户令牌失效。
+20. `HASHIDS_SALT` ：Sqids 字母表，用于混淆用户令牌信息， 可空，如为空则使用默认字母表`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`，如设置，则需要保证字母表中无重复字符。
+21. `AUTO_PRICE_UPDATES`：自动更新价格，可选值为 `true` 和 `false`，未设置则默认为 `false`。开启后每次启动程序时，会检测数据库中的数据和程序中默认模型价格，如果数据库中的模型价格有缺失将会自动同步到数据库中。 开启带来的问题：你删不掉程序默认的模型价格，删除后，重启又回来了，这个选项适合跟官网一致价格的用户使用。
+22. `AUTO_PRICE_UPDATES_MODE`：价格更新模式，可选值为 `add`:仅增加系统不存在的价格   `overwrite`：覆盖系统所有价格配置  `update`：仅仅更新现有数据   `system`:使用程序内置价格表配置初始化价格配置，默认为 `system`。建议生成环境使用`system`模式，手动去web的价格管理模块手动获取价格更新服务器数据并一一核对更新。
+23. `AUTO_PRICE_UPDATES_INTERVAL` ：价格自动更新时间，单位分钟，仅`AUTO_PRICE_UPDATES_MODE`为`add`、`overwrite`时生效，系统将按照此时间周期性从价格更新服务器获取价格配置并更新系统价格。默认值：1440
+24. `UPDATE_PRICE_SERVICE` ：设置之后将使用指定的价格服务更新价格。不设置则使用系统默认价格服务`https://raw.githubusercontent.com/MartialBE/one-api/prices/prices.json`
+

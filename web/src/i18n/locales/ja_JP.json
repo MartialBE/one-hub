@@ -18,7 +18,11 @@
     "pleaseFetchData": "まずデータを取得してください",
     "priceChangeModels": "価格変更モデル（参考用。自分で価格を変更した場合は無視してください）",
     "to": "から",
-    "url": "URL"
+    "url": "URL",
+    "priceServerTotal": "価格サーバー総数",
+    "updateModeAdd": "新規追加のみ",
+    "updateModeUpdate": "価格変更のみ",
+    "updateModeOverwrite": "上書き"
   },
   "Header 配置": "ヘッダー構成",
   "about": {
@@ -251,7 +255,19 @@
     "today_requests": "今日のリクエスト",
     "today_tokens": "今日のトークン",
     "unknown": "不明",
-    "used": "使用済み"
+    "used": "使用済み",
+    "week_model_statistics": "近七日模型統計",
+    "week_consumption_log": "近七日消費日志",
+    "date": "日付",
+    "request_count": "リクエスト数",
+    "amount": "金額",
+    "tokens": "Tokens(入力/出力)",
+    "cache_tokens": "CacheTokens",
+    "request_time": "リクエスト時間(s)",
+    "loading": "読み込み中...",
+    "quickStart": "クイックスタート",
+    "quickStartTip": "下のボタンをクリックすると、システムはsys_playgroundのトークンを自動的に作成します",
+    "ComparedWithYesterday": "昨日と比較"
   },
   "description": "All in one の OpenAI インターフェース\nさまざまな API アクセス方法を統合\nワンクリックで展開、即座に使用可能",
   "echo 映射": "エコーマッピング",
@@ -524,7 +540,11 @@
     "saveOk": "正常に保存",
     "type": "タイプ",
     "typeCheck": "タイプはトークンまたは時間のみです",
-    "typeErr": "タイプエラー"
+    "typeErr": "タイプエラー",
+    "locked_title": "価格をロックする",
+    "locked": "ロックされた価格",
+    "unlocked": "ロックされていない価格",
+    "lockedTip": "価格をロックすると、サーバーまたはプログラムの価格更新によって上書きできなくなります。プログラムまたは価格サーバーの価格更新を希望する場合はロックしないでください"
   },
   "profile": "プロフィール",
   "profilePage": {

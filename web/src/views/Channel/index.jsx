@@ -18,7 +18,7 @@ import ChannelTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
 import EditeModal from './component/EditModal';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import TableToolBar from './component/TableToolBar';
 import BatchModal from './component/BatchModal';
 import { useTranslation } from 'react-i18next';
@@ -73,7 +73,7 @@ export default function ChannelList() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('channel'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [channels, setChannels] = useState([]);
@@ -108,8 +108,10 @@ export default function ChannelList() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('channel', newRowsPerPage);
   };
 
   const searchChannels = async () => {
@@ -378,7 +380,12 @@ export default function ChannelList() {
   return (
     <AdminContainer>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('channel_index.channel')}</Typography>
+        <Typography variant="h2">
+          {t('channel_index.channel')}
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            Channel
+          </Typography>
+        </Typography>
 
         <ButtonGroup variant="contained" aria-label="outlined small primary button group">
           <Button color="primary" startIcon={<Icon icon="solar:add-circle-line-duotone" />} onClick={() => handleOpenModal(0)}>
@@ -416,7 +423,7 @@ export default function ChannelList() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             {matchUpMd ? (
               <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
                 <Button onClick={() => handleRefresh(true)} startIcon={<Icon icon="solar:refresh-circle-bold-duotone" width={18} />}>

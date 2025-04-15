@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 import PayDialog from './PayDialog';
 
 import { API } from 'utils/api';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { showError, showInfo, showSuccess, renderQuota, trims } from 'utils/common';
 import { useTranslation } from 'react-i18next';
 
@@ -41,12 +41,16 @@ const TopupCard = () => {
   const [disabledPay, setDisabledPay] = useState(false);
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
   const siteInfo = useSelector((state) => state.siteInfo);
-  const RechargeDiscount = useSelector((state) => {
-    if (state.siteInfo.RechargeDiscount === '') {
+  const RechargeDiscount = useMemo(() => {
+    if (siteInfo.RechargeDiscount === '') {
       return {};
     }
-    return JSON.parse(state.siteInfo.RechargeDiscount);
-  });
+    try {
+      return JSON.parse(siteInfo.RechargeDiscount);
+    } catch (e) {
+      return {};
+    }
+  }, [siteInfo.RechargeDiscount]);
   const topUp = async () => {
     if (redemptionCode === '') {
       showInfo(t('topupCard.inputPlaceholder'));

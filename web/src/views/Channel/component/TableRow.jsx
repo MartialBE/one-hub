@@ -54,6 +54,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { copy, renderQuota } from 'utils/common';
 import { ChannelCheck } from './ChannelCheck';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -121,13 +122,14 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   const [weight, setWeight] = useState(item.weight);
   const tagDeleteConfirm = useBoolean();
   const quickEdit = useBoolean();
+  const simpleChannelEdit = useBoolean();
   const [totalTagChannels, setTotalTagChannels] = useState(0);
   const [isTagChannelsLoading, setIsTagChannelsLoading] = useState(false);
   const [tagChannels, setTagChannels] = useState([]);
   const [selectedChannels, setSelectedChannels] = useState([]);
   const [currentTestingChannel, setCurrentTestingChannel] = useState(null);
   const [tagPage, setTagPage] = useState(0);
-  const [tagRowsPerPage, setTagRowsPerPage] = useState(10);
+  const [tagRowsPerPage, setTagRowsPerPage] = useState(() => getPageSize('channelTag'));
   const tagModelPopover = usePopover();
 
   const batchConfirm = useBoolean();
@@ -143,6 +145,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   modelMap = item.models.split(',');
   modelMap.sort();
 
+  const [editedChannel, setEditedChannel] = useState({});
   const fetchTagChannels = useCallback(async () => {
     if (!item.tag) return;
 
@@ -168,8 +171,10 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
   };
 
   const handleChangeTagRowsPerPage = (event) => {
-    setTagRowsPerPage(parseInt(event.target.value, 10));
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setTagRowsPerPage(newRowsPerPage);
     setTagPage(0);
+    savePageSize('channelTag', newRowsPerPage);
   };
 
   const handleToggleChannel = (channelId) => {
@@ -1093,6 +1098,20 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                                           </IconButton>
                                         </Tooltip>
 
+                                        <Tooltip title={t('common.edit')} placement="top">
+                                          <IconButton
+                                            size="small"
+                                            sx={{ p: 0.5, color: 'primary.main' }}
+                                            onClick={() => {
+                                              setCurrentTestingChannel(channel);
+                                              setEditedChannel({name: channel.name, key: channel.key})
+                                              simpleChannelEdit.onTrue();
+                                            }}
+                                          >
+                                            <Icon icon="solar:pen-bold" width={18} height={18} />
+                                          </IconButton>
+                                        </Tooltip>
+
                                         <Tooltip title={t('channel_index.actions')} placement="top">
                                           <IconButton
                                             size="small"
@@ -1123,7 +1142,7 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                             onPageChange={handleChangeTagPage}
                             rowsPerPage={tagRowsPerPage}
                             onRowsPerPageChange={handleChangeTagRowsPerPage}
-                            rowsPerPageOptions={[10, 25, 50, 100]}
+                            rowsPerPageOptions={PAGE_SIZE_OPTIONS}
                             labelRowsPerPage="每页行数:"
                             labelDisplayedRows={({ from, to, count }) => `${from}-${to} 共 ${count}`}
                             sx={{
@@ -1333,6 +1352,96 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
           </Button>
         }
       />
+
+      {/* 添加子渠道的简化编辑对话框 */}
+      <Dialog open={simpleChannelEdit.value} onClose={simpleChannelEdit.onFalse} fullWidth maxWidth="md" >
+        <DialogTitle>{t('common.edit')}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="sub-channel-name"
+            label={t('channel_index.channelName')}
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={editedChannel.name}
+            onChange={(e) => setEditedChannel({...editedChannel, name: e.target.value})}
+            sx={{ mb: 2, mt: 1 }}
+          />
+          <TextField
+            margin="dense"
+            id="sub-channel-key"
+            label={t('channel_row.key')}
+            type="text"
+            fullWidth
+            multiline
+            minRows={3}
+            variant="outlined"
+            value={editedChannel.key}
+            onChange={(e) => setEditedChannel({...editedChannel, key: e.target.value})}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={simpleChannelEdit.onFalse}>{t('common.cancel')}</Button>
+          <Button variant="contained" color="primary"
+            onClick={() => {
+              if (!editedChannel?.name?.trim()) {
+                showError(t('channel_edit.requiredName'));
+                return;
+              }
+              if (!editedChannel?.key?.trim()) {
+                showError(t('channel_row.keyRequired'));
+                return;
+              }
+              
+              // 确保这里使用currentTestingChannel的ID，因为这是子渠道
+              const channelId = currentTestingChannel.id;
+              
+              // 创建一个包含名称和密钥的对象来更新
+              const updateData = {
+                id: channelId,
+                name: editedChannel.name,
+                key: editedChannel.key
+              };
+              
+              // 使用PUT请求更新渠道
+              API.put('/api/channel/', updateData)
+                .then((res) => {
+                  if (res && res.data) {
+                    const { success, message } = res.data;
+                    if (success) {
+                      showSuccess(t('channel_edit.editSuccess'));
+                      
+                      // 更新本地状态
+                      setTagChannels((prev) =>
+                        prev.map((c) =>
+                          c.id === channelId ? { ...c, name: editedChannel.name, key: editedChannel.key } : c
+                        )
+                      );
+                      
+                      onRefresh(false); // 刷新父组件数据
+                    } else {
+                      showError(message || t('channel_edit.editError'));
+                    }
+                  } else {
+                    showError(t('channel_edit.editError'));
+                  }
+                })
+                .catch((error) => {
+                  const errorMessage = error.response?.data?.message || error.message || '未知错误';
+                  showError(t('channel_edit.editError', { message: errorMessage }));
+                })
+                .finally(() => {
+                  simpleChannelEdit.onFalse();
+                  setCurrentTestingChannel(null);
+                });
+            }}
+          >
+            {t('common.submit')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

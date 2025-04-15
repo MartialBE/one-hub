@@ -9,6 +9,7 @@ import (
 )
 
 type DisableChannelKeyword struct {
+	keywords   string
 	AcMachines *goahocorasick.Machine
 	ready      bool
 	mutex      sync.RWMutex
@@ -39,6 +40,10 @@ too many invalid requests`
 
 func (d *DisableChannelKeyword) Load(keywords string) {
 	if keywords == "" {
+		d.mutex.Lock()
+		defer d.mutex.Unlock()
+		d.ready = false
+		d.keywords = ""
 		return
 	}
 
@@ -65,6 +70,7 @@ func (d *DisableChannelKeyword) Load(keywords string) {
 			logger.SysError("failed to build Aho-Corasick machine: " + err.Error())
 		}
 	}
+	d.keywords = keywords
 }
 
 func (d *DisableChannelKeyword) IsContains(message string) bool {
@@ -81,4 +87,10 @@ func (d *DisableChannelKeyword) IsContains(message string) bool {
 	matches := d.AcMachines.MultiPatternSearch(messageRunes, false)
 
 	return len(matches) > 0
+}
+
+func (d *DisableChannelKeyword) GetKeywords() string {
+	d.mutex.RLock()
+	defer d.mutex.RUnlock()
+	return d.keywords
 }

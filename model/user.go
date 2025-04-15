@@ -24,6 +24,7 @@ type User struct {
 	Status           int            `json:"status" gorm:"type:int;default:1"` // enabled, disabled
 	Email            string         `json:"email" gorm:"index" validate:"max=50"`
 	AvatarUrl        string         `json:"avatar_url" gorm:"type:varchar(500);column:avatar_url;default:''"`
+	OidcId           string         `json:"oidc_id" gorm:"column:oidc_id;index"`
 	GitHubId         string         `json:"github_id" gorm:"column:github_id;index"`
 	GitHubIdNew      int            `json:"github_id_new" gorm:"column:github_id_new;index"`
 	WeChatId         string         `json:"wechat_id" gorm:"column:wechat_id;index"`
@@ -69,7 +70,7 @@ func GetUsersList(params *GenericParams) (*DataResult[User], error) {
 		if common.UsingPostgreSQL {
 			groupCol = `"group"`
 		}
-		db = db.Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ? or " + groupCol + " LIKE ?", utils.String2Int(params.Keyword), params.Keyword+"%", params.Keyword+"%", params.Keyword+"%", params.Keyword+"%")
+		db = db.Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ? or "+groupCol+" LIKE ?", utils.String2Int(params.Keyword), params.Keyword+"%", params.Keyword+"%", params.Keyword+"%", params.Keyword+"%")
 	}
 
 	return PaginateAndOrder[User](db, &params.PaginationParams, &users, allowedUserOrderFields)
@@ -283,6 +284,17 @@ func (user *User) FillUserByLarkId() error {
 		return errors.New("lark id 为空！")
 	}
 	DB.Where(User{LarkId: user.LarkId}).First(user)
+	return nil
+}
+
+func (user *User) FillUserByOidcId() error {
+	if user.OidcId == "" {
+		return errors.New("OIDC ID 为空！")
+	}
+	err := DB.Where(User{OidcId: user.OidcId}).First(user)
+	if err != nil {
+		return err.Error
+	}
 	return nil
 }
 

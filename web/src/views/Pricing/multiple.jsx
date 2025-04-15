@@ -82,6 +82,7 @@ export default function Multiple({ prices, reloadData, handleOpenModal, ownedby 
                   { id: 'input', label: t('modelpricePage.inputMultiplier'), disableSort: true },
                   { id: 'output', label: t('modelpricePage.outputMultiplier'), disableSort: true },
                   { id: 'count', label: t('pricingPage.ModelCount'), disableSort: true },
+                  { id: 'locked', label: t('pricing_edit.locked_title'), disableSort: true },
                   { id: 'action', label: t('paymentGatewayPage.tableHeaders.action'), disableSort: true }
                 ]}
               />

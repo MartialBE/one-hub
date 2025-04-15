@@ -20,7 +20,8 @@ import {
   TextField,
   Checkbox,
   MenuItem,
-  Stack
+  Stack,
+  Alert
 } from '@mui/material';
 
 import { showSuccess, showError, trims } from 'utils/common';
@@ -53,6 +54,7 @@ const originInputs = {
   channel_type: 1,
   input: 0,
   output: 0,
+  locked: false,
   models: []
 };
 
@@ -98,6 +100,11 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
     { value: 'rate', label: t('modelpricePage.rate') },
     { value: 'USD', label: 'USD' },
     { value: 'RMB', label: 'RMB' }
+  ];
+
+  const lockedOptions = [
+    { value: true, label: t('pricing_edit.locked') },
+    { value: false, label: t('pricing_edit.unlocked') }
   ];
 
   const unitOptions = [
@@ -147,7 +154,8 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
           type: values.type,
           channel_type: values.channel_type,
           input: calculateRate(values.input),
-          output: calculateRate(values.output)
+          output: calculateRate(values.output),
+          locked: values.locked
         }
       });
       const { success, message } = res.data;
@@ -381,6 +389,21 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                   <FormHelperText id="helper-tex-channel-models-label"> {t('pricing_edit.modelTip')} </FormHelperText>
                 )}
               </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.locked && errors.locked)} sx={{ ...theme.typography.otherInput }}>
+                {/* 使用ToggleButtonGroup组件 */}
+                <Stack direction="row" spacing={2}>
+                  <ToggleButtonGroup
+                    value={values.locked}
+                    onChange={(event, newLocked) => {
+                      handleChange({ target: { name: 'locked', value: newLocked } });
+                    }}
+                    options={lockedOptions}
+                    aria-label="locked toggle"
+                  />
+                </Stack>
+              </FormControl>
+              <Alert severity="warning">{t('pricing_edit.lockedTip')}</Alert>
 
               <DialogActions>
                 <Button onClick={onCancel}>{t('common.cancel')}</Button>

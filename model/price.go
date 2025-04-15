@@ -27,6 +27,7 @@ type Price struct {
 	ChannelType int     `json:"channel_type" gorm:"default:0" binding:"gte=0"`
 	Input       float64 `json:"input" gorm:"default:0" binding:"gte=0"`
 	Output      float64 `json:"output" gorm:"default:0" binding:"gte=0"`
+	Locked      bool    `json:"locked" gorm:"default:false"` // 如果模型为locked 则覆盖模式不会更新locked的模型价格
 
 	ExtraRatios map[string]float64 `json:"extra_ratios,omitempty" gorm:"-"`
 }
@@ -122,6 +123,7 @@ func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
 			ChannelType: prices.ChannelType,
 			Input:       prices.Input,
 			Output:      prices.Output,
+			Locked:      prices.Locked,
 		}).Error
 
 	return err
@@ -140,6 +142,18 @@ func InsertPrices(tx *gorm.DB, prices []*Price) error {
 
 func DeleteAllPrices(tx *gorm.DB) error {
 	err := tx.Where("1=1").Delete(&Price{}).Error
+	return err
+}
+
+// 只删除未lock的价格
+func DeleteAllPricesNotLock(tx *gorm.DB) error {
+	err := tx.Where("locked = ?", false).Delete(&Price{}).Error
+	return err
+}
+
+// 只删除指定的未lock的数据
+func DeletePricesByModelNameAndNotLock(tx *gorm.DB, models []string) error {
+	err := tx.Where("locked = ? and model IN (?)", false, models).Delete(&Price{}).Error
 	return err
 }
 

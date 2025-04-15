@@ -18,7 +18,13 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
 
   return (
     <>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 3, sm: 2, md: 4 }}
+        padding={'24px'}
+        paddingBottom={'0px'}
+        sx={{ width: '100%', '& > *': { flex: 1 } }}
+      >
         <FormControl>
           <InputLabel htmlFor="channel-token_name-label">{t('tableToolBar.tokenName')}</InputLabel>
           <OutlinedInput
@@ -57,7 +63,33 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             }
           />
         </FormControl>
-
+        <FormControl>
+          <InputLabel htmlFor="channel-source_ip-label">{t('tableToolBar.sourceIp')}</InputLabel>
+          <OutlinedInput
+            id="source_ip"
+            name="source_ip"
+            sx={{
+              minWidth: '100%'
+            }}
+            label={t('tableToolBar.sourceIp')}
+            value={filterName.source_ip}
+            onChange={handleFilterName}
+            placeholder={t('tableToolBar.sourceIp')}
+            startAdornment={
+              <InputAdornment position="start">
+                <Icon icon="solar:user-bold-duotone" width="20" color={grey500} />
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+      </Stack>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 3, sm: 2, md: 4 }}
+        padding={'24px'}
+        paddingBottom={'0px'}
+        sx={{ width: '100%', '& > *': { flex: 1 } }}
+      >
         <FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
             <DateTimePicker
@@ -103,7 +135,7 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
             />
           </LocalizationProvider>
         </FormControl>
-        <FormControl sx={{ minWidth: '22%' }}>
+        <FormControl>
           <InputLabel htmlFor="channel-log_type-label">{t('tableToolBar.type')}</InputLabel>
           <Select
             id="channel-type-label"
@@ -134,7 +166,12 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
       </Stack>
 
       {userIsAdmin && (
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={{ xs: 3, sm: 2, md: 4 }}
+          padding={'24px'}
+          sx={{ width: '100%', '& > *': { flex: 1 } }}
+        >
           <FormControl>
             <InputLabel htmlFor="channel-channel_id-label">{t('tableToolBar.channelId')}</InputLabel>
             <OutlinedInput
@@ -167,26 +204,6 @@ export default function TableToolBar({ filterName, handleFilterName, userIsAdmin
               value={filterName.username}
               onChange={handleFilterName}
               placeholder={t('tableToolBar.username')}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Icon icon="solar:user-bold-duotone" width="20" color={grey500} />
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-
-          <FormControl>
-            <InputLabel htmlFor="channel-source_ip-label">{t('tableToolBar.sourceIp')}</InputLabel>
-            <OutlinedInput
-              id="source_ip"
-              name="source_ip"
-              sx={{
-                minWidth: '100%'
-              }}
-              label={t('tableToolBar.sourceIp')}
-              value={filterName.source_ip}
-              onChange={handleFilterName}
-              placeholder={t('tableToolBar.sourceIp')}
               startAdornment={
                 <InputAdornment position="start">
                   <Icon icon="solar:user-bold-duotone" width="20" color={grey500} />

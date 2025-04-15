@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
-const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
+const Sidebar = ({ drawerOpen, drawerToggle, window: windowProp }) => {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
   const { t } = useTranslation();
@@ -143,20 +143,18 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
               }
             }}
           >
-            {!matchUpMd && (
-              <Box
-                sx={{
-                  px: 2,
-                  pt: 2.5,
-                  pb: 1.5,
-                  mt: 0.5,
-                  display: 'flex',
-                  justifyContent: 'center'
-                }}
-              >
-                <LogoSection />
-              </Box>
-            )}
+            <Box
+              sx={{
+                px: 2,
+                pt: 2.5,
+                pb: 1.5,
+                mt: 0.5,
+                display: 'flex',
+                justifyContent: 'flex-start'
+              }}
+            >
+              <LogoSection />
+            </Box>
 
             <Box
               sx={{
@@ -213,7 +211,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
       aria-label="mailbox folders"
     >
       <Drawer
-        container={window?.document.body}
+        container={windowProp?.document.body}
         variant={matchUpMd ? 'persistent' : 'temporary'}
         anchor="left"
         open={drawerOpen}

@@ -4,7 +4,6 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/logger"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -26,91 +25,116 @@ func GetOption(key string) (option Option, err error) {
 }
 
 func InitOptionMap() {
-	config.OptionMapRWMutex.Lock()
-	config.OptionMap = make(map[string]string)
-	config.OptionMap["PasswordLoginEnabled"] = strconv.FormatBool(config.PasswordLoginEnabled)
-	config.OptionMap["PasswordRegisterEnabled"] = strconv.FormatBool(config.PasswordRegisterEnabled)
-	config.OptionMap["EmailVerificationEnabled"] = strconv.FormatBool(config.EmailVerificationEnabled)
-	config.OptionMap["GitHubOAuthEnabled"] = strconv.FormatBool(config.GitHubOAuthEnabled)
-	config.OptionMap["WeChatAuthEnabled"] = strconv.FormatBool(config.WeChatAuthEnabled)
-	config.OptionMap["LarkAuthEnabled"] = strconv.FormatBool(config.LarkAuthEnabled)
-	config.OptionMap["TurnstileCheckEnabled"] = strconv.FormatBool(config.TurnstileCheckEnabled)
-	config.OptionMap["RegisterEnabled"] = strconv.FormatBool(config.RegisterEnabled)
-	config.OptionMap["AutomaticDisableChannelEnabled"] = strconv.FormatBool(config.AutomaticDisableChannelEnabled)
-	config.OptionMap["AutomaticEnableChannelEnabled"] = strconv.FormatBool(config.AutomaticEnableChannelEnabled)
-	config.OptionMap["ApproximateTokenEnabled"] = strconv.FormatBool(config.ApproximateTokenEnabled)
-	config.OptionMap["LogConsumeEnabled"] = strconv.FormatBool(config.LogConsumeEnabled)
-	config.OptionMap["DisplayInCurrencyEnabled"] = strconv.FormatBool(config.DisplayInCurrencyEnabled)
-	config.OptionMap["ChannelDisableThreshold"] = strconv.FormatFloat(config.ChannelDisableThreshold, 'f', -1, 64)
-	config.OptionMap["EmailDomainRestrictionEnabled"] = strconv.FormatBool(config.EmailDomainRestrictionEnabled)
-	config.OptionMap["EmailDomainWhitelist"] = strings.Join(config.EmailDomainWhitelist, ",")
-	config.OptionMap["SMTPServer"] = ""
-	config.OptionMap["SMTPFrom"] = ""
-	config.OptionMap["SMTPPort"] = strconv.Itoa(config.SMTPPort)
-	config.OptionMap["SMTPAccount"] = ""
-	config.OptionMap["SMTPToken"] = ""
-	config.OptionMap["Notice"] = ""
-	config.OptionMap["About"] = ""
-	config.OptionMap["HomePageContent"] = ""
-	config.OptionMap["Footer"] = config.Footer
-	config.OptionMap["SystemName"] = config.SystemName
-	config.OptionMap["Logo"] = config.Logo
-	config.OptionMap["ServerAddress"] = ""
-	config.OptionMap["GitHubClientId"] = ""
 
-	config.OptionMap["OIDCClientId"] = ""
-	config.OptionMap["OIDCClientSecret"] = ""
-	config.OptionMap["OIDCIssuer"] = ""
-	config.OptionMap["OIDCScopes"] = ""
-	config.OptionMap["OIDCUsernameClaims"] = ""
+	config.GlobalOption.RegisterBool("PasswordLoginEnabled", &config.PasswordLoginEnabled)
+	config.GlobalOption.RegisterBool("PasswordRegisterEnabled", &config.PasswordRegisterEnabled)
+	config.GlobalOption.RegisterBool("EmailVerificationEnabled", &config.EmailVerificationEnabled)
+	config.GlobalOption.RegisterBool("GitHubOAuthEnabled", &config.GitHubOAuthEnabled)
+	config.GlobalOption.RegisterBool("WeChatAuthEnabled", &config.WeChatAuthEnabled)
+	config.GlobalOption.RegisterBool("LarkAuthEnabled", &config.LarkAuthEnabled)
+	config.GlobalOption.RegisterBool("OIDCAuthEnabled", &config.OIDCAuthEnabled)
+	config.GlobalOption.RegisterBool("TurnstileCheckEnabled", &config.TurnstileCheckEnabled)
+	config.GlobalOption.RegisterBool("RegisterEnabled", &config.RegisterEnabled)
+	config.GlobalOption.RegisterBool("AutomaticDisableChannelEnabled", &config.AutomaticDisableChannelEnabled)
+	config.GlobalOption.RegisterBool("AutomaticEnableChannelEnabled", &config.AutomaticEnableChannelEnabled)
+	config.GlobalOption.RegisterBool("ApproximateTokenEnabled", &config.ApproximateTokenEnabled)
+	config.GlobalOption.RegisterBool("LogConsumeEnabled", &config.LogConsumeEnabled)
+	config.GlobalOption.RegisterBool("DisplayInCurrencyEnabled", &config.DisplayInCurrencyEnabled)
+	config.GlobalOption.RegisterFloat("ChannelDisableThreshold", &config.ChannelDisableThreshold)
+	config.GlobalOption.RegisterBool("EmailDomainRestrictionEnabled", &config.EmailDomainRestrictionEnabled)
 
-	config.OptionMap["WeChatServerAddress"] = ""
-	config.OptionMap["WeChatServerToken"] = ""
-	config.OptionMap["WeChatAccountQRCodeImageURL"] = ""
-	config.OptionMap["TurnstileSiteKey"] = ""
-	config.OptionMap["TurnstileSecretKey"] = ""
-	config.OptionMap["QuotaForNewUser"] = strconv.Itoa(config.QuotaForNewUser)
-	config.OptionMap["QuotaForInviter"] = strconv.Itoa(config.QuotaForInviter)
-	config.OptionMap["QuotaForInvitee"] = strconv.Itoa(config.QuotaForInvitee)
-	config.OptionMap["QuotaRemindThreshold"] = strconv.Itoa(config.QuotaRemindThreshold)
-	config.OptionMap["PreConsumedQuota"] = strconv.Itoa(config.PreConsumedQuota)
-	config.OptionMap["TopUpLink"] = config.TopUpLink
-	config.OptionMap["ChatLink"] = config.ChatLink
-	config.OptionMap["ChatLinks"] = config.ChatLinks
-	config.OptionMap["QuotaPerUnit"] = strconv.FormatFloat(config.QuotaPerUnit, 'f', -1, 64)
-	config.OptionMap["RetryTimes"] = strconv.Itoa(config.RetryTimes)
-	config.OptionMap["RetryCooldownSeconds"] = strconv.Itoa(config.RetryCooldownSeconds)
+	config.GlobalOption.RegisterCustom("EmailDomainWhitelist", func() string {
+		return strings.Join(config.EmailDomainWhitelist, ",")
+	}, func(value string) error {
+		config.EmailDomainWhitelist = strings.Split(value, ",")
+		return nil
+	}, "")
 
-	config.OptionMap["MjNotifyEnabled"] = strconv.FormatBool(config.MjNotifyEnabled)
+	config.GlobalOption.RegisterString("SMTPServer", &config.SMTPServer)
+	config.GlobalOption.RegisterString("SMTPFrom", &config.SMTPFrom)
+	config.GlobalOption.RegisterInt("SMTPPort", &config.SMTPPort)
+	config.GlobalOption.RegisterString("SMTPAccount", &config.SMTPAccount)
+	config.GlobalOption.RegisterString("SMTPToken", &config.SMTPToken)
+	config.GlobalOption.RegisterValue("Notice")
+	config.GlobalOption.RegisterValue("About")
+	config.GlobalOption.RegisterValue("HomePageContent")
+	config.GlobalOption.RegisterString("Footer", &config.Footer)
+	config.GlobalOption.RegisterString("SystemName", &config.SystemName)
+	config.GlobalOption.RegisterString("Logo", &config.Logo)
+	config.GlobalOption.RegisterString("ServerAddress", &config.ServerAddress)
+	config.GlobalOption.RegisterString("GitHubClientId", &config.GitHubClientId)
 
-	config.OptionMap["ChatImageRequestProxy"] = ""
+	config.GlobalOption.RegisterString("OIDCClientId", &config.OIDCClientId)
+	config.GlobalOption.RegisterString("OIDCClientSecret", &config.OIDCClientSecret)
+	config.GlobalOption.RegisterString("OIDCIssuer", &config.OIDCIssuer)
+	config.GlobalOption.RegisterString("OIDCScopes", &config.OIDCScopes)
+	config.GlobalOption.RegisterString("OIDCUsernameClaims", &config.OIDCUsernameClaims)
 
-	config.OptionMap["PaymentUSDRate"] = strconv.FormatFloat(config.PaymentUSDRate, 'f', -1, 64)
-	config.OptionMap["PaymentMinAmount"] = strconv.Itoa(config.PaymentMinAmount)
-	config.OptionMap["RechargeDiscount"] = common.RechargeDiscount2JSONString()
+	config.GlobalOption.RegisterString("WeChatServerAddress", &config.WeChatServerAddress)
+	config.GlobalOption.RegisterString("WeChatServerToken", &config.WeChatServerToken)
+	config.GlobalOption.RegisterString("WeChatAccountQRCodeImageURL", &config.WeChatAccountQRCodeImageURL)
+	config.GlobalOption.RegisterString("TurnstileSiteKey", &config.TurnstileSiteKey)
+	config.GlobalOption.RegisterString("TurnstileSecretKey", &config.TurnstileSecretKey)
+	config.GlobalOption.RegisterInt("QuotaForNewUser", &config.QuotaForNewUser)
+	config.GlobalOption.RegisterInt("QuotaForInviter", &config.QuotaForInviter)
+	config.GlobalOption.RegisterInt("QuotaForInvitee", &config.QuotaForInvitee)
+	config.GlobalOption.RegisterInt("QuotaRemindThreshold", &config.QuotaRemindThreshold)
+	config.GlobalOption.RegisterInt("PreConsumedQuota", &config.PreConsumedQuota)
 
-	config.OptionMap["CFWorkerImageUrl"] = config.CFWorkerImageUrl
-	config.OptionMap["CFWorkerImageKey"] = config.CFWorkerImageKey
-	config.OptionMap["OldTokenMaxId"] = strconv.Itoa(config.OldTokenMaxId)
-	config.OptionMap["GitHubOldIdCloseEnabled"] = strconv.FormatBool(config.GitHubOldIdCloseEnabled)
+	config.GlobalOption.RegisterString("TopUpLink", &config.TopUpLink)
+	config.GlobalOption.RegisterString("ChatLink", &config.ChatLink)
+	config.GlobalOption.RegisterString("ChatLinks", &config.ChatLinks)
+	config.GlobalOption.RegisterFloat("QuotaPerUnit", &config.QuotaPerUnit)
+	config.GlobalOption.RegisterInt("RetryTimes", &config.RetryTimes)
+	config.GlobalOption.RegisterInt("RetryCooldownSeconds", &config.RetryCooldownSeconds)
 
-	config.OptionMap["AudioTokenJson"] = GetDefaultAudioRatio()
+	config.GlobalOption.RegisterBool("MjNotifyEnabled", &config.MjNotifyEnabled)
+	config.GlobalOption.RegisterString("ChatImageRequestProxy", &config.ChatImageRequestProxy)
+	config.GlobalOption.RegisterFloat("PaymentUSDRate", &config.PaymentUSDRate)
+	config.GlobalOption.RegisterInt("PaymentMinAmount", &config.PaymentMinAmount)
 
-	config.OptionMap["GeminiAPIEnabled"] = strconv.FormatBool(config.GeminiAPIEnabled)
-	config.OptionMap["ClaudeAPIEnabled"] = strconv.FormatBool(config.ClaudeAPIEnabled)
+	config.GlobalOption.RegisterCustom("RechargeDiscount", func() string {
+		return common.RechargeDiscount2JSONString()
+	}, func(value string) error {
+		config.RechargeDiscount = value
+		common.UpdateRechargeDiscountByJSONString(value)
+		return nil
+	}, "")
 
-	config.OptionMap["DisableChannelKeywords"] = common.GetDefaultDisableChannelKeywords()
+	config.GlobalOption.RegisterString("CFWorkerImageUrl", &config.CFWorkerImageUrl)
+	config.GlobalOption.RegisterString("CFWorkerImageKey", &config.CFWorkerImageKey)
+	config.GlobalOption.RegisterInt("OldTokenMaxId", &config.OldTokenMaxId)
+	config.GlobalOption.RegisterBool("GitHubOldIdCloseEnabled", &config.GitHubOldIdCloseEnabled)
 
-	config.OptionMap["RetryTimeOut"] = strconv.Itoa(config.RetryTimeOut)
+	config.GlobalOption.RegisterCustom("AudioTokenJson", func() string {
+		return GetDefaultAudioRatio()
+	}, func(value string) error {
+		config.AudioTokenJson = value
+		if PricingInstance != nil {
+			PricingInstance.Init()
+		}
+		return nil
+	}, "")
 
-	config.OptionMapRWMutex.Unlock()
+	config.GlobalOption.RegisterBool("GeminiAPIEnabled", &config.GeminiAPIEnabled)
+	config.GlobalOption.RegisterBool("ClaudeAPIEnabled", &config.ClaudeAPIEnabled)
+
+	config.GlobalOption.RegisterCustom("DisableChannelKeywords", func() string {
+		return common.DisableChannelKeywordsInstance.GetKeywords()
+	}, func(value string) error {
+		common.DisableChannelKeywordsInstance.Load(value)
+		return nil
+	}, common.GetDefaultDisableChannelKeywords())
+
+	config.GlobalOption.RegisterInt("RetryTimeOut", &config.RetryTimeOut)
+
 	loadOptionsFromDatabase()
 }
 
 func loadOptionsFromDatabase() {
 	options, _ := AllOption()
 	for _, option := range options {
-		err := updateOptionMap(option.Key, option.Value)
+		err := config.GlobalOption.Set(option.Key, option.Value)
 		if err != nil {
 			logger.SysError("failed to update option map: " + err.Error())
 		}
@@ -138,114 +162,5 @@ func UpdateOption(key string, value string) error {
 	// otherwise it will execute Update (with all fields).
 	DB.Save(&option)
 	// Update OptionMap
-	return updateOptionMap(key, value)
-}
-
-var optionIntMap = map[string]*int{
-	"SMTPPort":             &config.SMTPPort,
-	"QuotaForNewUser":      &config.QuotaForNewUser,
-	"QuotaForInviter":      &config.QuotaForInviter,
-	"QuotaForInvitee":      &config.QuotaForInvitee,
-	"QuotaRemindThreshold": &config.QuotaRemindThreshold,
-	"PreConsumedQuota":     &config.PreConsumedQuota,
-	"RetryTimes":           &config.RetryTimes,
-	"RetryCooldownSeconds": &config.RetryCooldownSeconds,
-	"PaymentMinAmount":     &config.PaymentMinAmount,
-	"OldTokenMaxId":        &config.OldTokenMaxId,
-	"RetryTimeOut":         &config.RetryTimeOut,
-}
-
-var optionBoolMap = map[string]*bool{
-	"PasswordRegisterEnabled":        &config.PasswordRegisterEnabled,
-	"PasswordLoginEnabled":           &config.PasswordLoginEnabled,
-	"EmailVerificationEnabled":       &config.EmailVerificationEnabled,
-	"GitHubOAuthEnabled":             &config.GitHubOAuthEnabled,
-	"OIDCAuthEnabled":                &config.OIDCAuthEnabled,
-	"WeChatAuthEnabled":              &config.WeChatAuthEnabled,
-	"LarkAuthEnabled":                &config.LarkAuthEnabled,
-	"TurnstileCheckEnabled":          &config.TurnstileCheckEnabled,
-	"RegisterEnabled":                &config.RegisterEnabled,
-	"EmailDomainRestrictionEnabled":  &config.EmailDomainRestrictionEnabled,
-	"AutomaticDisableChannelEnabled": &config.AutomaticDisableChannelEnabled,
-	"AutomaticEnableChannelEnabled":  &config.AutomaticEnableChannelEnabled,
-	"ApproximateTokenEnabled":        &config.ApproximateTokenEnabled,
-	"LogConsumeEnabled":              &config.LogConsumeEnabled,
-	"DisplayInCurrencyEnabled":       &config.DisplayInCurrencyEnabled,
-	"MjNotifyEnabled":                &config.MjNotifyEnabled,
-	"GitHubOldIdCloseEnabled":        &config.GitHubOldIdCloseEnabled,
-	"GeminiAPIEnabled":               &config.GeminiAPIEnabled,
-	"ClaudeAPIEnabled":               &config.ClaudeAPIEnabled,
-}
-
-var optionStringMap = map[string]*string{
-	"SMTPServer":                  &config.SMTPServer,
-	"SMTPAccount":                 &config.SMTPAccount,
-	"SMTPFrom":                    &config.SMTPFrom,
-	"SMTPToken":                   &config.SMTPToken,
-	"ServerAddress":               &config.ServerAddress,
-	"GitHubClientId":              &config.GitHubClientId,
-	"GitHubClientSecret":          &config.GitHubClientSecret,
-	"OIDCClientId":                &config.OIDCClientId,
-	"OIDCClientSecret":            &config.OIDCClientSecret,
-	"OIDCIssuer":                  &config.OIDCIssuer,
-	"OIDCScopes":                  &config.OIDCScopes,
-	"OIDCUsernameClaims":          &config.OIDCUsernameClaims,
-	"Footer":                      &config.Footer,
-	"SystemName":                  &config.SystemName,
-	"Logo":                        &config.Logo,
-	"WeChatServerAddress":         &config.WeChatServerAddress,
-	"WeChatServerToken":           &config.WeChatServerToken,
-	"WeChatAccountQRCodeImageURL": &config.WeChatAccountQRCodeImageURL,
-	"TurnstileSiteKey":            &config.TurnstileSiteKey,
-	"TurnstileSecretKey":          &config.TurnstileSecretKey,
-	"TopUpLink":                   &config.TopUpLink,
-	"ChatLink":                    &config.ChatLink,
-	"ChatLinks":                   &config.ChatLinks,
-	"LarkClientId":                &config.LarkClientId,
-	"LarkClientSecret":            &config.LarkClientSecret,
-	"ChatImageRequestProxy":       &config.ChatImageRequestProxy,
-	"CFWorkerImageUrl":            &config.CFWorkerImageUrl,
-	"CFWorkerImageKey":            &config.CFWorkerImageKey,
-}
-
-func updateOptionMap(key string, value string) (err error) {
-	config.OptionMapRWMutex.Lock()
-	defer config.OptionMapRWMutex.Unlock()
-	config.OptionMap[key] = value
-	if ptr, ok := optionIntMap[key]; ok {
-		*ptr, _ = strconv.Atoi(value)
-		return
-	}
-
-	if ptr, ok := optionBoolMap[key]; ok {
-		*ptr = value == "true"
-		return
-	}
-
-	if ptr, ok := optionStringMap[key]; ok {
-		*ptr = value
-		return
-	}
-
-	switch key {
-	case "EmailDomainWhitelist":
-		config.EmailDomainWhitelist = strings.Split(value, ",")
-	case "ChannelDisableThreshold":
-		config.ChannelDisableThreshold, _ = strconv.ParseFloat(value, 64)
-	case "QuotaPerUnit":
-		config.QuotaPerUnit, _ = strconv.ParseFloat(value, 64)
-	case "PaymentUSDRate":
-		config.PaymentUSDRate, _ = strconv.ParseFloat(value, 64)
-	case "RechargeDiscount":
-		err = common.UpdateRechargeDiscountByJSONString(value)
-		config.RechargeDiscount = common.RechargeDiscount2JSONString()
-	case "AudioTokenJson":
-		config.AudioTokenJson = value
-		if PricingInstance != nil {
-			PricingInstance.Init()
-		}
-	case "DisableChannelKeywords":
-		common.DisableChannelKeywordsInstance.Load(value)
-	}
-	return err
+	return config.GlobalOption.Set(key, value)
 }

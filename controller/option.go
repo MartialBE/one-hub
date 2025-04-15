@@ -13,8 +13,7 @@ import (
 
 func GetOptions(c *gin.Context) {
 	var options []*model.Option
-	config.OptionMapRWMutex.Lock()
-	for k, v := range config.OptionMap {
+	for k, v := range config.GlobalOption.GetAll() {
 		if strings.HasSuffix(k, "Token") || strings.HasSuffix(k, "Secret") {
 			continue
 		}
@@ -23,7 +22,6 @@ func GetOptions(c *gin.Context) {
 			Value: utils.Interface2String(v),
 		})
 	}
-	config.OptionMapRWMutex.Unlock()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",

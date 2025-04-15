@@ -19,7 +19,7 @@ import { API } from 'utils/api';
 import { Icon } from '@iconify/react';
 import EditeModal from './component/EditModal';
 import { useSelector } from 'react-redux';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from 'contexts/UserContext';
 
@@ -28,7 +28,7 @@ export default function Token() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('token'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -54,8 +54,10 @@ export default function Token() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('token', newRowsPerPage);
   };
 
   const searchTokens = async (event) => {
@@ -168,7 +170,12 @@ export default function Token() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('token_index.token')}</Typography>
+        <Typography variant="h2">
+          {t('token_index.token')}
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            Token
+          </Typography>
+        </Typography>
 
         <Button
           variant="contained"
@@ -201,7 +208,7 @@ export default function Token() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('token_index.refresh')}

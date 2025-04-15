@@ -13,7 +13,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
 
   return (
     <>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'} sx={{ width: '100%', '& > *': { flex: 1 } }}>
         <FormControl>
           <InputLabel htmlFor="channel-name-label">{t('channel_index.channelName')}</InputLabel>
           <OutlinedInput
@@ -111,8 +111,8 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
         </FormControl>
       </Stack>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'}>
-        <FormControl sx={{ minWidth: '17.5%' }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} sx={{ width: '100%', '& > *': { flex: 1 } }}>
+        <FormControl>
           <InputLabel htmlFor="channel-type-label">{t('channel_index.channelType')}</InputLabel>
           <Select
             id="channel-type-label"
@@ -144,7 +144,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             })}
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: '17.5%' }}>
+        <FormControl>
           <InputLabel htmlFor="channel-status-label">{t('channel_index.status')}</InputLabel>
           <Select
             id="channel-status-label"
@@ -178,7 +178,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
           </Select>
         </FormControl>
 
-        <FormControl sx={{ minWidth: '17.5%' }}>
+        <FormControl>
           <InputLabel htmlFor="channel-group-label">{t('channel_index.group')}</InputLabel>
           <Select
             id="channel-group-label"
@@ -206,7 +206,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             })}
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: '17.5%' }}>
+        <FormControl>
           <InputLabel htmlFor="channel-filter_tag-label">{t('channel_index.filterTags')}</InputLabel>
           <Select
             id="channel-filter_tag-label"
@@ -236,7 +236,7 @@ export default function TableToolBar({ filterName, handleFilterName, groupOption
             </MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: '17.5%' }}>
+        <FormControl>
           <InputLabel htmlFor="channel-tag-label">{t('channel_index.tags')}</InputLabel>
           <Select
             id="channel-tag-label"

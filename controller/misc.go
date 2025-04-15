@@ -55,32 +55,26 @@ func GetStatus(c *gin.Context) {
 }
 
 func GetNotice(c *gin.Context) {
-	config.OptionMapRWMutex.RLock()
-	defer config.OptionMapRWMutex.RUnlock()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    config.OptionMap["Notice"],
+		"data":    config.GlobalOption.Get("Notice"),
 	})
 }
 
 func GetAbout(c *gin.Context) {
-	config.OptionMapRWMutex.RLock()
-	defer config.OptionMapRWMutex.RUnlock()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    config.OptionMap["About"],
+		"data":    config.GlobalOption.Get("About"),
 	})
 }
 
 func GetHomePageContent(c *gin.Context) {
-	config.OptionMapRWMutex.RLock()
-	defer config.OptionMapRWMutex.RUnlock()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    config.OptionMap["HomePageContent"],
+		"data":    config.GlobalOption.Get("HomePageContent"),
 	})
 }
 

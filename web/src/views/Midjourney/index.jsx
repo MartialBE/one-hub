@@ -16,7 +16,7 @@ import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/TableToolBar';
 import { API } from 'utils/api';
 import { isAdmin } from 'utils/common';
-import { ITEMS_PER_PAGE, PAGE_SIZE_OPTIONS } from 'constants';
+import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 
@@ -34,7 +34,7 @@ export default function Log() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
+  const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('midjourney'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
@@ -57,8 +57,10 @@ export default function Log() {
   };
 
   const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowsPerPage);
+    savePageSize('midjourney', newRowsPerPage);
   };
 
   const searchLogs = async () => {
@@ -122,7 +124,12 @@ export default function Log() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('midjourneyPage.midjourney')}</Typography>
+        <Typography variant="h2">
+          {t('midjourneyPage.midjourney')}
+          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+            Midjourney
+          </Typography>
+        </Typography>
       </Stack>
       <Card>
         <Box component="form" noValidate>
@@ -137,7 +144,7 @@ export default function Log() {
             p: (theme) => theme.spacing(0, 1, 0, 3)
           }}
         >
-          <Container>
+          <Container maxWidth="xl">
             <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
               <Button onClick={handleRefresh} startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}>
                 {t('midjourneyPage.refreshClearSearch')}
