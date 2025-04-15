@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import AuthGuard from 'utils/route-guard/AuthGuard';
@@ -17,6 +18,7 @@ import { SET_MENU } from 'store/actions';
 
 // assets
 import { Icon } from '@iconify/react';
+import ProfileDrawer from './ProfileDrawer';
 
 // styles
 export const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -88,6 +90,17 @@ const MainLayout = () => {
     dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
   };
 
+  // Profile drawer state
+  const [profileDrawerOpen, setProfileDrawerOpen] = useState(false);
+
+  const openProfileDrawer = () => {
+    setProfileDrawerOpen(true);
+  };
+
+  const closeProfileDrawer = () => {
+    setProfileDrawerOpen(false);
+  };
+
   return (
     <Box
       sx={{
@@ -119,7 +132,7 @@ const MainLayout = () => {
         }}
       >
         <Toolbar sx={{ px: { xs: 1.5, sm: 2, md: 3 }, minHeight: '64px', height: '64px' }}>
-          <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+          <Header handleLeftDrawerToggle={handleLeftDrawerToggle} toggleProfileDrawer={openProfileDrawer} />
         </Toolbar>
       </AppBar>
 
@@ -136,6 +149,9 @@ const MainLayout = () => {
           </AdminContainer>
         </AuthGuard>
       </Main>
+
+      {/* 用户信息抽屉 */}
+      <ProfileDrawer open={profileDrawerOpen} onClose={closeProfileDrawer} />
     </Box>
   );
 };

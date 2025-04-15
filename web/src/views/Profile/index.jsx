@@ -27,7 +27,6 @@ import { useSelector } from 'react-redux';
 import EmailModal from './component/EmailModal';
 import Turnstile from 'react-turnstile';
 import LarkIcon from 'assets/images/icons/lark.svg';
-import OidcIcon from 'assets/images/icons/oidc.svg';
 import { useTheme } from '@mui/material/styles';
 
 const validationSchema = Yup.object().shape({
