@@ -125,8 +125,8 @@ const ProfileDrawer = ({ open, onClose }) => {
             }}
           >
             <Typography variant="caption" color="primary">
-              {t('userPage.group')}: {userGroup?.[users.group]?.name || users.group}（{t('modelpricePage.RPM')}:
-              {userGroup?.[users.group]?.api_rate || 0}）
+              {t('userPage.group')}: {userGroup?.[users.group]?.name || users.group}（ {t('modelpricePage.rate')}:
+              {userGroup?.[users.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:{userGroup?.[users.group]?.api_rate || 'Unknown'}）
             </Typography>
           </Box>
         </Box>
