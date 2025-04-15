@@ -46,7 +46,7 @@ var OIDCAuthEnabled = false
 var EnableSafe = false
 
 // 默认使用系统自带关键词审查工具
-var SafeToolName = ""
+var SafeToolName = "Keyword"
 
 // 系统自带关键词审查默认字典
 var SafeKeyWords = []string{

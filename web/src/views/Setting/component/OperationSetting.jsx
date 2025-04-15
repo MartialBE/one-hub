@@ -66,13 +66,14 @@ const OperationSetting = () => {
   let [loading, setLoading] = useState(false);
   let [historyTimestamp, setHistoryTimestamp] = useState(now.getTime() / 1000 - 30 * 24 * 3600); // a month ago new Date().getTime() / 1000 + 3600
   const loadStatus = useContext(LoadStatusContext);
+  const [safeToolsLoading, setSafeToolsLoading] = useState(true);
 
   const getOptions = async () => {
     try {
       const res = await API.get('/api/option/');
       const { success, message, data } = res.data;
       if (success) {
-        let newInputs = {};
+        let newInputs = { ...inputs }; // 保留现有的 inputs 内容，包括 safeTools
         data.forEach((item) => {
           if (item.key === 'RechargeDiscount') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);
@@ -86,7 +87,8 @@ const OperationSetting = () => {
           }
           newInputs[item.key] = item.value;
         });
-        setInputs(newInputs);
+        // 确保不会覆盖 safeTools
+        setInputs(prev => ({ ...newInputs, safeTools: prev.safeTools }));
         setOriginInputs(newInputs);
       } else {
         showError(message);
@@ -97,25 +99,40 @@ const OperationSetting = () => {
   };
 
   const getSafeTools = async () => {
+    setSafeToolsLoading(true);
     try {
+      console.log('正在获取安全工具列表...');
       const res = await API.get('/api/option/safe_tools');
       const { success, message, data } = res.data;
       if (success) {
-        setInputs((prev) => ({
-          ...prev,
-          safeTools: data
-        }));
+        console.log('获取到的安全工具列表:', data);
+        setInputs((prev) => {
+          const newInputs = {
+            ...prev,
+            safeTools: data
+          };
+          console.log('更新后的inputs:', newInputs);
+          return newInputs;
+        });
       } else {
         showError(message);
       }
     } catch (error) {
-      return;
+      console.error('获取安全工具列表失败:', error);
+      showError('获取安全工具列表失败');
+    } finally {
+      setSafeToolsLoading(false);
     }
   };
 
   useEffect(() => {
-    getOptions().then();
-    getSafeTools().then();
+    const initData = async () => {
+      await getSafeTools();
+      await getOptions();
+      // 再次确认是否有 safeTools 数据
+      console.log('初始化后的数据:', inputs);
+    };
+    initData();
   }, []);
 
   const updateOption = async (key, value) => {
@@ -863,7 +880,7 @@ const OperationSetting = () => {
                 name="SafeToolName"
                 value={inputs.SafeToolName || ''}
                 label={t('setting_index.operationSettings.safetySettings.safeToolName.label')}
-                disabled={loading}
+                disabled={loading || safeToolsLoading}
                 onChange={(e) => {
                   setInputs((prev) => ({
                     ...prev,
@@ -871,7 +888,11 @@ const OperationSetting = () => {
                   }));
                 }}
               >
-                {inputs.safeTools?.map((tool) => (
+                {safeToolsLoading && <MenuItem value="">加载中...</MenuItem>}
+                {!safeToolsLoading && (!inputs.safeTools || inputs.safeTools.length === 0) && (
+                  <MenuItem value="">暂无安全工具</MenuItem>
+                )}
+                {inputs.safeTools && inputs.safeTools.map((tool) => (
                   <MenuItem key={tool} value={tool}>
                     {tool}
                   </MenuItem>
