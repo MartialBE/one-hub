@@ -88,7 +88,7 @@ const OperationSetting = () => {
           newInputs[item.key] = item.value;
         });
         // 确保不会覆盖 safeTools
-        setInputs(prev => ({ ...newInputs, safeTools: prev.safeTools }));
+        setInputs((prev) => ({ ...newInputs, safeTools: prev.safeTools }));
         setOriginInputs(newInputs);
       } else {
         showError(message);
@@ -101,17 +101,14 @@ const OperationSetting = () => {
   const getSafeTools = async () => {
     setSafeToolsLoading(true);
     try {
-      console.log('正在获取安全工具列表...');
       const res = await API.get('/api/option/safe_tools');
       const { success, message, data } = res.data;
       if (success) {
-        console.log('获取到的安全工具列表:', data);
         setInputs((prev) => {
           const newInputs = {
             ...prev,
             safeTools: data
           };
-          console.log('更新后的inputs:', newInputs);
           return newInputs;
         });
       } else {
@@ -129,8 +126,6 @@ const OperationSetting = () => {
     const initData = async () => {
       await getSafeTools();
       await getOptions();
-      // 再次确认是否有 safeTools 数据
-      console.log('初始化后的数据:', inputs);
     };
     initData();
   }, []);
@@ -889,14 +884,13 @@ const OperationSetting = () => {
                 }}
               >
                 {safeToolsLoading && <MenuItem value="">加载中...</MenuItem>}
-                {!safeToolsLoading && (!inputs.safeTools || inputs.safeTools.length === 0) && (
-                  <MenuItem value="">暂无安全工具</MenuItem>
-                )}
-                {inputs.safeTools && inputs.safeTools.map((tool) => (
-                  <MenuItem key={tool} value={tool}>
-                    {tool}
-                  </MenuItem>
-                ))}
+                {!safeToolsLoading && (!inputs.safeTools || inputs.safeTools.length === 0) && <MenuItem value="">暂无安全工具</MenuItem>}
+                {inputs.safeTools &&
+                  inputs.safeTools.map((tool) => (
+                    <MenuItem key={tool} value={tool}>
+                      {tool}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
 
