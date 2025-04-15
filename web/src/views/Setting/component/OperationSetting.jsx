@@ -11,7 +11,8 @@ import {
   TextField,
   Alert,
   Select,
-  MenuItem
+  MenuItem,
+  Chip
 } from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
@@ -851,7 +852,23 @@ const OperationSetting = () => {
         <Stack spacing={2}>
           <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
             <FormControlLabel
-              label={t('setting_index.operationSettings.safetySettings.enableSafe')}
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <span>{t('setting_index.operationSettings.safetySettings.enableSafe')}</span>
+                  <Chip
+                    label="Beta"
+                    size="small"
+                    color="error"
+                    sx={{
+                      height: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      backgroundColor: 'red',
+                      color: 'white'
+                    }}
+                  />
+                </Stack>
+              }
               control={
                 <Checkbox
                   checked={inputs.EnableSafe === 'true'}
