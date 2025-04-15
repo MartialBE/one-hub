@@ -119,7 +119,7 @@ func InitOptionMap() {
 	config.GlobalOption.RegisterBool("GeminiAPIEnabled", &config.GeminiAPIEnabled)
 	config.GlobalOption.RegisterBool("ClaudeAPIEnabled", &config.ClaudeAPIEnabled)
 
-	config.GlobalOption.RegisterCustom("DisableChannelKeywordsDisableChannelKeywords", func() string {
+	config.GlobalOption.RegisterCustom("DisableChannelKeywords", func() string {
 		return common.DisableChannelKeywordsInstance.GetKeywords()
 	}, func(value string) error {
 		common.DisableChannelKeywordsInstance.Load(value)
