@@ -86,6 +86,7 @@ func SetApiRouter(router *gin.Engine) {
 			optionRoute.PUT("/telegram/reload", controller.ReloadTelegramBot)
 			optionRoute.GET("/telegram/:id", controller.GetTelegramMenu)
 			optionRoute.DELETE("/telegram/:id", controller.DeleteTelegramMenu)
+			optionRoute.GET("/safe_tools", controller.GetSafeTools)
 		}
 
 		modelOwnedByRoute := apiRouter.Group("/model_ownedby")
