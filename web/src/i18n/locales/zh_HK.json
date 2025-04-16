@@ -269,7 +269,10 @@
     "loading": "加載中...",
     "quickStart": "快速開始",
     "quickStartTip": "當您點擊下面按鈕時，系統會自動創建一個sys_playground的令牌",
-    "ComparedWithYesterday": "相比昨日"
+    "ComparedWithYesterday": "相比昨日",
+    "usage": "使用率",
+    "RPM": "當前RPM",
+    "TPM": "當前TPM"
   },
   "description": "一站式的 OpenAI 接口\n整合各種 API 訪問方式\n一鍵部署，開箱即用",
   "echo 映射": "echo 映射",

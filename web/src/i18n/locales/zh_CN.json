@@ -74,7 +74,10 @@
     "loading": "加载中...",
     "quickStart": "快速开始",
     "quickStartTip": "当您点击下面按钮时，系统会自动创建一个sys_playground的令牌",
-    "ComparedWithYesterday": "相比昨日"
+    "ComparedWithYesterday": "相比昨日",
+    "usage": "使用率",
+    "RPM": "当前RPM",
+    "TPM": "当前TPM"
   },
   "analytics_index": {
     "startTime": "开始时间",

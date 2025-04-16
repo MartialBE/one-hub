@@ -269,7 +269,10 @@
     "loading": "読み込み中...",
     "quickStart": "クイックスタート",
     "quickStartTip": "下のボタンをクリックすると、システムはsys_playgroundのトークンを自動的に作成します",
-    "ComparedWithYesterday": "昨日と比較"
+    "ComparedWithYesterday": "昨日と比較",
+    "usage": "使用率",
+    "RPM": "現在のRPM",
+    "TPM": "現在のTPM"
   },
   "description": "All in one の OpenAI インターフェース\nさまざまな API アクセス方法を統合\nワンクリックで展開、即座に使用可能",
   "echo 映射": "エコーマッピング",

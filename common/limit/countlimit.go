@@ -16,17 +16,23 @@ var (
 	//go:embed countscript.lua
 	countLuaScript string
 	countScript    = redis.NewScript(countLuaScript)
+
+	//go:embed countgetscript.lua
+	countGetLuaScript string
+	countGetScript    = redis.NewScript(countGetLuaScript)
 )
 
 type CountLimiter struct {
-	rate   int
-	window time.Duration
+	rate       int
+	actualRate int
+	window     time.Duration
 }
 
-func NewCountLimiter(rate int, window time.Duration) *CountLimiter {
+func NewCountLimiter(rate int, actualRate int, window time.Duration) *CountLimiter {
 	return &CountLimiter{
-		rate:   rate,
-		window: window,
+		rate:       rate,
+		actualRate: actualRate,
+		window:     window,
 	}
 }
 
@@ -36,6 +42,34 @@ func (l *CountLimiter) Allow(keyPrefix string) bool {
 
 func (l *CountLimiter) AllowN(keyPrefix string, n int) bool {
 	return l.reserveN(context.Background(), keyPrefix, n)
+}
+
+func (l *CountLimiter) GetCurrentRate(keyPrefix string) (int, error) {
+	countKey := fmt.Sprintf(countFormat, keyPrefix)
+
+	result, err := redis.ScriptRunCtx(context.Background(),
+		countGetScript,
+		[]string{
+			countKey,
+		},
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	// 如果是redis.Nil错误，表示计数不存在，已用速率为0
+	if result == nil {
+		return 0, nil
+	}
+
+	count, ok := result.(int64)
+	if !ok {
+		return 0, fmt.Errorf("无法转换计数结果")
+	}
+
+	// count是当前已经使用的请求数量
+	return int(count), nil
 }
 
 func (l *CountLimiter) reserveN(ctx context.Context, keyPrefix string, n int) bool {
