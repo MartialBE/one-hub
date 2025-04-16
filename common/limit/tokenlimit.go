@@ -40,19 +40,25 @@ var (
 	//go:embed tokenscript.lua
 	tokenLuaScript string
 	tokenScript    = redis.NewScript(tokenLuaScript)
+
+	//go:embed tokengetscript.lua
+	tokenGetLuaScript string
+	tokenGetScript    = redis.NewScript(tokenGetLuaScript)
 )
 
 type TokenLimiter struct {
-	rate  int
-	burst int
+	rate       int
+	actualRate int
+	burst      int
 }
 
 // NewTokenLimiter returns a new TokenLimiter that allows events up to rate and permits
 // bursts of at most burst tokens.
-func NewTokenLimiter(rate, burst int) *TokenLimiter {
+func NewTokenLimiter(rate, actualRate, burst int) *TokenLimiter {
 	return &TokenLimiter{
-		rate:  rate,
-		burst: burst,
+		rate:       rate,
+		actualRate: actualRate,
+		burst:      burst,
 	}
 }
 
@@ -65,6 +71,51 @@ func (lim *TokenLimiter) Allow(keyPrefix string) bool {
 // Otherwise, use Reserve or Wait.
 func (lim *TokenLimiter) AllowN(keyPrefix string, n int) bool {
 	return lim.reserveN(context.Background(), keyPrefix, n)
+}
+
+// GetCurrentRate 获取当前速率使用情况，返回已使用的速率
+func (lim *TokenLimiter) GetCurrentRate(keyPrefix string) (int, error) {
+	tokenKey := fmt.Sprintf(tokenFormat, keyPrefix)
+	timestampKey := fmt.Sprintf(timestampFormat, keyPrefix)
+
+	resp, err := redis.ScriptRunCtx(context.Background(),
+		tokenGetScript,
+		[]string{
+			tokenKey,
+			timestampKey,
+		},
+		strconv.Itoa(lim.rate),
+		strconv.Itoa(lim.burst),
+		strconv.FormatInt(time.Now().Unix(), 10),
+	)
+
+	if errors.Is(err, redis.Nil) {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+
+	// 如果没有使用过令牌，则返回0
+	if resp == nil {
+		return 0, nil
+	}
+
+	currentTokens, ok := resp.(int64)
+	if !ok {
+		return 0, fmt.Errorf("无法转换令牌使用结果")
+	}
+
+	// 计算已使用的速率（总容量减去剩余令牌）
+	// 如果currentTokens等于burst，表示没有消耗任何令牌
+	if int(currentTokens) >= lim.burst {
+		return 0, nil
+	}
+
+	usedTokens := lim.burst - int(currentTokens)
+
+	// 返回每分钟的使用率
+	return usedTokens * 60 / TokenBurstMultiplier, nil
 }
 
 func (lim *TokenLimiter) reserveN(ctx context.Context, keyPrefix string, n int) bool {

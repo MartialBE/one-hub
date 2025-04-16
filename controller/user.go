@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/limit"
 	"one-api/common/utils"
 	"one-api/model"
 	"strconv"
@@ -232,6 +234,50 @@ func GetUser(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    user,
+	})
+}
+
+const API_LIMIT_KEY = "api-limiter:%d"
+
+func GetRateRealtime(c *gin.Context) {
+	id := c.GetInt("id")
+	user, err := model.GetUserById(id, false)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	limiter := model.GlobalUserGroupRatio.GetAPILimiter(user.Group)
+	key := fmt.Sprintf(API_LIMIT_KEY, id)
+	// 获取当前已使用的速率
+	rpm, err := limiter.GetCurrentRate(key)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	maxRPM := limit.GetMaxRate(limiter)
+	var usageRpmRate float64 = 0
+	if maxRPM > 0 {
+		usageRpmRate = math.Floor(float64(rpm)/float64(maxRPM)*100*100) / 100
+	}
+
+	data := map[string]interface{}{
+		"rpm":          rpm,
+		"maxRPM":       maxRPM,
+		"usageRpmRate": usageRpmRate,
+		"tpm":          0,
+		"maxTPM":       0,
+		"usageTpmRate": 0,
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    data,
 	})
 }
 

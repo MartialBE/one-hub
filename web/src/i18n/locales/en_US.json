@@ -271,7 +271,10 @@
     "loading": "Loading...",
     "quickStart": "Quick Start",
     "quickStartTip": "When you click the button below, the system will automatically create a sys_playground token",
-    "ComparedWithYesterday": "Compared with yesterday"
+    "ComparedWithYesterday": "Compared with yesterday",
+    "usage": "Usage",
+    "RPM": "Current RPM",
+    "TPM": "Current TPM"
   },
   "description": "All-in-one OpenAI interface\nIntegrates various API access methods\nOne-click deployment, ready to use",
   "echo 映射": "echo mapping",
