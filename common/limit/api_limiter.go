@@ -22,7 +22,7 @@ func NewAPILimiter(rpm int) RateLimiter {
 	return NewCountLimiter(
 		int(ratePerSecond),
 		rpm,
-		window,
+		1*time.Second,
 	)
 }
 
