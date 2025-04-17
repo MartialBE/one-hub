@@ -1233,5 +1233,24 @@
   },
   "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
     "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "Set the proxy address separately, supporting both http and socks5, for example: http://127.0.0.1:1080. You can use `%s` as a session identifier placeholder in the proxy address. When a placeholder is detected in the program, it will be replaced with a unique session identifier generated based on the Key."
+  },
+  "请输入版本号，例如：v3[__i18n_ally_root__]": {
+    "1": ""
+  },
+  "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5*，表示支持所有gpt-3": {
+        "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+          "5*是正确的，*gpt-3": {
+            "5是错误的": ""
+          }
+        }
+      }
+    }
+  },
+  "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx": {
+    "__i18n_ally_root__": {
+      "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+    }
   }
 }

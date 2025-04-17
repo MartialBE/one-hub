@@ -528,7 +528,8 @@
     "noPriceModelWarning": "存在未配置價格的模型，請及時配置價格：",
     "refreshButton": "刷新",
     "singleOperation": "單條操作",
-    "updatePricesButton": "更新價格"
+    "updatePricesButton": "更新價格",
+    "title": "模型價格"
   },
   "pricing_edit": {
     "channelType": "渠道類型",
@@ -973,7 +974,8 @@
     "task": "任務ID",
     "time": "耗時",
     "type": "類型",
-    "user": "用戶"
+    "user": "用戶",
+    "title": "非同步任務"
   },
   "telegramPage": {
     "action": "操作",
@@ -1259,9 +1261,25 @@
           "5是错误的": "請選擇該渠道所支持的模型，你也可以輸入通配符*來匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5開頭的模型，*號只能在最後一位使用，前面必須有字符，例如：gpt-3.5*是正確的，*gpt-3.5是錯誤的。"
         }
       }
+    },
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        "5*，表示支持所有gpt-3": {
+          "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+            "5*是正确的，*gpt-3": {
+              "5是错误的": ""
+            }
+          }
+        }
+      }
     }
   },
   "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx": {
-    "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "輸入後，會替換請求地址中的v1，例如：freeapi，則請求chat時會變成https://xxx.com/freeapi/chat/completions，如果需要禁用版本號，請輸入 disable"
+    "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "輸入後，會替換請求地址中的v1，例如：freeapi，則請求chat時會變成https://xxx.com/freeapi/chat/completions，如果需要禁用版本號，請輸入 disable",
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+      }
+    }
   }
 }

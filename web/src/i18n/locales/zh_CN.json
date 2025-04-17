@@ -428,6 +428,7 @@
     "keepSafe": "请妥善保管。如有泄漏，请立即重置。"
   },
   "pricingPage": {
+    "title": "模型价格",
     "currencyInfo1": "美元",
     "currencyInfo2": "：1 === $0.002 / 1K tokens",
     "currencyInfo3": "人民币",
@@ -1182,6 +1183,7 @@
   "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启": "使用代码执行功能，开启后，计算tokens不准确，建议个人使用开启",
   "是否启用代码执行": "是否启用代码执行",
   "taskPage": {
+    "title": "异步任务",
     "task": "任务ID",
     "subTime": "提交时间",
     "finishTime": "完成时间",

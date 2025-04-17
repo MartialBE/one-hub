@@ -31,6 +31,6 @@ ConfirmDialog.propTypes = {
   open: PropTypes.bool,
   title: PropTypes.string,
   action: PropTypes.node,
-  content: PropTypes.string,
+  content: PropTypes.node,
   onClose: PropTypes.func
 };

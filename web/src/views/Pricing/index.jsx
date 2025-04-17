@@ -186,12 +186,12 @@ const Pricing = () => {
   return (
     <Stack spacing={3}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h2">
-          模型价格
-          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+        <Stack direction="column" spacing={1}>
+          <Typography variant="h2">{t('pricingPage.title')}</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
             Price
           </Typography>
-        </Typography>
+        </Stack>
 
         <ButtonGroup variant="contained" aria-label="outlined small primary button group">
           <Button color="primary" onClick={() => handleOpenaddModal(null)} startIcon={<Icon icon="solar:add-circle-line-duotone" />}>

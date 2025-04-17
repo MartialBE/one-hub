@@ -151,12 +151,12 @@ export default function ModelPrice() {
 
   return (
     <Stack spacing={3} sx={{ padding: theme.spacing(3) }}>
-      <Typography variant="h2">
-        {t('modelpricePage.availableModels')}
-        <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+      <Stack direction="column" spacing={1}>
+        <Typography variant="h2">{t('modelpricePage.availableModels')}</Typography>
+        <Typography variant="subtitle1" color="text.secondary">
           Available Models
         </Typography>
-      </Typography>
+      </Stack>
 
       <Card sx={{ p: 2, backgroundColor: theme.palette.background.paper }}>
         <Stack spacing={2}>
@@ -340,4 +340,3 @@ function getOther(t, extraRatios) {
     </Stack>
   );
 }
-
