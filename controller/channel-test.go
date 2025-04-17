@@ -121,13 +121,6 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 			Stream: false,
 		}
 
-		if strings.HasPrefix(newModelName, "o1") || strings.HasPrefix(newModelName, "o3") {
-			testRequest.MaxCompletionTokens = 10
-		} else {
-			if !strings.Contains(newModelName, "gemini-2") {
-				testRequest.MaxTokens = 10
-			}
-		}
 		response, openAIErrorWithStatusCode = chatProvider.CreateChatCompletion(testRequest)
 	default:
 		return nil, errors.New("不支持的模型类型")

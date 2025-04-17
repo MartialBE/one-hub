@@ -22,19 +22,27 @@ func NewAPILimiter(rpm int) RateLimiter {
 		// 如果是rpm设定值较小，说明并发较小，使用固定窗口
 		return NewCountLimiter(rpm, rpm, window)
 	}
+	// 将RPM转换为每秒速率
+	ratePerSecond := float64(rpm) / 60
+	burst := int(ratePerSecond * TokenBurstMultiplier)
+	return NewTokenLimiter(
+		int(ratePerSecond),
+		rpm,
+		burst,
+	)
 	// 如果是rpm设定值较大，说明并发较大，限流敏感，使用滑动窗口灵活限流
-	return NewSlidingWindowLimiter(rpm, rpm, window)
+	//return NewSlidingWindowLimiter(rpm, rpm, window)
 }
 
 // GetMaxRate 获取限流器的最大速率（rpm）
 func GetMaxRate(limiter RateLimiter) int {
 	switch l := limiter.(type) {
 	case *CountLimiter:
-		return l.actualRate
+		return l.rpm
 	case *TokenLimiter:
-		return l.actualRate
+		return l.rpm
 	case *SlidingWindowLimiter:
-		return l.actualRate
+		return l.rpm
 	default:
 		return 0
 	}

@@ -32,8 +32,10 @@ import (
 )
 
 const (
-	tokenFormat     = "{%s}:tokens"
-	timestampFormat = "{%s}:ts"
+	tokenFormat      = "{%s}:tokens"
+	timestampFormat  = "{%s}:ts"
+	counterFormat    = "{%s}:counter" // 请求计数器key
+	lastMinuteFormat = "{%s}:lastmin" // 上一分钟时间戳key
 )
 
 var (
@@ -47,18 +49,18 @@ var (
 )
 
 type TokenLimiter struct {
-	rate       int
-	actualRate int
-	burst      int
+	rate  int //每秒的速率阈值
+	rpm   int //rpm阈值
+	burst int
 }
 
 // NewTokenLimiter returns a new TokenLimiter that allows events up to rate and permits
 // bursts of at most burst tokens.
-func NewTokenLimiter(rate, actualRate, burst int) *TokenLimiter {
+func NewTokenLimiter(rate, rpm, burst int) *TokenLimiter {
 	return &TokenLimiter{
-		rate:       rate,
-		actualRate: actualRate,
-		burst:      burst,
+		rate:  rate,
+		rpm:   rpm,
+		burst: burst,
 	}
 }
 
@@ -77,22 +79,28 @@ func (lim *TokenLimiter) AllowN(keyPrefix string, n int) bool {
 func (lim *TokenLimiter) GetCurrentRate(keyPrefix string) (int, error) {
 	tokenKey := fmt.Sprintf(tokenFormat, keyPrefix)
 	timestampKey := fmt.Sprintf(timestampFormat, keyPrefix)
+	counterKey := fmt.Sprintf(counterFormat, keyPrefix)
+	lastMinuteKey := fmt.Sprintf(lastMinuteFormat, keyPrefix)
 
 	resp, err := redis.ScriptRunCtx(context.Background(),
 		tokenGetScript,
 		[]string{
 			tokenKey,
 			timestampKey,
+			counterKey,
+			lastMinuteKey,
 		},
 		strconv.Itoa(lim.rate),
 		strconv.Itoa(lim.burst),
 		strconv.FormatInt(time.Now().Unix(), 10),
+		strconv.Itoa(lim.rpm),
 	)
 
 	if errors.Is(err, redis.Nil) {
 		return 0, nil
 	}
 	if err != nil {
+		logger.SysError(fmt.Sprintf("fail to get current rate: %s", err))
 		return 0, err
 	}
 
@@ -101,39 +109,52 @@ func (lim *TokenLimiter) GetCurrentRate(keyPrefix string) (int, error) {
 		return 0, nil
 	}
 
-	currentTokens, ok := resp.(int64)
-	if !ok {
+	// 尝试转换为接口数组
+	result, ok := resp.([]interface{})
+	if !ok || len(result) < 3 {
+		logger.SysError(fmt.Sprintf("fail to convert token result: %v", resp))
 		return 0, fmt.Errorf("无法转换令牌使用结果")
 	}
 
-	// 计算已使用的速率（总容量减去剩余令牌）
-	// 如果currentTokens等于burst，表示没有消耗任何令牌
-	if int(currentTokens) >= lim.burst {
-		return 0, nil
+	// 获取实时RPM（索引1是当前RPM）
+	var realTimeRPM int
+	switch v := result[1].(type) {
+	case int64:
+		realTimeRPM = int(v)
+	case int:
+		realTimeRPM = v
+	default:
+		logger.SysError(fmt.Sprintf("unexpected type for RPM result: %T", result[1]))
+		return 0, fmt.Errorf("无法转换RPM结果: %v", result[1])
 	}
 
-	usedTokens := lim.burst - int(currentTokens)
-
-	// 返回每分钟的使用率
-	return usedTokens * 60 / TokenBurstMultiplier, nil
+	// 返回实时RPM
+	if lim.rpm == 0 {
+		return 0, nil
+	}
+	return realTimeRPM, nil
 }
 
 func (lim *TokenLimiter) reserveN(ctx context.Context, keyPrefix string, n int) bool {
 	tokenKey := fmt.Sprintf(tokenFormat, keyPrefix)
 	timestampKey := fmt.Sprintf(timestampFormat, keyPrefix)
+	counterKey := fmt.Sprintf(counterFormat, keyPrefix)
+	lastMinuteKey := fmt.Sprintf(lastMinuteFormat, keyPrefix)
 
 	resp, err := redis.ScriptRunCtx(ctx,
 		tokenScript,
 		[]string{
 			tokenKey,
 			timestampKey,
+			counterKey,
+			lastMinuteKey,
 		},
-		[]string{
-			strconv.Itoa(lim.rate),
-			strconv.Itoa(lim.burst),
-			strconv.FormatInt(time.Now().Unix(), 10),
-			strconv.Itoa(n),
-		})
+		strconv.Itoa(lim.rate),
+		strconv.Itoa(lim.burst),
+		strconv.FormatInt(time.Now().Unix(), 10),
+		strconv.Itoa(n),
+		strconv.Itoa(lim.rpm),
+	)
 	// redis allowed == false
 	// Lua boolean false -> r Nil bulk reply
 	if errors.Is(err, redis.Nil) {
@@ -148,13 +169,14 @@ func (lim *TokenLimiter) reserveN(ctx context.Context, keyPrefix string, n int) 
 		return false
 	}
 
-	code, ok := resp.(int64)
-	if !ok {
-		logger.SysError(fmt.Sprintf("fail to eval redis script: %v, use in-process limiter for rescue", resp))
+	// Lua脚本返回的是布尔值，在Redis中布尔true会转为1，false会返回nil
+	switch v := resp.(type) {
+	case int64:
+		return v == 1
+	case bool:
+		return v
+	default:
+		logger.SysError(fmt.Sprintf("unexpected return type from redis script: %T %v, use in-process limiter for rescue", resp, resp))
 		return false
 	}
-
-	// redis allowed == true
-	// Lua boolean true -> r integer reply with value of 1
-	return code == 1
 }
