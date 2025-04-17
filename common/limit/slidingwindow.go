@@ -24,17 +24,17 @@ var (
 
 // SlidingWindowLimiter 滑动窗口限流器
 type SlidingWindowLimiter struct {
-	rate       int           // 最大请求速率
-	actualRate int           // 实际请求速率
-	window     time.Duration // 窗口大小
+	rate   int           // 最大请求速率
+	rpm    int           // 系统设置的RPM阈值
+	window time.Duration // 窗口大小
 }
 
 // NewSlidingWindowLimiter 创建新的滑动窗口限流器
-func NewSlidingWindowLimiter(rate int, actualRate int, window time.Duration) *SlidingWindowLimiter {
+func NewSlidingWindowLimiter(rate int, rpm int, window time.Duration) *SlidingWindowLimiter {
 	return &SlidingWindowLimiter{
-		rate:       rate,
-		actualRate: actualRate,
-		window:     window,
+		rate:   rate,
+		rpm:    rpm,
+		window: window,
 	}
 }
 
