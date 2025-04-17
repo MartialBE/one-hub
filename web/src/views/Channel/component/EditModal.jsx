@@ -484,7 +484,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     textAlign: 'right'
                   }}
                 >
-                  <Switch checked={batchAdd} onChange={(e) => setBatchAdd(e.target.checked)} />
+                  <Switch checked={Boolean(batchAdd)} onChange={(e) => setBatchAdd(e.target.checked)} />
                   {t('channel_edit.batchAdd')}
                 </Container>
               )}
@@ -906,9 +906,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     control={
                       <Switch
                         disabled={hasTag}
-                        checked={values.only_chat === true}
-                        onClick={() => {
-                          setFieldValue('only_chat', !values.only_chat);
+                        checked={Boolean(values.only_chat)}
+                        onChange={(event) => {
+                          setFieldValue('only_chat', event.target.checked);
                         }}
                       />
                     }
