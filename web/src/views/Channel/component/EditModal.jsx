@@ -42,8 +42,9 @@ import { useTranslation } from 'react-i18next';
 import useCustomizeT from 'hooks/useCustomizeT';
 
 import { PreCostType } from '../type/other';
-import ModelMappingInput from './ModelMappingInput';
-import ModelHeadersInput from './ModelHeadersInput';
+// import ModelMappingInput from './ModelMappingInput';
+// import ModelHeadersInput from './ModelHeadersInput';
+import MapInput from './MapInput';
 
 import pluginList from '../type/Plugin.json';
 import { Icon } from '@iconify/react';
@@ -766,13 +767,18 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                   error={Boolean(touched.model_mapping && errors.model_mapping)}
                   sx={{ ...theme.typography.otherInput }}
                 >
-                  <ModelMappingInput
-                    value={values.model_mapping}
+                  <MapInput
+                    mapValue={values.model_mapping}
                     onChange={(newValue) => {
                       setFieldValue('model_mapping', newValue);
                     }}
                     disabled={hasTag}
                     error={Boolean(touched.model_mapping && errors.model_mapping)}
+                    label={{
+                      keyName: customizeT(inputLabel.model_mapping),
+                      valueName: customizeT(inputPrompt.model_mapping),
+                      name: customizeT(inputLabel.model_mapping)
+                    }}
                   />
                   {touched.model_mapping && errors.model_mapping ? (
                     <FormHelperText error id="helper-tex-channel-model_mapping-label">
@@ -789,13 +795,18 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                   error={Boolean(touched.model_headers && errors.model_headers)}
                   sx={{ ...theme.typography.otherInput }}
                 >
-                  <ModelHeadersInput
-                    value={values.model_headers}
+                  <MapInput
+                    mapValue={values.model_headers}
                     onChange={(newValue) => {
                       setFieldValue('model_headers', newValue);
                     }}
                     disabled={hasTag}
                     error={Boolean(touched.model_headers && errors.model_headers)}
+                    label={{
+                      keyName: customizeT(inputLabel.model_headers),
+                      valueName: customizeT(inputPrompt.model_headers),
+                      name: customizeT(inputLabel.model_headers)
+                    }}
                   />
                   {touched.model_headers && errors.model_headers ? (
                     <FormHelperText error id="helper-tex-channel-model_headers-label">

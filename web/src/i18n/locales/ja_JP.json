@@ -95,7 +95,10 @@
     "requiredModels": "モデルを空にすることはできません",
     "requiredName": "名前は必須です",
     "validJson": "有効な JSON 文字列である必要があります",
-    "copyModels": "モデルをコピーします"
+    "copyModels": "モデルをコピーします",
+    "mapAdd": "{{name}}を追加",
+    "mapAddByJson": "JSONを使用して{{name}}を追加します。",
+    "mapJsonInput": "JSON 入力"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
@@ -203,7 +206,9 @@
     "tagChannelsError": "アクション{{action}}のラベルチャネルが失敗しました: {{message}}",
     "tagChannelsSuccess": "タグチャネル{{action}}が成功しました",
     "weightUpdateError": "重みの更新に失敗しました：{{message}}",
-    "weightUpdateSuccess": "重みが更新されました"
+    "weightUpdateSuccess": "重みが更新されました",
+    "key": "鍵",
+    "keyRequired": "キーを入力してください。"
   },
   "common": {
     "again": "再試行 ({{count}})",
@@ -241,7 +246,8 @@
     "unknown": "未知",
     "verificationCode": "検証コード",
     "deleteError": "削除に失敗しました：{{message}}",
-    "deleteSuccess": "削除しました！"
+    "deleteSuccess": "削除しました！",
+    "jsonFormatError": "JSON形式が間違っています"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -416,7 +422,9 @@
     "inputAudioTokensRatio": "オーディオ入力倍率",
     "other": "その他",
     "outputAudioTokensRatio": "オーディオ出力倍率",
-    "rate": "倍率"
+    "rate": "倍率",
+    "RPM": "APIレート",
+    "free": "無料"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",

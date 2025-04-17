@@ -95,7 +95,10 @@
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
     "validJson": "Must be a valid JSON string",
-    "copyModels": "Copy model"
+    "copyModels": "Copy model",
+    "mapAdd": "Add {{name}}",
+    "mapAddByJson": "Add {{name}} through JSON",
+    "mapJsonInput": "JSON input"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -243,7 +246,8 @@
     "unknown": "unknown",
     "verificationCode": "Verification code",
     "deleteError": "Deletion failed: {{message}}",
-    "deleteSuccess": "Delete successful!"
+    "deleteSuccess": "Delete successful!",
+    "jsonFormatError": "JSON format error"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -418,7 +422,9 @@
     "inputAudioTokensRatio": "Audio input ratio",
     "other": "Other",
     "outputAudioTokensRatio": "Audio output ratio",
-    "rate": "Rate"
+    "rate": "Rate",
+    "RPM": "API rate",
+    "free": "Free"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",
