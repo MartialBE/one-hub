@@ -9,15 +9,17 @@ import Chart from 'react-apexcharts';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
-import { useTranslation } from 'react-i18next';
-import { IconTrendingDown, IconTrendingUp, IconEqual } from '@tabler/icons-react';
+import { Icon } from '@iconify/react';
 import { renderNumber } from 'utils/common';
+
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   borderRadius: '16px',
   border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
   boxShadow: theme.palette.mode === 'dark' ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
   overflow: 'hidden',
-  height: '100px'
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column'
 }));
 
 const getChartOptions = (theme, type = 'default') => {
@@ -105,7 +107,6 @@ const getChartOptions = (theme, type = 'default') => {
 
 const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, lastDayValue, type = 'default' }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
   const customChartData = chartData
     ? {
         ...chartData,
@@ -121,123 +122,124 @@ const StatisticalLineChartCard = ({ isLoading, title, chartData, todayValue, las
               show: false
             },
             padding: {
-              right: 15
+              right: 10
             }
           }
         }
       }
     : null;
 
+  // 获取趋势图标
+  const getTrendIcon = (percentChange) => {
+    if (percentChange > 0) return 'mdi:trending-up';
+    if (percentChange < 0) return 'mdi:trending-down';
+    return 'mdi:trending-neutral';
+  };
+
+  // 获取趋势颜色
+  const getTrendColor = (percentChange) => {
+    if (percentChange > 0) return theme.palette.error.main;
+    if (percentChange < 0) return theme.palette.success.main;
+    return theme.palette.info.main;
+  };
+
+  // 计算百分比变化
+  const getPercentChange = () => {
+    const todayValueNum = parseFloat((todayValue || '0').toString().replace('$', ''));
+    const lastDayValueNum = parseFloat((lastDayValue || '0').toString().replace('$', ''));
+
+    if (todayValueNum === 0 && lastDayValueNum === 0) return 0;
+    if (todayValueNum === 0 && lastDayValueNum > 0) return -100;
+    if (todayValueNum > 0 && lastDayValueNum === 0) return 100;
+    return Math.round(((todayValueNum - lastDayValueNum) / lastDayValueNum) * 100);
+  };
+
+  const percentChange = lastDayValue !== undefined ? getPercentChange() : 0;
+  const trendIcon = getTrendIcon(percentChange);
+  const trendColor = getTrendColor(percentChange);
+
   return (
     <>
       {isLoading ? (
         <SkeletonTotalOrderCard />
       ) : (
-        <CardWrapper border={false} content={false} sx={{ height: '100%' }}>
+        <CardWrapper border={false} content={false}>
           <Box
             sx={{
-              p: 2.5,
-              height: '100%'
+              p: 2,
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
-            <Grid container alignItems="center" spacing={2} sx={{ height: '100%' }}>
-              <Grid item xs>
-                <Typography
-                  variant="h3"
-                  sx={{
-                    fontSize: '24px',
-                    fontWeight: 500,
-                    color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.87)',
-                    mb: 0.5
-                  }}
-                >
-                  {renderNumber(todayValue || 0)}
-                </Typography>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <Grid container justifyContent="space-between" alignItems="center">
+                  <Grid item>
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        fontSize: '22px',
+                        fontWeight: 500,
+                        color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.87)'
+                      }}
+                    >
+                      {renderNumber(todayValue || 0)}
+                    </Typography>
+                  </Grid>
+                  {lastDayValue !== undefined && (
+                    <Grid item>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+                          borderRadius: '12px',
+                          py: 0.5,
+                          px: 1
+                        }}
+                      >
+                        <Icon icon={trendIcon} style={{ color: trendColor, fontSize: '16px', marginRight: '4px' }} />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: trendColor,
+                            fontSize: '12px',
+                            fontWeight: 500
+                          }}
+                        >
+                          {`${Math.abs(percentChange)}%`}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              </Grid>
 
+              <Grid item xs={12}>
                 <Typography
                   variant="body2"
                   sx={{
-                    fontSize: '13px',
+                    fontSize: '12px',
                     color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
                   }}
                 >
                   {title}
                 </Typography>
-                <Divider sx={{ mt: 1.5, mb: 1.5 }} />
-                {lastDayValue !== undefined && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      mt: 0.5
-                    }}
-                  >
-                    {(() => {
-                      // 去除美元符号进行数值比较
-                      const todayValueNum = parseFloat((todayValue || '0').toString().replace('$', ''));
-                      const lastDayValueNum = parseFloat((lastDayValue || '0').toString().replace('$', ''));
-
-                      // 计算变化百分比
-                      const getPercentChange = () => {
-                        if (todayValueNum === 0 && lastDayValueNum === 0) return 0;
-                        if (todayValueNum === 0 && lastDayValueNum > 0) return -100;
-                        if (todayValueNum > 0 && lastDayValueNum === 0) return 100;
-                        return Math.round(((todayValueNum - lastDayValueNum) / lastDayValueNum) * 100);
-                      };
-
-
-                      const percentChange = getPercentChange();
-                      const isIncrease = percentChange >= 0;
-                      let color = isIncrease ? 'error.main' : 'success.main';
-                      let Icon = isIncrease ? IconTrendingUp : IconTrendingDown;
-                      if (percentChange === 0) {
-                        color = 'info.main';
-                        Icon = IconEqual;
-                      }
-
-                      return (
-                        <Typography
-                          component="span"
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            color,
-                            fontSize: '14px'
-                          }}
-                        >
-                          <Box component="span" sx={{ ml: 0.5, color: color, fontSize: '14px' }}>
-                            {t('dashboard_index.ComparedWithYesterday')}
-                          </Box>
-                          <Box
-                            component="span"
-                            sx={{
-                              mr: 1,
-                              ml: 1,
-                              display: 'inline-flex'
-                            }}
-                          >
-                            <Icon />
-                          </Box>
-                          {`${Math.abs(percentChange)}%`}
-                        </Typography>
-                      );
-                    })()}
-                  </Box>
-                )}
-              </Grid>
-
-              <Grid item xs={6}>
-                <Box
-                  sx={{
-                    height: '70px',
-                    position: 'relative',
-                    mr: 1
-                  }}
-                >
-                  {customChartData && <Chart {...customChartData} height="100%" width="100%" />}
-                </Box>
               </Grid>
             </Grid>
+
+            <Divider sx={{ my: 1.5 }} />
+
+            <Box
+              sx={{
+                mt: 'auto',
+                height: '45px',
+                width: '100%'
+              }}
+            >
+              {customChartData && <Chart {...customChartData} height="100%" width="100%" />}
+            </Box>
           </Box>
         </CardWrapper>
       )}
