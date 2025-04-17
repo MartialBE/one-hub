@@ -23,16 +23,16 @@ var (
 )
 
 type CountLimiter struct {
-	rate       int
-	actualRate int
-	window     time.Duration
+	rate   int
+	rpm    int
+	window time.Duration
 }
 
-func NewCountLimiter(rate int, actualRate int, window time.Duration) *CountLimiter {
+func NewCountLimiter(rate int, rpm int, window time.Duration) *CountLimiter {
 	return &CountLimiter{
-		rate:       rate,
-		actualRate: actualRate,
-		window:     window,
+		rate:   rate,
+		rpm:    rpm,
+		window: window,
 	}
 }
 
