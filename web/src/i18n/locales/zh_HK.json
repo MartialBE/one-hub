@@ -99,7 +99,9 @@
     "copyModels": "複製模型",
     "mapAdd": "新增{{name}}",
     "mapAddByJson": "透過 JSON 添加{{name}}",
-    "mapJsonInput": "JSON 輸入"
+    "mapJsonInput": "JSON 輸入",
+    "listJsonError": "JSON格式錯誤，請確保輸入的是陣列格式。",
+    "listJsonHelperText": "請輸入JSON數組格式，例如：[\"項目1\", \"項目2\", \"項目3\"]"
   },
   "channel_index": {
     "AzureApiVersion": "Azure 版本號",
@@ -1237,28 +1239,45 @@
     "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "單獨設置代理地址，支持http和socks5，例如：http://127.0.0.1:1080,代理地址中可以通過 `%s` 作為會話標識佔位符，程式中檢測到有占位符會根據Key生成唯一會話標識符進行替換"
   },
   "用于测试使用的模型，为空时无法测速,如：gpt-3": {
-    "5-turbo，仅支持chat模型": "用於測試使用的模型，為空時無法測速，例如：gpt-3.5-turbo，僅支持chat模型"
+    "5-turbo，仅支持chat模型": "用於測試使用的模型，為空時無法測速，例如：gpt-3.5-turbo，僅支持chat模型",
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        "5-turbo，仅支持chat模型": ""
+      }
+    }
   },
   "请参考wiki中的文档获取key": {
     " https://github": {
       "com/MartialBE/one-hub/wiki/VertexAI": "請參考wiki中的文件獲取key。https://github.com/MartialBE/one-hub/wiki/VertexAI"
+    },
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        " https://github": {
+          "com/MartialBE/one-hub/wiki/VertexAI": ""
+        }
+      }
     }
   },
   "请输入你部署的Ollama地址，例如：http://127": {
     "0": {
       "0": {
-        "1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息": "請輸入您部署的Ollama地址，例如：http://127.0.0.1:11434，如果您使用了Cloudflare Zero Trust，可以在下方插件填入授權資訊。"
+        "1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息": "請輸入您部署的Ollama地址，例如：http://127.0.0.1:11434，如果您使用了Cloudflare Zero Trust，可以在下方插件填入授權資訊"
       }
     }
   },
   "请输入版本号，例如：v3": {
-    "1": "請輸入版本號，例如：v3.1"
+    "1": "請輸入版本號，例如：v3.1",
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        "1": ""
+      }
+    }
   },
   "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3": {
     "5*，表示支持所有gpt-3": {
       "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
         "5*是正确的，*gpt-3": {
-          "5是错误的": "請選擇該渠道所支持的模型，你也可以輸入通配符*來匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5開頭的模型，*號只能在最後一位使用，前面必須有字符，例如：gpt-3.5*是正確的，*gpt-3.5是錯誤的。"
+          "5是错误的": "請選擇該渠道所支持的模型，你亦可以輸入通配符*來匹配模型，例如：gpt-3.5*，表示支持所有 gpt-3.5 開頭的模型，*號只能在最後一位使用，前面必須有字符，例如：gpt-3.5*是正確的，*gpt-3.5是錯誤的。"
         }
       }
     },
@@ -1270,16 +1289,34 @@
               "5是错误的": ""
             }
           }
+        },
+        "__i18n_ally_root__": {
+          "__i18n_ally_root__": {
+            "5*，表示支持所有gpt-3": {
+              "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+                "5*是正确的，*gpt-3": {
+                  "5是错误的": ""
+                }
+              }
+            }
+          }
         }
       }
     }
   },
   "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx": {
-    "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "輸入後，會替換請求地址中的v1，例如：freeapi，則請求chat時會變成https://xxx.com/freeapi/chat/completions，如果需要禁用版本號，請輸入 disable",
+    "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "輸入後，會替換請求地址中的v1，例如：freeapi，則請求chat時會變成https://xxx.com/freeapi/chat/completions。如果需要禁用版本號，請輸入 disable。",
     "__i18n_ally_root__": {
       "__i18n_ally_root__": {
-        "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+        "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "",
+        "__i18n_ally_root__": {
+          "__i18n_ally_root__": {
+            "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+          }
+        }
       }
     }
-  }
+  },
+  "禁用流式的模型": "停用流動式的模型",
+  "这里填写禁用流式的模型，注意：如果填写了禁用流式的模型，那么这些模型在流式请求时会跳过该渠道": "呢度填寫禁用流式嘅模型，注意：如果填寫咗禁用流式嘅模型，咁就會喺流式請求時跳過呢個渠道。"
 }

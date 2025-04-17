@@ -42,9 +42,8 @@ import { useTranslation } from 'react-i18next';
 import useCustomizeT from 'hooks/useCustomizeT';
 
 import { PreCostType } from '../type/other';
-// import ModelMappingInput from './ModelMappingInput';
-// import ModelHeadersInput from './ModelHeadersInput';
 import MapInput from './MapInput';
+import ListInput from './ListInput';
 
 import pluginList from '../type/Plugin.json';
 import { Icon } from '@iconify/react';
@@ -87,6 +86,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
   const [hasTag, setHasTag] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const removeDuplicates = (array) => [...new Set(array)];
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -238,6 +238,10 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
       } catch (error) {
         showError('Error parsing model_headers:' + error.message);
       }
+    }
+
+    if (values.disabled_stream) {
+      values.disabled_stream = removeDuplicates(values.disabled_stream);
     }
 
     // 获取现有的模型 ID
@@ -817,6 +821,27 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                   )}
                 </FormControl>
               )}
+              {inputPrompt.disabled_stream && (
+                <FormControl
+                  fullWidth
+                  error={Boolean(touched.disabled_stream && errors.disabled_stream)}
+                  sx={{ ...theme.typography.otherInput }}
+                >
+                  <ListInput
+                    listValue={values.disabled_stream}
+                    onChange={(newValue) => {
+                      setFieldValue('disabled_stream', newValue);
+                    }}
+                    disabled={hasTag}
+                    error={Boolean(touched.disabled_stream && errors.disabled_stream)}
+                    label={{
+                      name: customizeT(inputLabel.disabled_stream),
+                      itemName: customizeT(inputPrompt.disabled_stream)
+                    }}
+                  />
+                </FormControl>
+              )}
+
               <FormControl fullWidth error={Boolean(touched.proxy && errors.proxy)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-proxy-label">{customizeT(inputLabel.proxy)}</InputLabel>
                 <OutlinedInput

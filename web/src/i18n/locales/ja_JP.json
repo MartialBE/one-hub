@@ -98,7 +98,9 @@
     "copyModels": "モデルをコピーします",
     "mapAdd": "{{name}}を追加",
     "mapAddByJson": "JSONを使用して{{name}}を追加します。",
-    "mapJsonInput": "JSON 入力"
+    "mapJsonInput": "JSON 入力",
+    "listJsonError": "JSON形式が間違っています。入力が配列形式であることを確認してください。",
+    "listJsonHelperText": "JSON配列形式を入力してください。例：[\"プロジェクト1\", \"プロジェクト2\", \"プロジェクト3\"]"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
@@ -528,7 +530,8 @@
     "noPriceModelWarning": "未設定の価格モデルがあります。価格を設定してください：",
     "refreshButton": "更新",
     "singleOperation": "シングル操作",
-    "updatePricesButton": "価格を更新"
+    "updatePricesButton": "価格を更新",
+    "title": "モデル価格"
   },
   "pricing_edit": {
     "channelType": "チャンネルの種類",
@@ -973,7 +976,8 @@
     "task": "タスクID",
     "time": "時間がかかる",
     "type": "タイプ",
-    "user": "ユーザー"
+    "user": "ユーザー",
+    "title": "非同期タスク"
   },
   "telegramPage": {
     "action": "アクション",
@@ -1266,5 +1270,26 @@
       },
       "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
     }
-  }
+  },
+  "用于测试使用的模型，为空时无法测速,如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5-turbo，仅支持chat模型": ""
+    }
+  },
+  "禁用流式的模型": "フロー型モデルを無効にする",
+  "请参考wiki中的文档获取key": {
+    "__i18n_ally_root__": {
+      " https://github": {
+        "com/MartialBE/one-hub/wiki/VertexAI": ""
+      }
+    }
+  },
+  "请输入你部署的Ollama地址，例如：http://127[__i18n_ally_root__]": {
+    "0": {
+      "0": {
+        "1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息": ""
+      }
+    }
+  },
+  "这里填写禁用流式的模型，注意：如果填写了禁用流式的模型，那么这些模型在流式请求时会跳过该渠道": "ここには、ストリーミングを無効にするモデルを記入してください。注意：ストリーミングを無効にするモデルを記入した場合、これらのモデルはストリームリクエスト時にそのチャンネルをスキップします。"
 }

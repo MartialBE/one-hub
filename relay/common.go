@@ -117,6 +117,8 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
 	group := c.GetString("token_group")
 	skipOnlyChat := c.GetBool("skip_only_chat")
+	isStream := c.GetBool("is_stream")
+
 	var filters []model.ChannelsFilterFunc
 	if skipOnlyChat {
 		filters = append(filters, model.FilterOnlyChat())
@@ -131,6 +133,10 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		if allowTypes, ok := types.([]int); ok {
 			filters = append(filters, model.FilterChannelTypes(allowTypes))
 		}
+	}
+
+	if isStream {
+		filters = append(filters, model.FilterDisabledStream(modelName))
 	}
 
 	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
