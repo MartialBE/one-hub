@@ -123,7 +123,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		Model:         request.Model,
 		Messages:      make([]Message, 0),
 		System:        "",
-		MaxTokens:     defaultMaxTokens(request.MaxTokens),
+		MaxTokens:     request.MaxTokens,
 		StopSequences: nil,
 		Temperature:   request.Temperature,
 		TopP:          request.TopP,
@@ -180,21 +180,65 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		claudeRequest.ToolChoice = ConvertToolChoice(toolType, toolFunc)
 	}
 
+	if claudeRequest.MaxTokens == 0 {
+		claudeRequest.MaxTokens = config.ClaudeSettingsInstance.GetDefaultMaxTokens(request.Model)
+	}
+
 	// 如果是3-7 默认开启thinking
-	if strings.Contains(request.Model, "claude-3-7-sonnet") && request.OneOtherArg == "thinking" {
-		if claudeRequest.MaxTokens == 0 {
-			claudeRequest.MaxTokens = 8192
-		}
-		// BudgetTokens 为 max_tokens 的 80%
-		claudeRequest.Thinking = &Thinking{
-			Type:         "enabled",
-			BudgetTokens: int(float64(claudeRequest.MaxTokens) * 0.8),
+	if strings.Contains(request.Model, "claude-3-7-sonnet") && (request.OneOtherArg == "thinking" || request.Reasoning != nil) {
+		var opErr *types.OpenAIErrorWithStatusCode
+		claudeRequest.MaxTokens, claudeRequest.Thinking, opErr = getThinking(claudeRequest.MaxTokens, request.Reasoning)
+
+		if opErr != nil {
+			return nil, opErr
 		}
 
 		claudeRequest.TopP = nil
 	}
 
 	return &claudeRequest, nil
+}
+
+func getThinking(maxTokens int, reasoning *types.ChatReasoning) (newMaxtokens int, thinking *Thinking, err *types.OpenAIErrorWithStatusCode) {
+	newMaxtokens = maxTokens
+	thinking = &Thinking{
+		Type: "enabled",
+	}
+
+	if reasoning == nil || (reasoning.MaxTokens == 0 && reasoning.Effort == "") {
+		thinking.BudgetTokens = int(float64(maxTokens) * config.ClaudeSettingsInstance.BudgetTokensPercentage)
+	} else if reasoning.MaxTokens > 0 {
+		if reasoning.MaxTokens < 1024 {
+			err = common.StringErrorWrapper("budget_token must be greater than 1024", "budget_tokens_too_small", http.StatusBadRequest)
+			return
+		}
+
+		if reasoning.MaxTokens > maxTokens {
+			err = common.StringErrorWrapper(fmt.Sprintf("budget_token cannot be greater than the max_token, max_token: %d, budget_token: %d", maxTokens, reasoning.MaxTokens), "budget_tokens_too_large", http.StatusBadRequest)
+			return
+		}
+		thinking.BudgetTokens = reasoning.MaxTokens
+	} else {
+		switch reasoning.Effort {
+		case "low":
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.2)
+		case "medium":
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.5)
+		default:
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.8)
+		}
+	}
+
+	// 如果低于1024,则设置为1024
+	if thinking.BudgetTokens < 1024 {
+		thinking.BudgetTokens = 1024
+	}
+
+	if newMaxtokens <= thinking.BudgetTokens {
+		newMaxtokens = 1280
+	}
+
+	return
 }
 
 func ConvertToolChoice(toolType, toolFunc string) *ToolChoice {

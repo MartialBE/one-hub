@@ -660,6 +660,18 @@
         "info": "配置禁用通道关键词，每行一个关键词。",
         "save": "保存禁用通道关键词设置"
       },
+      "claudeSettings": {
+        "title": "Claude设置",
+        "budgetTokensPercentage": {
+          "label": "默认思考Token百分比",
+          "placeholder": "请输入默认思考Token百分比"
+        },
+        "defaultMaxTokens": {
+          "label": "默认MaxToken数量",
+          "placeholder": "请输入默认MaxToken数量,json格式, default代表默认值， 例如：{\"default\": 1000, \"claude-3-7-sonnet-latest\": 128000}"
+        },
+        "save": "保存Claude设置"
+      },
       "safetySettings": {
         "title": "系统安全设置",
         "enableSafe": "开启 Prompt 安全检查",

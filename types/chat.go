@@ -218,10 +218,16 @@ type ChatCompletionRequest struct {
 	Audio               *ChatAudio                    `json:"audio,omitempty"`
 	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
 	Prediction          any                           `json:"prediction,omitempty"`
+	WebSearchOptions    *WebSearchOptions             `json:"web_search_options,omitempty"`
 
-	WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
+	Reasoning *ChatReasoning `json:"reasoning,omitempty"`
 
 	OneOtherArg string `json:"-"`
+}
+
+type ChatReasoning struct {
+	MaxTokens int    `json:"max_tokens,omitempty"`
+	Effort    string `json:"effort,omitempty"`
 }
 
 type WebSearchOptions struct {
