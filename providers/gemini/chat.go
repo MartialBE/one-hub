@@ -168,6 +168,12 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		geminiRequest.GenerationConfig.ResponseModalities = []string{"Text", "Image"}
 	}
 
+	if request.Reasoning != nil {
+		geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
+			ThinkingBudget: request.Reasoning.MaxTokens,
+		}
+	}
+
 	functions := request.GetFunctions()
 
 	if functions != nil {
