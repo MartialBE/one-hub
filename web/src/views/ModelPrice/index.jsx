@@ -96,10 +96,14 @@ export default function ModelPrice() {
         const formatPrice = (value, type) => {
           if (typeof value === 'number') {
             let nowUnit = '';
+            let isM = unit === 'M';
+            if (type === 'times') {
+              isM = false;
+            }
             if (type === 'tokens') {
               nowUnit = `/ 1${unit}`;
             }
-            return ValueFormatter(value, true, unit === 'M') + nowUnit;
+            return ValueFormatter(value, true, isM) + nowUnit;
           }
           return value;
         };
@@ -201,9 +205,6 @@ export default function ModelPrice() {
                       ) : (
                         <Label color="success">{t('modelpricePage.free')}</Label>
                       )}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('modelpricePage.RPM')}：<Label color="info">{group.api_rate} RPM</Label>
                     </Typography>
                   </Stack>
                 </Stack>
