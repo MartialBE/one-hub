@@ -29,6 +29,8 @@ func Relay(c *gin.Context) {
 		return
 	}
 
+	c.Set("is_stream", relay.IsStream())
+
 	if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusServiceUnavailable)
 		relay.HandleError(openaiErr)

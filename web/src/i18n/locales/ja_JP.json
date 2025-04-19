@@ -95,7 +95,12 @@
     "requiredModels": "モデルを空にすることはできません",
     "requiredName": "名前は必須です",
     "validJson": "有効な JSON 文字列である必要があります",
-    "copyModels": "モデルをコピーします"
+    "copyModels": "モデルをコピーします",
+    "mapAdd": "{{name}}を追加",
+    "mapAddByJson": "JSONを使用して{{name}}を追加します。",
+    "mapJsonInput": "JSON 入力",
+    "listJsonError": "JSON形式が間違っています。入力が配列形式であることを確認してください。",
+    "listJsonHelperText": "JSON配列形式を入力してください。例：[\"プロジェクト1\", \"プロジェクト2\", \"プロジェクト3\"]"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
@@ -203,7 +208,9 @@
     "tagChannelsError": "アクション{{action}}のラベルチャネルが失敗しました: {{message}}",
     "tagChannelsSuccess": "タグチャネル{{action}}が成功しました",
     "weightUpdateError": "重みの更新に失敗しました：{{message}}",
-    "weightUpdateSuccess": "重みが更新されました"
+    "weightUpdateSuccess": "重みが更新されました",
+    "key": "鍵",
+    "keyRequired": "キーを入力してください。"
   },
   "common": {
     "again": "再試行 ({{count}})",
@@ -241,7 +248,8 @@
     "unknown": "未知",
     "verificationCode": "検証コード",
     "deleteError": "削除に失敗しました：{{message}}",
-    "deleteSuccess": "削除しました！"
+    "deleteSuccess": "削除しました！",
+    "jsonFormatError": "JSON形式が間違っています"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -416,7 +424,9 @@
     "inputAudioTokensRatio": "オーディオ入力倍率",
     "other": "その他",
     "outputAudioTokensRatio": "オーディオ出力倍率",
-    "rate": "倍率"
+    "rate": "倍率",
+    "RPM": "APIレート",
+    "free": "無料"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
@@ -520,7 +530,8 @@
     "noPriceModelWarning": "未設定の価格モデルがあります。価格を設定してください：",
     "refreshButton": "更新",
     "singleOperation": "シングル操作",
-    "updatePricesButton": "価格を更新"
+    "updatePricesButton": "価格を更新",
+    "title": "モデル価格"
   },
   "pricing_edit": {
     "channelType": "チャンネルの種類",
@@ -965,7 +976,8 @@
     "task": "タスクID",
     "time": "時間がかかる",
     "type": "タイプ",
-    "user": "ユーザー"
+    "user": "ユーザー",
+    "title": "非同期タスク"
   },
   "telegramPage": {
     "action": "アクション",
@@ -1225,5 +1237,59 @@
   },
   "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
     "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "単独のプロキシアドレスを設定し、httpおよびsocks5をサポートします。例：http://127.0.0.1:1080。プロキシアドレスには`％s`をセッション識別子のプレースホルダとして使用できます。プログラムがプレースホルダを検出すると、Keyに基づいて一意のセッション識別子を生成して置換します。"
-  }
+  },
+  "请输入版本号，例如：v3": {
+    "__i18n_ally_root__": {
+      "1": ""
+    }
+  },
+  "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5*，表示支持所有gpt-3": {
+        "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+          "5*是正确的，*gpt-3": {
+            "5是错误的": ""
+          }
+        }
+      },
+      "__i18n_ally_root__": {
+        "5*，表示支持所有gpt-3": {
+          "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+            "5*是正确的，*gpt-3": {
+              "5是错误的": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx": {
+    "__i18n_ally_root__": {
+      "__i18n_ally_root__": {
+        "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+      },
+      "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+    }
+  },
+  "用于测试使用的模型，为空时无法测速,如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5-turbo，仅支持chat模型": ""
+    }
+  },
+  "禁用流式的模型": "フロー型モデルを無効にする",
+  "请参考wiki中的文档获取key": {
+    "__i18n_ally_root__": {
+      " https://github": {
+        "com/MartialBE/one-hub/wiki/VertexAI": ""
+      }
+    }
+  },
+  "请输入你部署的Ollama地址，例如：http://127[__i18n_ally_root__]": {
+    "0": {
+      "0": {
+        "1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息": ""
+      }
+    }
+  },
+  "这里填写禁用流式的模型，注意：如果填写了禁用流式的模型，那么这些模型在流式请求时会跳过该渠道": "ここには、ストリーミングを無効にするモデルを記入してください。注意：ストリーミングを無効にするモデルを記入した場合、これらのモデルはストリームリクエスト時にそのチャンネルをスキップします。"
 }

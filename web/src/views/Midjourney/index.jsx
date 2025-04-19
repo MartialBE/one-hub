@@ -124,12 +124,12 @@ export default function Log() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h2">
-          {t('midjourneyPage.midjourney')}
-          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+        <Stack direction="column" spacing={1}>
+          <Typography variant="h2">{t('midjourneyPage.midjourney')}</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
             Midjourney
           </Typography>
-        </Typography>
+        </Stack>
       </Stack>
       <Card>
         <Box component="form" noValidate>

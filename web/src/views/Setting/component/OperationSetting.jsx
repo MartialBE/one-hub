@@ -61,7 +61,9 @@ const OperationSetting = () => {
     EnableSafe: '',
     SafeToolName: '',
     SafeKeyWords: '',
-    safeTools: []
+    safeTools: [],
+    ClaudeBudgetTokensPercentage: 0,
+    ClaudeDefaultMaxTokens: ''
   });
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
@@ -308,6 +310,18 @@ const OperationSetting = () => {
             showError(`安全设置保存失败: ${error.message || '未知错误'}`);
             setLoading(false);
             return;
+          }
+          break;
+        case 'claude':
+          if (originInputs.ClaudeBudgetTokensPercentage !== inputs.ClaudeBudgetTokensPercentage) {
+            await updateOption('ClaudeBudgetTokensPercentage', inputs.ClaudeBudgetTokensPercentage);
+          }
+          if (originInputs.ClaudeDefaultMaxTokens !== inputs.ClaudeDefaultMaxTokens) {
+            if (!verifyJSON(inputs.ClaudeDefaultMaxTokens)) {
+              showError('默认MaxToken数量不是合法的 JSON 字符串');
+              return;
+            }
+            await updateOption('ClaudeDefaultMaxTokens', inputs.ClaudeDefaultMaxTokens);
           }
           break;
       }
@@ -843,6 +857,52 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.disableChannelKeywordsSettings.save')}
+            </Button>
+          </Stack>
+        </Stack>
+      </SubCard>
+
+      <SubCard title={t('setting_index.operationSettings.claudeSettings.title')}>
+        <Stack spacing={2}>
+          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="ClaudeBudgetTokensPercentage">
+                {t('setting_index.operationSettings.claudeSettings.budgetTokensPercentage.label')}
+              </InputLabel>
+              <OutlinedInput
+                id="ClaudeBudgetTokensPercentage"
+                name="ClaudeBudgetTokensPercentage"
+                type="number"
+                value={inputs.ClaudeBudgetTokensPercentage}
+                onChange={handleInputChange}
+                label={t('setting_index.operationSettings.claudeSettings.budgetTokensPercentage.label')}
+                placeholder={t('setting_index.operationSettings.claudeSettings.budgetTokensPercentage.placeholder')}
+                disabled={loading}
+              />
+            </FormControl>
+
+            <FormControl fullWidth>
+              <TextField
+                multiline
+                maxRows={15}
+                id="ClaudeDefaultMaxTokens"
+                label={t('setting_index.operationSettings.claudeSettings.defaultMaxTokens.label')}
+                value={inputs.ClaudeDefaultMaxTokens}
+                name="ClaudeDefaultMaxTokens"
+                onChange={handleTextFieldChange}
+                minRows={5}
+                placeholder={t('setting_index.operationSettings.claudeSettings.defaultMaxTokens.placeholder')}
+                disabled={loading}
+              />
+            </FormControl>
+
+            <Button
+              variant="contained"
+              onClick={() => {
+                submitConfig('claude').then();
+              }}
+            >
+              {t('setting_index.operationSettings.claudeSettings.save')}
             </Button>
           </Stack>
         </Stack>

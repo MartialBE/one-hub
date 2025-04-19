@@ -154,12 +154,12 @@ export default function Redemption() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h2">
-          {t('redemptionPage.pageTitle')}
-          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+        <Stack direction="column" spacing={1}>
+          <Typography variant="h2">{t('redemptionPage.pageTitle')}</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
             Redemption
           </Typography>
-        </Typography>
+        </Stack>
 
         <Button
           variant="contained"

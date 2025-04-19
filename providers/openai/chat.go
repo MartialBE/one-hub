@@ -9,6 +9,7 @@ import (
 	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/types"
+	"regexp"
 	"strings"
 )
 
@@ -163,7 +164,8 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 }
 
 func otherProcessing(request *types.ChatCompletionRequest, otherArg string) {
-	if (strings.HasPrefix(request.Model, "o1") || strings.HasPrefix(request.Model, "o3")) && request.MaxTokens > 0 {
+	matched, _ := regexp.MatchString(`^o[1-9]`, request.Model)
+	if matched && request.MaxTokens > 0 {
 		request.MaxCompletionTokens = request.MaxTokens
 		request.MaxTokens = 0
 

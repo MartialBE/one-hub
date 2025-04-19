@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Button, TextField, IconButton, List, ListItem, ListItemSecondaryAction } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { useTranslation } from 'react-i18next';
+
 import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { showError } from 'utils/common';
+import { Box, List, Button, ListItem, TextField, IconButton, ListItemSecondaryAction } from '@mui/material';
 
-const ModelMappingInput = ({ value, onChange, disabled, error }) => {
+import { Icon } from '@iconify/react';
+import { showError } from 'utils/common';
+import { useTranslation } from 'react-i18next';
+
+const MapInput = ({ mapValue, onChange, disabled, error, label }) => {
   const { t } = useTranslation();
   const [mappings, setMappings] = useState([]);
 
   useEffect(() => {
     try {
-      setMappings(value || [{ index: 0, key: '', value: '' }]);
+      setMappings(mapValue || [{ index: 0, key: '', value: '' }]);
     } catch (e) {
       setMappings([{ index: 0, key: '', value: '' }]);
     }
-  }, [value]);
+  }, [mapValue]);
 
   const [openJsonDialog, setOpenJsonDialog] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
@@ -78,9 +79,8 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
       setMappings(newMappings);
       updateParent(newMappings);
       handleCloseJsonDialog();
-    } catch (error) {
-      console.error('Invalid JSON input:', error);
-      showError(t('channel_edit.invalidJson'));
+    } catch (e) {
+      showError(t('common.jsonFormatError'));
     }
   };
 
@@ -90,7 +90,7 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
         {mappings.map(({ index, key, value }) => (
           <ListItem key={index}>
             <TextField
-              label={t('channel_edit.modelMappingKey')}
+              label={label.keyName}
               value={key}
               onChange={(e) => handleChange(index, 'key', e.target.value)}
               disabled={disabled}
@@ -98,7 +98,7 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
               sx={{ mr: 1, flex: 1 }}
             />
             <TextField
-              label={t('channel_edit.modelMappingValue')}
+              label={label.valueName}
               value={value}
               onChange={(e) => handleChange(index, 'value', e.target.value)}
               disabled={disabled}
@@ -107,28 +107,28 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
             />
             <ListItemSecondaryAction>
               <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(index)} disabled={disabled}>
-                <DeleteIcon />
+                <Icon icon="mdi:delete" />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <Button startIcon={<AddIcon />} onClick={handleAdd} disabled={disabled}>
-        {t('channel_edit.addModelMapping')}
+      <Button startIcon={<Icon icon="mdi:plus" />} onClick={handleAdd} disabled={disabled}>
+        {t('channel_edit.mapAdd', { name: label.name })}
       </Button>
 
-      <Button startIcon={<AddIcon />} onClick={handleAddByJson} disabled={disabled}>
-        {t('channel_edit.addModelMappingByJson')}
+      <Button startIcon={<Icon icon="mdi:plus" />} onClick={handleAddByJson} disabled={disabled}>
+        {t('channel_edit.mapAddByJson', { name: label.name })}
       </Button>
 
-      <Dialog open={openJsonDialog} onClose={handleCloseJsonDialog} fullWidth maxWidth={'md'}>
-        <DialogTitle>{t('channel_edit.addModelMappingByJson')}</DialogTitle>
+      <Dialog open={openJsonDialog} onClose={handleCloseJsonDialog} fullWidth maxWidth="md">
+        <DialogTitle>{t('channel_edit.mapAddByJson', { name: label.name })}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
             id="json-input"
-            label={t('channel_edit.jsonInputLabel')}
+            label={t('channel_edit.mapJsonInput')}
             type="text"
             fullWidth
             multiline
@@ -146,17 +146,16 @@ const ModelMappingInput = ({ value, onChange, disabled, error }) => {
   );
 };
 
-ModelMappingInput.propTypes = {
-  value: PropTypes.arrayOf(
-    PropTypes.shape({
-      index: PropTypes.number,
-      key: PropTypes.string,
-      value: PropTypes.string
-    })
-  ),
+MapInput.propTypes = {
+  mapValue: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  error: PropTypes.bool
+  error: PropTypes.bool,
+  label: PropTypes.shape({
+    name: PropTypes.string,
+    keyName: PropTypes.string,
+    valueName: PropTypes.string
+  }).isRequired
 };
 
-export default ModelMappingInput;
+export default MapInput;

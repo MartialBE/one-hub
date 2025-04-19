@@ -144,18 +144,19 @@ func UpdateChannelsTag(tag string, channel *Channel) error {
 
 	err = tx.Model(Channel{}).Where("tag = ?", tag).Updates(
 		Channel{
-			BaseURL:      channel.BaseURL,
-			Other:        channel.Other,
-			Models:       channel.Models,
-			Group:        channel.Group,
-			Tag:          channel.Tag,
-			ModelMapping: channel.ModelMapping,
-			ModelHeaders: channel.ModelHeaders,
-			Proxy:        channel.Proxy,
-			TestModel:    channel.TestModel,
-			OnlyChat:     channel.OnlyChat,
-			Plugin:       channel.Plugin,
-			PreCost:      channel.PreCost,
+			BaseURL:        channel.BaseURL,
+			Other:          channel.Other,
+			Models:         channel.Models,
+			Group:          channel.Group,
+			Tag:            channel.Tag,
+			ModelMapping:   channel.ModelMapping,
+			ModelHeaders:   channel.ModelHeaders,
+			Proxy:          channel.Proxy,
+			TestModel:      channel.TestModel,
+			OnlyChat:       channel.OnlyChat,
+			Plugin:         channel.Plugin,
+			PreCost:        channel.PreCost,
+			DisabledStream: channel.DisabledStream,
 		}).Error
 
 	if err != nil {

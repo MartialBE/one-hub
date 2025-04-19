@@ -218,21 +218,21 @@ type ChatCompletionRequest struct {
 	Audio               *ChatAudio                    `json:"audio,omitempty"`
 	ReasoningEffort     *string                       `json:"reasoning_effort,omitempty"`
 	Prediction          any                           `json:"prediction,omitempty"`
-	Thinking            *Thinking                     `json:"thinking,omitempty"`
+	WebSearchOptions    *WebSearchOptions             `json:"web_search_options,omitempty"`
 
-	WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
+	Reasoning *ChatReasoning `json:"reasoning,omitempty"`
 
 	OneOtherArg string `json:"-"`
+}
+
+type ChatReasoning struct {
+	MaxTokens int    `json:"max_tokens,omitempty"`
+	Effort    string `json:"effort,omitempty"`
 }
 
 type WebSearchOptions struct {
 	SearchContextSize string `json:"search_context_size,omitempty"`
 	UserLocation      any    `json:"user_location,omitempty"`
-}
-
-type Thinking struct {
-	Type         string `json:"type,omitempty"`
-	BudgetTokens int    `json:"budget_tokens,omitempty"`
 }
 
 func (r ChatCompletionRequest) ParseToolChoice() (toolType, toolFunc string) {

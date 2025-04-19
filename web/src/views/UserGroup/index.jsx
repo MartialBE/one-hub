@@ -139,12 +139,12 @@ export default function UserGroup() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h2">
-          {t('userGroup.title')}
-          <Typography variant="subtitle1" sx={{ mt: 1 }} color="text.secondary">
+        <Stack direction="column" spacing={1}>
+          <Typography variant="h2">{t('userGroup.title')}</Typography>
+          <Typography variant="subtitle1" color="text.secondary">
             User Group
           </Typography>
-        </Typography>
+        </Stack>
 
         <Button
           variant="contained"

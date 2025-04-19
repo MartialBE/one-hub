@@ -95,7 +95,12 @@
     "requiredModels": "Model cannot be empty",
     "requiredName": "Name is required",
     "validJson": "Must be a valid JSON string",
-    "copyModels": "Copy model"
+    "copyModels": "Copy model",
+    "mapAdd": "Add {{name}}",
+    "mapAddByJson": "Add {{name}} through JSON",
+    "mapJsonInput": "JSON input",
+    "listJsonError": "JSON format error, please make sure the input is in array format.",
+    "listJsonHelperText": "Please enter the JSON array format, for example: [\"item1\", \"item2\", \"item3\"]"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -243,7 +248,8 @@
     "unknown": "unknown",
     "verificationCode": "Verification code",
     "deleteError": "Deletion failed: {{message}}",
-    "deleteSuccess": "Delete successful!"
+    "deleteSuccess": "Delete successful!",
+    "jsonFormatError": "JSON format error"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -418,7 +424,9 @@
     "inputAudioTokensRatio": "Audio input ratio",
     "other": "Other",
     "outputAudioTokensRatio": "Audio output ratio",
-    "rate": "Rate"
+    "rate": "Rate",
+    "RPM": "API rate",
+    "free": "Free"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",
@@ -522,7 +530,8 @@
     "noPriceModelWarning": "There are models without configured prices, please configure the prices in time:",
     "refreshButton": "Refresh",
     "singleOperation": "Single Operation",
-    "updatePricesButton": "Update Prices"
+    "updatePricesButton": "Update Prices",
+    "title": "Model price"
   },
   "pricing_edit": {
     "channelType": "Channel type",
@@ -967,7 +976,8 @@
     "task": "Task ID",
     "time": "time consuming",
     "type": "type",
-    "user": "user"
+    "user": "user",
+    "title": "Asynchronous task"
   },
   "telegramPage": {
     "action": "Action",
@@ -1227,5 +1237,64 @@
   },
   "单独设置代理地址，支持http和socks5，例如：http://127[0][0]": {
     "1:1080,代理地址中可以通过 `%s` 作为会话标识占位符，程序中检测到有占位符会根据Key生成唯一会话标识符进行替换": "Set the proxy address separately, supporting both http and socks5, for example: http://127.0.0.1:1080. You can use `%s` as a session identifier placeholder in the proxy address. When a placeholder is detected in the program, it will be replaced with a unique session identifier generated based on the Key."
-  }
+  },
+  "请输入版本号，例如：v3[__i18n_ally_root__]": {
+    "1": "",
+    "__i18n_ally_root__": {
+      "1": ""
+    }
+  },
+  "请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5*，表示支持所有gpt-3": {
+        "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+          "5*是正确的，*gpt-3": {
+            "5是错误的": ""
+          }
+        }
+      },
+      "__i18n_ally_root__": {
+        "__i18n_ally_root__": {
+          "5*，表示支持所有gpt-3": {
+            "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+              "5*是正确的，*gpt-3": {
+                "5是错误的": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "输入后，会替换请求地址中的v1，例如：freeapi，则请求chat时会变成https://xxx": {
+    "__i18n_ally_root__": {
+      "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "",
+      "__i18n_ally_root__": {
+        "__i18n_ally_root__": {
+          "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+        }
+      }
+    }
+  },
+  "用于测试使用的模型，为空时无法测速,如：gpt-3": {
+    "__i18n_ally_root__": {
+      "5-turbo，仅支持chat模型": ""
+    }
+  },
+  "禁用流式的模型": "Disable the streaming model",
+  "请参考wiki中的文档获取key": {
+    "__i18n_ally_root__": {
+      " https://github": {
+        "com/MartialBE/one-hub/wiki/VertexAI": ""
+      }
+    }
+  },
+  "请输入你部署的Ollama地址，例如：http://127[__i18n_ally_root__]": {
+    "0": {
+      "0": {
+        "1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息": ""
+      }
+    }
+  },
+  "这里填写禁用流式的模型，注意：如果填写了禁用流式的模型，那么这些模型在流式请求时会跳过该渠道": "Fill in here to disable the streaming model. Note: If you fill in to disable the streaming model, these models will be skipped for streaming requests on that channel."
 }
