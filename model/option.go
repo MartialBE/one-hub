@@ -106,10 +106,10 @@ func InitOptionMap() {
 	config.GlobalOption.RegisterInt("OldTokenMaxId", &config.OldTokenMaxId)
 	config.GlobalOption.RegisterBool("GitHubOldIdCloseEnabled", &config.GitHubOldIdCloseEnabled)
 
-	config.GlobalOption.RegisterCustom("AudioTokenJson", func() string {
-		return GetDefaultAudioRatio()
+	config.GlobalOption.RegisterCustom("ExtraTokenPriceJson", func() string {
+		return GetDefaultExtraRatio()
 	}, func(value string) error {
-		config.AudioTokenJson = value
+		config.ExtraTokenPriceJson = value
 		if PricingInstance != nil {
 			PricingInstance.Init()
 		}

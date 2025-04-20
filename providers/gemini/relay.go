@@ -39,7 +39,7 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 	}
 
 	usage := p.GetUsage()
-	*usage = convertOpenAIUsage(request.Model, geminiResponse.UsageMetadata)
+	*usage = convertOpenAIUsage(geminiResponse.UsageMetadata)
 
 	return geminiResponse, nil
 }
@@ -115,10 +115,9 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		h.LastType = lastType
 	}
 
-	adjustTokenCounts(h.ModelName, geminiResponse.UsageMetadata)
-
 	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
 	h.Usage.CompletionTokens += geminiResponse.UsageMetadata.CandidatesTokenCount - h.LastCandidates
+	h.Usage.CompletionTokensDetails.ReasoningTokens += geminiResponse.UsageMetadata.ThoughtsTokenCount
 	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	h.LastCandidates = geminiResponse.UsageMetadata.CandidatesTokenCount
 

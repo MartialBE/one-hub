@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"one-api/common/config"
 	"one-api/common/utils"
 )
 
@@ -73,6 +74,37 @@ type UsageEvent struct {
 	TotalTokens        int                     `json:"total_tokens"`
 	InputTokenDetails  PromptTokensDetails     `json:"input_token_details,omitempty"`
 	OutputTokenDetails CompletionTokensDetails `json:"output_token_details,omitempty"`
+
+	ExtraTokens map[string]int `json:"-"`
+}
+
+func (u *UsageEvent) GetExtraTokens() map[string]int {
+	if u.ExtraTokens == nil {
+		u.ExtraTokens = make(map[string]int)
+	}
+
+	// 组装，已有的数据
+	if u.InputTokenDetails.CachedTokens > 0 && u.ExtraTokens[config.UsageExtraCache] == 0 {
+		u.ExtraTokens[config.UsageExtraCache] = u.InputTokenDetails.CachedTokens
+	}
+
+	if u.InputTokenDetails.AudioTokens > 0 && u.ExtraTokens[config.UsageExtraInputAudio] == 0 {
+		u.ExtraTokens[config.UsageExtraInputAudio] = u.InputTokenDetails.AudioTokens
+	}
+
+	if u.OutputTokenDetails.AudioTokens > 0 && u.ExtraTokens[config.UsageExtraOutputAudio] == 0 {
+		u.ExtraTokens[config.UsageExtraOutputAudio] = u.OutputTokenDetails.AudioTokens
+	}
+
+	return u.ExtraTokens
+}
+
+func (u *UsageEvent) SetExtraTokens(key string, value int) {
+	if u.ExtraTokens == nil {
+		u.ExtraTokens = make(map[string]int)
+	}
+
+	u.ExtraTokens[key] = value
 }
 
 func (u *UsageEvent) ToChatUsage() *Usage {

@@ -21,6 +21,36 @@ const (
 	DefaultCachedReadRatio  = 0.1
 )
 
+func GetIncreaseTokens(tokens int, ratio float64) int {
+	return int(float64(tokens) * (ratio - 1))
+}
+
+var ExtraKeyIsPrompt = map[string]bool{
+	config.UsageExtraCache:            true,
+	config.UsageExtraCachedWrite:      true,
+	config.UsageExtraCachedRead:       true,
+	config.UsageExtraInputAudio:       true,
+	config.UsageExtraOutputAudio:      false,
+	config.UsageExtraReasoning:        false,
+	config.UsageExtraInputTextTokens:  true,
+	config.UsageExtraOutputTextTokens: false,
+}
+
+func GetExtraPriceIsPrompt(key string) bool {
+	return ExtraKeyIsPrompt[key]
+}
+
+var defaultExtraPrice = map[string]float64{
+	config.UsageExtraCache:            0.5,
+	config.UsageExtraCachedWrite:      1.25,
+	config.UsageExtraCachedRead:       0.1,
+	config.UsageExtraInputAudio:       40,
+	config.UsageExtraOutputAudio:      40,
+	config.UsageExtraReasoning:        1,
+	config.UsageExtraInputTextTokens:  1,
+	config.UsageExtraOutputTextTokens: 1,
+}
+
 type Price struct {
 	Model       string  `json:"model" gorm:"type:varchar(100)" binding:"required"`
 	Type        string  `json:"type"  gorm:"default:'tokens'" binding:"required"`
@@ -38,18 +68,18 @@ func GetAllPrices() ([]*Price, error) {
 		return nil, err
 	}
 
-	if config.AudioTokenJson == "" {
+	if config.ExtraTokenPriceJson == "" {
 		return prices, nil
 	}
 
-	audioToken := make(map[string]map[string]float64)
-	err := json.Unmarshal([]byte(config.AudioTokenJson), &audioToken)
+	extraRatios := make(map[string]map[string]float64)
+	err := json.Unmarshal([]byte(config.ExtraTokenPriceJson), &extraRatios)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, price := range prices {
-		if ratio, ok := audioToken[price.Model]; ok {
+		if ratio, ok := extraRatios[price.Model]; ok {
 			price.ExtraRatios = ratio
 		}
 	}
@@ -89,21 +119,18 @@ func (price *Price) GetOutput() float64 {
 }
 
 func (price *Price) GetExtraRatio(key string) float64 {
-	if ratio, ok := price.ExtraRatios[key]; ok {
-		return ratio
+	if price.ExtraRatios != nil {
+		if ratio, ok := price.ExtraRatios[key]; ok {
+			return ratio
+		}
 	}
 
-	switch key {
-	case "cached_tokens_ratio":
-		return DefaultCacheRatios
-	case "cached_write_ratio":
-		return DefaultCachedWriteRatio
-	case "cached_read_ratio":
-		return DefaultCachedReadRatio
-	default:
-		return DefaultAudioRatio
+	ratio, ok := defaultExtraPrice[key]
+	if !ok {
+		return 1
 	}
 
+	return ratio
 }
 
 func (price *Price) FetchInputCurrencyPrice(rate float64) string {
@@ -472,12 +499,12 @@ func GetDefaultPrice() []*Price {
 	return prices
 }
 
-func GetDefaultAudioRatio() string {
-	if config.AudioTokenJson != "" {
-		return config.AudioTokenJson
+func GetDefaultExtraRatio() string {
+	if config.ExtraTokenPriceJson != "" {
+		return config.ExtraTokenPriceJson
 	}
 
-	config.AudioTokenJson = `{"gpt-4o-audio-preview":{"input_audio_tokens_ratio":40,"output_audio_tokens_ratio":20},"gpt-4o-audio-preview-2024-10-01":{"input_audio_tokens_ratio":40,"output_audio_tokens_ratio":20},"gpt-4o-audio-preview-2024-12-17":{"input_audio_tokens_ratio":16,"output_audio_tokens_ratio":8},"gpt-4o-mini-audio-preview":{"input_audio_tokens_ratio":67,"output_audio_tokens_ratio":34},"gpt-4o-mini-audio-preview-2024-12-17":{"input_audio_tokens_ratio":67,"output_audio_tokens_ratio":34},"gpt-4o-realtime-preview":{"input_audio_tokens_ratio":20,"output_audio_tokens_ratio":10},"gpt-4o-realtime-preview-2024-10-01":{"input_audio_tokens_ratio":20,"output_audio_tokens_ratio":10},"gpt-4o-realtime-preview-2024-12-17":{"input_audio_tokens_ratio":8,"output_audio_tokens_ratio":4},"gpt-4o-mini-realtime-preview":{"input_audio_tokens_ratio":17,"output_audio_tokens_ratio":8.4},"gpt-4o-mini-realtime-preview-2024-12-17":{"input_audio_tokens_ratio":17,"output_audio_tokens_ratio":8.4}}`
+	config.ExtraTokenPriceJson = `{"gpt-4o-audio-preview":{"input_audio_tokens":40,"output_audio_tokens":20},"gpt-4o-audio-preview-2024-10-01":{"input_audio_tokens":40,"output_audio_tokens":20},"gpt-4o-audio-preview-2024-12-17":{"input_audio_tokens":16,"output_audio_tokens":8},"gpt-4o-mini-audio-preview":{"input_audio_tokens":67,"output_audio_tokens":34},"gpt-4o-mini-audio-preview-2024-12-17":{"input_audio_tokens":67,"output_audio_tokens":34},"gpt-4o-realtime-preview":{"input_audio_tokens":20,"output_audio_tokens":10},"gpt-4o-realtime-preview-2024-10-01":{"input_audio_tokens":20,"output_audio_tokens":10},"gpt-4o-realtime-preview-2024-12-17":{"input_audio_tokens":8,"output_audio_tokens":4},"gpt-4o-mini-realtime-preview":{"input_audio_tokens":17,"output_audio_tokens":8.4},"gpt-4o-mini-realtime-preview-2024-12-17":{"input_audio_tokens":17,"output_audio_tokens":8.4},"gemini-2.5-flash-preview-04-17":{"reasoning_tokens":5.833}}`
 
-	return config.AudioTokenJson
+	return config.ExtraTokenPriceJson
 }

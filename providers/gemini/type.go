@@ -19,6 +19,13 @@ import (
 
 const GeminiImageSymbol = "![one-hub-gemini-image]"
 
+const (
+	ModalityTEXT  = "TEXT"
+	ModalityAUDIO = "AUDIO"
+	ModalityIMAGE = "IMAGE"
+	ModalityVIDEO = "VIDEO"
+)
+
 var ImageSymbolAcMachines = &goahocorasick.Machine{}
 var imageRegex = regexp.MustCompile(`\!\[one-hub-gemini-image\]\((.*?)\)`)
 
@@ -334,8 +341,16 @@ type GeminiUsageMetadata struct {
 	CandidatesTokenCount    int `json:"candidatesTokenCount"`
 	TotalTokenCount         int `json:"totalTokenCount"`
 	CachedContentTokenCount int `json:"cachedContentTokenCount,omitempty"`
-	PromptTokensDetails     any `json:"promptTokensDetails,omitempty"`
-	CandidatesTokensDetails any `json:"candidatesTokensDetails,omitempty"`
+	ThoughtsTokenCount      int `json:"thoughtsTokenCount,omitempty"`
+	ToolUsePromptTokenCount int `json:"toolUsePromptTokenCount,omitempty"`
+
+	PromptTokensDetails     []GeminiUsageMetadataDetails `json:"promptTokensDetails,omitempty"`
+	CandidatesTokensDetails []GeminiUsageMetadataDetails `json:"candidatesTokensDetails,omitempty"`
+}
+
+type GeminiUsageMetadataDetails struct {
+	Modality   string `json:"modality"`
+	TokenCount int    `json:"tokenCount"`
 }
 
 type GeminiChatCandidate struct {
