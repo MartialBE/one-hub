@@ -106,23 +106,100 @@ const MenuCard = () => {
                   color: theme.palette.primary.main,
                   border: 'none',
                   borderColor: theme.palette.primary.main,
-                  background: '#fff',
-                  marginRight: '12px'
+                  background: '#cdd5df',
+                  marginRight: '12px',
+                  cursor: 'pointer'
                 }}
                 onClick={() => navigate('/panel/profile')}
-              ></Avatar>
+              />
             </ListItemAvatar>
             <ListItemText
               sx={{ mt: 0 }}
               primary={
-                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[800] }}>
-                  {account.user?.username}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme.palette.primary[200],
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start'
+                  }}
+                >
+                  <span>{userData ? userData.display_name : 'Loading...'}</span>
+                    {userData && userGroupMap && selectedGroup && userGroupMap[selectedGroup] && (
+                      <Chip
+                      label={`${userGroupMap[selectedGroup].name} ❤️ rpm: ${userGroupMap[selectedGroup].api_rate}`}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
+                        height: '1.2rem', 
+                        fontSize: '0.75rem',
+                        borderRadius: '4px',
+                      }}
+                      />
+                    )}
                 </Typography>
               }
-              secondary={<Typography variant="caption"> {t('menu.welcomeBack')} </Typography>}
             />
           </ListItem>
         </List>
+        <Box sx={{ mt: 2, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, fontSize: '0.5rem' }}>
+            <Typography variant="body2" color="textSecondary" sx={{ flexGrow: 1 }}>
+              {t('sidebar.remainingBalance')}: ${balance}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {t('dashboard_index.calls')}: {requestCount}
+            </Typography>
+          </Box>
+          <Box sx={{ position: 'relative' }}>
+            <LinearProgress
+              variant="determinate"
+              value={progressValue}
+              sx={{
+                height: 20,
+                borderRadius: 5,
+                bgcolor: theme.palette.background.default,
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 5,
+                  bgcolor: theme.palette.success.dark
+                }
+              }}
+            />
+            <Typography
+              variant="caption"
+              component="div"
+              color="textSecondary"
+              sx={{
+                position: 'absolute',
+                right: theme.spacing(1),
+                top: '50%',
+                transform: 'translateY(-50%)'
+              }}
+            >
+              {`${t('dashboard_index.used')}:💲${usedQuota} | ${Math.round(progressValue)}% `}
+            </Typography>
+          </Box>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<IconHeadset />}
+          fullWidth
+          sx={{
+            mt: 2,
+            //颜色适配暗色
+            background: '#13151A',
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+              backgroundColor: '#1C1E23',
+              color: '#1CE3EA'
+            }
+          }}
+          onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
+        >
+          微信客服
+        </Button>
       </CardContent>
     </CardStyle>
   );
