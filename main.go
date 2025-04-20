@@ -82,7 +82,10 @@ func main() {
 	// 初始化安全检查器
 	safty.InitSaftyTools()
 	// 初始化账单数据
-	go model.InsertStatisticsMonth()
+	if config.UserInvoiceMonth {
+		logger.SysLog("Enable User Invoice Monthly Data")
+		go model.InsertStatisticsMonth()
+	}
 	initHttpServer()
 }
 
