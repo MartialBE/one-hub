@@ -1,4 +1,4 @@
-// import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 // material-ui
@@ -7,18 +7,19 @@ import {
   Avatar,
   Card,
   CardContent,
-  // Grid,
-  // LinearProgress,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Typography
-  // linearProgressClasses
+  Typography,
+  Chip,
+  Box,
+  LinearProgress
 } from '@mui/material';
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { API } from 'utils/api';
 
 // assets
 // import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
@@ -85,11 +86,61 @@ const CardStyle = styled(Card)(({ theme }) => ({
 
 // ==============================|| SIDEBAR MENU Card ||============================== //
 
+
 const MenuCard = () => {
   const theme = useTheme();
   const account = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [userData, setUserData] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [usedQuota, setUsedQuota] = useState(0);
+  const [requestCount, setRequestCount] = useState(0);
+  const [userGroupMap, setUserGroupMap] = useState({});
+  const [selectedGroup, setSelectedGroup] = useState('');
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        let res = await API.get(`/api/user/self`);
+        const { success, data } = res.data;
+        if (success) {
+          setUserData(data);
+          const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
+          setBalance((data.quota / quotaPerUnit).toFixed(2));
+          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(2));
+          setRequestCount(data.request_count);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+  
+    loadUserData();
+    const fetchUserGroupMap = async () => {
+      try {
+        const res = await API.get('/api/user_group_map');
+        const { success, message, data } = res.data;
+        if (success) {
+          setUserGroupMap(data);
+          setSelectedGroup(Object.keys(data)[0]); // 默认选择第一个分组
+        } else {
+          showError(message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUserGroupMap();
+  }, []);
+  
+  const getGroupLabel = (group) => {
+    if (!group) return '未知';
+    return group === 'default' ? '免费用户' : group;
+  };
+  
+  const totalQuota = parseFloat(balance) + parseFloat(usedQuota);
+  const progressValue = (parseFloat(usedQuota) / totalQuota) * 100;
 
   return (
     <CardStyle>
@@ -182,24 +233,6 @@ const MenuCard = () => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<IconHeadset />}
-          fullWidth
-          sx={{
-            mt: 2,
-            //颜色适配暗色
-            background: '#13151A',
-            color: theme.palette.primary.contrastText,
-            '&:hover': {
-              backgroundColor: '#1C1E23',
-              color: '#1CE3EA'
-            }
-          }}
-          onClick={() => window.open('https://work.weixin.qq.com/kfid/kfce787ac8bbad50026', '_blank')}
-        >
-          微信客服
-        </Button>
       </CardContent>
     </CardStyle>
   );
