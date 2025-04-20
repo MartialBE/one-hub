@@ -81,6 +81,8 @@ func main() {
 	search.InitSearcher()
 	// 初始化安全检查器
 	safty.InitSaftyTools()
+	// 初始化账单数据
+	go model.InsertStatisticsMonth()
 	initHttpServer()
 }
 
