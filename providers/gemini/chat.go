@@ -305,7 +305,7 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatRe
 	}
 
 	usage := provider.GetUsage()
-	*usage = convertOpenAIUsage(request.Model, response.UsageMetadata)
+	*usage = convertOpenAIUsage(response.UsageMetadata)
 	openaiResponse.Usage = usage
 
 	return
@@ -401,10 +401,9 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		h.LastType = lastType
 	}
 
-	adjustTokenCounts(h.Request.Model, geminiResponse.UsageMetadata)
-
 	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
 	h.Usage.CompletionTokens += geminiResponse.UsageMetadata.CandidatesTokenCount - h.LastCandidates
+	h.Usage.CompletionTokensDetails.ReasoningTokens += geminiResponse.UsageMetadata.ThoughtsTokenCount
 	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
 	h.LastCandidates = geminiResponse.UsageMetadata.CandidatesTokenCount
 }
@@ -416,48 +415,50 @@ var modelAdjustRatios = map[string]int{
 	"gemini-1.5-flash": 2,
 }
 
-func adjustTokenCounts(modelName string, usage *GeminiUsageMetadata) {
-	if usage.PromptTokenCount <= tokenThreshold && usage.CandidatesTokenCount <= tokenThreshold {
-		return
-	}
+// func adjustTokenCounts(modelName string, usage *GeminiUsageMetadata) {
+// 	if usage.PromptTokenCount <= tokenThreshold && usage.CandidatesTokenCount <= tokenThreshold {
+// 		return
+// 	}
 
-	currentRatio := 1
-	for model, r := range modelAdjustRatios {
-		if strings.HasPrefix(modelName, model) {
-			currentRatio = r
-			break
-		}
-	}
+// 	currentRatio := 1
+// 	for model, r := range modelAdjustRatios {
+// 		if strings.HasPrefix(modelName, model) {
+// 			currentRatio = r
+// 			break
+// 		}
+// 	}
 
-	if currentRatio == 1 {
-		return
-	}
+// 	if currentRatio == 1 {
+// 		return
+// 	}
 
-	adjustTokenCount := func(count int) int {
-		if count > tokenThreshold {
-			return tokenThreshold + (count-tokenThreshold)*currentRatio
-		}
-		return count
-	}
+// 	adjustTokenCount := func(count int) int {
+// 		if count > tokenThreshold {
+// 			return tokenThreshold + (count-tokenThreshold)*currentRatio
+// 		}
+// 		return count
+// 	}
 
-	if usage.PromptTokenCount > tokenThreshold {
-		usage.PromptTokenCount = adjustTokenCount(usage.PromptTokenCount)
-	}
+// 	if usage.PromptTokenCount > tokenThreshold {
+// 		usage.PromptTokenCount = adjustTokenCount(usage.PromptTokenCount)
+// 	}
 
-	if usage.CandidatesTokenCount > tokenThreshold {
-		usage.CandidatesTokenCount = adjustTokenCount(usage.CandidatesTokenCount)
-	}
+// 	if usage.CandidatesTokenCount > tokenThreshold {
+// 		usage.CandidatesTokenCount = adjustTokenCount(usage.CandidatesTokenCount)
+// 	}
 
-	usage.TotalTokenCount = usage.PromptTokenCount + usage.CandidatesTokenCount
-}
+// 	usage.TotalTokenCount = usage.PromptTokenCount + usage.CandidatesTokenCount
+// }
 
-func convertOpenAIUsage(modelName string, geminiUsage *GeminiUsageMetadata) types.Usage {
-	adjustTokenCounts(modelName, geminiUsage)
-
+func convertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
 	return types.Usage{
 		PromptTokens:     geminiUsage.PromptTokenCount,
 		CompletionTokens: geminiUsage.CandidatesTokenCount,
 		TotalTokens:      geminiUsage.TotalTokenCount,
+
+		CompletionTokensDetails: types.CompletionTokensDetails{
+			ReasoningTokens: geminiUsage.ThoughtsTokenCount,
+		},
 	}
 }
 

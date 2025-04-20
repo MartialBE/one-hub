@@ -147,7 +147,7 @@ var SMTPAccount = ""
 var SMTPFrom = ""
 var SMTPToken = ""
 
-var AudioTokenJson = ""
+var ExtraTokenPriceJson = ""
 
 var ChatImageRequestProxy = ""
 

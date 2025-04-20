@@ -319,13 +319,13 @@
     "durationLabel": "時間",
     "durationTooltip": "t/s: 出力トークンの数を総生成時間で割った値であり、生成速度を示します。",
     "groupLabel": "グループ",
-    "inputAudioTokens": "Input audio tokens",
+    "inputAudioTokens": "Input audio tokens (* {{ ratio }})",
     "inputLabel": "入力",
-    "inputTextTokens": "Input text tokens",
+    "inputTextTokens": "Input text tokens (* {{ ratio }})",
     "modelLabel": "モデル",
-    "outputAudioTokens": "Output audio tokens",
+    "outputAudioTokens": "Output audio tokens (* {{ ratio }})",
     "outputLabel": "出力",
-    "outputTextTokens": "Output text tokens",
+    "outputTextTokens": "Output text tokens (* {{ ratio }})",
     "quotaLabel": "クォータ",
     "refreshButton": "更新/検索条件をクリア",
     "searchButton": "検索",
@@ -354,7 +354,8 @@
       "illustrate": "* この記録はシステムアップグレード前のログであり"
     },
     "cachedReadTokens": "キャッシュからトークンを読み取ります（* {{ ratio }} )",
-    "cachedWriteTokens": "トークンのキャッシュ書き込み（* {{ ratio }} ）"
+    "cachedWriteTokens": "トークンのキャッシュ書き込み（* {{ ratio }} ）",
+    "reasoningTokens": "推理トークン"
   },
   "login": {
     "codeRequired": "確認コードを入力する必要があります",
@@ -773,10 +774,10 @@
         "title": "レート設定"
       },
       "title": "運営設定",
-      "audioTokenSettings": {
-        "info": "オーディオ倍率を設定します。JSON形式で、キーはモデル名であり、値は入力および出力のオーディオトークンの倍率です。例：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
-        "save": "オーディオトークン設定を保存します",
-        "title": "オーディオトークンの設定"
+      "extraTokenPriceJson": {
+        "info": "追加トークン価格を設定します。JSON形式で、キーはモデル名であり、値は入力および出力の追加トークン価格です。例：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
+        "save": "追加トークン価格設定を保存します",
+        "title": "追加トークン価格設定"
       },
       "disableChannelKeywordsSettings": {
         "info": "キーワードを1行ずつ入力して、禁止ワードリストを設定してください。",

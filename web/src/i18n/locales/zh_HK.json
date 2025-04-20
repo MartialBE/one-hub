@@ -320,13 +320,13 @@
     "durationLabel": "耗時",
     "durationTooltip": "t/s：輸出Token的數量除以總生成時間，表示生成速度",
     "groupLabel": "分組",
-    "inputAudioTokens": "輸入音頻Tokens",
+    "inputAudioTokens": "輸入音頻Tokens (* {{ ratio }})",
     "inputLabel": "輸入",
-    "inputTextTokens": "輸入文本Tokens",
+    "inputTextTokens": "輸入文本Tokens (* {{ ratio }})",
     "modelLabel": "模型",
-    "outputAudioTokens": "輸出音頻Tokens",
+    "outputAudioTokens": "輸出音頻Tokens (* {{ ratio }})",
     "outputLabel": "輸出",
-    "outputTextTokens": "輸出文本Tokens",
+    "outputTextTokens": "輸出文本Tokens (* {{ ratio }})",
     "quotaLabel": "額度",
     "refreshButton": "刷新/清除搜尋條件",
     "searchButton": "搜尋",
@@ -354,8 +354,9 @@
       "old_log": "舊版log",
       "illustrate": "* 本筆記錄為系統升級前所記錄的log"
     },
-    "cachedReadTokens": "緩存讀取Tokens",
-    "cachedWriteTokens": "緩存寫入 Tokens"
+    "cachedReadTokens": "緩存讀取Tokens (* {{ ratio }})",
+    "reasoningTokens": "推理Tokens (* {{ ratio }})",
+    "cachedWriteTokens": "緩存寫入 Tokens (* {{ ratio }})"
   },
   "login": {
     "codeRequired": "驗證碼不能為空",
@@ -773,10 +774,10 @@
         "title": "倍率設置"
       },
       "title": "運營設置",
-      "audioTokenSettings": {
-        "info": "配置音頻倍率。配置格式為JSON，鍵為模型名稱，值為輸入輸出Token倍率。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
-        "save": "保留音頻權杖設置",
-        "title": "音頻Token設置"
+      "extraTokenPriceJson": {
+        "info": "配置額外Token價格。配置格式為JSON，鍵為模型名稱，值為輸入輸出Token價格。例如：{\"gpt-4o-audio-preview\":{\"input_audio_tokens_ratio\":40,\"output_audio_tokens_ratio\":20},\"gpt-4o-mini-audio-preview\":{\"input_audio_tokens_ratio\":67,\"output_audio_tokens_ratio\":34}}",
+        "save": "保存額外Token價格設置",
+        "title": "額外Token價格設定"
       },
       "disableChannelKeywordsSettings": {
         "info": "配置停用通道關鍵字，每行一個關鍵字。",
