@@ -294,6 +294,16 @@ export default function InvoiceDetail() {
                 >
                   {t('invoice_index.requestTime')}
                 </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    fontWeight: 600,
+                    color: theme.palette.text.primary,
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  {t('invoice_index.amount')}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -325,6 +335,9 @@ export default function InvoiceDetail() {
                   </TableCell>
                   <TableCell align="right" sx={{ p: 2 }}>
                     {(item.request_time / 1000).toFixed(3)}s
+                  </TableCell>
+                  <TableCell align="right" sx={{ p: 2 }}>
+                    ${calculateQuota(item.quota)}
                   </TableCell>
                 </TableRow>
               ))}
