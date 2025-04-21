@@ -1,4 +1,4 @@
-// import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 // material-ui
@@ -7,18 +7,19 @@ import {
   Avatar,
   Card,
   CardContent,
-  // Grid,
-  // LinearProgress,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Typography
-  // linearProgressClasses
+  Typography,
+  Chip,
+  Box,
+  LinearProgress
 } from '@mui/material';
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { API } from 'utils/api';
 
 // assets
 // import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
@@ -85,11 +86,61 @@ const CardStyle = styled(Card)(({ theme }) => ({
 
 // ==============================|| SIDEBAR MENU Card ||============================== //
 
+
 const MenuCard = () => {
   const theme = useTheme();
   const account = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [userData, setUserData] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [usedQuota, setUsedQuota] = useState(0);
+  const [requestCount, setRequestCount] = useState(0);
+  const [userGroupMap, setUserGroupMap] = useState({});
+  const [selectedGroup, setSelectedGroup] = useState('');
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        let res = await API.get(`/api/user/self`);
+        const { success, data } = res.data;
+        if (success) {
+          setUserData(data);
+          const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
+          setBalance((data.quota / quotaPerUnit).toFixed(2));
+          setUsedQuota((data.used_quota / quotaPerUnit).toFixed(2));
+          setRequestCount(data.request_count);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+  
+    loadUserData();
+    const fetchUserGroupMap = async () => {
+      try {
+        const res = await API.get('/api/user_group_map');
+        const { success, message, data } = res.data;
+        if (success) {
+          setUserGroupMap(data);
+          setSelectedGroup(Object.keys(data)[0]); // 默认选择第一个分组
+        } else {
+          showError(message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUserGroupMap();
+  }, []);
+  
+  const getGroupLabel = (group) => {
+    if (!group) return '未知';
+    return group === 'default' ? '免费用户' : group;
+  };
+  
+  const totalQuota = parseFloat(balance) + parseFloat(usedQuota);
+  const progressValue = (parseFloat(usedQuota) / totalQuota) * 100;
 
   return (
     <CardStyle>
@@ -106,23 +157,82 @@ const MenuCard = () => {
                   color: theme.palette.primary.main,
                   border: 'none',
                   borderColor: theme.palette.primary.main,
-                  background: '#fff',
-                  marginRight: '12px'
+                  background: '#cdd5df',
+                  marginRight: '12px',
+                  cursor: 'pointer'
                 }}
                 onClick={() => navigate('/panel/profile')}
-              ></Avatar>
+              />
             </ListItemAvatar>
             <ListItemText
               sx={{ mt: 0 }}
               primary={
-                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[800] }}>
-                  {account.user?.username}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme.palette.primary[200],
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start'
+                  }}
+                >
+                  <span>{userData ? userData.display_name : 'Loading...'}</span>
+                    {userData && userGroupMap && selectedGroup && userGroupMap[selectedGroup] && (
+                      <Chip
+                      label={`${userGroupMap[selectedGroup].name} ❤️ rpm: ${userGroupMap[selectedGroup].api_rate}`}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
+                        height: '1.2rem', 
+                        fontSize: '0.75rem',
+                        borderRadius: '4px',
+                      }}
+                      />
+                    )}
                 </Typography>
               }
-              secondary={<Typography variant="caption"> {t('menu.welcomeBack')} </Typography>}
             />
           </ListItem>
         </List>
+        <Box sx={{ mt: 2, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, fontSize: '0.5rem' }}>
+            <Typography variant="body2" color="textSecondary" sx={{ flexGrow: 1 }}>
+              {t('sidebar.remainingBalance')}: ${balance}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {t('dashboard_index.calls')}: {requestCount}
+            </Typography>
+          </Box>
+          <Box sx={{ position: 'relative' }}>
+            <LinearProgress
+              variant="determinate"
+              value={progressValue}
+              sx={{
+                height: 20,
+                borderRadius: 5,
+                bgcolor: theme.palette.background.default,
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 5,
+                  bgcolor: theme.palette.success.dark
+                }
+              }}
+            />
+            <Typography
+              variant="caption"
+              component="div"
+              color="textSecondary"
+              sx={{
+                position: 'absolute',
+                right: theme.spacing(1),
+                top: '50%',
+                transform: 'translateY(-50%)'
+              }}
+            >
+              {`${t('dashboard_index.used')}:💲${usedQuota} | ${Math.round(progressValue)}% `}
+            </Typography>
+          </Box>
+        </Box>
       </CardContent>
     </CardStyle>
   );

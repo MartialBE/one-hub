@@ -26,6 +26,10 @@
     "updateModeUpdate": "Update Only",
     "updateModeOverwrite": "Overwrite All"
   },
+  "sidebar": {
+    "totalQuota": "Total Quota",
+    "remainingBalance": "Remaining Balance"
+  },
   "Header 配置": "Header configuration",
   "about": {
     "aboutDescription": "You can set the about content in the settings page, supports HTML & Markdown",
@@ -268,6 +272,7 @@
     "used": "Used",
     "week_model_statistics": "Week Model Statistics",
     "week_consumption_log": "Week Consumption Log",
+    "7days_model_usage_pie": "7 Days Model Usage Pie",
     "date": "Date",
     "request_count": "Request Count",
     "amount": "Amount",
@@ -310,7 +315,7 @@
   "jump": "Redirecting...",
   "log": "Log",
   "logPage": {
-    "cachedTokens": "Cache Tokens",
+    "cachedTokens": "Cache Tokens (* {{ ratio }})",
     "channelLabel": "Channel",
     "columnSettings": "Column Settings",
     "selectColumns": "Select Columns",
@@ -319,13 +324,13 @@
     "durationLabel": "Duration",
     "durationTooltip": "t/s: The number of output tokens divided by the total generation time, indicating the generation speed",
     "groupLabel": "group",
-    "inputAudioTokens": "Input audio tokens",
+    "inputAudioTokens": "Input audio tokens (* {{ ratio }})",
     "inputLabel": "Input",
-    "inputTextTokens": "Input text tokens",
+    "inputTextTokens": "Input text tokens (* {{ ratio }})",
     "modelLabel": "Model",
-    "outputAudioTokens": "Output audio tokens",
+    "outputAudioTokens": "Output audio tokens (* {{ ratio }})",
     "outputLabel": "Output",
-    "outputTextTokens": "Output text tokens",
+    "outputTextTokens": "Output text tokens (* {{ ratio }})",
     "quotaLabel": "Quota",
     "refreshButton": "Refresh/Clear Search",
     "searchButton": "Search",
@@ -353,7 +358,7 @@
       "old_log": "old version log",
       "illustrate": "* This record is the log recorded before the system upgrade"
     },
-    "cachedReadTokens": "Cache read Tokens",
+    "cachedReadTokens": "Cache read Tokens (* {{ ratio }})",
     "cachedWriteTokens": "Write tokens to cache (* {{ ratio }})"
   },
   "login": {
@@ -773,10 +778,10 @@
         "title": "Rate Settings"
       },
       "title": "Operation Settings",
-      "audioTokenSettings": {
-        "info": "Configure audio rates. The configuration format is JSON, with keys as model names and values as input-output token rates. For example: {\"gpt-4o-audio-preview\": {\"input_audio_tokens_ratio\": 40, \"output_audio_tokens_ratio\": 20}, \"gpt-4o-mini-audio-preview\": {\"input_audio_tokens_ratio\": 67, \"output_audio_tokens_ratio\": 34}}",
-        "save": "Save audio token settings",
-        "title": "Audio token settings"
+      "extraTokenPriceJson": {
+        "info": "Configure extra token prices. The configuration format is JSON, with keys as model names and values as input-output token prices. For example: {\"gpt-4o-audio-preview\": {\"input_audio_tokens_ratio\": 40, \"output_audio_tokens_ratio\": 20}, \"gpt-4o-mini-audio-preview\": {\"input_audio_tokens_ratio\": 67, \"output_audio_tokens_ratio\": 34}}",
+        "save": "Save extra token price settings",
+        "title": "Extra token price settings"
       },
       "disableChannelKeywordsSettings": {
         "info": "Disable channel keywords, one keyword per line.",

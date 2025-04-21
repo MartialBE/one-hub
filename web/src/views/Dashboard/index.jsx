@@ -1,5 +1,5 @@
-import { useEffect, useState, useContext } from 'react';
-import { Grid, Typography, Box } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Grid, Box } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
@@ -7,10 +7,8 @@ import SupportModels from './component/SupportModels';
 import { getLastSevenDays, generateBarChartOptions, renderChartNumber } from 'utils/chart';
 import { API } from 'utils/api';
 import { showError, calculateQuota } from 'utils/common';
-import UserCard from 'ui-component/cards/UserCard';
+import ModelUsagePieChart from './component/ModelUsagePieChart';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from 'contexts/UserContext';
-import Label from 'ui-component/Label';
 import InviteCard from './component/InviteCard';
 import QuotaLogWeek from './component/QuotaLogWeek';
 import QuickStartCard from './component/QuickStartCard';
@@ -24,7 +22,7 @@ const Dashboard = () => {
   const [tokenChart, setTokenChart] = useState(null);
   const [users, setUsers] = useState([]);
   const { t } = useTranslation();
-  const { userGroup } = useContext(UserContext);
+  const [modelUsageData, setModelUsageData] = useState([]);
 
   const userDashboard = async () => {
     try {
@@ -37,6 +35,7 @@ const Dashboard = () => {
           setQuotaChart(getLineCardOption(lineData, 'Quota'));
           setTokenChart(getLineCardOption(lineData, 'PromptTokens'));
           setStatisticalData(getBarDataGroup(data));
+          setModelUsageData(getModelUsageData(data));
         }
       } else {
         showError(message);
@@ -124,70 +123,7 @@ const Dashboard = () => {
 
           <Grid item lg={4} xs={12}>
             {/* 用户信息 */}
-            <UserCard>
-              <Box
-                sx={{
-                  pt: 4,
-                  pb: 4,
-                  px: 3,
-                  textAlign: 'center'
-                }}
-              >
-                <Typography variant="h4" sx={{ mb: 0.5 }}>
-                  {users.username}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  {users.email}
-                </Typography>
-
-                <Label color={'primary'} variant="outlined" sx={{ mb: 3 }}>
-                  {userGroup?.[users.group]?.name || users.group}
-                  (RPM:{userGroup?.[users.group]?.api_rate || 0})
-                </Label>
-
-                {/* 统计信息区域 */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2.5
-                  }}
-                >
-                  {[
-                    {
-                      label: t('dashboard_index.balance'),
-                      value: users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')
-                    },
-                    {
-                      label: t('dashboard_index.used'),
-                      value: users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')
-                    },
-                    { label: t('dashboard_index.calls'), value: users?.request_count || t('dashboard_index.unknown') }
-                  ].map((item, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        px: 2,
-                        py: 1.5,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(145, 158, 171, 0.08)',
-                        '&:hover': {
-                          bgcolor: 'rgba(145, 158, 171, 0.12)'
-                        }
-                      }}
-                    >
-                      <Typography variant="body2">{item.label}</Typography>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {item.value}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            </UserCard>
+            <ModelUsagePieChart isLoading={isLoading} data={modelUsageData} />
             <Box mt={2}>
               <QuickStartCard />
             </Box>
@@ -201,6 +137,22 @@ const Dashboard = () => {
     </Grid>
   );
 };
+
+// 新增函数来处理模型使用数据
+function getModelUsageData(data) {
+  const modelUsage = {};
+  data.forEach(item => {
+    if (!modelUsage[item.ModelName]) {
+      modelUsage[item.ModelName] = 0;
+    }
+    modelUsage[item.ModelName] += item.RequestCount;
+  });
+
+  return Object.entries(modelUsage).map(([name, count]) => ({
+    name,
+    value: count
+  }));
+}
 export default Dashboard;
 
 function getLineDataGroup(statisticalData) {

@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"one-api/common/config"
 )
 
 type Usage struct {
@@ -11,6 +12,57 @@ type Usage struct {
 	TotalTokens             int                     `json:"total_tokens"`
 	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details"`
 	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details"`
+
+	ExtraTokens map[string]int `json:"-"`
+}
+
+func (u *Usage) GetExtraTokens() map[string]int {
+	if u.ExtraTokens == nil {
+		u.ExtraTokens = make(map[string]int)
+	}
+
+	// 组装，已有的数据
+	if u.PromptTokensDetails.CachedTokens > 0 && u.ExtraTokens[config.UsageExtraCache] == 0 {
+		u.ExtraTokens[config.UsageExtraCache] = u.PromptTokensDetails.CachedTokens
+	}
+
+	if u.PromptTokensDetails.AudioTokens > 0 && u.ExtraTokens[config.UsageExtraInputAudio] == 0 {
+		u.ExtraTokens[config.UsageExtraInputAudio] = u.PromptTokensDetails.AudioTokens
+	}
+
+	if u.PromptTokensDetails.TextTokens > 0 && u.ExtraTokens[config.UsageExtraInputTextTokens] == 0 {
+		u.ExtraTokens[config.UsageExtraInputTextTokens] = u.PromptTokensDetails.TextTokens
+	}
+
+	if u.PromptTokensDetails.CachedWriteTokens > 0 && u.ExtraTokens[config.UsageExtraCachedWrite] == 0 {
+		u.ExtraTokens[config.UsageExtraCachedWrite] = u.PromptTokensDetails.CachedWriteTokens
+	}
+
+	if u.PromptTokensDetails.CachedReadTokens > 0 && u.ExtraTokens[config.UsageExtraCachedRead] == 0 {
+		u.ExtraTokens[config.UsageExtraCachedRead] = u.PromptTokensDetails.CachedReadTokens
+	}
+
+	if u.CompletionTokensDetails.AudioTokens > 0 && u.ExtraTokens[config.UsageExtraOutputAudio] == 0 {
+		u.ExtraTokens[config.UsageExtraOutputAudio] = u.CompletionTokensDetails.AudioTokens
+	}
+
+	if u.CompletionTokensDetails.TextTokens > 0 && u.ExtraTokens[config.UsageExtraOutputTextTokens] == 0 {
+		u.ExtraTokens[config.UsageExtraOutputTextTokens] = u.CompletionTokensDetails.TextTokens
+	}
+
+	if u.CompletionTokensDetails.ReasoningTokens > 0 && u.ExtraTokens[config.UsageExtraReasoning] == 0 {
+		u.ExtraTokens[config.UsageExtraReasoning] = u.CompletionTokensDetails.ReasoningTokens
+	}
+
+	return u.ExtraTokens
+}
+
+func (u *Usage) SetExtraTokens(key string, value int) {
+	if u.ExtraTokens == nil {
+		u.ExtraTokens = make(map[string]int)
+	}
+
+	u.ExtraTokens[key] = value
 }
 
 type PromptTokensDetails struct {

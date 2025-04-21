@@ -213,37 +213,12 @@ func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 	}
 
 	if usage != nil {
-		promptDetails := usage.PromptTokensDetails
-		completionDetails := usage.CompletionTokensDetails
+		extraTokens := usage.GetExtraTokens()
 
-		if promptDetails.CachedTokens != 0 {
-			meta["cached_tokens"] = promptDetails.CachedTokens
-			meta["cached_tokens_ratio"] = q.price.GetExtraRatio("cached_tokens_ratio")
-		}
-		if promptDetails.AudioTokens != 0 {
-			meta["input_audio_tokens"] = promptDetails.AudioTokens
-			meta["input_audio_tokens_ratio"] = q.price.GetExtraRatio("input_audio_tokens_ratio")
-		}
-		if promptDetails.TextTokens != 0 {
-			meta["input_text_tokens"] = promptDetails.TextTokens
-		}
-
-		if promptDetails.CachedWriteTokens > 0 {
-			meta["cached_write_tokens"] = promptDetails.CachedWriteTokens
-			meta["cached_write_ratio"] = q.price.GetExtraRatio("cached_write_ratio")
-		}
-
-		if promptDetails.CachedReadTokens > 0 {
-			meta["cached_read_tokens"] = promptDetails.CachedReadTokens
-			meta["cached_read_ratio"] = q.price.GetExtraRatio("cached_read_ratio")
-		}
-
-		if completionDetails.AudioTokens != 0 {
-			meta["output_audio_tokens"] = completionDetails.AudioTokens
-			meta["output_audio_tokens_ratio"] = q.price.GetExtraRatio("output_audio_tokens_ratio")
-		}
-		if completionDetails.TextTokens != 0 {
-			meta["output_text_tokens"] = completionDetails.TextTokens
+		for key, value := range extraTokens {
+			meta[key] = value
+			extraRatio := q.price.GetExtraRatio(key)
+			meta[key+"_ratio"] = extraRatio
 		}
 	}
 
@@ -296,32 +271,16 @@ func (q *Quota) GetTotalQuota(promptTokens, completionTokens int) (quota int) {
 func (q *Quota) getComputeTokensByUsage(usage *types.Usage) (promptTokens, completionTokens int) {
 	promptTokens = usage.PromptTokens
 	completionTokens = usage.CompletionTokens
-	completionDetails := usage.CompletionTokensDetails
-	promptDetails := usage.PromptTokensDetails
 
-	if promptDetails.CachedTokens > 0 {
-		cachedTokensRatio := q.price.GetExtraRatio("cached_tokens_ratio")
-		promptTokens -= int(float64(promptDetails.CachedTokens) * cachedTokensRatio)
-	}
+	extraTokens := usage.GetExtraTokens()
 
-	if promptDetails.AudioTokens > 0 {
-		inputAudioTokensRatio := q.price.GetExtraRatio("input_audio_tokens_ratio") - 1
-		promptTokens += int(float64(promptDetails.AudioTokens) * inputAudioTokensRatio)
-	}
-
-	if promptDetails.CachedWriteTokens > 0 {
-		cachedWriteTokensRatio := q.price.GetExtraRatio("cached_write_ratio")
-		promptTokens += int(float64(promptDetails.CachedWriteTokens) * cachedWriteTokensRatio)
-	}
-
-	if promptDetails.CachedReadTokens > 0 {
-		cachedReadTokensRatio := q.price.GetExtraRatio("cached_read_ratio")
-		promptTokens += int(float64(promptDetails.CachedReadTokens) * cachedReadTokensRatio)
-	}
-
-	if completionDetails.AudioTokens > 0 {
-		outputAudioTokensRatio := q.price.GetExtraRatio("output_audio_tokens_ratio") - 1
-		completionTokens += int(float64(completionDetails.AudioTokens) * outputAudioTokensRatio)
+	for key, value := range extraTokens {
+		extraRatio := q.price.GetExtraRatio(key)
+		if model.GetExtraPriceIsPrompt(key) {
+			promptTokens += model.GetIncreaseTokens(value, extraRatio)
+		} else {
+			completionTokens += model.GetIncreaseTokens(value, extraRatio)
+		}
 	}
 
 	return
@@ -330,22 +289,15 @@ func (q *Quota) getComputeTokensByUsage(usage *types.Usage) (promptTokens, compl
 func (q *Quota) getComputeTokensByUsageEvent(usage *types.UsageEvent) (promptTokens, completionTokens int) {
 	promptTokens = usage.InputTokens
 	completionTokens = usage.OutputTokens
-	inputDetails := usage.InputTokenDetails
+	extraTokens := usage.GetExtraTokens()
 
-	if inputDetails.CachedTokens > 0 {
-		cachedTokensRatio := q.price.GetExtraRatio("cached_tokens_ratio")
-		promptTokens -= int(float64(inputDetails.CachedTokens) * cachedTokensRatio)
-	}
-	if inputDetails.AudioTokens > 0 {
-		inputAudioTokensRatio := q.price.GetExtraRatio("input_audio_tokens_ratio") - 1
-		promptTokens += int(float64(inputDetails.AudioTokens) * inputAudioTokensRatio)
-	}
-
-	outputDetails := usage.OutputTokenDetails
-
-	if outputDetails.AudioTokens > 0 {
-		outputAudioTokensRatio := q.price.GetExtraRatio("output_audio_tokens_ratio") - 1
-		completionTokens += int(float64(outputDetails.AudioTokens) * outputAudioTokensRatio)
+	for key, value := range extraTokens {
+		extraRatio := q.price.GetExtraRatio(key)
+		if model.GetExtraPriceIsPrompt(key) {
+			promptTokens += model.GetIncreaseTokens(value, extraRatio)
+		} else {
+			completionTokens += model.GetIncreaseTokens(value, extraRatio)
+		}
 	}
 
 	return

@@ -255,12 +255,13 @@ function calculateTokens(item) {
   const output_audio_tokens = metadata?.output_audio_tokens_ratio || TOKEN_RATIOS.OUTPUT_AUDIO;
 
   const cached_ratio = metadata?.cached_tokens_ratio || TOKEN_RATIOS.CACHED;
-  const cached_write_ratio = metadata?.cached_write_ratio || 0;
-  const cached_read_ratio = metadata?.cached_read_ratio || 0;
+  const cached_write_ratio = metadata?.cached_write_tokens_ratio || 0;
+  const cached_read_ratio = metadata?.cached_recached_read_tokens_ratioad_ratio || 0;
+  const reasoning_tokens = metadata?.reasoning_tokens_ratio || 0;
 
   const tokenDetails = [
-    { key: 'input_text_tokens', label: 'logPage.inputTextTokens', rate: TOKEN_RATIOS.TEXT },
-    { key: 'output_text_tokens', label: 'logPage.outputTextTokens', rate: TOKEN_RATIOS.TEXT },
+    { key: 'input_text_tokens', label: 'logPage.inputTextTokens', rate: TOKEN_RATIOS.TEXT, labelParams: { ratio: TOKEN_RATIOS.TEXT } },
+    { key: 'output_text_tokens', label: 'logPage.outputTextTokens', rate: TOKEN_RATIOS.TEXT, labelParams: { ratio: TOKEN_RATIOS.TEXT } },
     {
       key: 'input_audio_tokens',
       label: 'logPage.inputAudioTokens',
@@ -273,9 +274,15 @@ function calculateTokens(item) {
       rate: output_audio_tokens,
       labelParams: { ratio: output_audio_tokens }
     },
-    { key: 'cached_tokens', label: 'logPage.cachedTokens', rate: cached_ratio },
-    { key: 'cached_write_tokens', label: 'logPage.cachedWriteTokens', rate: cached_write_ratio },
-    { key: 'cached_read_tokens', label: 'logPage.cachedReadTokens', rate: cached_read_ratio }
+    { key: 'cached_tokens', label: 'logPage.cachedTokens', rate: cached_ratio, labelParams: { ratio: cached_ratio } },
+    {
+      key: 'cached_write_tokens',
+      label: 'logPage.cachedWriteTokens',
+      rate: cached_write_ratio,
+      labelParams: { ratio: cached_write_ratio }
+    },
+    { key: 'cached_read_tokens', label: 'logPage.cachedReadTokens', rate: cached_read_ratio, labelParams: { ratio: cached_read_ratio } },
+    { key: 'reasoning_tokens', label: 'logPage.reasoningTokens', rate: reasoning_tokens, labelParams: { ratio: reasoning_tokens } }
   ]
     .filter(({ key }) => metadata[key] > 0)
     .map(({ key, label, rate, labelParams }) => {
@@ -284,7 +291,7 @@ function calculateTokens(item) {
       if (key === 'input_audio_tokens' || key === 'cached_tokens') {
         totalInputTokens += tokens - metadata[key];
         show = true;
-      } else if (key === 'output_audio_tokens') {
+      } else if (key === 'output_audio_tokens' || key === 'reasoning_tokens') {
         totalOutputTokens += tokens - metadata[key];
         show = true;
       } else if (key === 'cached_write_tokens' || key === 'cached_read_tokens') {
