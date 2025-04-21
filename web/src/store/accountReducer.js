@@ -1,7 +1,8 @@
 import * as actionTypes from './actions';
 
 export const initialState = {
-  user: undefined
+  user: undefined,
+  userGroup: []
 };
 
 const accountReducer = (state = initialState, action) => {
@@ -15,6 +16,11 @@ const accountReducer = (state = initialState, action) => {
       return {
         ...state,
         user: undefined
+      };
+    case actionTypes.SET_USER_GROUP:
+      return {
+        ...state,
+        userGroup: action.payload
       };
     default:
       return state;

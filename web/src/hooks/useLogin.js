@@ -1,6 +1,7 @@
-import { API } from 'utils/api';
+import { API, LoginCheckAPI } from 'utils/api';
+import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { LOGIN } from 'store/actions';
+import { LOGIN, SET_USER_GROUP } from 'store/actions';
 import { useNavigate } from 'react-router';
 import { showSuccess } from 'utils/common';
 import { useTranslation } from 'react-i18next';
@@ -15,10 +16,10 @@ const useLogin = () => {
         username,
         password
       });
-      const { success, message, data } = res.data;
+      const { success, message } = res.data;
       if (success) {
-        localStorage.setItem('user', JSON.stringify(data));
-        dispatch({ type: LOGIN, payload: data });
+        loadUser();
+        loadUserGroup();
         navigate('/panel');
       }
       return { success, message };
@@ -32,14 +33,14 @@ const useLogin = () => {
     try {
       const affCode = localStorage.getItem('aff');
       const res = await API.get(`/api/oauth/github?code=${code}&state=${state}&aff=${affCode}`);
-      const { success, message, data } = res.data;
+      const { success, message } = res.data;
       if (success) {
         if (message === 'bind') {
           showSuccess(t('common.bindOk'));
           navigate('/panel');
         } else {
-          dispatch({ type: LOGIN, payload: data });
-          localStorage.setItem('user', JSON.stringify(data));
+          loadUser();
+          loadUserGroup();
           showSuccess(t('common.loginOk'));
           navigate('/panel');
         }
@@ -55,14 +56,14 @@ const useLogin = () => {
     try {
       const affCode = localStorage.getItem('aff');
       const res = await API.get(`/api/oauth/oidc?code=${code}&state=${state}&aff=${affCode}`);
-      const { success, message, data } = res.data;
+      const { success, message } = res.data;
       if (success) {
         if (message === 'bind') {
           showSuccess(t('common.bindOk'));
           navigate('/panel');
         } else {
-          dispatch({ type: LOGIN, payload: data });
-          localStorage.setItem('user', JSON.stringify(data));
+          loadUser();
+          loadUserGroup();
           showSuccess(t('common.loginOk'));
           navigate('/panel');
         }
@@ -78,14 +79,13 @@ const useLogin = () => {
     try {
       const affCode = localStorage.getItem('aff');
       const res = await API.get(`/api/oauth/lark?code=${code}&state=${state}&aff=${affCode}`);
-      const { success, message, data } = res.data;
+      const { success, message } = res.data;
       if (success) {
         if (message === 'bind') {
           showSuccess(t('common.bindOk'));
           navigate('/panel');
         } else {
-          dispatch({ type: LOGIN, payload: data });
-          localStorage.setItem('user', JSON.stringify(data));
+          loadUser();
           showSuccess(t('common.loginOk'));
           navigate('/panel');
         }
@@ -101,10 +101,10 @@ const useLogin = () => {
     try {
       const affCode = localStorage.getItem('aff');
       const res = await API.get(`/api/oauth/wechat?code=${code}&aff=${affCode}`);
-      const { success, message, data } = res.data;
+      const { success, message } = res.data;
       if (success) {
-        dispatch({ type: LOGIN, payload: data });
-        localStorage.setItem('user', JSON.stringify(data));
+        loadUser();
+        loadUserGroup();
         showSuccess(t('common.loginOk'));
         navigate('/panel');
       }
@@ -122,7 +122,33 @@ const useLogin = () => {
     navigate('/');
   };
 
-  return { login, logout, githubLogin, wechatLogin, larkLogin, oidcLogin };
+  const loadUser = useCallback(async () => {
+    try {
+      const res = await LoginCheckAPI.get('/api/user/self');
+      const { success, data } = res.data;
+      if (success) {
+        dispatch({ type: LOGIN, payload: data });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatch]);
+
+  const loadUserGroup = useCallback(() => {
+    try {
+      API.get('/api/user_group_map').then((res) => {
+        const { success, data } = res.data;
+        if (success) {
+          dispatch({ type: SET_USER_GROUP, payload: data });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    return [];
+  }, []);
+
+  return { login, logout, githubLogin, wechatLogin, larkLogin, oidcLogin, loadUser, loadUserGroup };
 };
 
 export default useLogin;

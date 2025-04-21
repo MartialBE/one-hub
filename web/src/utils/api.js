@@ -25,3 +25,9 @@ API.interceptors.response.use(
     showError(error);
   }
 );
+
+export const LoginCheckAPI = axios.create({
+  // ... 其他代码 ...
+
+  baseURL: import.meta.env.VITE_APP_SERVER || '/'
+});

@@ -9,3 +9,5 @@ export const SET_MODEL_OWNEDBY = '@siteInfo/SET_MODEL_OWNEDBY';
 export const LOGIN = '@account/LOGIN';
 export const LOGOUT = '@account/LOGOUT';
 export const SET_THEME = '@customization/SET_THEME';
+
+export const SET_USER_GROUP = '@userGroup/SET_USER_GROUP';
