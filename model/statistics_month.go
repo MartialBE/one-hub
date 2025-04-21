@@ -101,9 +101,15 @@ func generateInsertStatisticsMonthSQL(date time.Time) string {
 	month := date.Month()
 
 	// First day of the month
-	firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+	firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
 	// Last day of the month
-	lastDay := time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC)
+	if month == 12 {
+		year = year + 1
+		month = 1
+	} else {
+		month = month + 1
+	}
+	lastDay := time.Date(year, month, 0, 0, 0, 0, 0, time.Local)
 
 	firstDayStr := firstDay.Format("2006-01-02")
 	lastDayStr := lastDay.Format("2006-01-02")
