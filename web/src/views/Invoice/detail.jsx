@@ -239,7 +239,7 @@ export default function InvoiceDetail() {
             mb: 4,
             borderRadius: '8px',
             // overflow: 'hidden',
-            border: `1px solid ${alpha(theme.palette.divider, 0.3)}`
+            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
           }}
         >
           <Table>
@@ -312,7 +312,7 @@ export default function InvoiceDetail() {
                   key={index}
                   sx={{
                     '&:nth-of-type(odd)': {
-                      bgcolor: alpha(theme.palette.action.hover, 0.2)
+                      bgcolor: alpha(theme.palette.action.hover, 0.05)
                     },
                     '&:last-child td, &:last-child th': {
                       border: 0
