@@ -1,6 +1,6 @@
 // contexts/User/index.jsx
 import React, { useEffect, useCallback, createContext, useState } from 'react';
-import { API } from 'utils/api';
+import { API, LoginCheckAPI } from 'utils/api';
 import { LOGIN } from 'store/actions';
 import { useDispatch } from 'react-redux';
 
@@ -12,10 +12,11 @@ const UserProvider = ({ children }) => {
   const [isUserLoaded, setIsUserLoaded] = useState(false);
   const [userGroup, setUserGroup] = useState({});
 
-  const loadUser = useCallback(() => {
-    let user = localStorage.getItem('user');
-    if (user) {
-      let data = JSON.parse(user);
+  const loadUser = useCallback(async () => {
+    const res = await LoginCheckAPI.get('/api/user/self');
+
+    if (res.status === 200) {
+      const { data } = res.data;
       dispatch({ type: LOGIN, payload: data });
     }
     setIsUserLoaded(true);

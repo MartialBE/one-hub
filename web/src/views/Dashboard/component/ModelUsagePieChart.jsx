@@ -7,7 +7,27 @@ import { gridSpacing } from 'store/constant';
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import { red, pink, purple, deepPurple, indigo, blue, lightBlue, cyan, teal, green, lightGreen, lime, yellow, amber, orange, deepOrange, brown, grey, blueGrey } from '@mui/material/colors';
+import {
+  red,
+  pink,
+  purple,
+  deepPurple,
+  indigo,
+  blue,
+  lightBlue,
+  cyan,
+  teal,
+  green,
+  lightGreen,
+  lime,
+  yellow,
+  amber,
+  orange,
+  deepOrange,
+  brown,
+  grey,
+  blueGrey
+} from '@mui/material/colors';
 
 const ModelUsagePieChart = ({ isLoading, data }) => {
   const { t } = useTranslation();
@@ -16,9 +36,9 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
     options: {
       chart: {
         type: 'pie',
-        height: '100%',
+        height: '100%'
       },
-      labels: data.map(item => item.name),
+      labels: data.map((item) => item.name),
       colors: [
         red[500],
         pink[500],
@@ -67,7 +87,7 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
         deepOrange[700],
         brown[700],
         grey[700],
-        blueGrey[700],
+        blueGrey[700]
       ],
       legend: {
         show: true,
@@ -75,12 +95,12 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
         position: 'bottom',
         offsetY: 5,
         labels: {
-          useSeriesColors: false,
+          useSeriesColors: false
         },
         markers: {
           width: 12,
           height: 12,
-          radius: 5,
+          radius: 5
         },
         itemMargin: {
           horizontal: 10,
@@ -88,29 +108,31 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
         }
       },
       stroke: {
-        width: 0  // 将线条宽度设置为 0，effectively 禁用了饼块之间的白线
+        width: 0 // 将线条宽度设置为 0，effectively 禁用了饼块之间的白线
       },
       plotOptions: {
         pie: {
           donut: {
-            size: '0%',  // 可以调整这个值来改变饼图中心空洞的大小
+            size: '0%' // 可以调整这个值来改变饼图中心空洞的大小
           }
         }
       },
-      responsive: [{
-        breakpoint: 490,
-        options: {
-          chart: {
-            height: 490
-          },
-          legend: {
-            position: 'bottom',
-            fontSize: '10px',
+      responsive: [
+        {
+          breakpoint: 490,
+          options: {
+            chart: {
+              height: 490
+            },
+            legend: {
+              position: 'bottom',
+              fontSize: '10px'
+            }
           }
         }
-      }],
+      ]
     },
-    series: data.map(item => item.value)
+    series: data.map((item) => item.value)
   };
 
   return (
@@ -125,16 +147,13 @@ const ModelUsagePieChart = ({ isLoading, data }) => {
         <MainCard>
           <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-              <Typography variant="h3" sx={{ mb: 2 }}>{t('dashboard_index.7days_model_usage_pie')}</Typography>
+              <Typography variant="h3" sx={{ mb: 2 }}>
+                {t('dashboard_index.7days_model_usage_pie')}
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               {data.length > 0 ? (
-                <ReactApexChart
-                  options={chartData.options}
-                  series={chartData.series}
-                  type="pie"
-                  height={500}
-                />
+                <ReactApexChart options={chartData.options} series={chartData.series} type="pie" height={500} />
               ) : (
                 <Box
                   sx={{
