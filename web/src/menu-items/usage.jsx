@@ -4,7 +4,7 @@ const icons = {
   IconArticle: () => <Icon width={20} icon="solar:document-text-bold-duotone" />,
   IconBrush: () => <Icon width={20} icon="tabler:photo-ai" />,
   IconList: () => <Icon width={20} icon="solar:checklist-minimalistic-bold-duotone" />,
-  IconInvoice: () => <Icon width={20} icon="solar:book-bookmark-bold-duotone" />
+  IconInvoice: () => <Icon width={20} icon="solar:dollar-minimalistic-bold-duotone" />
 };
 
 const usage = {

@@ -90,10 +90,10 @@ export default function InvoiceDetail() {
     navigate('/panel/invoice');
   };
 
-// Handle download invoice as PDF
-//   const handleDownload = () => {
-//     printElementAsPDF('invoice-paper', `invoice-${date}.pdf`);
-//   };
+  // Handle download invoice as PDF
+  //   const handleDownload = () => {
+  //     printElementAsPDF('invoice-paper', `invoice-${date}.pdf`);
+  //   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
@@ -149,7 +149,7 @@ export default function InvoiceDetail() {
           </Typography>
         </Box>
 
-        <Divider sx={{ mb: 4 }} />
+        <Divider sx={{ borderStyle: 'dashed', borderWidth: '1.5px', mb: 4 }} />
 
         <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>
@@ -221,7 +221,7 @@ export default function InvoiceDetail() {
             </Box>
           </Grid>
         </Grid>
-
+        <Divider sx={{ borderStyle: 'dashed', borderWidth: '1.5px', mb: 4 }} />
         <Typography
           variant="h4"
           gutterBottom
@@ -345,19 +345,19 @@ export default function InvoiceDetail() {
           </Table>
         </TableContainer>
 
-        <Divider/>
+        <Divider sx={{ borderStyle: 'dashed', borderWidth: '1.5px', mb: 4 }} />
 
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            bgcolor: alpha(theme.palette.success.light, 0.15),
+            alignItems: 'baseline',
+            justifyContent: 'flex-end',
+            gap: 2,
             borderRadius: '8px'
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
-            {t('invoice_index.quota')}
+            {t('invoice_index.quota')}:
           </Typography>
           <Typography
             variant="h4"
