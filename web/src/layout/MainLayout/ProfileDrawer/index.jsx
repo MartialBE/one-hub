@@ -22,41 +22,20 @@ import {
 import User1 from 'assets/images/users/user-round.svg';
 import useLogin from 'hooks/useLogin';
 import { useTranslation } from 'react-i18next';
-import { useState, useContext, useEffect } from 'react';
-import { API } from 'utils/api';
-import { showError, calculateQuota } from 'utils/common';
+import { calculateQuota } from 'utils/common';
 
 // assets
 import { Icon } from '@iconify/react';
-
-import { UserContext } from 'contexts/UserContext';
-
 
 // ==============================|| PROFILE DRAWER ||============================== //
 
 const ProfileDrawer = ({ open, onClose }) => {
   const { t } = useTranslation();
-  const [users, setUsers] = useState([]);
-  const { userGroup } = useContext(UserContext);
   const theme = useTheme();
   const navigate = useNavigate();
-  const account = useSelector((state) => state.account);
+  const { user, userGroup } = useSelector((state) => state.account);
+
   const { logout } = useLogin();
-
-
-  const loadUser = async () => {
-    try {
-      let res = await API.get(`/api/user/self`);
-      const { success, message, data } = res.data;
-      if (success) {
-        setUsers(data);
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      return;
-    }
-  };
 
   const handleLogout = async () => {
     logout();
@@ -67,9 +46,7 @@ const ProfileDrawer = ({ open, onClose }) => {
     navigate(path);
     if (onClose) onClose();
   };
-  useEffect(() => {
-    loadUser();
-  }, []);
+
   return (
     <SwipeableDrawer
       anchor="right"
@@ -101,7 +78,7 @@ const ProfileDrawer = ({ open, onClose }) => {
         {/* 用户信息头部 */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, pb: 2 }}>
           <Avatar
-            src={account.user?.avatar_url || User1}
+            src={user?.avatar_url || User1}
             sx={{
               border: `1px solid ${theme.palette.primary.dark}`,
               width: 64,
@@ -110,10 +87,10 @@ const ProfileDrawer = ({ open, onClose }) => {
             }}
           />
           <Typography variant="h5" sx={{ fontWeight: 500, mb: 0.5 }}>
-            {users.display_name || users.username || 'Unknown'}
+            {user?.display_name || user?.username || 'Unknown'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {users.email || 'Unknown'}
+            {user?.email || 'Unknown'}
           </Typography>
           <Box
             sx={{
@@ -125,8 +102,8 @@ const ProfileDrawer = ({ open, onClose }) => {
             }}
           >
             <Typography variant="caption" color="primary">
-              {t('userPage.group')}: {userGroup?.[users.group]?.name || users.group}（ {t('modelpricePage.rate')}:
-              {userGroup?.[users.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:{userGroup?.[users.group]?.api_rate || 'Unknown'}）
+              {t('userPage.group')}: {userGroup?.[user?.group]?.name || user?.group}（ {t('modelpricePage.rate')}:
+              {userGroup?.[user?.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:{userGroup?.[user?.group]?.api_rate || 'Unknown'}）
             </Typography>
           </Box>
         </Box>
@@ -139,7 +116,7 @@ const ProfileDrawer = ({ open, onClose }) => {
               <Typography variant="body2" color="text.secondary">
                 {t('dashboard_index.balance')}
               </Typography>
-              <Typography variant="body2">{users?.quota ? '$' + calculateQuota(users.quota) : t('dashboard_index.unknown')}</Typography>
+              <Typography variant="body2">{user?.quota ? '$' + calculateQuota(user.quota) : t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -147,7 +124,7 @@ const ProfileDrawer = ({ open, onClose }) => {
                 {t('dashboard_index.used')}
               </Typography>
               <Typography variant="body2">
-                {users?.used_quota ? '$' + calculateQuota(users.used_quota) : t('dashboard_index.unknown')}
+                {user?.used_quota ? '$' + calculateQuota(user.used_quota) : t('dashboard_index.unknown')}
               </Typography>
             </Box>
 
@@ -155,14 +132,14 @@ const ProfileDrawer = ({ open, onClose }) => {
               <Typography variant="body2" color="text.secondary">
                 {t('dashboard_index.calls')}
               </Typography>
-              <Typography variant="body2">{users?.request_count || t('dashboard_index.unknown')}</Typography>
+              <Typography variant="body2">{user?.request_count || t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" color="text.secondary">
                 {t('invite_count')}
               </Typography>
-              <Typography variant="body2">{users?.aff_count || t('dashboard_index.unknown') }</Typography>
+              <Typography variant="body2">{user?.aff_count || t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -170,11 +147,11 @@ const ProfileDrawer = ({ open, onClose }) => {
                 {t('invite_reward')}
               </Typography>
               <Typography variant="body2">
-                {users?.aff_quota ? '$' + calculateQuota(users.aff_quota) : t('dashboard_index.unknown')}
+                {user?.aff_quota ? '$' + calculateQuota(user.aff_quota) : t('dashboard_index.unknown')}
               </Typography>
             </Box>
           </Stack>
-          <Divider sx={{ borderWidth: '1px', borderStyle: 'dashed', mt: 2 , mb: 2 }} />
+          <Divider sx={{ borderWidth: '1px', borderStyle: 'dashed', mt: 2, mb: 2 }} />
           {/* 按钮区域 */}
           <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
             <Button
@@ -198,7 +175,7 @@ const ProfileDrawer = ({ open, onClose }) => {
             </Button>
           </Box>
 
-          <Divider sx={{ borderWidth: '1px', borderStyle: 'dashed', mt: 2 , mb: 2 }} />
+          <Divider sx={{ borderWidth: '1px', borderStyle: 'dashed', mt: 2, mb: 2 }} />
 
           {/* 底部导航菜单 */}
           <Box>
@@ -226,7 +203,6 @@ const ProfileDrawer = ({ open, onClose }) => {
             </List>
           </Box>
         </Box>
-
 
         {/* 退出按钮 - 固定在底部 */}
         <Box sx={{ mt: 'auto', p: 2, position: 'sticky', bottom: 0, bgcolor: theme.palette.background.paper }}>

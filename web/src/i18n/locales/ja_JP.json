@@ -26,6 +26,10 @@
     "updateModeUpdate": "価格変更のみ",
     "updateModeOverwrite": "上書き"
   },
+  "sidebar": {
+    "totalQuota": "総額",
+    "remainingBalance": "残高"
+  },
   "Header 配置": "ヘッダー構成",
   "about": {
     "aboutDescription": "設定ページで「About」内容を設定できます。HTML & Markdownをサポートしています",
@@ -268,6 +272,7 @@
     "used": "使用済み",
     "week_model_statistics": "近七日模型統計",
     "week_consumption_log": "近七日消費日志",
+    "7days_model_usage_pie": "近七日模型使用情況",
     "date": "日付",
     "request_count": "リクエスト数",
     "amount": "金額",

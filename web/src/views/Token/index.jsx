@@ -34,12 +34,13 @@ export default function Token() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [tokens, setTokens] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const { userGroup, loadUserGroup } = useContext(UserContext);
+  const { loadUserGroup } = useContext(UserContext);
   const [userGroupOptions, setUserGroupOptions] = useState([]);
 
   const [openModal, setOpenModal] = useState(false);
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
+  const { userGroup } = useSelector((state) => state.account);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';

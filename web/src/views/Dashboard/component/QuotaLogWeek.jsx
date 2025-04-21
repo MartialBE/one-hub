@@ -1,61 +1,50 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { API } from 'utils/api';
 import { calculateQuota } from 'utils/common';
 import { getLastSevenDays } from 'utils/chart';
 import { useTranslation } from 'react-i18next';
 import SubCard from 'ui-component/cards/SubCard';
 
-const QuotaLogWeek = () => {
+const QuotaLogWeek = ({ data }) => {
   const [logData, setLogData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
   const [isHasData, setIsHasData] = useState(false);
 
   useEffect(() => {
-    const fetchLogData = async () => {
-      try {
-        const res = await API.get('/api/user/dashboard');
-        const { success, data } = res.data;
-        if (success && data) {
-          setIsHasData(true);
-          // 处理数据，按日期分组
-          const lastSevenDays = getLastSevenDays();
-          const processedData = lastSevenDays
-            .map((date) => {
-              const dayData = data.filter((item) => item.Date === date);
+    if (data) {
+      setIsHasData(true);
+      // 处理数据，按日期分组
+      const lastSevenDays = getLastSevenDays();
+      const processedData = lastSevenDays
+        .map((date) => {
+          const dayData = data.filter((item) => item.Date === date);
 
-              // 计算当天的总和
-              const totalRequests = dayData.reduce((sum, item) => sum + item.RequestCount, 0);
-              const totalAmount = dayData.reduce((sum, item) => sum + item.Quota, 0).toFixed(6);
-              const totalInputTokens = dayData.reduce((sum, item) => sum + item.PromptTokens, 0);
-              const totalOutputTokens = dayData.reduce((sum, item) => sum + item.CompletionTokens, 0);
-              const totalDuration = dayData.reduce((sum, item) => sum + item.RequestTime, 0);
+          // 计算当天的总和
+          const totalRequests = dayData.reduce((sum, item) => sum + item.RequestCount, 0);
+          const totalAmount = dayData.reduce((sum, item) => sum + item.Quota, 0).toFixed(6);
+          const totalInputTokens = dayData.reduce((sum, item) => sum + item.PromptTokens, 0);
+          const totalOutputTokens = dayData.reduce((sum, item) => sum + item.CompletionTokens, 0);
+          const totalDuration = dayData.reduce((sum, item) => sum + item.RequestTime, 0);
 
-              return {
-                date,
-                requests: totalRequests,
-                amount: calculateQuota(totalAmount, 6),
-                tokens: `${totalInputTokens}/${totalOutputTokens}`,
-                cacheTokens: 0, // 假设默认为0，如果API返回了相关数据则使用实际值
-                duration: (totalDuration / 1000).toFixed(3)
-              };
-            })
-            .reverse();
+          return {
+            date,
+            requests: totalRequests,
+            amount: calculateQuota(totalAmount, 6),
+            tokens: `${totalInputTokens}/${totalOutputTokens}`,
+            cacheTokens: 0, // 假设默认为0，如果API返回了相关数据则使用实际值
+            duration: (totalDuration / 1000).toFixed(3)
+          };
+        })
+        .reverse();
 
-          setLogData(processedData);
-        } else {
-          setIsHasData(false);
-        }
-        setIsLoading(false);
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchLogData();
-  }, []);
+      setLogData(processedData);
+    } else {
+      setIsHasData(false);
+    }
+    setIsLoading(false);
+  }, [data]);
 
   return (
     <SubCard title={t('dashboard_index.week_consumption_log')} contentSX={{ p: 0 }}>
@@ -108,3 +97,7 @@ const QuotaLogWeek = () => {
 };
 
 export default QuotaLogWeek;
+
+QuotaLogWeek.propTypes = {
+  data: PropTypes.array
+};
