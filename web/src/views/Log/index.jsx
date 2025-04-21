@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { showError, trims } from 'utils/common';
 
 import Table from '@mui/material/Table';
@@ -21,9 +21,9 @@ import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from 'contexts/UserContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
 
 export default function Log() {
   const { t } = useTranslation();
@@ -48,7 +48,7 @@ export default function Log() {
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
   const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const { userGroup } = useContext(UserContext);
+  const { userGroup } = useSelector((state) => state.account);
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('sm'));
 

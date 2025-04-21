@@ -22,22 +22,19 @@ import {
 import User1 from 'assets/images/users/user-round.svg';
 import useLogin from 'hooks/useLogin';
 import { useTranslation } from 'react-i18next';
-import { useContext } from 'react';
 import { calculateQuota } from 'utils/common';
 
 // assets
 import { Icon } from '@iconify/react';
 
-import { UserContext } from 'contexts/UserContext';
-
 // ==============================|| PROFILE DRAWER ||============================== //
 
 const ProfileDrawer = ({ open, onClose }) => {
   const { t } = useTranslation();
-  const { userGroup } = useContext(UserContext);
   const theme = useTheme();
   const navigate = useNavigate();
-  const account = useSelector((state) => state.account);
+  const { user, userGroup } = useSelector((state) => state.account);
+
   const { logout } = useLogin();
 
   const handleLogout = async () => {
@@ -81,7 +78,7 @@ const ProfileDrawer = ({ open, onClose }) => {
         {/* 用户信息头部 */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, pb: 2 }}>
           <Avatar
-            src={account?.user?.avatar_url || User1}
+            src={user?.avatar_url || User1}
             sx={{
               border: `1px solid ${theme.palette.primary.dark}`,
               width: 64,
@@ -90,10 +87,10 @@ const ProfileDrawer = ({ open, onClose }) => {
             }}
           />
           <Typography variant="h5" sx={{ fontWeight: 500, mb: 0.5 }}>
-            {account?.user?.display_name || account?.user?.username || 'Unknown'}
+            {user?.display_name || user?.username || 'Unknown'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {account?.user?.email || 'Unknown'}
+            {user?.email || 'Unknown'}
           </Typography>
           <Box
             sx={{
@@ -105,9 +102,8 @@ const ProfileDrawer = ({ open, onClose }) => {
             }}
           >
             <Typography variant="caption" color="primary">
-              {t('userPage.group')}: {userGroup?.[account?.user?.group]?.name || account?.user?.group}（ {t('modelpricePage.rate')}:
-              {userGroup?.[account?.user?.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:
-              {userGroup?.[account?.user?.group]?.api_rate || 'Unknown'}）
+              {t('userPage.group')}: {userGroup?.[user?.group]?.name || user?.group}（ {t('modelpricePage.rate')}:
+              {userGroup?.[user?.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:{userGroup?.[user?.group]?.api_rate || 'Unknown'}）
             </Typography>
           </Box>
         </Box>
@@ -120,9 +116,7 @@ const ProfileDrawer = ({ open, onClose }) => {
               <Typography variant="body2" color="text.secondary">
                 {t('dashboard_index.balance')}
               </Typography>
-              <Typography variant="body2">
-                {account?.user?.quota ? '$' + calculateQuota(account.user.quota) : t('dashboard_index.unknown')}
-              </Typography>
+              <Typography variant="body2">{user?.quota ? '$' + calculateQuota(user.quota) : t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -130,7 +124,7 @@ const ProfileDrawer = ({ open, onClose }) => {
                 {t('dashboard_index.used')}
               </Typography>
               <Typography variant="body2">
-                {account?.user?.used_quota ? '$' + calculateQuota(account.user.used_quota) : t('dashboard_index.unknown')}
+                {user?.used_quota ? '$' + calculateQuota(user.used_quota) : t('dashboard_index.unknown')}
               </Typography>
             </Box>
 
@@ -138,14 +132,14 @@ const ProfileDrawer = ({ open, onClose }) => {
               <Typography variant="body2" color="text.secondary">
                 {t('dashboard_index.calls')}
               </Typography>
-              <Typography variant="body2">{account?.user?.request_count || t('dashboard_index.unknown')}</Typography>
+              <Typography variant="body2">{user?.request_count || t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" color="text.secondary">
                 {t('invite_count')}
               </Typography>
-              <Typography variant="body2">{account?.user?.aff_count || t('dashboard_index.unknown')}</Typography>
+              <Typography variant="body2">{user?.aff_count || t('dashboard_index.unknown')}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -153,7 +147,7 @@ const ProfileDrawer = ({ open, onClose }) => {
                 {t('invite_reward')}
               </Typography>
               <Typography variant="body2">
-                {account?.user?.aff_quota ? '$' + calculateQuota(account.user.aff_quota) : t('dashboard_index.unknown')}
+                {user?.aff_quota ? '$' + calculateQuota(user.aff_quota) : t('dashboard_index.unknown')}
               </Typography>
             </Box>
           </Stack>

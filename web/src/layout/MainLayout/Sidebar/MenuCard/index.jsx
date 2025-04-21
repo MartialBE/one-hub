@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 // material-ui
@@ -7,7 +7,6 @@ import { Avatar, Card, CardContent, Box, Typography, Chip, LinearProgress, Stack
 import User1 from 'assets/images/users/user-round.svg';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from 'contexts/UserContext';
 import { Icon } from '@iconify/react';
 
 const CardStyle = styled(Card)(({ theme }) => ({
@@ -63,13 +62,12 @@ const InfoChip = styled(Chip)(() => ({
 
 const MenuCard = () => {
   const theme = useTheme();
-  const account = useSelector((state) => state.account);
+  const { user, userGroup } = useSelector((state) => state.account);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [balance, setBalance] = useState(0);
   const [usedQuota, setUsedQuota] = useState(0);
   const [requestCount, setRequestCount] = useState(0);
-  const { userGroup } = useContext(UserContext);
 
   const quotaPerUnit = localStorage.getItem('quota_per_unit') || 500000;
 
@@ -77,12 +75,12 @@ const MenuCard = () => {
   const progressValue = (parseFloat(usedQuota) / totalQuota) * 100;
 
   useEffect(() => {
-    if (account && account.user) {
-      setBalance(((account.user.quota || 0) / quotaPerUnit).toFixed(2));
-      setUsedQuota(((account.user.used_quota || 0) / quotaPerUnit).toFixed(2));
-      setRequestCount(account.user.request_count || 0);
+    if (user) {
+      setBalance(((user.quota || 0) / quotaPerUnit).toFixed(2));
+      setUsedQuota(((user.used_quota || 0) / quotaPerUnit).toFixed(2));
+      setRequestCount(user.request_count || 0);
     }
-  }, [account, quotaPerUnit]);
+  }, [user, quotaPerUnit]);
 
   const getProgressColor = () => {
     if (progressValue < 60) return theme.palette.success.main;
@@ -95,7 +93,7 @@ const MenuCard = () => {
       <CardContent sx={{ p: 1.5, pb: '8px !important' }}>
         <Stack direction="row" spacing={1} alignItems="center" mb={1}>
           <Avatar
-            src={account.user?.avatar_url || User1}
+            src={user?.avatar_url || User1}
             sx={{
               width: 36,
               height: 36,
@@ -118,16 +116,16 @@ const MenuCard = () => {
                 mb: 0.3
               }}
             >
-              {account && account.user ? account.user.display_name || 'Loading...' : 'Loading...'}
+              {user ? user.display_name || 'Loading...' : 'Loading...'}
             </Typography>
 
-            {account && account.user && userGroup && userGroup[account.user.group] && (
+            {user && userGroup && userGroup[user.group] && (
               <InfoChip
                 label={
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <Icon icon="solar:heart-bold" color={theme.palette.error.main} width={12} />
                     <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500 }}>
-                      {userGroup[account.user.group].name} | rpm:{userGroup[account.user.group].api_rate}
+                      {userGroup[user.group].name} | rpm:{userGroup[user.group].api_rate}
                     </Typography>
                   </Stack>
                 }
