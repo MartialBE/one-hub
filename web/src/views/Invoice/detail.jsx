@@ -165,10 +165,6 @@ export default function InvoiceDetail() {
               {t('invoice_index.userinfo')}
             </Typography>
             <Box
-              sx={{
-                bgcolor: alpha(theme.palette.primary.light, 0.08),
-                borderRadius: '8px'
-              }}
             >
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.username')}:</span>
@@ -197,10 +193,6 @@ export default function InvoiceDetail() {
               {t('invoice_index.usage_statistics')}
             </Typography>
             <Box
-              sx={{
-                bgcolor: alpha(theme.palette.primary.light, 0.08),
-                borderRadius: '8px'
-              }}
             >
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.promptTokens')}:</span>
