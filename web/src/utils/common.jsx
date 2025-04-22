@@ -141,8 +141,7 @@ export async function onLarkOAuthClicked(lark_client_id) {
 }
 
 export function useIsAdmin() {
-  const account = useSelector((state) => state.account);
-  const user = account.user;
+  const { user } = useSelector((state) => state.account);
   if (!user) return false;
   return user.role >= 10;
 }
