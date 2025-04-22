@@ -18,15 +18,18 @@ import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ChatLinksDataGrid from './ChatLinksDataGrid';
 import dayjs from 'dayjs';
 import { LoadStatusContext } from 'contexts/StatusContext';
 import { useTranslation } from 'react-i18next';
 import 'dayjs/locale/zh-cn';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { useSelector } from 'react-redux';
 
 const OperationSetting = () => {
   const { t } = useTranslation();
+  const siteInfo = useSelector((state) => state.siteInfo);
   let now = new Date();
   let [inputs, setInputs] = useState({
     QuotaForNewUser: 0,
@@ -68,6 +71,7 @@ const OperationSetting = () => {
   const [originInputs, setOriginInputs] = useState({});
   let [loading, setLoading] = useState(false);
   let [historyTimestamp, setHistoryTimestamp] = useState(now.getTime() / 1000 - 30 * 24 * 3600); // a month ago new Date().getTime() / 1000 + 3600
+  let [invoiceMonth, setInvoiceMonth] = useState(now.getTime()); // a month ago new Date().getTime() / 1000 + 3600
   const loadStatus = useContext(LoadStatusContext);
   const [safeToolsLoading, setSafeToolsLoading] = useState(true);
 
@@ -350,6 +354,21 @@ const OperationSetting = () => {
     }
   };
 
+  const genInvoiceMonth = async ()=>{
+    try{
+      const time = dayjs(invoiceMonth).format('YYYY-MM-DD')
+      const res = await API.post(`/api/option/invoice/gen/${time}`);
+      const {success, message} = res.data;
+      if (success) {
+        showSuccess(`账单生成成功！`);
+        return;
+      }
+      showError('账单生成失败：' + message);
+    } catch (error) {
+      return;
+    }
+  }
+
   return (
     <Stack spacing={2}>
       <SubCard title={t('setting_index.operationSettings.generalSettings.title')}>
@@ -583,6 +602,53 @@ const OperationSetting = () => {
           </Button>
         </Stack>
       </SubCard>
+
+      {siteInfo.UserInvoiceMonth && (
+        <SubCard title={t('setting_index.operationSettings.invoice.title')}>
+          <Stack direction="column" justifyContent="flex-start" alignItems="flex-start" spacing={2}>
+            <FormControl>
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
+                <DatePicker
+                  label={t('setting_index.operationSettings.invoice.genTime')}
+                  placeholder={t('setting_index.operationSettings.invoice.genTime')}
+                  name="invoiceMonth"
+                  value={invoiceMonth === null ? null : dayjs(invoiceMonth)}
+                  disabled={loading}
+                  views={['month', 'year']}
+                  format="YYYY-MM"
+                  onChange={(newValue) => {
+                    // Set to the first day of the selected month
+                    if (newValue) {
+                      const firstDayOfMonth = newValue.startOf('month');
+                      setInvoiceMonth(firstDayOfMonth.valueOf());
+                    } else {
+                      setInvoiceMonth(null);
+                    }
+                  }}
+                  slotProps={{
+                    actionBar: {
+                      actions: ['clear', 'accept']
+                    }
+                  }}
+                />
+              </LocalizationProvider>
+            </FormControl>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (invoiceMonth) {
+                  genInvoiceMonth().then()
+                } else {
+                  showError("Please select invoice Month")
+                }
+              }}
+            >
+              {t('setting_index.operationSettings.invoice.genMonthInvoice')}
+            </Button>
+          </Stack>
+        </SubCard>
+      )}
+
       <SubCard title={t('setting_index.operationSettings.monitoringSettings.title')}>
         <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
           <Stack direction={{ sm: 'column', md: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }}>

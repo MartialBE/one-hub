@@ -281,50 +281,6 @@ func GetRateRealtime(c *gin.Context) {
 	})
 }
 
-// GetUserInvoice 根据查询参数获取用户的账单统计数据
-func GetUserInvoice(c *gin.Context) {
-	var params model.StatisticsMonthSearchParams
-	if err := c.ShouldBindQuery(&params); err != nil {
-		common.APIRespondWithError(c, http.StatusOK, err)
-		return
-	}
-	id := c.GetInt("id")
-	params.UserId = id
-	invoices, err := model.GetUserInvoices(&params)
-	if err != nil {
-		common.APIRespondWithError(c, http.StatusOK, err)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-		"data":    invoices,
-	})
-}
-
-// GetUserInvoiceDetail 获取用户指定月份的账单详情。
-func GetUserInvoiceDetail(c *gin.Context) {
-	var params model.StatisticsMonthDetailSearchParams
-	if err := c.ShouldBindQuery(&params); err != nil {
-		common.APIRespondWithError(c, http.StatusOK, err)
-		return
-	}
-	id := c.GetInt("id")
-	date := c.Query("date")
-	params.UserId = id
-	params.Date = date
-	invoices, err := model.GetUserInvoiceDetail(&params)
-	if err != nil {
-		common.APIRespondWithError(c, http.StatusOK, err)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-		"data":    invoices,
-	})
-}
-
 func GetUserDashboard(c *gin.Context) {
 	id := c.GetInt("id")
 
