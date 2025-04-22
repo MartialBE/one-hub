@@ -6,13 +6,12 @@ import NavGroup from './NavGroup';
 import menuItem from 'menu-items';
 import { isAdmin } from 'utils/common';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 const MenuList = () => {
   const userIsAdmin = isAdmin();
   const { t } = useTranslation();
-  const siteInfo = useSelector((state) => state.siteInfo);
+
   // 遍历并修改 children 的 title 字段
   menuItem.items.forEach((group) => {
     group.children.forEach((item) => {
@@ -31,9 +30,7 @@ const MenuList = () => {
           );
         }
 
-        const filteredChildren = item.children.filter(
-          (child) => (!child.isAdmin || userIsAdmin) && !(siteInfo.UserInvoiceMonth === false && child.id === 'invoice')
-        );
+        const filteredChildren = item.children.filter((child) => !child.isAdmin || userIsAdmin);
 
         if (filteredChildren.length === 0) {
           return null;
