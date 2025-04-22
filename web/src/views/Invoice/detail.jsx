@@ -145,7 +145,7 @@ export default function InvoiceDetail() {
               fontWeight: 500
             }}
           >
-            #{date.replace(/-/g, '')}
+            #{date.replace(/-/g, '')}-{userData.username.toUpperCase()}
           </Typography>
         </Box>
 
@@ -329,7 +329,7 @@ export default function InvoiceDetail() {
                     {(item.request_time / 1000).toFixed(3)}s
                   </TableCell>
                   <TableCell align="right" sx={{ p: 2 }}>
-                    ${calculateQuota(item.quota)}
+                    ${calculateQuota(item.quota,6)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -359,7 +359,7 @@ export default function InvoiceDetail() {
               fontSize: '1.75rem'
             }}
           >
-            ${calculateQuota(totalQuota)}
+            ${calculateQuota(totalQuota,6)}
           </Typography>
         </Box>
       </Paper>

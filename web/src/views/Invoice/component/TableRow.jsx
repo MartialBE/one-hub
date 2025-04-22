@@ -13,7 +13,7 @@ export default function InvoiceTableRow({ item, manageInvoice }) {
     <>
       <TableRow tabIndex={item.id}>
         <TableCell>{item.date ? item.date.substring(0, 7) : ''}</TableCell>
-        <TableCell>${calculateQuota(item.quota)}</TableCell>
+        <TableCell>${calculateQuota(item.quota,6)}</TableCell>
         <TableCell>
           {renderNumber(item.prompt_tokens)} / {renderNumber(item.completion_tokens)}
         </TableCell>
