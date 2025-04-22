@@ -34,7 +34,9 @@ lastUpdated: true
 - prices 列表，通过`运营 --> 模型价格`手动维护，或 json 连接更新。
 - Oaklight/onehub_prices 项目提供了 [sync_price.py](https://raw.githubusercontent.com/Oaklight/onehub_prices/refs/heads/master/src/sync_pricing.py) 和 [sync_ownedby.py](https://raw.githubusercontent.com/Oaklight/onehub_prices/refs/heads/master/src/sync_ownedby.py) 两份自动同步脚本。用法见项目[README](https://github.com/Oaklight/onehub_prices?tab=readme-ov-file#%E4%BB%B7%E6%A0%BC%E5%90%8C%E6%AD%A5%E6%8C%87%E5%AF%BC)。
 
+::: tip 说明
+可以使用环境变量`UPDATE_PRICE_SERVICE`设置默认价格更新服务器地址，详见[环境变量](../deployment/env)
+:::
 
 
-**可以使用环境变量`UPDATE_PRICE_SERVICE`设置默认价格服务 **，详见[环境变量](../deployment/env)
 

@@ -219,6 +219,12 @@ export function renderNumber(num) {
   }
 }
 
+// 数字千位分隔符
+export function thousandsSeparator(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+
 export function renderQuotaWithPrompt(quota, digits) {
   let displayInCurrency = localStorage.getItem('display_in_currency');
   displayInCurrency = displayInCurrency === 'true';
@@ -235,6 +241,55 @@ export function downloadTextAsFile(text, filename) {
   a.href = url;
   a.download = filename;
   a.click();
+}
+
+export function printElementAsPDF(elementId, filename) {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    showError('Element not found');
+    return;
+  }
+
+  // Create a new window
+  const printWindow = window.open('', '_blank');
+
+  // Get the styles from the current document
+  const styles = Array.from(document.styleSheets)
+    .map(styleSheet => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map(rule => rule.cssText)
+          .join('\n');
+      } catch (e) {
+        // Ignore cross-origin stylesheets
+        return '';
+      }
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  // Write the HTML content to the new window
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${filename}</title>
+        <style>${styles}</style>
+      </head>
+      <body>
+        ${element.outerHTML}
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  // Wait for the content to load before printing
+  printWindow.onload = function() {
+    printWindow.print();
+    // Close the window after printing (optional)
+    // printWindow.close();
+  };
 }
 
 export function removeTrailingSlash(url) {
