@@ -145,7 +145,7 @@ export default function InvoiceDetail() {
               fontWeight: 500
             }}
           >
-            #{date.replace(/-/g, '')}
+            #{date.replace(/-/g, '')}-{userData.id}
           </Typography>
         </Box>
 
@@ -164,18 +164,17 @@ export default function InvoiceDetail() {
             >
               {t('invoice_index.userinfo')}
             </Typography>
-            <Box
-            >
+            <Box>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.username')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.username')}</span>
                 <span style={{ fontWeight: 500 }}>{userData.username}</span>
               </Typography>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.email')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.email')}</span>
                 <span style={{ fontWeight: 500 }}>{userData.email}</span>
               </Typography>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.date')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.date')}</span>
                 <span style={{ fontWeight: 500 }}>{date ? date.substring(0, 7) : ''}</span>
               </Typography>
             </Box>
@@ -192,22 +191,21 @@ export default function InvoiceDetail() {
             >
               {t('invoice_index.usage_statistics')}
             </Typography>
-            <Box
-            >
+            <Box>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.promptTokens')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.promptTokens')}</span>
                 <span style={{ fontWeight: 500 }}>{thousandsSeparator(totalPromptTokens)}</span>
               </Typography>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.completionTokens')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.completionTokens')}</span>
                 <span style={{ fontWeight: 500 }}>{thousandsSeparator(totalCompletionTokens)}</span>
               </Typography>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.requestTime')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.requestTime')}</span>
                 <span style={{ fontWeight: 500 }}>{(totalRequestTime / 1000).toFixed(3)}s</span>
               </Typography>
               <Typography variant="body1" gutterBottom sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.requestCount')}:</span>
+                <span style={{ color: theme.palette.text.secondary }}>{t('invoice_index.requestCount')}</span>
                 <span style={{ fontWeight: 500 }}>{thousandsSeparator(totalRequestCount)}</span>
               </Typography>
             </Box>
@@ -329,7 +327,7 @@ export default function InvoiceDetail() {
                     {(item.request_time / 1000).toFixed(3)}s
                   </TableCell>
                   <TableCell align="right" sx={{ p: 2 }}>
-                    ${calculateQuota(item.quota)}
+                    ${calculateQuota(item.quota, 6)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -349,17 +347,17 @@ export default function InvoiceDetail() {
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
-            {t('invoice_index.quota')}:
+            {t('invoice_index.quota')}
           </Typography>
           <Typography
             variant="h4"
             sx={{
               fontWeight: 700,
               color: theme.palette.success.dark,
-              fontSize: '1.75rem'
+              fontSize: '1.65rem'
             }}
           >
-            ${calculateQuota(totalQuota)}
+            ${calculateQuota(totalQuota, 6)}
           </Typography>
         </Box>
       </Paper>

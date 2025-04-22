@@ -602,6 +602,11 @@
         "approximateToken": "使用近似的方式估算 token 数以减少计算量",
         "saveButton": "保存通用设置"
       },
+      "invoice":{
+        "title": "账单设置",
+        "genTime": "账单时间",
+        "genMonthInvoice":"生成月账单"
+      },
       "otherSettings": {
         "title": "其他设置",
         "mjNotify": "Midjourney 允许回调（会泄露服务器ip地址）",
