@@ -50,7 +50,7 @@ type StatisticsMonthDetailSearchParams struct {
 }
 type StatisticsMonthGeneratedHistory struct {
 	ID        int64     `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	Date      time.Time `gorm:"primary_key;type:datetime" json:"date"`
+	Date      time.Time `gorm:"primary_key;type:date" json:"date"`
 	Count     int       `json:"count"`
 	CreatedAt int64     `json:"created_time" gorm:"bigint"`
 }
