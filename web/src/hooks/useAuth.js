@@ -1,8 +1,8 @@
-import { isAdmin } from 'utils/common';
+import { useIsAdmin } from 'utils/common';
 import { useNavigate } from 'react-router-dom';
 
 const useAuth = () => {
-  const userIsAdmin = isAdmin();
+  const userIsAdmin = useIsAdmin();
   const navigate = useNavigate();
 
   if (!userIsAdmin) {

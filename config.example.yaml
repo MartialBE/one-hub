@@ -33,6 +33,7 @@ auto_price_updates: false # 启用自动更新价格，可选值为 true 和 fal
 auto_price_updates_mode: "system" # 可选值为 "add":仅增加 和 "overwrite"：全部覆盖，会删除系统现有的价格配置，"update":只更新系统现有的价格，"system":使用程序内置，使用程序内置仅仅项目启动的时候使用内置更新并且自动从价格服务器更新失效，默认为 "system"。（以上模式不含被lock的数据）
 auto_price_updates_interval: 1440 # 自动更新价格的时间间隔，单位为分钟，默认为 1440。
 update_price_service: "https://raw.githubusercontent.com/MartialBE/one-api/prices/prices.json" # 设置之后将使用指定的价格服务更新价格
+user_invoice_month:false #是否开启用户月账单功能
 
 # 令牌设置
 user_token_secret: "" # 用户令牌密钥, 请设置至少32位的随机字符串，修改后用户令牌将无法验证，例如：vWVmFxp5YIOXuHhEod8jBcqiw0zKP2fk
