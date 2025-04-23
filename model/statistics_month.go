@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"one-api/common"
 	"one-api/common/logger"
+	"strings"
 	"time"
 )
 
@@ -217,20 +218,7 @@ func GetUserInvoices(params *StatisticsMonthSearchParams) (*DataResult[Statistic
 		return &DataResult[StatisticsMonthNoModel]{}, err
 	}
 
-	// Then get the paginated data
-	rawSQL := "" +
-		"SELECT " + dateStr + "," +
-		" sum(request_count) as request_count," +
-		" sum(quota) as quota," +
-		" sum(prompt_tokens) as prompt_tokens," +
-		" sum(completion_tokens) as completion_tokens," +
-		" sum(request_time) as request_time" +
-		" FROM statistics_months " +
-		"WHERE user_id = ? " +
-		"GROUP BY date,user_id " +
-		"ORDER BY date DESC " +
-		"LIMIT ? OFFSET ?" +
-		""
+	// Set default pagination values
 	if params.Size == 0 {
 		params.Size = 10
 	}
@@ -238,7 +226,51 @@ func GetUserInvoices(params *StatisticsMonthSearchParams) (*DataResult[Statistic
 		params.Page = 1
 	}
 	offset := (params.Page - 1) * params.Size
-	err = DB.Raw(rawSQL, params.UserId, params.Size, offset).Scan(&statistics).Error
+
+	// Use GORM's query builder for safer SQL construction
+	query := DB.Table("statistics_months").
+		Select(dateStr+", sum(request_count) as request_count, sum(quota) as quota, sum(prompt_tokens) as prompt_tokens, sum(completion_tokens) as completion_tokens, sum(request_time) as request_time").
+		Where("user_id = ?", params.UserId).
+		Group("date, user_id")
+
+	// Define allowed fields for ordering to prevent SQL injection
+	allowedOrderFields := map[string]bool{
+		"date":              true,
+		"request_count":     true,
+		"quota":             true,
+		"prompt_tokens":     true,
+		"completion_tokens": true,
+		"request_time":      true,
+	}
+
+	// Apply ordering with validation
+	orderField := "date" // Default order field
+	orderDir := "DESC"   // Default order direction
+
+	field := strings.TrimSpace(params.Order)
+	if len(field) > 0 {
+		isDesc := strings.HasPrefix(field, "-")
+		if isDesc {
+			field = strings.TrimPrefix(field, "-")
+			orderDir = "DESC"
+		} else {
+			orderDir = "ASC"
+		}
+
+		// Check if the field is in the allowed list
+		if allowedOrderFields[field] {
+			orderField = field
+		}
+	}
+
+	// Apply the validated order
+	query = query.Order(orderField + " " + orderDir)
+
+	// Apply pagination
+	query = query.Limit(params.Size).Offset(offset)
+
+	// Execute the query
+	err = query.Scan(&statistics).Error
 	if err != nil {
 		logger.SysLog(fmt.Sprintf("Failed to get user invoices for user %d", params.UserId))
 		return &DataResult[StatisticsMonthNoModel]{}, err
