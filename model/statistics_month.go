@@ -207,6 +207,17 @@ func GetUserInvoices(params *StatisticsMonthSearchParams) (*DataResult[Statistic
 	} else if common.UsingSQLite {
 		dateStr = "strftime('%Y-%m-%d', date) as date"
 	}
+
+	// First, get the total count without pagination
+	countSQL := "SELECT COUNT(DISTINCT date) FROM statistics_months WHERE user_id = ?"
+
+	err := DB.Raw(countSQL, params.UserId).Scan(&count).Error
+	if err != nil {
+		logger.SysLog(fmt.Sprintf("Failed to get total count of user invoices for user %d: %v", params.UserId, err))
+		return &DataResult[StatisticsMonthNoModel]{}, err
+	}
+
+	// Then get the paginated data
 	rawSQL := "" +
 		"SELECT " + dateStr + "," +
 		" sum(request_count) as request_count," +
@@ -227,12 +238,12 @@ func GetUserInvoices(params *StatisticsMonthSearchParams) (*DataResult[Statistic
 		params.Page = 1
 	}
 	offset := (params.Page - 1) * params.Size
-	err := DB.Raw(rawSQL, params.UserId, params.Size, offset).Scan(&statistics).Error
+	err = DB.Raw(rawSQL, params.UserId, params.Size, offset).Scan(&statistics).Error
 	if err != nil {
 		logger.SysLog(fmt.Sprintf("Failed to get user invoices for user %d", params.UserId))
 		return &DataResult[StatisticsMonthNoModel]{}, err
 	}
-	count = int64(len(statistics))
+
 	return &DataResult[StatisticsMonthNoModel]{
 		Data:       &statistics,
 		Page:       params.Page,
