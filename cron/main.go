@@ -35,6 +35,20 @@ func InitCron() {
 		return
 	}
 
+	if config.UserInvoiceMonth {
+		// 每月一号早上四点生成上个月的账单数据
+		err = scheduler.Manager.AddJob(
+			"generate_statistics_month",
+			gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(4, 0, 0))),
+			gocron.NewTask(func() {
+				err := model.InsertStatisticsMonth()
+				if err != nil {
+					logger.SysError("Generate statistics month data error:" + err.Error())
+				}
+			}),
+		)
+	}
+
 	// 每十分钟更新一次统计数据
 	err = scheduler.Manager.AddJob(
 		"update_statistics",

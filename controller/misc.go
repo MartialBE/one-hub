@@ -53,6 +53,7 @@ func GetStatus(c *gin.Context) {
 			"EnableSafe":          config.EnableSafe,
 			"SafeToolName":        config.SafeToolName,
 			"SafeKeyWords":        config.SafeKeyWords,
+			"UserInvoiceMonth":    config.UserInvoiceMonth,
 		},
 	})
 }

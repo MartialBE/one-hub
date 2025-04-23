@@ -15,7 +15,7 @@ import LogTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/TableToolBar';
 import { API } from 'utils/api';
-import { isAdmin } from 'utils/common';
+import { useIsAdmin } from 'utils/common';
 import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
@@ -42,7 +42,7 @@ export default function Log() {
   const [refreshFlag, setRefreshFlag] = useState(false);
 
   const [logs, setLogs] = useState([]);
-  const userIsAdmin = isAdmin();
+  const userIsAdmin = useIsAdmin();
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';

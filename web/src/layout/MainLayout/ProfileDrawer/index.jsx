@@ -103,11 +103,10 @@ const ProfileDrawer = ({ open, onClose }) => {
           >
             <Typography variant="caption" color="primary">
               {t('userPage.group')}: {userGroup?.[user?.group]?.name || user?.group}（ {t('modelpricePage.rate')}:
-              {userGroup?.[user?.group]?.ratio || 'Unknown'}/ {t('modelpricePage.RPM')}:{userGroup?.[user?.group]?.api_rate || 'Unknown'}）
+              {userGroup?.[user?.group]?.ratio || t('dashboard_index.unknown')}/ {t('modelpricePage.RPM')}:{userGroup?.[user?.group]?.api_rate || t('dashboard_index.unknown')}）
             </Typography>
           </Box>
         </Box>
-        <Divider sx={{ borderWidth: '1px', borderStyle: 'dashed' }} />
 
         {/* 用户数据区域 - 严格按照图片布局 */}
         <Box sx={{ px: 3, py: 1.5 }}>

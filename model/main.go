@@ -184,6 +184,18 @@ func InitDB() (err error) {
 			return err
 		}
 
+		if config.UserInvoiceMonth {
+			err = db.AutoMigrate(&StatisticsMonthGeneratedHistory{})
+			if err != nil {
+				return err
+			}
+
+			err = db.AutoMigrate(&StatisticsMonth{})
+			if err != nil {
+				return err
+			}
+		}
+
 		migrationAfter(DB)
 
 		logger.SysLog("database migrated")

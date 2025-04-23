@@ -6,6 +6,7 @@ const config = {
   fontFamily: `'Roboto', Helvetica, sans-serif`,
   borderRadius: 12,
   siteInfo: {
+    UserInvoiceMonth: false,
     chat_link: '',
     display_in_currency: true,
     email_verification: false,

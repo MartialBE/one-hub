@@ -123,9 +123,9 @@ const MenuCard = () => {
               <InfoChip
                 label={
                   <Stack direction="row" spacing={0.5} alignItems="center">
-                    <Icon icon="solar:heart-bold" color={theme.palette.error.main} width={12} />
+                    {/*<Icon icon="solar:heart-bold" color={theme.palette.error.main} width={12} />*/}
                     <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 500 }}>
-                      {userGroup[user.group].name} | rpm:{userGroup[user.group].api_rate}
+                      {userGroup[user.group].name} | RPM:{userGroup[user.group].api_rate}
                     </Typography>
                   </Stack>
                 }
