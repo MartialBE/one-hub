@@ -2,10 +2,14 @@ package controller
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/net/proxy"
+	"net"
 	"net/http"
+	"net/url"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
@@ -38,6 +42,41 @@ type GithubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
+func configureClientWithGitHubProxy(client *http.Client) error {
+	if config.GitHubProxy == "" {
+		return nil
+	}
+	proxyURL, parseErr := url.Parse(config.GitHubProxy)
+	if parseErr != nil {
+		logger.SysError("GitHub proxy URL parse error: " + parseErr.Error())
+		return parseErr
+	}
+
+	switch proxyURL.Scheme {
+	case "http", "https":
+		client.Transport = &http.Transport{
+			Proxy: http.ProxyURL(proxyURL),
+		}
+	case "socks5":
+		dialer, err := proxy.FromURL(proxyURL, proxy.Direct)
+		if err != nil {
+			logger.SysError("failed to create Github SOCKS5 dialer: " + err.Error())
+			return err
+		}
+		client.Transport = &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				return dialer.(proxy.ContextDialer).DialContext(ctx, network, addr)
+			},
+		}
+	default:
+		errMsg := "unsupported Github proxy scheme: " + proxyURL.Scheme
+		logger.SysError(errMsg)
+		return errors.New(errMsg)
+	}
+
+	return nil
+}
+
 func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 	if code == "" {
 		return nil, errors.New("无效的参数")
@@ -55,6 +94,11 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 	req.Header.Set("Accept", "application/json")
 	client := http.Client{
 		Timeout: 5 * time.Second,
+	}
+
+	// Configure client with GitHub proxy if needed
+	if err := configureClientWithGitHubProxy(&client); err != nil {
+		return nil, err
 	}
 	res, err := client.Do(req)
 	if err != nil {

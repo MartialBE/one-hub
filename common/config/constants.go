@@ -154,6 +154,7 @@ var ExtraTokenPriceJson = ""
 
 var ChatImageRequestProxy = ""
 
+var GitHubProxy = ""
 var GitHubClientId = ""
 var GitHubClientSecret = ""
 var GitHubOldIdCloseEnabled = false
