@@ -23,7 +23,7 @@ export default function Invoice() {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
-  const [orderBy, setOrderBy] = useState('id');
+  const [orderBy, setOrderBy] = useState('date');
   const [rowsPerPage, setRowsPerPage] = useState(() => getPageSize('invoice'));
   const [listCount, setListCount] = useState(0);
   const [searching, setSearching] = useState(false);
@@ -83,7 +83,7 @@ export default function Invoice() {
 
   // Handle refresh
   const handleRefresh = async () => {
-    setOrderBy('id');
+    setOrderBy('date');
     setOrder('desc');
     setRefreshFlag(!refreshFlag);
   };
