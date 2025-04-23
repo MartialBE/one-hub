@@ -16,13 +16,14 @@ func GenInvoice(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invalid time format"))
 		return
 	}
-	// 如果invoiceTime大于当前月份返回错误
-	if invoiceTime.After(time.Now().AddDate(0, 1, -time.Now().Day())) {
-		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than current month"))
+	date := time.Date(invoiceTime.Year(), invoiceTime.Month(), 1, 0, 0, 0, 0, time.Local)
+	// 如果invoiceTime大于等于当前月份返回错误
+	if !invoiceTime.Before(time.Now().Local().AddDate(0, 1, -date.Day())) {
+		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than or equal to current month"))
 		return
 	}
 
-	err = model.InsertStatisticsMonthForDate(invoiceTime)
+	err = model.InsertStatisticsMonthForDate(date)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
