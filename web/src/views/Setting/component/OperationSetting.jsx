@@ -354,11 +354,11 @@ const OperationSetting = () => {
     }
   };
 
-  const genInvoiceMonth = async ()=>{
-    try{
-      const time = dayjs(invoiceMonth).format('YYYY-MM-DD')
+  const genInvoiceMonth = async () => {
+    try {
+      const time = dayjs(invoiceMonth).format('YYYY-MM-DD');
       const res = await API.post(`/api/option/invoice/gen/${time}`);
-      const {success, message} = res.data;
+      const { success, message } = res.data;
       if (success) {
         showSuccess(`账单生成成功！`);
         return;
@@ -367,7 +367,21 @@ const OperationSetting = () => {
     } catch (error) {
       return;
     }
-  }
+  };
+  const updateInvoiceMonth = async () => {
+    try {
+      const time = dayjs(invoiceMonth).format('YYYY-MM-DD');
+      const res = await API.post(`/api/option/invoice/update/${time}`);
+      const { success, message } = res.data;
+      if (success) {
+        showSuccess(`账单更新成功！`);
+        return;
+      }
+      showError('账单更新失败：' + message);
+    } catch (error) {
+      return;
+    }
+  };
 
   return (
     <Stack spacing={2}>
@@ -633,18 +647,34 @@ const OperationSetting = () => {
                 />
               </LocalizationProvider>
             </FormControl>
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (invoiceMonth) {
-                  genInvoiceMonth().then()
-                } else {
-                  showError("Please select invoice Month")
-                }
-              }}
-            >
-              {t('setting_index.operationSettings.invoice.genMonthInvoice')}
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  if (invoiceMonth) {
+                    genInvoiceMonth().then();
+                  } else {
+                    showError('Please select invoice Month');
+                  }
+                }}
+              >
+                {t('setting_index.operationSettings.invoice.genMonthInvoice')}
+              </Button>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => {
+                  if (invoiceMonth) {
+                    updateInvoiceMonth().then();
+                  } else {
+                    showError('Please select invoice Month');
+                  }
+                }}
+              >
+                {t('setting_index.operationSettings.invoice.updateMonthInvoice')}
+              </Button>
+            </Stack>
           </Stack>
         </SubCard>
       )}

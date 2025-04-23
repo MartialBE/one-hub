@@ -605,7 +605,8 @@
       "invoice":{
         "title": "账单设置",
         "genTime": "账单时间",
-        "genMonthInvoice":"生成月账单"
+        "genMonthInvoice":"生成月账单",
+        "updateMonthInvoice":"更新月账单"
       },
       "otherSettings": {
         "title": "其他设置",

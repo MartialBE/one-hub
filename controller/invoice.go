@@ -18,11 +18,39 @@ func GenInvoice(c *gin.Context) {
 	}
 	date := time.Date(invoiceTime.Year(), invoiceTime.Month(), 1, 0, 0, 0, 0, time.Local)
 	// 如果invoiceTime大于等于当前月份返回错误
-	if !invoiceTime.Before(time.Now().Local().AddDate(0, 1, -date.Day())) {
+	if !invoiceTime.Before(time.Now().Local()) {
 		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than or equal to current month"))
 		return
 	}
+	if model.IsStatisticsMonthGenerated(date) {
+		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice the month data already generated"))
+		return
+	}
+	err = model.InsertStatisticsMonthForDate(date)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "账单任务提交成功，后台将自动执行指定月份的账单生成任务",
+	})
+}
+
+func UpdateInvoice(c *gin.Context) {
+	timeStr := c.Param("time")
+	invoiceTime, err := time.Parse("2006-01-02", timeStr)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invalid time format"))
+		return
+	}
+	date := time.Date(invoiceTime.Year(), invoiceTime.Month(), 1, 0, 0, 0, 0, time.Local)
+	// 如果invoiceTime大于等于当前月份返回错误
+	if !invoiceTime.Before(time.Now().Local()) {
+		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than or equal to current month"))
+		return
+	}
 	err = model.InsertStatisticsMonthForDate(date)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
