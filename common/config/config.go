@@ -17,6 +17,7 @@ func InitConf() {
 	RequestInterval = time.Duration(viper.GetInt("polling_interval")) * time.Second
 	SessionSecret = utils.GetOrDefault("session_secret", SessionSecret)
 	UserInvoiceMonth = viper.GetBool("user_invoice_month")
+	GitHubProxy = viper.GetString("github_proxy")
 }
 
 func setEnv() {
