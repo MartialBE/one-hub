@@ -32,7 +32,8 @@ export default defineConfig({
           { text: '图床配置', link: '/deployment/storage' },
           { text: '自动升级', link: '/deployment/update' },
           { text: '消息通知', link: '/deployment/notify' },
-          { text: '命令行参数', link: '/deployment/cli' }
+          { text: '命令行参数', link: '/deployment/cli' },
+          { text: '扩展价格', link: '/deployment/ExtraRatios' },
         ]
       },
       {
@@ -41,9 +42,11 @@ export default defineConfig({
           { text: '使用说明', link: '/use/index' },
           { text: '添加 VertexAI', link: '/use/VertexAI' },
           { text: 'Rerank 接口', link: '/use/Rerank' },
+          { text: '推理设置', link: '/use/reasoning' },
           { text: '价格更新', link: '/use/prices_update' },
           { text: '特殊调用', link: '/use/special' },
           { text: '常见问题', link: '/use/FAQ' }
+
         ]
       },
       {
