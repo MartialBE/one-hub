@@ -17,8 +17,9 @@ func GenInvoice(c *gin.Context) {
 		return
 	}
 	date := time.Date(invoiceTime.Year(), invoiceTime.Month(), 1, 0, 0, 0, 0, time.Local)
-	// 如果invoiceTime大于等于当前月份返回错误
-	if !invoiceTime.Before(time.Now().Local()) {
+	nowDate := time.Date(time.Now().Year(), time.Now().Month(), 1, 0, 0, 0, 0, time.Local)
+	// 如果date大于等于当前月份返回错误
+	if !date.Before(nowDate) {
 		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than or equal to current month"))
 		return
 	}
@@ -46,8 +47,9 @@ func UpdateInvoice(c *gin.Context) {
 		return
 	}
 	date := time.Date(invoiceTime.Year(), invoiceTime.Month(), 1, 0, 0, 0, 0, time.Local)
-	// 如果invoiceTime大于等于当前月份返回错误
-	if !invoiceTime.Before(time.Now().Local()) {
+	nowDate := time.Date(time.Now().Year(), time.Now().Month(), 1, 0, 0, 0, 0, time.Local)
+	// 如果date大于等于当前月份返回错误
+	if !date.Before(nowDate) {
 		common.APIRespondWithError(c, http.StatusOK, fmt.Errorf("invoice time cannot be later than or equal to current month"))
 		return
 	}
