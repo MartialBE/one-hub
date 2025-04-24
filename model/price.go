@@ -34,6 +34,7 @@ var ExtraKeyIsPrompt = map[string]bool{
 	config.UsageExtraReasoning:        false,
 	config.UsageExtraInputTextTokens:  true,
 	config.UsageExtraOutputTextTokens: false,
+	config.UsageExtraInputImageTokens: true,
 }
 
 func GetExtraPriceIsPrompt(key string) bool {
