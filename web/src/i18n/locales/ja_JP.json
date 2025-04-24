@@ -352,7 +352,7 @@
     "summary": "概要"
   },
   "logPage": {
-    "cachedTokens": "Cache Tokens",
+    "cachedTokens": "Cache Tokens (* {{ ratio }})",
     "channelLabel": "チャネル",
     "columnSettings": "列設定",
     "selectColumns": "列を選択",
@@ -464,12 +464,18 @@
     "times": "回数制課金",
     "tokens": "量に応じて支払う",
     "type": "タイプ",
-    "inputAudioTokensRatio": "オーディオ入力倍率",
+    "input_audio_tokens": "オーディオ入力倍率",
     "other": "その他",
-    "outputAudioTokensRatio": "オーディオ出力倍率",
+    "output_audio_tokens": "オーディオ出力倍率",
     "rate": "倍率",
     "RPM": "APIレート",
-    "free": "無料"
+    "free": "無料",
+    "cached_tokens": "キャッシュ倍率",
+    "cached_write_tokens": "キャッシュ書き込み倍率",
+    "cached_read_tokens": "キャッシュ読み取り倍率",
+    "reasoning_tokens": "推論倍率",
+    "input_text_tokens": "入力テキスト倍率",
+    "output_text_tokens": "出力テキスト倍率"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",

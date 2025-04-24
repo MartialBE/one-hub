@@ -15,11 +15,17 @@ type ImageRequest struct {
 	OutputQuality    *int    `json:"output_quality,omitempty"`
 	SafetyTolerance  *string `json:"safety_tolerance,omitempty"`
 	PromptUpsampling *string `json:"prompt_upsampling,omitempty"`
+
+	Background        *string `json:"background,omitempty"`
+	Moderation        *string `json:"moderation,omitempty"`
+	OutputCompression *int    `json:"output_compression,omitempty"`
+	OutputFormat      *string `json:"output_format,omitempty"`
 }
 
 type ImageResponse struct {
 	Created any                      `json:"created,omitempty"`
 	Data    []ImageResponseDataInner `json:"data,omitempty"`
+	Usage   *ResponsesUsage          `json:"usage,omitempty"`
 }
 
 type ImageResponseDataInner struct {

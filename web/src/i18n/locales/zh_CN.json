@@ -506,8 +506,14 @@
     "times": "按次付费",
     "noneGroup": "当前分组不可用",
     "other": "其他",
-    "inputAudioTokensRatio": "音频输入倍率",
-    "outputAudioTokensRatio": "音频输出倍率"
+    "input_audio_tokens": "音频输入倍率",
+    "output_audio_tokens": "音频输出倍率",
+    "cached_tokens": "缓存倍率",
+    "cached_write_tokens": "缓存写入倍率",
+    "cached_read_tokens": "缓存读取倍率",
+    "reasoning_tokens": "推理倍率",
+    "input_text_tokens": "输入文本倍率",
+    "output_text_tokens": "输出文本倍率"
   },
   "paymentPage": {
     "orderList": "订单列表",
@@ -602,11 +608,11 @@
         "approximateToken": "使用近似的方式估算 token 数以减少计算量",
         "saveButton": "保存通用设置"
       },
-      "invoice":{
+      "invoice": {
         "title": "账单设置",
         "genTime": "账单时间",
-        "genMonthInvoice":"生成月账单",
-        "updateMonthInvoice":"更新月账单"
+        "genMonthInvoice": "生成月账单",
+        "updateMonthInvoice": "更新月账单"
       },
       "otherSettings": {
         "title": "其他设置",

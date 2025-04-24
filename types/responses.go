@@ -129,18 +129,26 @@ type ResponsesUsageOutputTokensDetails struct {
 
 type ResponsesUsageInputTokensDetails struct {
 	CachedTokens int `json:"cached_tokens,omitempty"`
+	TextTokens   int `json:"text_tokens,omitempty"`
+	ImageTokens  int `json:"image_tokens,omitempty"`
 }
 
 func (u *ResponsesUsage) ToOpenAIUsage() *Usage {
-	return &Usage{
+	usage := &Usage{
 		PromptTokens:     u.InputTokens,
 		CompletionTokens: u.OutputTokens,
 		TotalTokens:      u.TotalTokens,
-		CompletionTokensDetails: CompletionTokensDetails{
-			ReasoningTokens: u.OutputTokensDetails.ReasoningTokens,
-		},
-		PromptTokensDetails: PromptTokensDetails{
-			CachedTokens: u.InputTokensDetails.CachedTokens,
-		},
 	}
+
+	if u.OutputTokensDetails != nil {
+		usage.CompletionTokensDetails.ReasoningTokens = u.OutputTokensDetails.ReasoningTokens
+	}
+
+	if u.InputTokensDetails != nil {
+		usage.PromptTokensDetails.CachedTokens = u.InputTokensDetails.CachedTokens
+		usage.PromptTokensDetails.TextTokens = u.InputTokensDetails.TextTokens
+		usage.PromptTokensDetails.ImageTokens = u.InputTokensDetails.ImageTokens
+	}
+
+	return usage
 }
