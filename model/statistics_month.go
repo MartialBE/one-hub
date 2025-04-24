@@ -163,16 +163,16 @@ func InsertStatisticsMonth() error {
 	// 获取上个月的日期
 	lastMonth := time.Now().AddDate(0, -1, 0)
 	date := time.Date(lastMonth.Year(), lastMonth.Month(), 1, 0, 0, 0, 0, time.Local)
+	if IsStatisticsMonthGenerated(date) {
+		logger.SysLog("Statistics month data already generated")
+		return nil
+	}
 	return InsertStatisticsMonthForDate(date)
 }
 
 // InsertStatisticsMonthForDate 生成指定月份的月度账单
 func InsertStatisticsMonthForDate(date time.Time) error {
 	logger.SysLog(fmt.Sprintf("Insert statistics month for date %s", date.Format("2006-01-02")))
-	if IsStatisticsMonthGenerated(date) {
-		logger.SysLog("Statistics month data already generated")
-		return nil
-	}
 	tx := DB.Begin()
 	// 执行SQL
 	sql := generateInsertStatisticsMonthSQL(date)

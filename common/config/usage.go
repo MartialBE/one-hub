@@ -10,4 +10,5 @@ const (
 	UsageExtraReasoning        = "reasoning_tokens"    // 推理
 	UsageExtraInputTextTokens  = "input_text_tokens"   // 输入文本
 	UsageExtraOutputTextTokens = "output_text_tokens"  // 输出文本
+	UsageExtraInputImageTokens = "input_image_tokens"  // 输入图像
 )

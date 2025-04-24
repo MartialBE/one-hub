@@ -327,17 +327,22 @@ export default function ModelPrice() {
 
 function getOther(t, extraRatios) {
   if (!extraRatios) return '';
-  const inputRatio = extraRatios.input_audio_tokens_ratio;
-  const outputRatio = extraRatios.output_audio_tokens_ratio;
+  // const inputRatio = extraRatios.input_audio_tokens_ratio;
+  // const outputRatio = extraRatios.output_audio_tokens_ratio;
 
   return (
     <Stack direction="column" spacing={1}>
-      <Label color="primary" variant="outlined">
+      {Object.entries(extraRatios).map(([key, value]) => (
+        <Label key={key} color="primary" variant="outlined">
+          {t(`modelpricePage.${key}`)}: {value}
+        </Label>
+      ))}
+      {/* <Label color="primary" variant="outlined">
         {t('modelpricePage.inputAudioTokensRatio')}: {inputRatio}
       </Label>
       <Label color="primary" variant="outlined">
         {t('modelpricePage.outputAudioTokensRatio')}: {outputRatio}
-      </Label>
+      </Label> */}
     </Stack>
   );
 }

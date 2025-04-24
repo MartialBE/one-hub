@@ -35,7 +35,11 @@ func (p *OpenAIProvider) CreateImageGenerations(request *types.ImageRequest) (*t
 		return nil, errWithCode
 	}
 
-	p.Usage.TotalTokens = p.Usage.PromptTokens
+	if response.Usage != nil && response.Usage.TotalTokens > 0 {
+		*p.Usage = *response.Usage.ToOpenAIUsage()
+	} else {
+		p.Usage.TotalTokens = p.Usage.PromptTokens
+	}
 
 	return &response.ImageResponse, nil
 

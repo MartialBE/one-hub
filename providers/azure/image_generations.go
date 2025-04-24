@@ -11,9 +11,6 @@ import (
 )
 
 func (p *AzureProvider) CreateImageGenerations(request *types.ImageRequest) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
-	if !openai.IsWithinRange(request.Model, request.N) {
-		return nil, common.StringErrorWrapper("n_not_within_range", "n_not_within_range", http.StatusBadRequest)
-	}
 
 	req, errWithCode := p.GetRequestTextBody(config.RelayModeImagesGenerations, request.Model, request)
 	if errWithCode != nil {
@@ -51,7 +48,11 @@ func (p *AzureProvider) CreateImageGenerations(request *types.ImageRequest) (*ty
 		response = &openaiResponse.ImageResponse
 	}
 
-	p.Usage.TotalTokens = p.Usage.PromptTokens
+	if response.Usage != nil && response.Usage.TotalTokens > 0 {
+		*p.Usage = *response.Usage.ToOpenAIUsage()
+	} else {
+		p.Usage.TotalTokens = p.Usage.PromptTokens
+	}
 
 	return response, nil
 
