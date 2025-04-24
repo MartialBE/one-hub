@@ -11,7 +11,7 @@ import (
 )
 
 func (p *OpenAIProvider) CreateImageEdits(request *types.ImageEditRequest) (*types.ImageResponse, *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.getRequestImageBody(config.RelayModeEdits, request.Model, request)
+	req, errWithCode := p.getRequestImageBody(config.RelayModeImagesEdits, request.Model, request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
