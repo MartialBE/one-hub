@@ -163,6 +163,22 @@ func (p *BaseProvider) ModelMappingHandler(modelName string) (string, error) {
 	return modelName, nil
 }
 
+// CustomParameterHandler processes extra parameters from the channel and returns them as a map
+func (p *BaseProvider) CustomParameterHandler() (map[string]interface{}, error) {
+	customParameter := p.Channel.GetCustomParameter()
+	if customParameter == "" || customParameter == "{}" {
+		return nil, nil
+	}
+
+	customParams := make(map[string]interface{})
+	err := json.Unmarshal([]byte(customParameter), &customParams)
+	if err != nil {
+		return nil, err
+	}
+
+	return customParams, nil
+}
+
 func (p *BaseProvider) GetAPIUri(relayMode int) string {
 	switch relayMode {
 	case config.RelayModeChatCompletions:

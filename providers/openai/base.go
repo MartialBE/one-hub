@@ -184,7 +184,65 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
-	// 创建请求
+
+	// 处理额外参数
+	customParams, err := p.CustomParameterHandler()
+	if err != nil {
+		return nil, common.ErrorWrapper(err, "custom_parameter_error", http.StatusInternalServerError)
+	}
+	// 如果有额外参数，将其添加到请求体中
+	if customParams != nil {
+		// 将请求体转换为map，以便添加额外参数
+		var requestMap map[string]interface{}
+		requestBytes, err := json.Marshal(request)
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "marshal_request_failed", http.StatusInternalServerError)
+		}
+
+		err = json.Unmarshal(requestBytes, &requestMap)
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "unmarshal_request_failed", http.StatusInternalServerError)
+		}
+
+		// 检查是否需要覆盖已有参数
+		shouldOverwrite := false
+		if overwriteValue, exists := customParams["overwrite"]; exists {
+			if boolValue, ok := overwriteValue.(bool); ok {
+				shouldOverwrite = boolValue
+			}
+		}
+
+		// 添加额外参数（不覆盖现有参数）
+		for key, value := range customParams {
+			// 忽略key为stream的参数
+			if key == "stream" {
+				continue
+			}
+			if key == "overwrite" {
+				continue
+			}
+			// 根据覆盖设置决定如何添加参数
+			if shouldOverwrite {
+				// 覆盖模式：直接添加/覆盖参数
+				requestMap[key] = value
+			} else {
+				// 非覆盖模式：仅当参数不存在时添加
+				if _, exists := requestMap[key]; !exists {
+					requestMap[key] = value
+				}
+			}
+		}
+
+		// 使用修改后的请求体创建请求
+		req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(requestMap), p.Requester.WithHeader(headers))
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		}
+
+		return req, nil
+	}
+
+	// 如果没有额外参数，使用原始请求体创建请求
 	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(request), p.Requester.WithHeader(headers))
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
