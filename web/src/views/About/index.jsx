@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
-import { marked } from 'marked';
 import { Box, Container, Typography } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import { useTranslation } from 'react-i18next';
+import ContentViewer from 'ui-component/ContentViewer';
 
 const About = () => {
   const { t } = useTranslation();
@@ -17,12 +17,8 @@ const About = () => {
       const res = await API.get('/api/about');
       const { success, message, data } = res.data;
       if (success) {
-        let aboutContent = data;
-        if (!data.startsWith('https://')) {
-          aboutContent = marked.parse(data);
-        }
-        setAbout(aboutContent);
-        localStorage.setItem('about', aboutContent);
+        setAbout(data);
+        localStorage.setItem('about', data);
       } else {
         showError(message);
         setAbout(t('about.loadingError'));
@@ -41,33 +37,27 @@ const About = () => {
   return (
     <>
       {aboutLoaded && about === '' ? (
-        <>
-          <Box>
-            <Container sx={{ paddingTop: '40px' }}>
-              <MainCard title={t('about.aboutTitle')}>
-                <Typography variant="body2">
-                  {t('about.aboutDescription')} <br />
-                  {t('about.projectRepo')}
-                  <a href="https://github.com/MartialBE/one-hub">https://github.com/MartialBE/one-hub</a>
-                </Typography>
-              </MainCard>
-            </Container>
-          </Box>
-        </>
+        <Box>
+          <Container sx={{ paddingTop: '40px' }}>
+            <MainCard title={t('about.aboutTitle')}>
+              <Typography variant="body2">
+                {t('about.aboutDescription')} <br />
+                {t('about.projectRepo')}
+                <a href="https://github.com/MartialBE/one-hub">https://github.com/MartialBE/one-hub</a>
+              </Typography>
+            </MainCard>
+          </Container>
+        </Box>
       ) : (
-        <>
-          <Box>
-            {about.startsWith('https://') ? (
-              <iframe title="about" src={about} style={{ width: '100%', height: '100vh', border: 'none' }} />
-            ) : (
-              <>
-                <Container>
-                  <div style={{ fontSize: 'larger' }} dangerouslySetInnerHTML={{ __html: about }}></div>
-                </Container>
-              </>
-            )}
-          </Box>
-        </>
+        <Box>
+          <ContentViewer
+            content={about}
+            loading={!aboutLoaded}
+            errorMessage={about === t('about.loadingError') ? t('about.loadingError') : ''}
+            containerStyle={{ minHeight: 'calc(100vh - 136px)' }}
+            contentStyle={{ fontSize: 'larger' }}
+          />
+        </Box>
       )}
     </>
   );
