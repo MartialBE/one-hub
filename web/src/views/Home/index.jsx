@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { showError } from 'utils/common';
 import { API } from 'utils/api';
-import { marked } from 'marked';
 import BaseIndex from './baseIndex';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import ContentViewer from 'ui-component/ContentViewer';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -17,12 +17,8 @@ const Home = () => {
       const res = await API.get('/api/home_page_content');
       const { success, message, data } = res.data;
       if (success) {
-        let content = data;
-        if (!data.startsWith('https://')) {
-          content = marked.parse(data);
-        }
-        setHomePageContent(content);
-        localStorage.setItem('home_page_content', content);
+        setHomePageContent(data);
+        localStorage.setItem('home_page_content', data);
       } else {
         showError(message);
         setHomePageContent(t('home.loadingErr'));
@@ -42,19 +38,15 @@ const Home = () => {
       {homePageContentLoaded && homePageContent === '' ? (
         <BaseIndex />
       ) : (
-        <>
-          <Box>
-            {homePageContent.startsWith('https://') ? (
-              <iframe title="home_page_content" src={homePageContent} style={{ width: '100%', height: '100vh', border: 'none' }} />
-            ) : (
-              <>
-                <Container>
-                  <div style={{ fontSize: 'larger' }} dangerouslySetInnerHTML={{ __html: homePageContent }}></div>
-                </Container>
-              </>
-            )}
-          </Box>
-        </>
+        <Box>
+          <ContentViewer
+            content={homePageContent}
+            loading={!homePageContentLoaded}
+            errorMessage={homePageContent === t('home.loadingErr') ? t('home.loadingErr') : ''}
+            containerStyle={{ minHeight: 'calc(100vh - 136px)' }}
+            contentStyle={{ fontSize: 'larger' }}
+          />
+        </Box>
       )}
     </>
   );
