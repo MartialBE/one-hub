@@ -35,12 +35,13 @@ type ImageResponseDataInner struct {
 }
 
 type ImageEditRequest struct {
-	Image          *multipart.FileHeader `form:"image" binding:"required"`
-	Mask           *multipart.FileHeader `form:"mask"`
-	Model          string                `form:"model"`
-	Prompt         string                `form:"prompt"`
-	N              int                   `form:"n"`
-	Size           string                `form:"size"`
-	ResponseFormat string                `form:"response_format"`
-	User           string                `form:"user"`
+	Image          *multipart.FileHeader   `form:"image"`
+	Images         []*multipart.FileHeader `form:"image[]"`
+	Mask           *multipart.FileHeader   `form:"mask"`
+	Model          string                  `form:"model"`
+	Prompt         string                  `form:"prompt"`
+	N              int                     `form:"n"`
+	Size           string                  `form:"size"`
+	ResponseFormat string                  `form:"response_format"`
+	User           string                  `form:"user"`
 }
