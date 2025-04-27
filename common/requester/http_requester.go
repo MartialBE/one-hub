@@ -1,6 +1,7 @@
 package requester
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -133,7 +134,15 @@ func RequestStream[T streamable](requester *HTTPRequester, resp *http.Response, 
 	// 	return nil, HandleErrorResp(resp, requester.ErrorHandler, requester.IsOpenAI)
 	// }
 
-	stream := NewStreamReader(resp, handlerPrefix, false)
+	stream := &streamReader[T]{
+		reader:        bufio.NewReader(resp.Body),
+		response:      resp,
+		handlerPrefix: handlerPrefix,
+		NoTrim:        false,
+
+		DataChan: make(chan T),
+		ErrChan:  make(chan error),
+	}
 
 	return stream, nil
 }
