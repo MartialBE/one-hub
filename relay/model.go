@@ -159,6 +159,10 @@ func AvailableModel(c *gin.Context) {
 	})
 }
 
+func GetAvailableModels(groupName string) map[string]*AvailableModelResponse {
+	return getAvailableModels(groupName)
+}
+
 func getAvailableModels(groupName string) map[string]*AvailableModelResponse {
 	publicModels := model.ChannelGroup.GetModelsGroups()
 	publicGroups := model.GlobalUserGroupRatio.GetPublicGroupList()

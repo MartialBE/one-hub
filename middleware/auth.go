@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"one-api/common/config"
 	"one-api/common/utils"
@@ -21,12 +22,16 @@ func authHelper(c *gin.Context, minRole int) {
 		// Check access token
 		accessToken := c.Request.Header.Get("Authorization")
 		if accessToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "无权进行此操作，未登录且未提供 access token",
-			})
-			c.Abort()
-			return
+			token := c.Param("accessToken")
+			if token == "" {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"success": false,
+					"message": "无权进行此操作，未登录且未提供 access token",
+				})
+				c.Abort()
+				return
+			}
+			accessToken = fmt.Sprintf("Bearer %s", token)
 		}
 		user := model.ValidateAccessToken(accessToken)
 		if user != nil && user.Username != "" {
