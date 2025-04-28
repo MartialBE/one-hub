@@ -23,8 +23,8 @@ type dashboardQueryParam struct {
 
 // GetTool 返回模型查询工具的定义
 func (c *Dashboard) GetTool() *protocol.Tool {
+	dashboardTool, _ := protocol.NewTool(
 		NAME,
-    NAME,
 		"账单查询，查询指定时间模型使用情况，可以传入开始和结束时间，如果不指定时间的话系统将会返回当前时间近七天的数据",
 		dashboardQueryParam{},
 	)
