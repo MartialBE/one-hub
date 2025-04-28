@@ -114,4 +114,7 @@ search:
   tavily:
     key: "" # tavily 密钥
 
+mcp:
+  enable: false # 开启mcp服务
+
 

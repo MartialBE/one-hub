@@ -8,29 +8,24 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 )
 
+const NAME = "calculator"
+
 // Calculator 实现了计算器工具
 type Calculator struct{}
-type calcReq struct {
+type calculatorQueryParam struct {
 	Operation string  `json:"operation" description:"要执行的操作 (add, subtract, multiply, divide)" required:"true" enum:"add,subtract,multiply,divide"`
 	X         float64 `json:"x" description:"第一个数字" required:"true"`
 	Y         float64 `json:"y" description:"第二个数字" required:"true"`
 }
 
-// NewCalculator 创建一个新的计算器工具实
-// NewCalculator 创建一个新的计算器工具实例
-func NewCalculator() *Calculator {
-	return &Calculator{}
-}
-
 // GetTool 返回计算器工具的定义
-// GetTool returns the calculator tool definition
 func (c *Calculator) GetTool() *protocol.Tool {
 	// 创建一个新的计算器工具
 	// Create a new calculator tool
 	calculatorTool, _ := protocol.NewTool(
-		"calculator",
+		NAME,
 		"四则运算计算器，可以加减乘除",
-		calcReq{},
+		calculatorQueryParam{},
 	)
 
 	return calculatorTool
@@ -38,7 +33,7 @@ func (c *Calculator) GetTool() *protocol.Tool {
 
 // HandleRequest 处理计算器工具的请求
 func (c *Calculator) HandleRequest(ctx context.Context, req *protocol.CallToolRequest) (*protocol.CallToolResult, error) {
-	t := calcReq{}
+	t := calculatorQueryParam{}
 
 	if err := protocol.VerifyAndUnmarshal(req.RawArguments, &t); err != nil {
 		return nil, err

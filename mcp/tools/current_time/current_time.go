@@ -10,35 +10,29 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 )
 
+const NAME = "current_time"
+
+// CurrentTime 实现了当前时间工
 // CurrentTime 实现了当前时间工具
-// CurrentTime implements a current time tool
 type CurrentTime struct{}
 
-type timeReq struct {
-}
-
-// NewCurrentTime 创建一个新的当前时间工具实例
-// NewCurrentTime creates a new current time tool instance
-func NewCurrentTime() *CurrentTime {
-	return &CurrentTime{}
+type timeQueryParam struct {
 }
 
 // GetTool 返回当前时间工具的定义
-// GetTool returns the current time tool definition
 func (c *CurrentTime) GetTool() *protocol.Tool {
 	// 创建一个新的当前时间工具
 	// Create a new current time tool
-	currentTimeTool, _ := protocol.NewTool(
-		"current_time",
-		"获取当前日期时间",
-		timeReq{},
+		NAME,
+    NAME,
+		timeQueryParam{},
+    timeQueryParam{},
 	)
 
 	return currentTimeTool
 }
 
 // HandleRequest 处理当前时间工具的请求
-// HandleRequest handles current time tool requests
 func (c *CurrentTime) HandleRequest(_ context.Context, _ *protocol.CallToolRequest) (*protocol.CallToolResult, error) {
 
 	// 获取当前时间

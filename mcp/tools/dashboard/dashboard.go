@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+const NAME = "dashboard"
+
+// Dashboar
 // Dashboard
 type Dashboard struct{}
 
@@ -18,15 +21,10 @@ type dashboardQueryParam struct {
 	EndOfDay   string `json:"endOfDay" description:"结束时间，格式2025-01-01,默认空字符串" default:"" required:"false"`
 }
 
-// NewDashboard 创建一个新的查询可用模型的工具
-func NewDashboard() *Dashboard {
-	return &Dashboard{}
-}
-
 // GetTool 返回模型查询工具的定义
 func (c *Dashboard) GetTool() *protocol.Tool {
-	dashboardTool, _ := protocol.NewTool(
-		"dashboard",
+		NAME,
+    NAME,
 		"账单查询，查询指定时间模型使用情况，可以传入开始和结束时间，如果不指定时间的话系统将会返回当前时间近七天的数据",
 		dashboardQueryParam{},
 	)

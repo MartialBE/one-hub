@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"one-api/common/logger"
 	"one-api/mcp"
 	"one-api/middleware"
 )
@@ -23,9 +24,16 @@ func SetMcpRouter(router *gin.Engine) {
 	}
 
 	go func() {
-		mcpServer.SSEServer.Run()
-		mcpServer.StreamableServer.Run()
+		err := mcpServer.SSEServer.Run()
+		if err != nil {
+			logger.SysError("mcp sse server error: " + err.Error())
+			return
+		}
+		err = mcpServer.StreamableServer.Run()
+		if err != nil {
+			logger.SysError("mcp streamable server error: " + err.Error())
+			return
+		}
 	}()
 
-	//defer server.McpServer.Shutdown(context.Background())
 }

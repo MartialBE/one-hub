@@ -10,24 +10,20 @@ import (
 	"one-api/relay"
 )
 
-// AvailableModel
+const NAME = "available_model"
+
 type AvailableModel struct{}
 
-type modelQuery struct {
+type modelQueryParam struct {
 	GroupName string `json:"groupName" description:"分组名称,默认为空" default:"" required:"false"`
-}
-
-// AvailableModel 创建一个新的查询可用模型的工具
-func NewAvailableModel() *AvailableModel {
-	return &AvailableModel{}
 }
 
 // GetTool 返回模型查询工具的定义
 func (c *AvailableModel) GetTool() *protocol.Tool {
 	availableTool, _ := protocol.NewTool(
-		"available_model",
+		NAME,
 		"查询可用模型的模型供应商、名称、输入价格、输出价格",
-		modelQuery{},
+		modelQueryParam{},
 	)
 	return availableTool
 }
@@ -48,7 +44,7 @@ func (c *AvailableModel) HandleRequest(ctx context.Context, req *protocol.CallTo
 		logger.SysLog("用户不存在，id类型错误")
 		return nil, errors.New("用户不存在")
 	}
-	query := modelQuery{}
+	query := modelQueryParam{}
 	if err := protocol.VerifyAndUnmarshal(req.RawArguments, &query); err != nil {
 		logger.SysLog(fmt.Sprintf("错误：%s", err.Error()))
 		return nil, err
@@ -58,7 +54,7 @@ func (c *AvailableModel) HandleRequest(ctx context.Context, req *protocol.CallTo
 	}
 	models := relay.GetAvailableModels(query.GroupName)
 	// 转成字符串
-	modelsStr := fmt.Sprintf("分组：%s模型列表\n", query.GroupName)
+	modelsStr := fmt.Sprintf("分组[%s]模型列表\n", query.GroupName)
 	for _, m := range models {
 		modelsStr += fmt.Sprintf("供应商:%s 名称:%s 输入价格:$%f/1K 输出价格:$%f/1K \n", m.OwnedBy, m.Price.Model, m.Price.Input*0.002, m.Price.Output*0.002)
 	}

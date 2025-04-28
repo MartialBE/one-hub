@@ -3,16 +3,12 @@ package mcp
 import (
 	"fmt"
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
+	"github.com/ThinkInAIXYZ/go-mcp/server"
+	"github.com/ThinkInAIXYZ/go-mcp/transport"
 	"github.com/gin-gonic/gin"
 	"one-api/common/config"
 	"one-api/common/logger"
-	"one-api/mcp/tools/available_model"
-	"one-api/mcp/tools/calculator"
-	"one-api/mcp/tools/current_time"
-	"one-api/mcp/tools/dashboard"
-
-	"github.com/ThinkInAIXYZ/go-mcp/server"
-	"github.com/ThinkInAIXYZ/go-mcp/transport"
+	"one-api/mcp/tools"
 )
 
 type Server struct {
@@ -57,25 +53,12 @@ func NewMcpServer() *Server {
 
 // RegisterTools 注册所有MCP工具到服务器
 func (mcp *Server) RegisterTools() {
-	// 注册计算器工具
-	calcTool := calculator.NewCalculator()
-	mcp.SSEServer.RegisterTool(calcTool.GetTool(), calcTool.HandleRequest)
-	mcp.StreamableServer.RegisterTool(calcTool.GetTool(), calcTool.HandleRequest)
-
-	// 注册当前时间工具
-	timeTool := current_time.NewCurrentTime()
-	mcp.SSEServer.RegisterTool(timeTool.GetTool(), timeTool.HandleRequest)
-	mcp.StreamableServer.RegisterTool(timeTool.GetTool(), timeTool.HandleRequest)
-
-	availableModel := available_model.NewAvailableModel()
-	mcp.SSEServer.RegisterTool(availableModel.GetTool(), availableModel.HandleRequest)
-	mcp.StreamableServer.RegisterTool(availableModel.GetTool(), availableModel.HandleRequest)
-
-	newDashboard := dashboard.NewDashboard()
-	mcp.SSEServer.RegisterTool(newDashboard.GetTool(), newDashboard.HandleRequest)
-	mcp.StreamableServer.RegisterTool(newDashboard.GetTool(), newDashboard.HandleRequest)
-
-	logger.SysLog(" All MCP tools registered")
+	// 遍历注册所有工具
+	for _, tool := range tools.McpTools {
+		mcp.SSEServer.RegisterTool(tool.GetTool(), tool.HandleRequest)
+		mcp.StreamableServer.RegisterTool(tool.GetTool(), tool.HandleRequest)
+	}
+	logger.SysLog("All MCP tools registered")
 }
 
 func (mcp *Server) HandleSSE(ctx *gin.Context) {

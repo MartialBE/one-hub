@@ -17,7 +17,10 @@ func SetRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte) {
 	SetDashboardRouter(router)
 	SetRelayRouter(router)
 	// 初始化MCP服务器与Gin集成
-	SetMcpRouter(router)
+	if config.MCP_ENABLE {
+		logger.SysLog("Enable MCP Server")
+		SetMcpRouter(router)
+	}
 	frontendBaseUrl := viper.GetString("frontend_base_url")
 	if config.IsMasterNode && frontendBaseUrl != "" {
 		frontendBaseUrl = ""
