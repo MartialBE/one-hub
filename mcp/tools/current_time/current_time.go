@@ -21,12 +21,10 @@ type timeQueryParam struct {
 
 // GetTool 返回当前时间工具的定义
 func (c *CurrentTime) GetTool() *protocol.Tool {
-	// 创建一个新的当前时间工具
-	// Create a new current time tool
+	currentTimeTool, _ := protocol.NewTool(
 		NAME,
-    NAME,
+		"获取当前时间",
 		timeQueryParam{},
-    timeQueryParam{},
 	)
 
 	return currentTimeTool
