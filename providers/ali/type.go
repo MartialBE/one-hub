@@ -38,6 +38,7 @@ type AliParameters struct {
 	EnableSearch      bool    `json:"enable_search,omitempty"`
 	IncrementalOutput bool    `json:"incremental_output,omitempty"`
 	ResultFormat      string  `json:"result_format,omitempty"`
+	EnableThinking    *bool   `json:"enable_thinking,omitempty"` // qwen3 thinking switch
 }
 
 type AliChatRequest struct {

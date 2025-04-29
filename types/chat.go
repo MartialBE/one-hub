@@ -220,7 +220,8 @@ type ChatCompletionRequest struct {
 	Prediction          any                           `json:"prediction,omitempty"`
 	WebSearchOptions    *WebSearchOptions             `json:"web_search_options,omitempty"`
 
-	Reasoning *ChatReasoning `json:"reasoning,omitempty"`
+	Reasoning      *ChatReasoning `json:"reasoning,omitempty"`
+	EnableThinking *bool          `json:"enable_thinking,omitempty"` // qwen3 thinking switch
 
 	OneOtherArg string `json:"-"`
 }
