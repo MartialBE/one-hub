@@ -3,7 +3,6 @@ package azure
 import (
 	"errors"
 	"net/http"
-	"strings"
 )
 
 func (p *AzureProvider) GetModelList() ([]string, error) {
@@ -20,8 +19,7 @@ func (p *AzureProvider) GetModelList() ([]string, error) {
 	}
 	var modelList []string
 	for _, model := range response.Data {
-		modelId := strings.Replace(model.Id, `gpt-35`, `gpt-3.5`, 1)
-		modelList = append(modelList, modelId)
+		modelList = append(modelList, model.Id)
 	}
 	return modelList, nil
 }
