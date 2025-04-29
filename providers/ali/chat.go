@@ -166,6 +166,7 @@ func (p *AliProvider) convertFromChatOpenai(request *types.ChatCompletionRequest
 		Parameters: AliParameters{
 			ResultFormat:      "message",
 			IncrementalOutput: request.Stream,
+			EnableThinking:    request.EnableThinking,
 		},
 	}
 
@@ -175,25 +176,25 @@ func (p *AliProvider) convertFromChatOpenai(request *types.ChatCompletionRequest
 }
 
 func (p *AliProvider) pluginHandle(request *AliChatRequest) {
-    if p.Channel.Plugin == nil {
-        return
-    }
+	if p.Channel.Plugin == nil {
+		return
+	}
 
-    plugin := p.Channel.Plugin.Data()
+	plugin := p.Channel.Plugin.Data()
 
-    // 检测是否开启了 web_search 插件
-    if pWeb, ok := plugin["web_search"]; ok {
-        if enable, ok := pWeb["enable"].(bool); ok && enable {
-            // 检查当前模型是否包含支持列表中的字符串
-            supportedModels := strings.Split(WebSearchSupportedModels, ",")
-            for _, model := range supportedModels {
-                if strings.Contains(request.Model, model) {
-                    request.Parameters.EnableSearch = true
-                    break
-                }
-            }
-        }
-    }
+	// 检测是否开启了 web_search 插件
+	if pWeb, ok := plugin["web_search"]; ok {
+		if enable, ok := pWeb["enable"].(bool); ok && enable {
+			// 检查当前模型是否包含支持列表中的字符串
+			supportedModels := strings.Split(WebSearchSupportedModels, ",")
+			for _, model := range supportedModels {
+				if strings.Contains(request.Model, model) {
+					request.Parameters.EnableSearch = true
+					break
+				}
+			}
+		}
+	}
 }
 
 // 转换为OpenAI聊天流式请求体
