@@ -100,8 +100,8 @@ function GetLightOption() {
     mode: 'light',
     heading: '#202939',
     paper: '#FFFFFF',
-    backgroundDefault: '#f8f7f7',
-    background: '#f8f7f7',
+    backgroundDefault: '#F5F7FA',
+    background: '#F5F7FA',
     darkTextPrimary: '#3E4555',
     darkTextSecondary: '#6C7A92',
     textDark: '#252F40',
@@ -112,8 +112,8 @@ function GetLightOption() {
     menuButton: varAlpha(color.primary200, 0.12),
     menuButtonColor: color.primaryMain,
     menuChip: '#EEF2F6',
-    headBackgroundColor: '#f8f7f7',
-    headBackgroundColorHover: varAlpha('#f8f7f7', 0.12),
+    headBackgroundColor: '#F5F7FA',
+    headBackgroundColorHover: varAlpha('#F5F7FA', 0.12),
     tableBorderBottom: '#E9EDF5'
   };
 }
