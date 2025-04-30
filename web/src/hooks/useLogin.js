@@ -128,9 +128,12 @@ const useLogin = () => {
       const { success, data } = res.data;
       if (success) {
         dispatch({ type: LOGIN, payload: data });
+        return data;
       }
+      return null;
     } catch (err) {
       console.error(err);
+      return null;
     }
   }, [dispatch]);
 

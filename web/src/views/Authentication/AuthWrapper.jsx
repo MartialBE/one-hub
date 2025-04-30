@@ -22,6 +22,11 @@ const AuthWrapper = ({ children }) => {
     }
   }, [account, navigate, isUserLoaded]);
 
+  // 在用户信息加载完成前显示加载状态
+  if (!isUserLoaded) {
+    return <AuthStyle>加载中...</AuthStyle>;
+  }
+
   return <AuthStyle> {children} </AuthStyle>;
 };
 

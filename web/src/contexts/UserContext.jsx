@@ -11,7 +11,8 @@ const UserProvider = ({ children }) => {
   const { loadUser: loadUserAction, loadUserGroup: loadUserGroupAction } = useLogin();
 
   const loadUser = useCallback(async () => {
-    loadUserAction();
+    setIsUserLoaded(false);
+    await loadUserAction();
     setIsUserLoaded(true);
   }, [loadUserAction]);
 
