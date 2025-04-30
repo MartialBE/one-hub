@@ -150,8 +150,6 @@ var SMTPAccount = ""
 var SMTPFrom = ""
 var SMTPToken = ""
 
-var ExtraTokenPriceJson = ""
-
 var ChatImageRequestProxy = ""
 
 var GitHubProxy = ""

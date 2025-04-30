@@ -57,7 +57,6 @@ const OperationSetting = () => {
     RechargeDiscount: '',
     CFWorkerImageUrl: '',
     CFWorkerImageKey: '',
-    ExtraTokenPriceJson: '',
     ClaudeAPIEnabled: '',
     GeminiAPIEnabled: '',
     DisableChannelKeywords: '',
@@ -272,22 +271,6 @@ const OperationSetting = () => {
               await updateOption('RechargeDiscount', inputs.RechargeDiscount);
             } catch (error) {
               showError('固定金额充值折扣处理失败: ' + error.message);
-              return;
-            }
-          }
-          break;
-        case 'ExtraTokenPriceJson':
-          if (originInputs.ExtraTokenPriceJson !== inputs.ExtraTokenPriceJson) {
-            try {
-              if (!verifyJSON(inputs.ExtraTokenPriceJson)) {
-                // 尝试转换为JSON
-                const audioTokens = inputs.ExtraTokenPriceJson.split('\n').filter((line) => line.trim() !== '');
-                await updateOption('ExtraTokenPriceJson', JSON.stringify(audioTokens));
-              } else {
-                await updateOption('ExtraTokenPriceJson', inputs.ExtraTokenPriceJson);
-              }
-            } catch (error) {
-              showError('音频Token不是合法的 JSON 字符串: ' + error.message);
               return;
             }
           }
@@ -895,52 +878,6 @@ const OperationSetting = () => {
               }}
             >
               {t('setting_index.operationSettings.chatLinkSettings.save')}
-            </Button>
-          </Stack>
-        </Stack>
-      </SubCard>
-
-      <SubCard title={t('setting_index.operationSettings.extraTokenPriceJson.title')}>
-        <Stack spacing={2}>
-          <Stack justifyContent="flex-start" alignItems="flex-start" spacing={2}>
-            <Alert severity="info">
-              配置扩展价格，必须以下格式：
-              {`{"gpt-4o-audio-preview":{"input_audio_tokens":40,"output_audio_tokens":20,"cached_tokens":0.5,"cached_write_tokens":1.25,"cached_read_tokens":0.1,"reasoning_tokens":1}}`}
-              ，当前支持以下配置：
-              <br />
-              input_audio_tokens：输入音频令牌 (输入价格)
-              <br />
-              output_audio_tokens：输出音频令牌 (输出价格)
-              <br />
-              cached_tokens：缓存令牌 (输入价格)
-              <br />
-              cached_write_tokens：缓存写入令牌 (输入价格)
-              <br />
-              cached_read_tokens：缓存读取令牌 (输入价格)
-              <br />
-              reasoning_tokens：推理令牌 (输出价格)
-            </Alert>
-            <FormControl fullWidth>
-              <TextField
-                multiline
-                maxRows={15}
-                id="ExtraTokenPriceJson"
-                label={t('setting_index.operationSettings.extraTokenPriceJson.info')}
-                value={inputs.ExtraTokenPriceJson}
-                name="ExtraTokenPriceJson"
-                onChange={handleTextFieldChange}
-                minRows={5}
-                placeholder={t('setting_index.operationSettings.extraTokenPriceJson.info')}
-                disabled={loading}
-              />
-            </FormControl>
-            <Button
-              variant="contained"
-              onClick={() => {
-                submitConfig('ExtraTokenPriceJson').then();
-              }}
-            >
-              {t('setting_index.operationSettings.extraTokenPriceJson.save')}
             </Button>
           </Stack>
         </Stack>
