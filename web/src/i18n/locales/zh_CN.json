@@ -500,10 +500,16 @@
     "RPM": "API速率",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
+    "input": "输入",
+    "output": "输出",
     "rate": "倍率",
     "search": "搜索",
     "tokens": "按量付费",
     "times": "按次付费",
+    "all": "全部",
+    "price": "价格",
+    "extraRatios": "扩展价格",
+    "noExtraRatios": "没有扩展价格",
     "noneGroup": "当前分组不可用",
     "other": "其他",
     "input_audio_tokens": "音频输入倍率",
@@ -513,7 +519,9 @@
     "cached_read_tokens": "缓存读取倍率",
     "reasoning_tokens": "推理倍率",
     "input_text_tokens": "输入文本倍率",
-    "output_text_tokens": "输出文本倍率"
+    "output_text_tokens": "输出文本倍率",
+    "input_image_tokens": "输入图片倍率",
+    "output_image_tokens": "输出图片倍率"
   },
   "paymentPage": {
     "orderList": "订单列表",
@@ -965,7 +973,15 @@
     "operationCompleted": "操作成功完成！",
     "inputMultiplierChanged": "输入倍率由",
     "to": "变为",
-    "outputMultiplierChanged": "输出倍率由"
+    "outputMultiplierChanged": "输出倍率由",
+    "extraRatiosAdded": "新增扩展倍率",
+    "extraRatiosRemoved": "删除扩展倍率",
+    "extraRatiosChanged": "扩展倍率变化",
+    "extraRatiosChanges": "扩展倍率变动",
+    "extraRatiosChangesTip": "扩展倍率变动：{{changes}}",
+    "added": "新增",
+    "removed": "删除",
+    "modified": "修改"
   },
   "error": {
     "unknownError": "未知错误"
@@ -1007,7 +1023,12 @@
     "deleteConfirm": "是否删除 {{title}}?",
     "deleteSuccess": "删除成功！",
     "deleteError": "删除失败: {{message}}",
-    "jsonFormatError": "JSON 格式错误"
+    "jsonFormatError": "JSON 格式错误",
+    "pageSize": "每页条数",
+    "search": "搜索",
+    "actions": "操作",
+    "total": "总数",
+    "noDataAvailable": "没有数据可用"
   },
   "channel_row": {
     "priorityTip": "优先级不能小于 0",
@@ -1119,7 +1140,14 @@
     "locked_title": "锁定价格",
     "locked": "锁定价格",
     "unlocked": "不锁定价格",
-    "lockedTip": "价格锁定后无法通过价格更新服务器和程序自带价格进行覆盖。如果您所配置的价格希望随程序或者价格服务器同步更新请勿锁定"
+    "lockedTip": "价格锁定后无法通过价格更新服务器和程序自带价格进行覆盖。如果您所配置的价格希望随程序或者价格服务器同步更新请勿锁定",
+    "extraRatios": "额外扩展倍率",
+    "selectExtraRatio": "选择扩展倍率",
+    "noExtraRatios": "暂无额外扩展倍率，请从下拉框选择添加",
+    "promptRatio": "提示倍率",
+    "completionRatio": "完成倍率",
+    "noAvailableRatios": "没有可用的扩展倍率",
+    "delMultipleInfoTip": "确定删除所选的 {{count}} 个价格吗？"
   },
   "redemption_edit": {
     "requiredQuota": "必须大于等于0",

@@ -43,10 +43,8 @@ func ConvertGeminiToChatOpenai(provider base.ProviderInterface, response *http.R
 
 func GeminiChatCompleteStrem(provider base.ProviderInterface, request *types.ChatCompletionRequest) requester.HandlerPrefix[string] {
 	chatHandler := &gemini.GeminiStreamHandler{
-		Usage:          provider.GetUsage(),
-		LastCandidates: 0,
-		LastType:       "",
-		Request:        request,
+		Usage:   provider.GetUsage(),
+		Request: request,
 	}
 
 	return chatHandler.HandlerStream

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTheme } from '@mui/material/styles';
 import { API } from 'utils/api';
@@ -87,6 +87,8 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
   const [hasTag, setHasTag] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [parameterFocused, setParameterFocused] = useState(false);
+  const parameterInputRef = useRef(null);
   const removeDuplicates = (array) => [...new Set(array)];
 
   const initChannel = (typeValue) => {
@@ -855,21 +857,28 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                   <TextField
                     id="channel-custom_parameter-label"
                     label={customizeT(inputLabel.custom_parameter)}
-                    multiline
-                    rows={8}
+                    multiline={Boolean(values.custom_parameter || parameterFocused)}
+                    rows={values.custom_parameter || parameterFocused ? 8 : 1}
                     value={values.custom_parameter}
                     name="custom_parameter"
                     disabled={hasTag}
                     error={Boolean(touched.custom_parameter && errors.custom_parameter)}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder='{
-  "temperature": 0.7,
-  "top_p": 0.9,
-  "nested_param": {
-    "key": "value"
-  }
-}'
+                    inputRef={parameterInputRef}
+                    onBlur={(e) => {
+                      handleBlur(e);
+                      setParameterFocused(false);
+                    }}
+                    onFocus={() => {
+                      setParameterFocused(true);
+                      // 使用setTimeout确保状态更新后重新聚焦
+                      setTimeout(() => {
+                        if (parameterInputRef.current) {
+                          parameterInputRef.current.focus();
+                        }
+                      }, 0);
+                    }}
+                    placeholder={parameterFocused ? '{\n  "temperature": 0.7,\n  "top_p": 0.9,\n  "nested_param": {\n      "key": "value"\n  }\n}' : ''}
                   />
                   {touched.custom_parameter && errors.custom_parameter ? (
                     <FormHelperText error id="helper-tex-channel-custom_parameter-label">

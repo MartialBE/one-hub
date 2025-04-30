@@ -11,11 +11,9 @@ import (
 )
 
 type GeminiRelayStreamHandler struct {
-	Usage          *types.Usage
-	LastCandidates int
-	LastType       string
-	Prefix         string
-	ModelName      string
+	Usage     *types.Usage
+	Prefix    string
+	ModelName string
 
 	key string
 }
@@ -54,11 +52,9 @@ func (p *GeminiProvider) CreateGeminiChatStream(request *GeminiChatRequest) (req
 	channel := p.GetChannel()
 
 	chatHandler := &GeminiRelayStreamHandler{
-		Usage:          p.Usage,
-		ModelName:      request.Model,
-		Prefix:         `data: `,
-		LastCandidates: 0,
-		LastType:       "",
+		Usage:     p.Usage,
+		ModelName: request.Model,
+		Prefix:    `data: `,
 
 		key: channel.Key,
 	}
@@ -101,25 +97,15 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		return
 	}
 
-	if geminiResponse.UsageMetadata == nil || (len(geminiResponse.Candidates) > 0 && len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil) {
+	if geminiResponse.UsageMetadata == nil {
 		dataChan <- rawStr
 		return
 	}
 
-	lastType := "text"
-	if len(geminiResponse.Candidates) > 0 && len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
-		lastType = "code"
-	}
-	if h.LastType != lastType {
-		h.LastCandidates = 0
-		h.LastType = lastType
-	}
-
 	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
-	h.Usage.CompletionTokens += geminiResponse.UsageMetadata.CandidatesTokenCount - h.LastCandidates
-	h.Usage.CompletionTokensDetails.ReasoningTokens += geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
-	h.LastCandidates = geminiResponse.UsageMetadata.CandidatesTokenCount
+	h.Usage.CompletionTokens = geminiResponse.UsageMetadata.CandidatesTokenCount + geminiResponse.UsageMetadata.ThoughtsTokenCount
+	h.Usage.CompletionTokensDetails.ReasoningTokens = geminiResponse.UsageMetadata.ThoughtsTokenCount
+	h.Usage.TotalTokens = geminiResponse.UsageMetadata.TotalTokenCount
 
 	dataChan <- rawStr
 }

@@ -150,8 +150,6 @@ var SMTPAccount = ""
 var SMTPFrom = ""
 var SMTPToken = ""
 
-var ExtraTokenPriceJson = ""
-
 var ChatImageRequestProxy = ""
 
 var GitHubProxy = ""
@@ -202,6 +200,8 @@ var RequestInterval time.Duration
 
 var BatchUpdateEnabled = false
 var BatchUpdateInterval = 5
+
+var MCP_ENABLE = false
 
 // Gemini
 var GeminiAPIEnabled = true

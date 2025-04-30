@@ -18,6 +18,7 @@ func InitConf() {
 	SessionSecret = utils.GetOrDefault("session_secret", SessionSecret)
 	UserInvoiceMonth = viper.GetBool("user_invoice_month")
 	GitHubProxy = viper.GetString("github_proxy")
+	MCP_ENABLE = viper.GetBool("mcp.enable") != false
 }
 
 func setEnv() {

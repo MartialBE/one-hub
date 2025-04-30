@@ -255,6 +255,61 @@ func addOldTokenMaxId() *gormigrate.Migration {
 	}
 }
 
+func addExtraRatios() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202504300001",
+		Migrate: func(tx *gorm.DB) error {
+			extraTokenPriceJson := ""
+			extraRatios := make(map[string]map[string]float64)
+			// 先查询数据库中是否存在extra_ratios
+			option, err := GetOption("ExtraTokenPriceJson")
+			if err == nil {
+				extraTokenPriceJson = option.Value
+
+			} else {
+				extraTokenPriceJson = GetDefaultExtraRatio()
+			}
+
+			err = json.Unmarshal([]byte(extraTokenPriceJson), &extraRatios)
+			if err != nil {
+				return err
+			}
+
+			if len(extraRatios) == 0 {
+				return nil
+			}
+
+			models := make([]string, 0)
+			for model := range extraRatios {
+				models = append(models, model)
+			}
+
+			// 查询数据库中是否存在
+			var prices []*Price
+			err = tx.Where("model IN (?)", models).Find(&prices).Error
+			if err != nil {
+				return err
+			}
+
+			for _, price := range prices {
+				extraRatios := extraRatios[price.Model]
+				jsonData := datatypes.NewJSONType(extraRatios)
+				price.ExtraRatios = &jsonData
+				err = tx.Model(&Price{}).Where("model = ?", price.Model).Updates(map[string]interface{}{
+					"extra_ratios": jsonData,
+				}).Error
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Rollback().Error
+		},
+	}
+}
 func migrationAfter(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -266,6 +321,7 @@ func migrationAfter(db *gorm.DB) error {
 		changeChannelApiVersion(),
 		initUserGroup(),
 		addOldTokenMaxId(),
+		addExtraRatios(),
 	})
 	return m.Migrate()
 }

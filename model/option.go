@@ -107,16 +107,6 @@ func InitOptionMap() {
 	config.GlobalOption.RegisterInt("OldTokenMaxId", &config.OldTokenMaxId)
 	config.GlobalOption.RegisterBool("GitHubOldIdCloseEnabled", &config.GitHubOldIdCloseEnabled)
 
-	config.GlobalOption.RegisterCustom("ExtraTokenPriceJson", func() string {
-		return GetDefaultExtraRatio()
-	}, func(value string) error {
-		config.ExtraTokenPriceJson = value
-		if PricingInstance != nil {
-			PricingInstance.Init()
-		}
-		return nil
-	}, "")
-
 	config.GlobalOption.RegisterBool("GeminiAPIEnabled", &config.GeminiAPIEnabled)
 	config.GlobalOption.RegisterBool("ClaudeAPIEnabled", &config.ClaudeAPIEnabled)
 

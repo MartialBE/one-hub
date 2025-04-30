@@ -1,302 +1,105 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  GridRowModes,
-  DataGrid,
-  GridToolbarContainer,
-  GridActionsCellItem,
-  GridToolbarExport,
-  GridToolbarColumnsButton,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-  GridToolbarDensitySelector
-} from '@mui/x-data-grid';
-import { zhCN } from '@mui/x-data-grid/locales';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  Paper,
+  Pagination,
+  InputAdornment,
+  useTheme,
+  IconButton
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { Icon } from '@iconify/react';
 import { showError, showSuccess, trims } from 'utils/common';
 import { API } from 'utils/api';
-import { ValueFormatter, priceType } from './component/util';
 import { useTranslation } from 'react-i18next';
 import { getPageSize, savePageSize } from 'constants';
-
-function validation(t, row, rows) {
-  if (row.model === '') {
-    return t('pricing_edit.requiredModelName');
-  }
-
-  // 判断 type 是否是 等于 tokens || times
-  if (row.type !== 'tokens' && row.type !== 'times') {
-    return t('pricing_edit.typeCheck');
-  }
-
-  if (row.channel_type <= 0) {
-    return t('pricing_edit.channelTypeErr2');
-  }
-
-  // 判断 model是否是唯一值
-  if (rows.filter((r) => r.model === row.model && (row.isNew || r.id !== row.id)).length > 0) {
-    return t('pricing_edit.modelNameRe');
-  }
-
-  if (row.input === '' || row.input < 0) {
-    return t('pricing_edit.inputVal');
-  }
-  if (row.output === '' || row.output < 0) {
-    return t('pricing_edit.outputVal');
-  }
-  return false;
-}
-
-function EditToolbar() {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ utf8WithBom: true }} />
-      <GridToolbarQuickFilter />
-    </GridToolbarContainer>
-  );
-}
-
-EditToolbar.propTypes = {
-  setRows: PropTypes.func.isRequired,
-  setRowModesModel: PropTypes.func.isRequired
-};
+import PriceCard from './component/PriceCard';
+import { alpha } from '@mui/material/styles';
+import EditModal from './component/EditModal';
+import ToggleButtonGroup from 'ui-component/ToggleButton';
 
 const Single = ({ ownedby, prices, reloadData }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [rows, setRows] = useState([]);
-  const [rowModesModel, setRowModesModel] = useState({});
   const [selectedRow, setSelectedRow] = useState(null);
+  const [editRow, setEditRow] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(getPageSize('pricing', 24));
+  const [channelFilter, setChannelFilter] = useState('all');
+  const [lockFilter, setLockFilter] = useState('all');
+  const [unit, setUnit] = useState('K');
 
-  const addOrUpdatePirces = useCallback(
-    async (newRow, oldRow, reject, resolve) => {
-      try {
-        let res;
-        newRow = trims(newRow);
-        if (oldRow.model == '') {
-          res = await API.post('/api/prices/single', newRow);
-        } else {
-          let modelEncode = encodeURIComponent(oldRow.model);
-          res = await API.put('/api/prices/single/' + modelEncode, newRow);
-        }
-        const { success, message } = res.data;
-        if (success) {
-          showSuccess(t('pricing_edit.saveOk'));
-          resolve(newRow);
-          reloadData();
-        } else {
-          reject(new Error(message));
-        }
-      } catch (error) {
-        reject(new Error(error));
-      }
-    },
-    [reloadData]
-  );
+  const unitOptions = [
+    { value: 'K', label: 'K' },
+    { value: 'M', label: 'M' }
+  ];
 
-  const handleEditClick = useCallback(
-    (id) => () => {
-      setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-    },
-    [rowModesModel]
-  );
-
-  const handleSaveClick = useCallback(
-    (id) => () => {
-      setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-    },
-    [rowModesModel]
-  );
-
-  const handleDeleteClick = useCallback(
-    (id) => () => {
-      setSelectedRow(rows.find((row) => row.id === id));
-    },
-    [rows]
-  );
+  // 删除确认对话框
+  const handleDeleteClick = (row) => {
+    setSelectedRow(row);
+  };
 
   const handleClose = () => {
     setSelectedRow(null);
   };
 
   const handleConfirmDelete = async () => {
-    // 执行删除操作
     await deletePirces(selectedRow.model);
     setSelectedRow(null);
   };
 
-  const handleCancelClick = useCallback(
-    (id) => () => {
-      setRowModesModel({
-        ...rowModesModel,
-        [id]: { mode: GridRowModes.View, ignoreModifications: true }
-      });
-
-      const editedRow = rows.find((row) => row.id === id);
-      if (editedRow.isNew) {
-        setRows(rows.filter((row) => row.id !== id));
-      }
-    },
-    [rowModesModel, rows]
-  );
-
-  const processRowUpdate = useCallback(
-    (newRow, oldRows) =>
-      new Promise((resolve, reject) => {
-        if (
-          !newRow.isNew &&
-          newRow.model === oldRows.model &&
-          newRow.input === oldRows.input &&
-          newRow.output === oldRows.output &&
-          newRow.type === oldRows.type &&
-          newRow.channel_type === oldRows.channel_type &&
-          newRow.locked === oldRows.locked
-        ) {
-          return resolve(oldRows);
-        }
-        const updatedRow = { ...newRow, isNew: false };
-        const error = validation(t, updatedRow, rows);
-        if (error) {
-          return reject(new Error(error));
-        }
-
-        const response = addOrUpdatePirces(updatedRow, oldRows, reject, resolve);
-        return response;
-      }),
-    [rows, addOrUpdatePirces]
-  );
-
-  const handleProcessRowUpdateError = useCallback((error) => {
-    showError(error.message);
-  }, []);
-
-  const handleRowModesModelChange = (newRowModesModel) => {
-    setRowModesModel(newRowModesModel);
+  // 编辑对话框
+  const handleEditClick = (row) => {
+    setEditRow(row);
   };
 
-  const modelRatioColumns = useMemo(
-    () => [
-      {
-        field: 'model',
-        sortable: true,
-        headerName: t('modelpricePage.model'),
-        minWidth: 220,
-        flex: 1,
-        editable: true
-      },
-      {
-        field: 'type',
-        sortable: true,
-        headerName: t('paymentGatewayPage.tableHeaders.type'),
-        flex: 0.5,
-        minWidth: 100,
-        type: 'singleSelect',
-        valueOptions: priceType,
-        editable: true
-      },
-      {
-        field: 'channel_type',
-        sortable: true,
-        headerName: t('modelpricePage.channelType'),
-        flex: 0.5,
-        minWidth: 100,
-        type: 'singleSelect',
-        valueOptions: ownedby,
-        editable: true
-      },
-      {
-        field: 'input',
-        sortable: false,
-        headerName: t('modelpricePage.inputMultiplier'),
-        flex: 0.8,
-        minWidth: 150,
-        type: 'number',
-        editable: true,
-        valueFormatter: (params) => ValueFormatter(params.value)
-      },
-      {
-        field: 'output',
-        sortable: false,
-        headerName: t('modelpricePage.outputMultiplier'),
-        flex: 0.8,
-        minWidth: 150,
-        type: 'number',
-        editable: true,
-        valueFormatter: (params) => ValueFormatter(params.value)
-      },
-      {
-        field: 'locked',
-        sortable: true,
-        headerName: t('pricing_edit.locked_title'),
-        flex: 0.5,
-        minWidth: 100,
-        type: 'boolean',
-        editable: true,
-        valueFormatter: (params) => (params.value ? t('pricing_edit.locked') : t('pricing_edit.unlocked'))
-      },
-      {
-        field: 'actions',
-        type: 'actions',
-        headerName: t('paymentGatewayPage.tableHeaders.action'),
-        flex: 0.5,
-        minWidth: 100,
-        // width: 100,
-        cellClassName: 'actions',
-        hideable: false,
-        disableExport: true,
-        getActions: ({ id }) => {
-          const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+  const handleEditClose = () => {
+    setEditRow(null);
+  };
 
-          if (isInEditMode) {
-            return [
-              <GridActionsCellItem
-                icon={<SaveIcon />}
-                key={'Save-' + id}
-                label="Save"
-                sx={{
-                  color: 'primary.main'
-                }}
-                onClick={handleSaveClick(id)}
-              />,
-              <GridActionsCellItem
-                icon={<CancelIcon />}
-                key={'Cancel-' + id}
-                label="Cancel"
-                className="textPrimary"
-                onClick={handleCancelClick(id)}
-                color="inherit"
-              />
-            ];
-          }
+  const handleUnitChange = (event, newUnit) => {
+    if (newUnit !== null) {
+      setUnit(newUnit);
+    }
+  };
 
-          return [
-            <GridActionsCellItem
-              key={'Edit-' + id}
-              icon={<EditIcon />}
-              label="Edit"
-              className="textPrimary"
-              onClick={handleEditClick(id)}
-              color="inherit"
-            />,
-            <GridActionsCellItem
-              key={'Delete-' + id}
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={handleDeleteClick(id)}
-              color="inherit"
-            />
-          ];
-        }
+  const handleSaveEdit = async (formData) => {
+    try {
+      let res;
+      formData = trims(formData);
+      if (formData.isNew || !editRow?.model) {
+        res = await API.post('/api/prices/single', formData);
+      } else {
+        let modelEncode = encodeURIComponent(editRow.model);
+        res = await API.put('/api/prices/single/' + modelEncode, formData);
       }
-    ],
-    [handleCancelClick, handleDeleteClick, handleEditClick, handleSaveClick, rowModesModel, ownedby]
-  );
+      const { success, message } = res.data;
+      if (success) {
+        showSuccess(t('pricing_edit.saveOk'));
+        reloadData();
+        setEditRow(null);
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      showError(error.message);
+    }
+  };
 
   const deletePirces = async (modelName) => {
     try {
@@ -314,6 +117,61 @@ const Single = ({ ownedby, prices, reloadData }) => {
     }
   };
 
+  // 筛选和分页
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      // 搜索过滤 - 支持模型名称、渠道类型搜索
+      const searchMatch =
+        searchTerm === '' ||
+        row.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ownedby
+          .find((o) => o.value === row.channel_type)
+          ?.label.toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      // 类型过滤
+      let typeMatch = true;
+      if (filterType !== 'all') {
+        typeMatch = row.type === filterType;
+      }
+
+      // 渠道过滤
+      let channelMatch = true;
+      if (channelFilter !== 'all') {
+        channelMatch = row.channel_type === channelFilter;
+      }
+
+      // 锁定状态过滤
+      let lockMatch = true;
+      if (lockFilter !== 'all') {
+        lockMatch = row.locked === (lockFilter === 'locked');
+      }
+
+      return searchMatch && typeMatch && channelMatch && lockMatch;
+    });
+  }, [rows, searchTerm, filterType, channelFilter, lockFilter, ownedby]);
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return filteredRows.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredRows, page, rowsPerPage]);
+
+  const pageCount = useMemo(() => {
+    return Math.ceil(filteredRows.length / rowsPerPage);
+  }, [filteredRows, rowsPerPage]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setRowsPerPage(newPageSize);
+    savePageSize('pricing', newPageSize);
+    setPage(1);
+  };
+
+  // 初始化数据
   useEffect(() => {
     let modelRatioList = [];
     let id = 0;
@@ -323,62 +181,237 @@ const Single = ({ ownedby, prices, reloadData }) => {
     setRows(modelRatioList);
   }, [prices]);
 
-  return (
-    <Box
-      sx={{
-        width: '100%',
-        '& .actions': {
-          color: 'text.secondary'
-        },
-        '& .textPrimary': {
-          color: 'text.primary'
-        }
-      }}
-    >
-      <DataGrid
-        autosizeOnMount
-        rows={rows}
-        columns={modelRatioColumns}
-        editMode="row"
-        initialState={{ pagination: { paginationModel: { pageSize: getPageSize('pricing', 20) }}}}
-        pageSizeOptions={[20, 30, 50, 100]}
-        onPaginationModelChange={(model) => {
-          savePageSize('pricing', model.pageSize);
-        }}
-        disableRowSelectionOnClick
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        processRowUpdate={processRowUpdate}
-        onProcessRowUpdateError={handleProcessRowUpdateError}
-        localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
-        // onCellDoubleClick={(params, event) => {
-        //   event.defaultMuiPrevented = true;
-        // }}
-        onRowEditStop={(params, event) => {
-          if (params.reason === 'rowFocusOut') {
-            event.defaultMuiPrevented = true;
-          }
-        }}
-        slots={{
-          toolbar: EditToolbar
-        }}
-        slotProps={{
-          toolbar: { setRows, setRowModesModel }
-        }}
-      />
+  // 当搜索词变化时重置到第一页
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, filterType, lockFilter]);
 
-      <Dialog
-        maxWidth="xs"
-        // TransitionProps={{ onEntered: handleEntered }}
-        open={!!selectedRow}
+  return (
+    <Box sx={{ width: '100%' }}>
+      {/* 工具栏 */}
+      <Paper
+        elevation={0}
+        variant="outlined"
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: 1
+        }}
       >
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: 2,
+            justifyContent: 'space-between'
+          }}
+        >
+          {/* 搜索栏 */}
+          <TextField
+            placeholder={t('common.search')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            size="small"
+            sx={{ width: { xs: '100%', sm: 280 } }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+              endAdornment: searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => setSearchTerm('')} size="small">
+                    <Icon icon="mdi:close" width={16} />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+
+          {/* 过滤和分页控制 */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 1,
+              width: { xs: '100%', sm: 'auto' }
+            }}
+          >
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>{t('pricing_edit.type')}</InputLabel>
+              <Select value={filterType} onChange={(e) => setFilterType(e.target.value)} label={t('pricing_edit.type')}>
+                <MenuItem value="all">{t('modelpricePage.all')}</MenuItem>
+                <MenuItem value="tokens">{t('modelpricePage.tokens')}</MenuItem>
+                <MenuItem value="times">{t('modelpricePage.times')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>{t('modelpricePage.channelType')}</InputLabel>
+              <Select value={channelFilter} onChange={(e) => setChannelFilter(e.target.value)} label={t('modelpricePage.channelType')}>
+                <MenuItem value="all">{t('modelpricePage.all')}</MenuItem>
+                {ownedby.map((channel) => (
+                  <MenuItem key={channel.value} value={channel.value}>
+                    {channel.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>{t('pricing_edit.locked_title')}</InputLabel>
+              <Select value={lockFilter} onChange={(e) => setLockFilter(e.target.value)} label={t('pricing_edit.locked_title')}>
+                <MenuItem value="all">{t('modelpricePage.all')}</MenuItem>
+                <MenuItem value="locked">{t('pricing_edit.locked')}</MenuItem>
+                <MenuItem value="unlocked">{t('pricing_edit.unlocked')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" sx={{ minWidth: 90 }}>
+              <InputLabel>{t('common.pageSize')}</InputLabel>
+              <Select value={rowsPerPage} onChange={handleChangeRowsPerPage} label={t('common.pageSize')}>
+                <MenuItem value={20}>20</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+                <MenuItem value={100}>100</MenuItem>
+              </Select>
+            </FormControl>
+
+            <ToggleButtonGroup value={unit} onChange={handleUnitChange} options={unitOptions} aria-label="unit toggle" />
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* 数据表格 */}
+      {filteredRows.length > 0 ? (
+        <Paper
+          elevation={0}
+          variant="outlined"
+          sx={{
+            overflow: 'hidden',
+            borderRadius: 1,
+            mb: 2
+          }}
+        >
+          {/* 表头 */}
+          <Box
+            sx={{
+              display: 'flex',
+              px: 2,
+              py: 1.5,
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`
+            }}
+          >
+            <Box width="25%" px={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('modelpricePage.model')}
+              </Typography>
+            </Box>
+            <Box width="20%" px={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('modelpricePage.price')} ({unit})
+              </Typography>
+            </Box>
+            <Box width="45%" px={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('modelpricePage.extraRatios')}
+              </Typography>
+            </Box>
+            <Box width="10%" px={1} textAlign="right">
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('common.actions')}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* 表格内容 */}
+          <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
+            <Box component="tbody">
+              {paginatedRows.map((price) => (
+                <PriceCard
+                  key={price.id}
+                  price={price}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteClick}
+                  ownedby={ownedby}
+                  unit={unit}
+                />
+              ))}
+            </Box>
+          </Box>
+
+          {/* 分页 */}
+          {filteredRows.length > rowsPerPage && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: 2,
+                py: 1.5,
+                borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`
+              }}
+            >
+              <Typography variant="caption" color="text.secondary">
+                {t('common.total')}: {filteredRows.length}
+              </Typography>
+
+              <Pagination
+                count={pageCount}
+                page={page}
+                onChange={handleChangePage}
+                color="primary"
+                showFirstButton
+                showLastButton
+                siblingCount={1}
+                size="small"
+              />
+            </Box>
+          )}
+        </Paper>
+      ) : (
+        <Paper
+          elevation={0}
+          variant="outlined"
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 1
+          }}
+        >
+          <Icon icon="mdi:file-search-outline" width={48} height={48} color={alpha(theme.palette.text.secondary, 0.4)} />
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            {searchTerm || filterType !== 'all' || lockFilter !== 'all' ? t('common.noSearchResults') : t('common.noDataAvailable')}
+          </Typography>
+        </Paper>
+      )}
+
+      {/* 删除确认对话框 */}
+      <Dialog open={!!selectedRow} onClose={handleClose}>
         <DialogTitle>{t('pricing_edit.delTip')}</DialogTitle>
         <DialogContent dividers>{t('pricing_edit.delInfoTip', { name: selectedRow?.model })}</DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>{t('common.cancel')}</Button>
-          <Button onClick={handleConfirmDelete}>{t('common.delete')}</Button>
+          <Button onClick={handleConfirmDelete} color="error">
+            {t('common.delete')}
+          </Button>
         </DialogActions>
       </Dialog>
+
+      {/* 编辑对话框 - 使用可复用的EditModal组件 */}
+      <EditModal
+        open={editRow !== null}
+        onCancel={handleEditClose}
+        onSaveSingle={handleSaveEdit}
+        ownedby={ownedby}
+        singleMode={true}
+        price={editRow}
+        rows={rows}
+        unit={unit}
+      />
     </Box>
   );
 };
