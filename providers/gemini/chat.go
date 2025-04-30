@@ -17,10 +17,8 @@ const (
 )
 
 type GeminiStreamHandler struct {
-	Usage          *types.Usage
-	LastCandidates int
-	LastType       string
-	Request        *types.ChatCompletionRequest
+	Usage   *types.Usage
+	Request *types.ChatCompletionRequest
 
 	key string
 }
@@ -81,10 +79,8 @@ func (p *GeminiProvider) CreateChatCompletionStream(request *types.ChatCompletio
 	}
 
 	chatHandler := &GeminiStreamHandler{
-		Usage:          p.Usage,
-		LastCandidates: 0,
-		LastType:       "",
-		Request:        request,
+		Usage:   p.Usage,
+		Request: request,
 
 		key: channel.Key,
 	}
@@ -387,25 +383,14 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 	}
 
 	// 和ExecutableCode的tokens共用，所以跳过
-	if geminiResponse.UsageMetadata == nil || len(geminiResponse.Candidates) == 0 || (len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].CodeExecutionResult != nil) {
+	if geminiResponse.UsageMetadata == nil {
 		return
 	}
 
-	lastType := "text"
-	if len(geminiResponse.Candidates) > 0 && len(geminiResponse.Candidates[0].Content.Parts) > 0 && geminiResponse.Candidates[0].Content.Parts[0].ExecutableCode != nil {
-		lastType = "code"
-	}
-
-	if h.LastType != lastType {
-		h.LastCandidates = 0
-		h.LastType = lastType
-	}
-
 	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
-	h.Usage.CompletionTokens += geminiResponse.UsageMetadata.CandidatesTokenCount - h.LastCandidates
-	h.Usage.CompletionTokensDetails.ReasoningTokens += geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
-	h.LastCandidates = geminiResponse.UsageMetadata.CandidatesTokenCount
+	h.Usage.CompletionTokens = geminiResponse.UsageMetadata.CandidatesTokenCount + geminiResponse.UsageMetadata.ThoughtsTokenCount
+	h.Usage.CompletionTokensDetails.ReasoningTokens = geminiResponse.UsageMetadata.ThoughtsTokenCount
+	h.Usage.TotalTokens = geminiResponse.UsageMetadata.TotalTokenCount
 }
 
 const tokenThreshold = 1000000
@@ -453,7 +438,7 @@ var modelAdjustRatios = map[string]int{
 func convertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
 	return types.Usage{
 		PromptTokens:     geminiUsage.PromptTokenCount,
-		CompletionTokens: geminiUsage.CandidatesTokenCount,
+		CompletionTokens: geminiUsage.CandidatesTokenCount + geminiUsage.ThoughtsTokenCount,
 		TotalTokens:      geminiUsage.TotalTokenCount,
 
 		CompletionTokensDetails: types.CompletionTokensDetails{
