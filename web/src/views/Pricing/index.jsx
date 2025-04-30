@@ -270,7 +270,13 @@ const Pricing = () => {
               <Single ownedby={ownedby} reloadData={reloadData} prices={prices} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} handleOpenModal={handleOpenaddModal} />
+              <Multiple
+                ownedby={ownedby}
+                reloadData={reloadData}
+                prices={prices}
+                handleOpenModal={handleOpenaddModal}
+                noPriceModels={noPriceModel}
+              />
             </CustomTabPanel>
           </Box>
         </AdminContainer>

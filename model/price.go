@@ -1,10 +1,10 @@
 package model
 
 import (
-	"encoding/json"
 	"one-api/common/config"
 
 	"github.com/shopspring/decimal"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -60,7 +60,7 @@ type Price struct {
 	Output      float64 `json:"output" gorm:"default:0" binding:"gte=0"`
 	Locked      bool    `json:"locked" gorm:"default:false"` // 如果模型为locked 则覆盖模式不会更新locked的模型价格
 
-	ExtraRatios map[string]float64 `json:"extra_ratios,omitempty" gorm:"-"`
+	ExtraRatios *datatypes.JSONType[map[string]float64] `json:"extra_ratios,omitempty" gorm:"type:json"`
 }
 
 func init() {
@@ -72,21 +72,21 @@ func GetAllPrices() ([]*Price, error) {
 	if err := DB.Find(&prices).Error; err != nil {
 		return nil, err
 	}
-	if config.ExtraTokenPriceJson == "" {
-		return prices, nil
-	}
+	// if config.ExtraTokenPriceJson == "" {
+	// 	return prices, nil
+	// }
 
-	extraRatios := make(map[string]map[string]float64)
-	err := json.Unmarshal([]byte(config.ExtraTokenPriceJson), &extraRatios)
-	if err != nil {
-		return nil, err
-	}
+	// extraRatios := make(map[string]map[string]float64)
+	// err := json.Unmarshal([]byte(config.ExtraTokenPriceJson), &extraRatios)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	for _, price := range prices {
-		if ratio, ok := extraRatios[price.Model]; ok {
-			price.ExtraRatios = ratio
-		}
-	}
+	// for _, price := range prices {
+	// 	if ratio, ok := extraRatios[price.Model]; ok {
+	// 		price.ExtraRatios = ratio
+	// 	}
+	// }
 
 	return prices, nil
 }
@@ -124,7 +124,8 @@ func (price *Price) GetOutput() float64 {
 
 func (price *Price) GetExtraRatio(key string) float64 {
 	if price.ExtraRatios != nil {
-		if ratio, ok := price.ExtraRatios[key]; ok {
+		extraRatios := price.ExtraRatios.Data()
+		if ratio, ok := extraRatios[key]; ok {
 			return ratio
 		}
 	}
@@ -155,6 +156,7 @@ func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
 			Input:       prices.Input,
 			Output:      prices.Output,
 			Locked:      prices.Locked,
+			ExtraRatios: prices.ExtraRatios,
 		}).Error
 
 	return err

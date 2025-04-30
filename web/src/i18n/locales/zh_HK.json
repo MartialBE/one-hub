@@ -24,7 +24,15 @@
     "to": "變為",
     "url": "URL",
     "priceServerTotal": "價格服務器總數",
-    "overwriteData": ""
+    "overwriteData": "",
+    "added": "新增",
+    "extraRatiosAdded": "新增擴展倍率",
+    "extraRatiosChanged": "擴展倍率變化",
+    "extraRatiosChanges": "擴展倍率變動",
+    "extraRatiosChangesTip": "擴展倍率變動：{{changes}}",
+    "extraRatiosRemoved": "刪除擴展倍率",
+    "modified": "修改",
+    "removed": "刪除"
   },
   "Header 配置": "Header 配置",
   "sidebar": {
@@ -254,7 +262,12 @@
     "verificationCode": "驗證碼",
     "deleteError": "刪除失敗：{{message}}",
     "deleteSuccess": "刪除成功！",
-    "jsonFormatError": "JSON 格式錯誤"
+    "jsonFormatError": "JSON 格式錯誤",
+    "actions": "操作",
+    "noDataAvailable": "冇數據可用",
+    "pageSize": "每頁條數",
+    "search": "搜尋",
+    "total": "總數"
   },
   "dashboard": "儀表板",
   "dashboard_index": {
@@ -286,7 +299,8 @@
     "ComparedWithYesterday": "相比昨日",
     "usage": "使用率",
     "RPM": "當前RPM",
-    "TPM": "當前TPM"
+    "TPM": "當前TPM",
+    "total": "總次數"
   },
   "description": "一站式的 OpenAI 接口\n整合各種 API 訪問方式\n一鍵部署，開箱即用",
   "echo 映射": "echo 映射",
@@ -476,7 +490,15 @@
     "cached_read_tokens": "快取讀取倍率",
     "reasoning_tokens": "推理倍率",
     "input_text_tokens": "輸入文本倍率",
-    "output_text_tokens": "輸出文本倍率"
+    "output_text_tokens": "輸出文本倍率",
+    "all": "全部",
+    "extraRatios": "擴展價格",
+    "input": "輸入",
+    "input_image_tokens": "輸入圖片倍率",
+    "noExtraRatios": "冇擴展價格",
+    "output": "輸出",
+    "output_image_tokens": "輸出圖片倍率",
+    "price": "價格"
   },
   "nova 映射": "nova 映射",
   "onyx 映射": "onyx 映射",
@@ -609,7 +631,13 @@
     "locked_title": "鎖定價格",
     "locked": "鎖定價格",
     "unlocked": "未鎖定價格",
-    "lockedTip": "價格鎖定後無法通過價格更新伺服器和程序覆蓋。如果您所配置的價格希望隨程序或價格伺服器同步更新，請勿鎖定"
+    "lockedTip": "價格鎖定後無法通過價格更新伺服器和程序覆蓋。如果您所配置的價格希望隨程序或價格伺服器同步更新，請勿鎖定",
+    "completionRatio": "完成倍率",
+    "delMultipleInfoTip": "確定刪除所選的 {{count}} 個價格嗎？",
+    "noAvailableRatios": "冇可用嘅擴展倍率",
+    "noExtraRatios": "暫無額外擴展倍率，請從下拉框選擇添加",
+    "promptRatio": "提示倍率",
+    "selectExtraRatio": "選擇擴展倍率"
   },
   "profile": "個人設定",
   "profilePage": {
@@ -843,6 +871,18 @@
           "placeholder": "請輸入關鍵詞，每行一個"
         },
         "save": "保存設置"
+      },
+      "claudeSettings": {
+        "budgetTokensPercentage": {
+          "label": "預設思考Token百分比",
+          "placeholder": "請輸入預設思考 Token 百分比"
+        },
+        "defaultMaxTokens": {
+          "label": "默認MaxToken數量",
+          "placeholder": "請輸入默認MaxToken數量，以json格式表示，default代表默認值，例如：{\"default\": 1000, \"claude-3-7-sonnet-latest\": 128000}"
+        },
+        "save": "保留Claude設置",
+        "title": "克勞德設置"
       }
     },
     "otherSettings": {

@@ -24,7 +24,15 @@
     "priceServerTotal": "価格サーバー総数",
     "updateModeAdd": "新規追加のみ",
     "updateModeUpdate": "価格変更のみ",
-    "updateModeOverwrite": "上書き"
+    "updateModeOverwrite": "上書き",
+    "added": "追加",
+    "extraRatiosAdded": "拡張倍率の追加",
+    "extraRatiosChanged": "拡大率の変化",
+    "extraRatiosChanges": "拡大率の変動",
+    "extraRatiosChangesTip": "拡張率変更：{{changes}}",
+    "extraRatiosRemoved": "拡張倍率を削除します",
+    "modified": "変更",
+    "removed": "削除"
   },
   "sidebar": {
     "totalQuota": "総額",
@@ -253,7 +261,12 @@
     "verificationCode": "検証コード",
     "deleteError": "削除に失敗しました：{{message}}",
     "deleteSuccess": "削除しました！",
-    "jsonFormatError": "JSON形式が間違っています"
+    "jsonFormatError": "JSON形式が間違っています",
+    "actions": "操作 -> 操作",
+    "noDataAvailable": "データがありません。",
+    "pageSize": "ページごとのアイテム数",
+    "search": "検索",
+    "total": "総数"
   },
   "dashboard": "ダッシュボード",
   "dashboard_index": {
@@ -285,7 +298,8 @@
     "ComparedWithYesterday": "昨日と比較",
     "usage": "使用率",
     "RPM": "現在のRPM",
-    "TPM": "現在のTPM"
+    "TPM": "現在のTPM",
+    "total": "総回数"
   },
   "description": "All in one の OpenAI インターフェース\nさまざまな API アクセス方法を統合\nワンクリックで展開、即座に使用可能",
   "echo 映射": "エコーマッピング",
@@ -475,7 +489,15 @@
     "cached_read_tokens": "キャッシュ読み取り倍率",
     "reasoning_tokens": "推論倍率",
     "input_text_tokens": "入力テキスト倍率",
-    "output_text_tokens": "出力テキスト倍率"
+    "output_text_tokens": "出力テキスト倍率",
+    "all": "すべて",
+    "extraRatios": "価格拡張",
+    "input": "入力",
+    "input_image_tokens": "画像倍率",
+    "noExtraRatios": "拡張価格はありません",
+    "output": "出力",
+    "output_image_tokens": "画像倍率",
+    "price": "価格"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",
@@ -609,7 +631,14 @@
     "locked_title": "価格をロックする",
     "locked": "ロックされた価格",
     "unlocked": "ロックされていない価格",
-    "lockedTip": "価格をロックすると、サーバーまたはプログラムの価格更新によって上書きできなくなります。プログラムまたは価格サーバーの価格更新を希望する場合はロックしないでください"
+    "lockedTip": "価格をロックすると、サーバーまたはプログラムの価格更新によって上書きできなくなります。プログラムまたは価格サーバーの価格更新を希望する場合はロックしないでください",
+    "completionRatio": "完了率",
+    "delMultipleInfoTip": "選択した{{count}}つの価格を削除しますか？",
+    "extraRatios": "追加拡張率",
+    "noAvailableRatios": "利用可能な拡張倍率はありません",
+    "noExtraRatios": "追加の拡張倍率はありません。ドロップダウンメニューから選択してください。",
+    "promptRatio": "倍率係数",
+    "selectExtraRatio": "拡大率を選択します"
   },
   "profile": "プロフィール",
   "profilePage": {
@@ -843,6 +872,18 @@
           "placeholder": "1行ずつ入力してください"
         },
         "save": "設定を保存する"
+      },
+      "claudeSettings": {
+        "budgetTokensPercentage": {
+          "label": "デフォルトの考慮トークンパーセンテージ",
+          "placeholder": "デフォルトの考慮トークンパーセンテージを入力してください"
+        },
+        "defaultMaxTokens": {
+          "label": "MaxTokenのデフォルト数量",
+          "placeholder": "デフォルトのMaxToken数を入力してください。JSON形式で、defaultはデフォルト値を表します。例：{\"default\": 1000, \"claude-3-7-sonnet-latest\": 128000}"
+        },
+        "save": "クロードの設定を保存します",
+        "title": "クロードの設定"
       }
     },
     "otherSettings": {

@@ -24,7 +24,15 @@
     "priceServerTotal": "Price Server Total",
     "updateModeAdd": "Add Only",
     "updateModeUpdate": "Update Only",
-    "updateModeOverwrite": "Overwrite All"
+    "updateModeOverwrite": "Overwrite All",
+    "added": "Add",
+    "extraRatiosAdded": "Increase the expansion rate",
+    "extraRatiosChanged": "Changes in magnification ratio",
+    "extraRatiosChanges": "Changes in magnification ratio",
+    "extraRatiosChangesTip": "Changes in magnification: {{changes}}",
+    "extraRatiosRemoved": "Remove magnification ratio",
+    "modified": "Edit",
+    "removed": "Delete"
   },
   "sidebar": {
     "totalQuota": "Total Quota",
@@ -253,7 +261,12 @@
     "verificationCode": "Verification code",
     "deleteError": "Deletion failed: {{message}}",
     "deleteSuccess": "Delete successful!",
-    "jsonFormatError": "JSON format error"
+    "jsonFormatError": "JSON format error",
+    "actions": "Operation",
+    "noDataAvailable": "No data available",
+    "pageSize": "Number of items per page",
+    "search": "Search",
+    "total": "Total"
   },
   "dashboard": "Dashboard",
   "dashboard_index": {
@@ -285,7 +298,8 @@
     "ComparedWithYesterday": "Compared with yesterday",
     "usage": "Usage",
     "RPM": "Current RPM",
-    "TPM": "Current TPM"
+    "TPM": "Current TPM",
+    "total": "Total number"
   },
   "description": "All-in-one OpenAI interface\nIntegrates various API access methods\nOne-click deployment, ready to use",
   "echo 映射": "echo mapping",
@@ -396,7 +410,8 @@
       "illustrate": "* This record is the log recorded before the system upgrade"
     },
     "cachedReadTokens": "Cache read Tokens (* {{ ratio }})",
-    "cachedWriteTokens": "Write tokens to cache (* {{ ratio }})"
+    "cachedWriteTokens": "Write tokens to cache (* {{ ratio }})",
+    "reasoningTokens": "Deduction Tokens (* {{ ratio }})"
   },
   "login": {
     "codeRequired": "verification code must be filled",
@@ -474,7 +489,15 @@
     "cached_read_tokens": "Cache Read Ratio",
     "reasoning_tokens": "Reasoning Ratio",
     "input_text_tokens": "Input text Ratio",
-    "output_text_tokens": "Output text Ratio"
+    "output_text_tokens": "Output text Ratio",
+    "all": "All",
+    "extraRatios": "Expand price",
+    "input": "Input",
+    "input_image_tokens": "Enter image magnification",
+    "noExtraRatios": "No additional charge",
+    "output": "output",
+    "output_image_tokens": "Output image magnification",
+    "price": "Price"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",
@@ -608,7 +631,14 @@
     "locked_title": "Lock price",
     "locked": "Locked price",
     "unlocked": "Unlocked price",
-    "lockedTip": "Price locked cannot be overridden by price updates on the server or program"
+    "lockedTip": "Price locked cannot be overridden by price updates on the server or program",
+    "completionRatio": "Completion ratio",
+    "delMultipleInfoTip": "Are you sure you want to delete the selected {{count}} prices?",
+    "extraRatios": "Extra expansion factor",
+    "noAvailableRatios": "No available extension ratio",
+    "noExtraRatios": "No additional magnification rate is available, please select to add from the drop-down menu.",
+    "promptRatio": "Leverage ratio",
+    "selectExtraRatio": "Select magnification ratio"
   },
   "profile": "Profile",
   "profilePage": {
@@ -842,6 +872,17 @@
           "placeholder": "Enter keywords, one per line"
         },
         "save": "Save Settings"
+      },
+      "claudeSettings": {
+        "budgetTokensPercentage": {
+          "label": "Default thinking token percentage",
+          "placeholder": "Please enter the default thinking token percentage."
+        },
+        "defaultMaxTokens": {
+          "label": "Default MaxToken quantity",
+          "placeholder": "Please enter the default MaxToken quantity in JSON format, where \"default\" represents the default value. For example: {\"default\": 1000, \"claude-3-7-sonnet-latest\": 128000}"
+        },
+        "save": "Save Claude's settings"
       }
     },
     "otherSettings": {
@@ -1309,6 +1350,17 @@
                 "5是错误的": ""
               }
             }
+          },
+          "__i18n_ally_root__": {
+            "__i18n_ally_root__": {
+              "5*，表示支持所有gpt-3": {
+                "5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3": {
+                  "5*是正确的，*gpt-3": {
+                    "5是错误的": ""
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1319,7 +1371,12 @@
       "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "",
       "__i18n_ally_root__": {
         "__i18n_ally_root__": {
-          "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+          "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": "",
+          "__i18n_ally_root__": {
+            "__i18n_ally_root__": {
+              "com/freeapi/chat/completions,如果需要禁用版本号，请输入 disable": ""
+            }
+          }
         }
       }
     }
