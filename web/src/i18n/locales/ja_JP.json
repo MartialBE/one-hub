@@ -504,7 +504,9 @@
     "noExtraRatios": "拡張価格はありません",
     "output": "出力",
     "output_image_tokens": "画像倍率",
-    "price": "価格"
+    "price": "価格",
+    "showAll": "すべて表示",
+    "onlyAvailable": "利用可能なだけ表示"
   },
   "nova 映射": "新星マッピング",
   "onyx 映射": "オニキスマッピング",

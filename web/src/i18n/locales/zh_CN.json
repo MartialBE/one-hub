@@ -528,7 +528,9 @@
     "input_text_tokens": "输入文本倍率",
     "output_text_tokens": "输出文本倍率",
     "input_image_tokens": "输入图片倍率",
-    "output_image_tokens": "输出图片倍率"
+    "output_image_tokens": "输出图片倍率",
+    "showAll": "显示所有",
+    "onlyAvailable": "只显示可用"
   },
   "paymentPage": {
     "orderList": "订单列表",

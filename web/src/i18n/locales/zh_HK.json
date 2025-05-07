@@ -505,7 +505,9 @@
     "noExtraRatios": "冇擴展價格",
     "output": "輸出",
     "output_image_tokens": "輸出圖片倍率",
-    "price": "價格"
+    "price": "價格",
+    "showAll": "顯示所有",
+    "onlyAvailable": "只顯示可用"
   },
   "nova 映射": "nova 映射",
   "onyx 映射": "onyx 映射",

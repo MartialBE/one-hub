@@ -504,7 +504,9 @@
     "noExtraRatios": "No additional charge",
     "output": "output",
     "output_image_tokens": "Output image magnification",
-    "price": "Price"
+    "price": "Price",
+    "showAll": "Show all",
+    "onlyAvailable": "Only show available"
   },
   "nova 映射": "nova mapping",
   "onyx 映射": "onyx mapping",
