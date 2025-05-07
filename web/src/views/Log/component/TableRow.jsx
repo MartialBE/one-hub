@@ -329,7 +329,7 @@ function calculateTokens(item) {
 function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
   if (!item?.metadata?.input_ratio) {
     let free = false;
-    if (item.quota === 0) {
+    if (item.quota === 0 && item.type === 2) {
       free = true;
     }
     const tips = (
@@ -339,14 +339,18 @@ function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
         <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
       </>
     );
-    return (
+    return free?(
       <Tooltip title={tips} placement="top" arrow>
         <Stack direction="column" spacing={0.3}>
           <Label color={free ? 'success' : 'secondary'} variant="soft">
-            {free ? t('logPage.content.free') : t('logPage.content.old_log')}
+            {t('logPage.content.free')}
           </Label>
         </Stack>
       </Tooltip>
+    ):(
+      <Label color={'success'} >
+        {item.content}
+      </Label>
     );
   }
   const groupDiscount = item?.metadata?.group_ratio || 1;
