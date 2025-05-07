@@ -801,7 +801,7 @@ func ChangeUserQuota(c *gin.Context) {
 		remark = fmt.Sprintf("%s, 备注: %s", remark, req.Remark)
 	}
 
-	model.RecordLog(userId, model.LogTypeManage, remark)
+	model.RecordQuotaLog(userId, model.LogTypeManage, req.Quota, remark)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
