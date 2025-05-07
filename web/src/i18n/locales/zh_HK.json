@@ -395,6 +395,13 @@
     "typeLabel": "類型",
     "userLabel": "用戶",
     "sourceIp": "Source IP",
+    "logType": {
+      "all": "全部",
+      "recharge": "充值",
+      "consumption": "消費",
+      "management": "管理",
+      "system": "系統"
+    },
     "content": {
       "calculate_steps": "計算步驟:",
       "calculate_steps_tip": "PS：本系統按照積分計算，所有金額均為積分換算而來，1積分=$0.000002，最低消費為1積分，本計算步驟僅供參考，以實際扣費為準。",

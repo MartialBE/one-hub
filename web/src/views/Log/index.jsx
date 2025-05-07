@@ -11,7 +11,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
-import { Button, Card, Stack, Container, Typography, Box, Menu, MenuItem, Checkbox, ListItemText } from '@mui/material';
+import { Button, Card, Stack, Container, Typography, Box, Menu, MenuItem, Checkbox, ListItemText, Tabs, Tab } from '@mui/material';
 import LogTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from './component/TableToolBar';
@@ -24,9 +24,11 @@ import { useTranslation } from 'react-i18next';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
+import { useLogType } from './type/LogType';
 
 export default function Log() {
   const { t } = useTranslation();
+  const LogType = useLogType();
   const originalKeyword = {
     p: 0,
     username: '',
@@ -34,7 +36,7 @@ export default function Log() {
     model_name: '',
     start_timestamp: 0,
     end_timestamp: dayjs().unix() + 3600,
-    log_type: 0,
+    log_type: '0',
     channel_id: '',
     source_ip: ''
   };
@@ -131,6 +133,13 @@ export default function Log() {
     setToolBarValue({ ...toolBarValue, [event.target.name]: event.target.value });
   };
 
+  const handleTabsChange = async (event, newValue) => {
+    const updatedToolBarValue = { ...toolBarValue, log_type: newValue };
+    setToolBarValue(updatedToolBarValue);
+    setPage(0);
+    setSearchKeyword(updatedToolBarValue);
+  };
+
   const fetchData = useCallback(
     async (page, rowsPerPage, keyword, order, orderBy) => {
       setSearching(true);
@@ -192,6 +201,20 @@ export default function Log() {
         </Stack>
       </Stack>
       <Card>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={toolBarValue.log_type}
+            onChange={handleTabsChange}
+            aria-label="basic tabs example"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+          >
+            {Object.values(LogType).map((option) => {
+              return <Tab key={option.value} label={option.text} value={option.value} />;
+            })}
+          </Tabs>
+        </Box>
         <Box component="form" noValidate>
           <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} userIsAdmin={userIsAdmin} />
         </Box>

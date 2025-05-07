@@ -293,6 +293,13 @@
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
     "sourceIp": "来源IP",
+    "logType": {
+      "all": "全部",
+      "recharge": "充值",
+      "consumption": "消费",
+      "management": "管理",
+      "system": "系统"
+    },
     "content": {
       "channel_group": "分组: {{ channel_group }}",
       "group_discount": "分组折扣: {{ discount }}",

@@ -9,11 +9,11 @@ import { TableRow, TableCell, Stack, Tooltip, Typography } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
-import LogType from '../type/LogType';
+import { useLogType } from '../type/LogType';
 import { useTranslation } from 'react-i18next';
 
-function renderType(type) {
-  const typeOption = LogType[type];
+function renderType(type, logTypes) {
+  const typeOption = logTypes[type];
   if (typeOption) {
     return (
       <Label variant="filled" color={typeOption.color}>
@@ -63,6 +63,7 @@ function requestTSLabelOptions(request_ts) {
 
 export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibility }) {
   const { t } = useTranslation();
+  const LogType = useLogType();
   let request_time = item.request_time / 1000;
   let request_time_str = request_time.toFixed(2) + ' S';
 
@@ -118,7 +119,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
             )}
           </TableCell>
         )}
-        {columnVisibility.type && <TableCell sx={{ p: '10px 8px' }}>{renderType(item.type)}</TableCell>}
+        {columnVisibility.type && <TableCell sx={{ p: '10px 8px' }}>{renderType(item.type, LogType)}</TableCell>}
         {columnVisibility.model_name && <TableCell sx={{ p: '10px 8px' }}>{viewModelName(item.model_name, item.is_stream)}</TableCell>}
 
         {columnVisibility.duration && (
@@ -339,7 +340,7 @@ function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
         <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
       </>
     );
-    return free?(
+    return free ? (
       <Tooltip title={tips} placement="top" arrow>
         <Stack direction="column" spacing={0.3}>
           <Label color={free ? 'success' : 'secondary'} variant="soft">
@@ -347,10 +348,8 @@ function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
           </Label>
         </Stack>
       </Tooltip>
-    ):(
-      <Label color={'success'} >
-        {item.content}
-      </Label>
+    ) : (
+      <>{item.content}</>
     );
   }
   const groupDiscount = item?.metadata?.group_ratio || 1;

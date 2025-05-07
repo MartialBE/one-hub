@@ -42,7 +42,7 @@ func commandRechargeToken(b *gotgbot.Bot, ctx *ext.Context) error {
 	// 去除input前后空格
 	input = strings.TrimSpace(input)
 
-	quota, err := model.Redeem(input, user.Id)
+	quota, err := model.Redeem(input, user.Id, "telegram")
 	if err != nil {
 		ctx.EffectiveMessage.Reply(b, "充值失败："+err.Error(), nil)
 		return handlers.EndConversation()
