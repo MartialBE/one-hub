@@ -146,6 +146,7 @@ export default function ModelPrice() {
     }
   };
 
+  // Get unique owned_by values and sort them by id
   const uniqueOwnedBy = [...new Set(Object.values(availableModels).map((model) => model.owned_by))];
 
   const getIconByName = (name) => {
@@ -183,8 +184,15 @@ export default function ModelPrice() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease-in-out',
                   transform: selectedGroup === key ? 'scale(1.02)' : 'none',
-                  border: (theme) => `1px solid ${selectedGroup === key ? theme.palette.primary.main : theme.palette.divider}`,
-                  backgroundColor: (theme) => (selectedGroup === key ? theme.palette.primary.light : theme.palette.background.paper),
+                  border: (theme) =>
+                    `1px solid ${
+                      group.public === false
+                        ? theme.palette.success.main
+                        : selectedGroup === key
+                          ? theme.palette.primary.main
+                          : theme.palette.divider
+                    }`,
+                  backgroundColor: (theme) => (selectedGroup === key ? theme.palette.primary : theme.palette.background.paper),
                   '&:hover': {
                     transform: 'scale(1.02)',
                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
@@ -193,7 +201,10 @@ export default function ModelPrice() {
               >
                 <Stack spacing={1.5}>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" color={selectedGroup === key ? 'primary.main' : 'text.primary'}>
+                    <Typography
+                      variant="h6"
+                      color={group.public === false ? 'success.main' : selectedGroup === key ? 'primary.main' : 'text.primary'}
+                    >
                       {group.name}
                     </Typography>
                   </Stack>

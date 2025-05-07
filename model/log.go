@@ -40,7 +40,7 @@ const (
 	LogTypeSystem
 )
 
-func RecordQuotaLog(userId int, logType int, quota int, content string) {
+func RecordQuotaLog(userId int, logType int, quota int, ip string, content string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
@@ -51,6 +51,7 @@ func RecordQuotaLog(userId int, logType int, quota int, content string) {
 		Quota:     quota,
 		CreatedAt: utils.GetTimestamp(),
 		Type:      logType,
+		SourceIp:  ip,
 		Content:   content,
 	}
 	err := DB.Create(log).Error

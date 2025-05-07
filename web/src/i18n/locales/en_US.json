@@ -394,6 +394,13 @@
     "typeLabel": "Type",
     "userLabel": "User",
     "sourceIp": "Source IP",
+    "logType": {
+      "all": "All",
+      "recharge": "Recharge",
+      "consumption": "Consumption",
+      "management": "Management",
+      "system": "System"
+    },
     "content": {
       "calculate_steps": "Calculation steps:",
       "calculate_steps_tip": "PS: This system calculates based on points, and all amounts are converted from points. 1 point = $0.000002, with a minimum spending of 1 point. This calculation is for reference only; actual charges may vary.",
