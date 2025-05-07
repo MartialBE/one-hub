@@ -69,6 +69,13 @@ export const CHANNEL_OPTIONS = {
     color: 'default',
     url: 'https://ai.360.com/open'
   },
+  20: {
+    key: 20,
+    text: 'OpenRouter',
+    value: 20,
+    color: 'default',
+    url: 'https://openrouter.ai/'
+  },
   23: {
     key: 23,
     text: '腾讯混元(旧)',

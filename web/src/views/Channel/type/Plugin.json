@@ -310,5 +310,19 @@
         }
       }
     }
+  },
+  "20": {
+    "other": {
+      "name": "覆盖参数",
+      "description": "覆盖参数",
+      "params": {
+        "provider": {
+          "name": "供应商",
+          "description": "格式{\"anthropic\": { \"order\": [\"Anthropic\", \"Amazon Bedrock\"], \"ignore\": [\"Google\"], \"allow_fallbacks\": true }}",
+          "type": "string",
+          "required": true
+        }
+      }
+    }
   }
 }

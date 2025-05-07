@@ -22,6 +22,7 @@ type OpenAIProvider struct {
 	BalanceAction        bool
 	SupportStreamOptions bool
 	StreamEscapeJSON     bool
+	ReasoningHandler     bool
 }
 
 // 创建 OpenAIProvider

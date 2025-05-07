@@ -27,6 +27,7 @@ import (
 	"one-api/providers/moonshot"
 	"one-api/providers/ollama"
 	"one-api/providers/openai"
+	"one-api/providers/openrouter"
 	"one-api/providers/palm"
 	"one-api/providers/recraftAI"
 	"one-api/providers/replicate"
@@ -85,6 +86,7 @@ func init() {
 		config.ChannelTypeGithub:       github.GithubProviderFactory{},
 		config.ChannelTypeRecraft:      recraftAI.RecraftProviderFactory{},
 		config.ChannelTypeReplicate:    replicate.ReplicateProviderFactory{},
+		config.ChannelTypeOpenRouter:   openrouter.OpenRouterProviderFactory{},
 	}
 }
 

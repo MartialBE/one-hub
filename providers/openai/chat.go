@@ -18,6 +18,8 @@ type OpenAIStreamHandler struct {
 	ModelName  string
 	isAzure    bool
 	EscapeJSON bool
+
+	ReasoningHandler bool
 }
 
 func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
@@ -96,7 +98,7 @@ func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		EscapeJSON: p.StreamEscapeJSON,
 	}
 
-	return requester.RequestStream[string](p.Requester, resp, chatHandler.HandlerChatStream)
+	return requester.RequestStream(p.Requester, resp, chatHandler.HandlerChatStream)
 }
 
 func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
@@ -152,6 +154,17 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 			h.Usage.CompletionTokens += countTokenText
 			h.Usage.TotalTokens += countTokenText
 		}
+	}
+
+	if h.ReasoningHandler && len(openaiResponse.Choices) > 0 {
+		for index, choices := range openaiResponse.Choices {
+			if choices.Delta.ReasoningContent == "" && choices.Delta.Reasoning != "" {
+				openaiResponse.Choices[index].Delta.ReasoningContent = choices.Delta.Reasoning
+				openaiResponse.Choices[index].Delta.Reasoning = ""
+			}
+		}
+
+		h.EscapeJSON = true
 	}
 
 	if h.EscapeJSON {
