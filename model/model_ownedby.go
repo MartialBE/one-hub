@@ -198,5 +198,6 @@ func GetDefaultModelOwnedBy() []*ModelOwnedBy {
 		{Id: config.ChannelTypeRerank, Name: "Rerank", Icon: ""},
 		{Id: config.ChannelTypeRecraft, Name: "RecraftAI", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/recraft.svg"},
 		{Id: config.ChannelTypeKling, Name: "Kling", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/kling-color.svg"},
+		{Id: config.ChannelTypeOpenRouter, Name: "OpenRouter", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/1.46.0/files/icons/openrouter.svg"},
 	}
 }
