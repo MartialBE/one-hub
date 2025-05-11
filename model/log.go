@@ -40,6 +40,26 @@ const (
 	LogTypeSystem
 )
 
+func RecordQuotaLog(userId int, logType int, quota int, ip string, content string) {
+	if logType == LogTypeConsume && !config.LogConsumeEnabled {
+		return
+	}
+	username, _ := CacheGetUsername(userId)
+	log := &Log{
+		UserId:    userId,
+		Username:  username,
+		Quota:     quota,
+		CreatedAt: utils.GetTimestamp(),
+		Type:      logType,
+		SourceIp:  ip,
+		Content:   content,
+	}
+	err := DB.Create(log).Error
+	if err != nil {
+		logger.SysError("failed to record log: " + err.Error())
+	}
+}
+
 func RecordLog(userId int, logType int, content string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return

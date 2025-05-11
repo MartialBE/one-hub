@@ -47,6 +47,7 @@ type ChatCompletionMessage struct {
 	Content          any                              `json:"content,omitempty"`
 	Refusal          string                           `json:"refusal,omitempty"`
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
+	Reasoning        string                           `json:"reasoning,omitempty"`
 	Name             *string                          `json:"name,omitempty"`
 	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
@@ -175,6 +176,13 @@ type ChatMessagePart struct {
 	ImageURL   *ChatMessageImageURL `json:"image_url,omitempty"`
 	InputAudio any                  `json:"input_audio,omitempty"`
 	Refusal    string               `json:"refusal,omitempty"`
+
+	File *ChatMessageFile `json:"file,omitempty"`
+}
+
+type ChatMessageFile struct {
+	Filename string `json:"filename,omitempty"`
+	FileData string `json:"file_data,omitempty"`
 }
 
 type ChatCompletionResponseFormat struct {
@@ -412,6 +420,7 @@ type ChatCompletionStreamChoiceDelta struct {
 	FunctionCall     *ChatCompletionToolCallsFunction `json:"function_call,omitempty"`
 	ToolCalls        []*ChatCompletionToolCalls       `json:"tool_calls,omitempty"`
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
+	Reasoning        string                           `json:"reasoning,omitempty"`
 	Image            []MultimediaData                 `json:"image,omitempty"`
 }
 

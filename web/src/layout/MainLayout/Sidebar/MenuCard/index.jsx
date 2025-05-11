@@ -182,7 +182,7 @@ const MenuCard = () => {
                 mt: 0.5
               }}
             >
-              {`💲${usedQuota} (${Math.round(progressValue)}%)`}
+              {`$${usedQuota} (${Math.round(progressValue)}%)`}
             </Typography>
           </Box>
         </Box>

@@ -5,29 +5,35 @@ import {
   Card,
   Stack,
   Typography,
-  Tabs,
-  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  InputAdornment,
-  Box
+  Box,
+  InputBase,
+  Paper,
+  IconButton,
+  Fade,
+  useMediaQuery,
+  Avatar,
+  ButtonBase,
+  Tooltip
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Icon } from '@iconify/react';
 import { API } from 'utils/api';
-import { showError, ValueFormatter } from 'utils/common';
+import { showError, ValueFormatter, copy } from 'utils/common';
 import { useTheme } from '@mui/material/styles';
-import IconWrapper from 'ui-component/IconWrapper';
 import Label from 'ui-component/Label';
 import ToggleButtonGroup from 'ui-component/ToggleButton';
+import { alpha } from '@mui/material/styles';
+
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const ownedby = useSelector((state) => state.siteInfo?.ownedby);
 
   const [rows, setRows] = useState([]);
@@ -36,8 +42,9 @@ export default function ModelPrice() {
   const [availableModels, setAvailableModels] = useState({});
   const [userGroupMap, setUserGroupMap] = useState({});
   const [selectedGroup, setSelectedGroup] = useState('');
-  const [selectedOwnedBy, setSelectedOwnedBy] = useState('');
+  const [selectedOwnedBy, setSelectedOwnedBy] = useState('all');
   const [unit, setUnit] = useState('K');
+  const [onlyShowAvailable, setOnlyShowAvailable] = useState(false);
 
   const unitOptions = [
     { value: 'K', label: 'K' },
@@ -50,7 +57,6 @@ export default function ModelPrice() {
       const { success, message, data } = res.data;
       if (success) {
         setAvailableModels(data);
-        setSelectedOwnedBy(Object.values(data)[0]?.owned_by || '');
       } else {
         showError(message);
       }
@@ -83,7 +89,8 @@ export default function ModelPrice() {
     if (!availableModels || !userGroupMap || !selectedGroup) return;
 
     const newRows = Object.entries(availableModels)
-      .filter(([, model]) => model.owned_by === selectedOwnedBy)
+      .filter(([, model]) => selectedOwnedBy === 'all' || model.owned_by === selectedOwnedBy)
+      .filter(([, model]) => !onlyShowAvailable || model.groups.includes(selectedGroup))
       .map(([modelName, model], index) => {
         const group = userGroupMap[selectedGroup];
         const price = model.groups.includes(selectedGroup)
@@ -111,6 +118,7 @@ export default function ModelPrice() {
         return {
           id: index + 1,
           model: modelName,
+          provider: model.owned_by,
           userGroup: model.groups,
           type: model.price.type,
           input: formatPrice(price.input, model.price.type),
@@ -121,19 +129,19 @@ export default function ModelPrice() {
 
     setRows(newRows);
     setFilteredRows(newRows);
-  }, [availableModels, userGroupMap, selectedGroup, selectedOwnedBy, t, unit]);
+  }, [availableModels, userGroupMap, selectedGroup, selectedOwnedBy, t, unit, onlyShowAvailable]);
 
   useEffect(() => {
     const filtered = rows.filter((row) => row.model.toLowerCase().includes(searchQuery.toLowerCase()));
     setFilteredRows(filtered);
   }, [searchQuery, rows]);
 
-  const handleTabChange = (event, newValue) => {
+  const handleOwnedByChange = (newValue) => {
     setSelectedOwnedBy(newValue);
   };
 
-  const handleGroupChange = (event) => {
-    setSelectedGroup(event.target.value);
+  const handleGroupChange = (groupKey) => {
+    setSelectedGroup(groupKey);
   };
 
   const handleSearchChange = (event) => {
@@ -146,177 +154,581 @@ export default function ModelPrice() {
     }
   };
 
-  const uniqueOwnedBy = [...new Set(Object.values(availableModels).map((model) => model.owned_by))];
+  const toggleOnlyShowAvailable = () => {
+    setOnlyShowAvailable((prev) => !prev);
+  };
+
+  const uniqueOwnedBy = ['all', ...new Set(Object.values(availableModels).map((model) => model.owned_by))];
 
   const getIconByName = (name) => {
+    if (name === 'all') return null;
     const owner = ownedby.find((item) => item.name === name);
     return owner?.icon;
   };
 
+  const clearSearch = () => {
+    setSearchQuery('');
+  };
+
   return (
     <Stack spacing={3} sx={{ padding: theme.spacing(3) }}>
-      <Stack direction="column" spacing={1}>
-        <Typography variant="h2">{t('modelpricePage.availableModels')}</Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Available Models
-        </Typography>
-      </Stack>
-
-      <Card sx={{ p: 2, backgroundColor: theme.palette.background.paper }}>
-        <Stack spacing={2}>
-          <Typography variant="subtitle2" color="textSecondary">
-            {t('modelpricePage.group')}
-          </Typography>
-          <Box
+      <Box sx={{ position: 'relative' }}>
+        <Fade in timeout={800}>
+          <Typography
+            variant="h2"
             sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-              gap: 2
+              fontWeight: 700,
+              background:
+                theme.palette.mode === 'dark'
+                  ? 'linear-gradient(45deg, #6b9fff 30%, #a29bfe 90%)'
+                  : 'linear-gradient(45deg, #2196F3 30%, #3f51b5 90%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
             }}
           >
-            {Object.entries(userGroupMap).map(([key, group]) => (
-              <Card
-                key={key}
-                onClick={() => handleGroupChange({ target: { value: key } })}
-                sx={{
-                  p: 2,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease-in-out',
-                  transform: selectedGroup === key ? 'scale(1.02)' : 'none',
-                  border: (theme) => `1px solid ${selectedGroup === key ? theme.palette.primary.main : theme.palette.divider}`,
-                  backgroundColor: (theme) => (selectedGroup === key ? theme.palette.primary.light : theme.palette.background.paper),
-                  '&:hover': {
-                    transform: 'scale(1.02)',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                  }
-                }}
-              >
-                <Stack spacing={1.5}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" color={selectedGroup === key ? 'primary.main' : 'text.primary'}>
-                      {group.name}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={1}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('modelpricePage.rate')}：{' '}
-                      {group.ratio > 0 ? (
-                        <Label color={group.ratio > 1 ? 'warning' : 'info'}>x{group.ratio}</Label>
-                      ) : (
-                        <Label color="success">{t('modelpricePage.free')}</Label>
-                      )}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Card>
-            ))}
-          </Box>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <TextField
-              placeholder={t('modelpricePage.search')}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              variant="outlined"
-              size="small"
-              sx={{ backgroundColor: theme.palette.background.paper }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
-              }}
-            />
-            <ToggleButtonGroup value={unit} onChange={handleUnitChange} options={unitOptions} aria-label="unit toggle" />
-          </Stack>
-        </Stack>
-      </Card>
+            {t('modelpricePage.availableModels')}
+          </Typography>
+        </Fade>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
+          Available Models
+        </Typography>
+      </Box>
 
-      <Box sx={{ width: '100%' }}>
-        <Tabs
-          value={selectedOwnedBy}
-          onChange={handleTabChange}
-          textColor="inherit"
-          indicatorColor="primary"
-          variant="standard"
+      <Card
+        elevation={0}
+        sx={{
+          p: 3,
+          overflow: 'visible',
+          backgroundColor: theme.palette.mode === 'dark' ? alpha(theme.palette.background.paper, 0.6) : theme.palette.background.paper,
+          borderRadius: 2
+        }}
+      >
+        {/* 搜索和单位选择 */}
+        <Box
           sx={{
-            '& .MuiTabs-flexContainer': {
-              flexWrap: 'wrap',
-              gap: 1
-            },
-            '& .MuiTabs-indicator': {
-              display: 'none'
-            }
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 2,
+            mb: 3
           }}
         >
-          {uniqueOwnedBy.map((ownedBy, index) => (
-            <Tab
-              key={index}
-              value={ownedBy}
-              icon={
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <IconWrapper url={getIconByName(ownedBy)} />
-                  <span>{ownedBy}</span>
-                </Stack>
-              }
+          <Paper
+            component="form"
+            sx={{
+              p: '2px 4px',
+              display: 'flex',
+              alignItems: 'center',
+              width: isMobile ? '100%' : 300,
+              borderRadius: '8px',
+              border: 'none',
+              boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.05)',
+              backgroundColor:
+                theme.palette.mode === 'dark' ? alpha(theme.palette.background.default, 0.6) : theme.palette.background.default
+            }}
+          >
+            <IconButton sx={{ p: '8px' }} aria-label="search">
+              <Icon icon="eva:search-fill" width={18} height={18} />
+            </IconButton>
+            <InputBase sx={{ ml: 1, flex: 1 }} placeholder={t('modelpricePage.search')} value={searchQuery} onChange={handleSearchChange} />
+            {searchQuery && (
+              <IconButton sx={{ p: '8px' }} aria-label="clear" onClick={clearSearch}>
+                <Icon icon="eva:close-fill" width={16} height={16} />
+              </IconButton>
+            )}
+          </Paper>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Unit:
+            </Typography>
+            <ToggleButtonGroup
+              value={unit}
+              onChange={handleUnitChange}
+              options={unitOptions}
+              aria-label="unit toggle"
+              size="small"
               sx={{
-                minHeight: '48px',
-                padding: '6px 16px',
-                borderRadius: 1,
-                transition: 'all 0.2s ease-in-out',
-                '& .MuiTab-iconWrapper': {
-                  margin: 0
-                },
-                '&:hover': {
-                  backgroundColor: (theme) => theme.palette.action.hover,
-                  transform: 'translateY(-1px)'
-                },
-                '&.Mui-selected': {
-                  backgroundColor: (theme) => theme.palette.action.selected,
-                  boxShadow: (theme) => (theme.palette.mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.1)')
+                '& .MuiToggleButtonGroup-grouped': {
+                  borderRadius: '6px !important',
+                  mx: 0.5,
+                  border: 0,
+                  boxShadow: theme.palette.mode === 'dark' ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 4px rgba(0,0,0,0.05)',
+                  '&.Mui-selected': {
+                    boxShadow: `0 0 0 1px ${theme.palette.primary.main}`
+                  }
                 }
               }}
             />
-          ))}
-        </Tabs>
-      </Box>
+          </Box>
+        </Box>
 
-      <Card sx={{ backgroundColor: theme.palette.background.default }}>
+        {/* 模型提供商标签 */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1.5,
+              fontWeight: 600,
+              color: theme.palette.text.primary,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+          >
+            <Icon icon="eva:globe-outline" width={18} height={18} />
+            {t('modelpricePage.channelType')}
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1
+            }}
+          >
+            {uniqueOwnedBy.map((ownedBy, index) => {
+              const isSelected = selectedOwnedBy === ownedBy;
+              return (
+                <ButtonBase
+                  key={index}
+                  onClick={() => handleOwnedByChange(ownedBy)}
+                  sx={{
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    transition: 'all 0.2s ease',
+                    transform: isSelected ? 'translateY(-1px)' : 'none',
+                    '&:hover': {
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      py: 0.75,
+                      px: 1.5,
+                      borderRadius: '6px',
+                      backgroundColor: isSelected
+                        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.25 : 0.1)
+                        : theme.palette.mode === 'dark'
+                          ? alpha(theme.palette.background.default, 0.5)
+                          : theme.palette.background.default,
+                      border: `1px solid ${
+                        isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                      }`,
+                      boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
+                    }}
+                  >
+                    {ownedBy !== 'all' ? (
+                      <Avatar
+                        src={getIconByName(ownedBy)}
+                        alt={ownedBy}
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#fff' : theme.palette.background.paper,
+                          '.MuiAvatar-img': {
+                            objectFit: 'contain',
+                            padding: '2px'
+                          }
+                        }}
+                      >
+                        {ownedBy.charAt(0).toUpperCase()}
+                      </Avatar>
+                    ) : (
+                      <Icon
+                        icon="eva:grid-outline"
+                        width={18}
+                        height={18}
+                        color={isSelected ? theme.palette.primary.main : theme.palette.text.secondary}
+                      />
+                    )}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: isSelected ? 600 : 500,
+                        color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
+                        fontSize: '0.8125rem'
+                      }}
+                    >
+                      {ownedBy === 'all' ? t('modelpricePage.all') : ownedBy}
+                    </Typography>
+                  </Box>
+                </ButtonBase>
+              );
+            })}
+          </Box>
+        </Box>
+
+        {/* 用户组标签 */}
+        <Box sx={{ mb: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 1.5
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                color: theme.palette.text.primary,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}
+            >
+              <Icon icon="eva:people-outline" width={18} height={18} />
+              {t('modelpricePage.group')}
+            </Typography>
+
+            <Tooltip title={onlyShowAvailable ? t('modelpricePage.showAll') : t('modelpricePage.onlyAvailable')} arrow>
+              <ButtonBase
+                onClick={toggleOnlyShowAvailable}
+                sx={{
+                  position: 'relative',
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                  '&:hover': {
+                    transform: 'translateY(-1px)',
+                    boxShadow: theme.palette.mode === 'dark' ? '0 3px 10px rgba(0,0,0,0.4)' : '0 3px 10px rgba(0,0,0,0.1)'
+                  },
+                  '&:active': {
+                    transform: 'translateY(0px)'
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    py: 0.6,
+                    px: 1.5,
+                    background: onlyShowAvailable
+                      ? theme.palette.mode === 'dark'
+                        ? `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.8)}, ${alpha(theme.palette.primary.dark, 0.9)})`
+                        : `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                      : theme.palette.mode === 'dark'
+                        ? alpha(theme.palette.background.paper, 0.6)
+                        : alpha(theme.palette.background.paper, 1),
+                    border: `1px solid ${
+                      onlyShowAvailable
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.1)
+                          : alpha('#000', 0.08)
+                    }`,
+                    borderRadius: '20px',
+                    boxShadow: onlyShowAvailable
+                      ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`
+                      : theme.palette.mode === 'dark'
+                        ? '0 2px 6px rgba(0,0,0,0.2)'
+                        : '0 2px 6px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: onlyShowAvailable
+                        ? '#fff'
+                        : theme.palette.mode === 'dark'
+                          ? alpha(theme.palette.primary.main, 0.2)
+                          : alpha(theme.palette.primary.main, 0.1),
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Icon
+                      icon={onlyShowAvailable ? 'eva:checkmark-outline' : 'eva:funnel-outline'}
+                      width={14}
+                      height={14}
+                      color={onlyShowAvailable ? theme.palette.primary.main : theme.palette.text.secondary}
+                    />
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      color: onlyShowAvailable ? '#fff' : theme.palette.text.primary,
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.01em',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    {t('modelpricePage.onlyAvailable')}
+                  </Typography>
+                </Box>
+              </ButtonBase>
+            </Tooltip>
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1
+            }}
+          >
+            {Object.entries(userGroupMap).map(([key, group]) => {
+              const isSelected = selectedGroup === key;
+              return (
+                <Tooltip
+                  key={key}
+                  title={group.ratio > 0 ? `${t('modelpricePage.rate')}: x${group.ratio}` : t('modelpricePage.free')}
+                  arrow
+                >
+                  <ButtonBase
+                    onClick={() => handleGroupChange(key)}
+                    sx={{
+                      position: 'relative',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      transition: 'all 0.2s ease',
+                      transform: isSelected ? 'translateY(-1px)' : 'none',
+                      '&:hover': {
+                        transform: 'translateY(-1px)'
+                      }
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 0.75,
+                        px: 1.5,
+                        borderRadius: '6px',
+                        backgroundColor: isSelected
+                          ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.25 : 0.1)
+                          : theme.palette.mode === 'dark'
+                            ? alpha(theme.palette.background.default, 0.5)
+                            : theme.palette.background.default,
+                        border: `1px solid ${
+                          isSelected
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === 'dark'
+                              ? alpha('#fff', 0.08)
+                              : alpha('#000', 0.05)
+                        }`,
+                        boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
+                      }}
+                    >
+                      <Icon
+                        icon={isSelected ? 'eva:checkmark-circle-2-fill' : 'eva:radio-button-off-outline'}
+                        width={16}
+                        height={16}
+                        color={isSelected ? theme.palette.primary.main : theme.palette.text.secondary}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: isSelected ? 600 : 500,
+                          color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
+                          fontSize: '0.8125rem'
+                        }}
+                      >
+                        {group.name}
+                      </Typography>
+                      {group.ratio > 0 ? (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: 24,
+                            height: 16,
+                            borderRadius: '4px',
+                            backgroundColor:
+                              group.ratio > 1
+                                ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.3 : 0.2)
+                                : alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.3 : 0.2),
+                            color: group.ratio > 1 ? theme.palette.warning.main : theme.palette.info.main,
+                            fontSize: '0.6875rem',
+                            fontWeight: 600,
+                            px: 0.5
+                          }}
+                        >
+                          x{group.ratio}
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: 24,
+                            height: 16,
+                            borderRadius: '4px',
+                            backgroundColor: alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.3 : 0.2),
+                            color: theme.palette.success.main,
+                            fontSize: '0.6875rem',
+                            fontWeight: 600,
+                            px: 0.5
+                          }}
+                        >
+                          {t('modelpricePage.free')}
+                        </Box>
+                      )}
+                    </Box>
+                  </ButtonBase>
+                </Tooltip>
+              );
+            })}
+          </Box>
+        </Box>
+      </Card>
+
+      <Card
+        sx={{
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: '12px',
+          overflow: 'hidden',
+          boxShadow: theme.palette.mode === 'dark' ? '0 4px 24px rgba(0,0,0,0.3)' : '0 4px 24px rgba(0,0,0,0.05)'
+        }}
+      >
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell width="25%">{t('modelpricePage.model')}</TableCell>
-                <TableCell width="10%">{t('modelpricePage.type')}</TableCell>
-                <TableCell width="22.5%">{t('modelpricePage.inputMultiplier')}</TableCell>
-                <TableCell width="22.5%">{t('modelpricePage.outputMultiplier')}</TableCell>
-                <TableCell width="22.5%">{t('modelpricePage.other')}</TableCell>
+                <TableCell width="25%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.model')}
+                </TableCell>
+                <TableCell width="15%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.channelType')}
+                </TableCell>
+                <TableCell width="10%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.type')}
+                </TableCell>
+                <TableCell width="17.5%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.inputMultiplier')}
+                </TableCell>
+                <TableCell width="17.5%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.outputMultiplier')}
+                </TableCell>
+                <TableCell width="15%" sx={{ fontWeight: 600, py: 1.5 }}>
+                  {t('modelpricePage.other')}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.model}</TableCell>
-                  <TableCell>
-                    {row.type === 'tokens' ? (
-                      <Label color="primary">{t('modelpricePage.tokens')}</Label>
-                    ) : (
-                      <Label color="secondary">{t('modelpricePage.times')}</Label>
-                    )}
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell sx={{ py: 1.5 }}>
+                      <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {row.model}
+                        </Typography>
+                        <IconButton size="small" onClick={() => copy(row.model)}>
+                          <Icon icon="eva:copy-outline" width={16} height={16} />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar
+                          src={getIconByName(row.provider)}
+                          alt={row.provider}
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#fff' : theme.palette.background.paper,
+                            '.MuiAvatar-img': {
+                              objectFit: 'contain',
+                              padding: '2px'
+                            }
+                          }}
+                        >
+                          {row.provider?.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Typography variant="body2">{row.provider}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>
+                      {row.type === 'tokens' ? (
+                        <Label
+                          color="primary"
+                          sx={{
+                            borderRadius: '4px',
+                            fontWeight: 500,
+                            fontSize: '0.75rem',
+                            py: 0.25,
+                            px: 0.75
+                          }}
+                        >
+                          {t('modelpricePage.tokens')}
+                        </Label>
+                      ) : (
+                        <Label
+                          color="secondary"
+                          sx={{
+                            borderRadius: '4px',
+                            fontWeight: 500,
+                            fontSize: '0.75rem',
+                            py: 0.25,
+                            px: 0.75
+                          }}
+                        >
+                          {t('modelpricePage.times')}
+                        </Label>
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>
+                      <Label
+                        color="info"
+                        variant="outlined"
+                        sx={{
+                          borderRadius: '4px',
+                          fontWeight: 500,
+                          fontSize: '0.75rem',
+                          py: 0.25,
+                          px: 0.75
+                        }}
+                      >
+                        {row.input}
+                      </Label>
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>
+                      <Label
+                        color="info"
+                        variant="outlined"
+                        sx={{
+                          borderRadius: '4px',
+                          fontWeight: 500,
+                          fontSize: '0.75rem',
+                          py: 0.25,
+                          px: 0.75
+                        }}
+                      >
+                        {row.output}
+                      </Label>
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>{getOther(t, row.extraRatios)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                    <Stack spacing={1.5} alignItems="center">
+                      <Icon icon="eva:search-outline" width={32} height={32} color={theme.palette.text.secondary} />
+                      <Typography variant="body2" color="text.secondary">
+                        {t('common.noData')}
+                      </Typography>
+                    </Stack>
                   </TableCell>
-                  <TableCell>
-                    <Label color="info" variant="outlined">
-                      {row.input}
-                    </Label>
-                  </TableCell>
-                  <TableCell>
-                    <Label color="info" variant="outlined">
-                      {row.output}
-                    </Label>
-                  </TableCell>
-                  <TableCell>{getOther(t, row.extraRatios)}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -327,22 +739,24 @@ export default function ModelPrice() {
 
 function getOther(t, extraRatios) {
   if (!extraRatios) return '';
-  // const inputRatio = extraRatios.input_audio_tokens_ratio;
-  // const outputRatio = extraRatios.output_audio_tokens_ratio;
 
   return (
-    <Stack direction="column" spacing={1}>
+    <Stack direction="column" spacing={0.5}>
       {Object.entries(extraRatios).map(([key, value]) => (
-        <Label key={key} color="primary" variant="outlined">
+        <Label
+          key={key}
+          color="primary"
+          variant="outlined"
+          sx={{
+            borderRadius: '4px',
+            fontSize: '0.75rem',
+            py: 0.25,
+            px: 0.75
+          }}
+        >
           {t(`modelpricePage.${key}`)}: {value}
         </Label>
       ))}
-      {/* <Label color="primary" variant="outlined">
-        {t('modelpricePage.inputAudioTokensRatio')}: {inputRatio}
-      </Label>
-      <Label color="primary" variant="outlined">
-        {t('modelpricePage.outputAudioTokensRatio')}: {outputRatio}
-      </Label> */}
     </Stack>
   );
 }
