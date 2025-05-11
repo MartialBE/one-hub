@@ -112,7 +112,22 @@
     "mapAddByJson": "Add {{name}} through JSON",
     "mapJsonInput": "JSON input",
     "listJsonError": "JSON format error, please make sure the input is in array format.",
-    "listJsonHelperText": "Please enter the JSON array format, for example: [\"item1\", \"item2\", \"item3\"]"
+    "listJsonHelperText": "Please enter the JSON array format, for example: [\"item1\", \"item2\", \"item3\"]",
+    "modelsFetched": "Models fetched successfully",
+    "selectedMappingCount": "Selected {{count}} model mappings",
+    "addMapping": "Add model mapping",
+    "addToModelMapping": "Add to model mapping",
+    "modelMapping": "Model mapping",
+    "modelMappingSettings": "Model mapping settings",
+    "prefixOrSuffix": "Prefix/Suffix",
+    "removePrefixHelp": "Enter the prefix you want to remove",
+    "removeSuffixHelp": "Enter the suffix you want to remove",
+    "addPlusSign": "Use mapping before billing",
+    "mappingPreview": "Mapping preview",
+    "removePrefix": "Remove prefix",
+    "removeSuffix": "Remove suffix",
+    "collapseList": "Collapse list",
+    "expandList": "Expand list"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",

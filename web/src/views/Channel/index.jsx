@@ -94,6 +94,7 @@ export default function ChannelList() {
   const [openModal, setOpenModal] = useState(false);
   const [editChannelId, setEditChannelId] = useState(0);
   const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [prices, setPrices] = useState([]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -113,6 +114,20 @@ export default function ChannelList() {
     setRowsPerPage(newRowsPerPage);
     savePageSize('channel', newRowsPerPage);
   };
+
+  const fetchPrices = useCallback(async () => {
+    try {
+      const res = await API.get('/api/prices');
+      const { success, message, data } = res.data;
+      if (success) {
+        setPrices(data);
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   const searchChannels = async () => {
     // event.preventDefault();
@@ -375,7 +390,8 @@ export default function ChannelList() {
     fetchGroups().then();
     fetchTags().then();
     fetchModels().then();
-  }, []);
+    fetchPrices().then();
+  }, [fetchPrices]);
 
   return (
     <AdminContainer>
@@ -517,6 +533,7 @@ export default function ChannelList() {
                   groupOptions={groupOptions}
                   onRefresh={handleRefresh}
                   modelOptions={modelOptions}
+                  prices={prices}
                 />
               ))}
             </TableBody>
@@ -541,6 +558,7 @@ export default function ChannelList() {
         channelId={editChannelId}
         groupOptions={groupOptions}
         modelOptions={modelOptions}
+        prices={prices}
       />
       <BatchModal open={openBatchModal} setOpen={setOpenBatchModal} />
 

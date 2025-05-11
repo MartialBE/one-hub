@@ -50,7 +50,8 @@ const defaultConfig = {
       '请选择该渠道所支持的模型,你也可以输入通配符*来匹配模型，例如：gpt-3.5*，表示支持所有gpt-3.5开头的模型，*号只能在最后一位使用，前面必须有字符，例如：gpt-3.5*是正确的，*gpt-3.5是错误的',
     model_mapping: '模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。在B模型加前缀+，表示使用传入模型计费，例如：+gpt-3.5-turbo',
     model_headers: '自定义模型请求头，例如：{"key": "value"}',
-    custom_parameter: '额外参数，添加到请求体中，支持嵌套JSON结构，例如：{"temperature": 0.7, "nested": {"key": "value"}}，如果参数中存在"overwrite":true，系统则会用额外参数覆盖现有参数，如果"overwrite"不存在或者false系统则只会增加相关参数',
+    custom_parameter:
+      '额外参数，添加到请求体中，支持嵌套JSON结构，例如：{"temperature": 0.7, "nested": {"key": "value"}}，如果参数中存在"overwrite":true，系统则会用额外参数覆盖现有参数，如果"overwrite"不存在或者false系统则只会增加相关参数',
     groups: '请选择该渠道所支持的用户组',
     only_chat: '如果选择了仅支持聊天，那么遇到有函数调用的请求会跳过该渠道',
     provider_models_list: '必须填写所有数据后才能获取模型列表',
@@ -514,6 +515,11 @@ const typeConfig = {
       key: '官方密钥格式： accessKey|secretKey'
     },
     modelGroup: 'Kling'
+  },
+  20: {
+    inputLabel: {
+      provider_models_list: '从OR获取模型列表'
+    }
   }
 };
 
