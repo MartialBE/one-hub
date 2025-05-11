@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   one-hub:
-    image: registry.si.icu/sijinhui/one-hub
+    image: registry.xiaosi.cc/sijinhui/one-hub
     container_name: one-hub
     restart: always
     network_mode: "host"
