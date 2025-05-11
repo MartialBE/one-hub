@@ -28,10 +28,9 @@ import {
   Tooltip,
   Collapse,
   Box,
-  Chip
+  Chip,
+  useMediaQuery
 } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { defaultConfig, typeConfig } from '../type/Config'; //typeConfig
@@ -40,11 +39,10 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'react-i18next';
 import useCustomizeT from 'hooks/useCustomizeT';
-
 import { PreCostType } from '../type/other';
 import MapInput from './MapInput';
 import ListInput from './ListInput';
-
+import ModelSelectorModal from './ModelSelectorModal';
 import pluginList from '../type/Plugin.json';
 import { Icon } from '@iconify/react';
 
@@ -74,22 +72,25 @@ const getValidationSchema = (t) =>
     custom_parameter: Yup.string().nullable()
   });
 
-const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, modelOptions }) => {
+const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, modelOptions, prices }) => {
   const { t } = useTranslation();
   const { t: customizeT } = useCustomizeT();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   // const [loading, setLoading] = useState(false);
   const [initialInput, setInitialInput] = useState(defaultConfig.input);
   const [inputLabel, setInputLabel] = useState(defaultConfig.inputLabel); //
   const [inputPrompt, setInputPrompt] = useState(defaultConfig.prompt);
   const [batchAdd, setBatchAdd] = useState(false);
-  const [providerModelsLoad, setProviderModelsLoad] = useState(false);
   const [hasTag, setHasTag] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [parameterFocused, setParameterFocused] = useState(false);
   const parameterInputRef = useRef(null);
   const removeDuplicates = (array) => [...new Set(array)];
+  const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
+  const [tempFormikValues, setTempFormikValues] = useState(null);
+  const [tempSetFieldValue, setTempSetFieldValue] = useState(null);
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -156,28 +157,17 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
     return modelList;
   };
 
-  const getProviderModels = async (values, setFieldValue) => {
-    setProviderModelsLoad(true);
-    try {
-      const res = await API.post(`/api/channel/provider_models_list`, { ...values, models: '', model_mapping: '', model_headers: '' });
-      const { success, message, data } = res.data;
-      if (success && data) {
-        let uniqueModels = Array.from(new Set(data));
-        let modelList = uniqueModels.map((model) => {
-          return {
-            id: model,
-            group: t('channel_edit.customModelTip')
-          };
-        });
+  const handleModelSelectorConfirm = (selectedModels) => {
+    if (tempSetFieldValue && tempFormikValues) {
+      const existingModels = tempFormikValues.models || [];
+      const existingModelIds = new Set(existingModels.map((model) => model.id));
 
-        setFieldValue('models', modelList);
-      } else {
-        showError(message || t('channel_edit.modelListError'));
-      }
-    } catch (error) {
-      showError(error.message);
+      // 过滤掉已存在的模型，避免重复
+      const newModels = selectedModels.filter((model) => !existingModelIds.has(model.id));
+
+      // 合并模型列表
+      tempSetFieldValue('models', [...existingModels, ...newModels]);
     }
-    setProviderModelsLoad(false);
   };
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
@@ -422,687 +412,764 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
       <Divider />
       <DialogContent>
         <Formik initialValues={initialInput} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
-          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => (
-            <form noValidate onSubmit={handleSubmit}>
-              {!isTag && (
-                <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-type-label">{customizeT(inputLabel.type)}</InputLabel>
-                  <Select
-                    id="channel-type-label"
-                    label={customizeT(inputLabel.type)}
-                    value={values.type}
-                    name="type"
-                    onBlur={handleBlur}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleTypeChange(setFieldValue, e.target.value, values);
-                    }}
-                    disabled={hasTag}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200
+          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
+            // 保存当前Formik状态，以便在模型选择器中使用
+            const openModelSelector = () => {
+              setTempFormikValues({ ...values });
+              setTempSetFieldValue(() => setFieldValue); // 保存函数引用
+              setModelSelectorOpen(true);
+            };
+
+            return (
+              <form noValidate onSubmit={handleSubmit}>
+                {!isTag && (
+                  <FormControl fullWidth error={Boolean(touched.type && errors.type)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-type-label">{customizeT(inputLabel.type)}</InputLabel>
+                    <Select
+                      id="channel-type-label"
+                      label={customizeT(inputLabel.type)}
+                      value={values.type}
+                      name="type"
+                      onBlur={handleBlur}
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleTypeChange(setFieldValue, e.target.value, values);
+                      }}
+                      disabled={hasTag}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200
+                          }
                         }
-                      }
-                    }}
-                  >
-                    {Object.values(CHANNEL_OPTIONS).map((option) => {
-                      return (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.text}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                  {touched.type && errors.type ? (
-                    <FormHelperText error id="helper-tex-channel-type-label">
-                      {errors.type}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-type-label"> {customizeT(inputPrompt.type)} </FormHelperText>
-                  )}
-                </FormControl>
-              )}
-
-              <FormControl fullWidth error={Boolean(touched.tag && errors.tag)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-tag-label">{customizeT(inputLabel.tag)}</InputLabel>
-                <OutlinedInput
-                  id="channel-tag-label"
-                  label={customizeT(inputLabel.tag)}
-                  type="text"
-                  value={values.tag}
-                  name="tag"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  inputProps={{}}
-                  aria-describedby="helper-text-channel-tag-label"
-                />
-                {touched.tag && errors.tag ? (
-                  <FormHelperText error id="helper-tex-channel-tag-label">
-                    {errors.tag}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-tag-label"> {customizeT(inputPrompt.tag)} </FormHelperText>
+                      }}
+                    >
+                      {Object.values(CHANNEL_OPTIONS).map((option) => {
+                        return (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.text}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                    {touched.type && errors.type ? (
+                      <FormHelperText error id="helper-tex-channel-type-label">
+                        {errors.type}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-type-label"> {customizeT(inputPrompt.type)} </FormHelperText>
+                    )}
+                  </FormControl>
                 )}
-              </FormControl>
 
-              {!isTag && (
-                <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-name-label">{customizeT(inputLabel.name)}</InputLabel>
+                <FormControl fullWidth error={Boolean(touched.tag && errors.tag)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-tag-label">{customizeT(inputLabel.tag)}</InputLabel>
                   <OutlinedInput
-                    id="channel-name-label"
-                    label={customizeT(inputLabel.name)}
+                    id="channel-tag-label"
+                    label={customizeT(inputLabel.tag)}
                     type="text"
-                    value={values.name}
-                    name="name"
+                    value={values.tag}
+                    name="tag"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    inputProps={{ autoComplete: 'name' }}
-                    aria-describedby="helper-text-channel-name-label"
+                    inputProps={{}}
+                    aria-describedby="helper-text-channel-tag-label"
                   />
-                  {touched.name && errors.name ? (
-                    <FormHelperText error id="helper-tex-channel-name-label">
-                      {errors.name}
+                  {touched.tag && errors.tag ? (
+                    <FormHelperText error id="helper-tex-channel-tag-label">
+                      {errors.tag}
                     </FormHelperText>
                   ) : (
-                    <FormHelperText id="helper-tex-channel-name-label"> {customizeT(inputPrompt.name)} </FormHelperText>
+                    <FormHelperText id="helper-tex-channel-tag-label"> {customizeT(inputPrompt.tag)} </FormHelperText>
                   )}
                 </FormControl>
-              )}
-              {channelId === 0 && (
+
+                {!isTag && (
+                  <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-name-label">{customizeT(inputLabel.name)}</InputLabel>
+                    <OutlinedInput
+                      id="channel-name-label"
+                      label={customizeT(inputLabel.name)}
+                      type="text"
+                      value={values.name}
+                      name="name"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      inputProps={{ autoComplete: 'name' }}
+                      aria-describedby="helper-text-channel-name-label"
+                    />
+                    {touched.name && errors.name ? (
+                      <FormHelperText error id="helper-tex-channel-name-label">
+                        {errors.name}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-name-label"> {customizeT(inputPrompt.name)} </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+                {channelId === 0 && (
+                  <Container
+                    sx={{
+                      textAlign: 'right'
+                    }}
+                  >
+                    <Switch checked={Boolean(batchAdd)} onChange={(e) => setBatchAdd(e.target.checked)} />
+                    {t('channel_edit.batchAdd')}
+                  </Container>
+                )}
+
+                {inputPrompt.base_url && (
+                  <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
+                    <OutlinedInput
+                      id="channel-base_url-label"
+                      label={customizeT(inputLabel.base_url)}
+                      type="text"
+                      value={values.base_url}
+                      name="base_url"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      inputProps={{}}
+                      aria-describedby="helper-text-channel-base_url-label"
+                    />
+
+                    {touched.base_url && errors.base_url ? (
+                      <FormHelperText error id="helper-tex-channel-base_url-label">
+                        {errors.base_url}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-base_url-label"> {customizeT(inputPrompt.base_url)} </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+
+                {inputPrompt.other && (
+                  <FormControl fullWidth error={Boolean(touched.other && errors.other)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-other-label">{customizeT(inputLabel.other)}</InputLabel>
+                    <OutlinedInput
+                      id="channel-other-label"
+                      label={customizeT(inputLabel.other)}
+                      type="text"
+                      value={values.other}
+                      name="other"
+                      disabled={hasTag}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      inputProps={{}}
+                      aria-describedby="helper-text-channel-other-label"
+                    />
+                    {touched.other && errors.other ? (
+                      <FormHelperText error id="helper-tex-channel-other-label">
+                        {errors.other}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-other-label"> {customizeT(inputPrompt.other)} </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+
+                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
+                  <Autocomplete
+                    multiple
+                    id="channel-groups-label"
+                    options={groupOptions}
+                    value={values.groups}
+                    disabled={hasTag}
+                    onChange={(e, value) => {
+                      const event = {
+                        target: {
+                          name: 'groups',
+                          value: value
+                        }
+                      };
+                      handleChange(event);
+                    }}
+                    onBlur={handleBlur}
+                    filterSelectedOptions
+                    renderInput={(params) => (
+                      <TextField {...params} name="groups" error={Boolean(errors.groups)} label={customizeT(inputLabel.groups)} />
+                    )}
+                    aria-describedby="helper-text-channel-groups-label"
+                  />
+                  {errors.groups ? (
+                    <FormHelperText error id="helper-tex-channel-groups-label">
+                      {errors.groups}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-groups-label"> {customizeT(inputPrompt.groups)} </FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
+                  <Box sx={{ position: 'relative' }}>
+                    <Autocomplete
+                      multiple
+                      freeSolo
+                      disableCloseOnSelect
+                      id="channel-models-label"
+                      disabled={hasTag}
+                      options={modelOptions}
+                      value={values.models}
+                      inputValue={inputValue}
+                      onInputChange={(event, newInputValue) => {
+                        if (newInputValue.includes(',')) {
+                          const modelsList = newInputValue
+                            .split(',')
+                            .map((item) => ({
+                              id: item.trim(),
+                              group: t('channel_edit.customModelTip')
+                            }))
+                            .filter((item) => item.id);
+
+                          const updatedModels = [...new Set([...values.models, ...modelsList])];
+                          const event = {
+                            target: {
+                              name: 'models',
+                              value: updatedModels
+                            }
+                          };
+                          handleChange(event);
+                          setInputValue('');
+                        } else {
+                          setInputValue(newInputValue);
+                        }
+                      }}
+                      onChange={(e, value) => {
+                        const event = {
+                          target: {
+                            name: 'models',
+                            value: value.map((item) =>
+                              typeof item === 'string' ? { id: item, group: t('channel_edit.customModelTip') } : item
+                            )
+                          }
+                        };
+                        handleChange(event);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="models"
+                          error={Boolean(errors.models)}
+                          label={customizeT(inputLabel.models)}
+                          InputProps={{
+                            ...params.InputProps
+                          }}
+                        />
+                      )}
+                      groupBy={(option) => option.group}
+                      getOptionLabel={(option) => {
+                        if (typeof option === 'string') {
+                          return option;
+                        }
+                        if (option.inputValue) {
+                          return option.inputValue;
+                        }
+                        return option.id;
+                      }}
+                      filterOptions={(options, params) => {
+                        const filtered = filter(options, params);
+                        const { inputValue } = params;
+                        const isExisting = options.some((option) => inputValue === option.id);
+                        if (inputValue !== '' && !isExisting) {
+                          filtered.push({
+                            id: inputValue,
+                            group: t('channel_edit.customModelTip')
+                          });
+                        }
+                        return filtered;
+                      }}
+                      renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                          <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
+                          {option.id}
+                        </li>
+                      )}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const tagProps = getTagProps({ index });
+                          return (
+                            <Chip
+                              key={index}
+                              label={option.id}
+                              {...tagProps}
+                              onClick={() => copy(option.id)}
+                              sx={{
+                                maxWidth: '100%',
+                                height: 'auto',
+                                margin: '3px',
+                                '& .MuiChip-label': {
+                                  whiteSpace: 'normal',
+                                  wordBreak: 'break-word',
+                                  padding: '6px 8px',
+                                  lineHeight: 1.4,
+                                  fontWeight: 400
+                                },
+                                '& .MuiChip-deleteIcon': {
+                                  margin: '0 5px 0 -6px'
+                                }
+                              }}
+                            />
+                          );
+                        })
+                      }
+                      sx={{
+                        '& .MuiAutocomplete-tag': {
+                          margin: '2px'
+                        },
+                        '& .MuiAutocomplete-inputRoot': {
+                          flexWrap: 'wrap'
+                        }
+                      }}
+                    />
+                  </Box>
+                  {errors.models ? (
+                    <FormHelperText error id="helper-tex-channel-models-label">
+                      {errors.models}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-models-label"> {customizeT(inputPrompt.models)} </FormHelperText>
+                  )}
+                </FormControl>
                 <Container
                   sx={{
                     textAlign: 'right'
                   }}
                 >
-                  <Switch checked={Boolean(batchAdd)} onChange={(e) => setBatchAdd(e.target.checked)} />
-                  {t('channel_edit.batchAdd')}
+                  <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        const modelString = values.models.map((model) => model.id).join(',');
+                        copy(modelString);
+                      }}
+                    >
+                      {isMobile ? <Icon icon="mdi:content-copy" /> : t('channel_edit.copyModels')}
+                    </Button>
+                    <Button
+                      disabled={hasTag}
+                      size="small"
+                      onClick={() => {
+                        setFieldValue('models', basicModels(values.type));
+                      }}
+                    >
+                      {isMobile ? <Icon icon="mdi:playlist-plus" /> : t('channel_edit.inputChannelModel')}
+                    </Button>
+                    {/* <Button
+                      disabled={hasTag}
+                      size="small"
+                      onClick={() => {
+                        setFieldValue('models', modelOptions);
+                      }}
+                    >
+                      {t('channel_edit.inputAllModel')}
+                    </Button> */}
+                    {inputLabel.provider_models_list && (
+                      <Tooltip title={customizeT(inputPrompt.provider_models_list)} placement="top">
+                        <Button
+                          disabled={hasTag}
+                          size="small"
+                          onClick={openModelSelector}
+                          startIcon={!isMobile && <Icon icon="mdi:cloud-download" />}
+                        >
+                          {isMobile ? <Icon icon="mdi:cloud-download" /> : customizeT(inputLabel.provider_models_list)}
+                        </Button>
+                      </Tooltip>
+                    )}
+                  </ButtonGroup>
                 </Container>
-              )}
-
-              {inputPrompt.base_url && (
-                <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
-                  <OutlinedInput
-                    id="channel-base_url-label"
-                    label={customizeT(inputLabel.base_url)}
-                    type="text"
-                    value={values.base_url}
-                    name="base_url"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                    aria-describedby="helper-text-channel-base_url-label"
-                  />
-
-                  {touched.base_url && errors.base_url ? (
-                    <FormHelperText error id="helper-tex-channel-base_url-label">
-                      {errors.base_url}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-base_url-label"> {customizeT(inputPrompt.base_url)} </FormHelperText>
-                  )}
-                </FormControl>
-              )}
-
-              {inputPrompt.other && (
-                <FormControl fullWidth error={Boolean(touched.other && errors.other)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-other-label">{customizeT(inputLabel.other)}</InputLabel>
-                  <OutlinedInput
-                    id="channel-other-label"
-                    label={customizeT(inputLabel.other)}
-                    type="text"
-                    value={values.other}
-                    name="other"
-                    disabled={hasTag}
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                    aria-describedby="helper-text-channel-other-label"
-                  />
-                  {touched.other && errors.other ? (
-                    <FormHelperText error id="helper-tex-channel-other-label">
-                      {errors.other}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-other-label"> {customizeT(inputPrompt.other)} </FormHelperText>
-                  )}
-                </FormControl>
-              )}
-
-              <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                <Autocomplete
-                  multiple
-                  id="channel-groups-label"
-                  options={groupOptions}
-                  value={values.groups}
-                  disabled={hasTag}
-                  onChange={(e, value) => {
-                    const event = {
-                      target: {
-                        name: 'groups',
-                        value: value
-                      }
-                    };
-                    handleChange(event);
-                  }}
-                  onBlur={handleBlur}
-                  filterSelectedOptions
-                  renderInput={(params) => (
-                    <TextField {...params} name="groups" error={Boolean(errors.groups)} label={customizeT(inputLabel.groups)} />
-                  )}
-                  aria-describedby="helper-text-channel-groups-label"
-                />
-                {errors.groups ? (
-                  <FormHelperText error id="helper-tex-channel-groups-label">
-                    {errors.groups}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-groups-label"> {customizeT(inputPrompt.groups)} </FormHelperText>
-                )}
-              </FormControl>
-
-              <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                <Box sx={{ position: 'relative' }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    disableCloseOnSelect
-                    id="channel-models-label"
-                    disabled={hasTag}
-                    options={modelOptions}
-                    value={values.models}
-                    inputValue={inputValue}
-                    onInputChange={(event, newInputValue) => {
-                      if (newInputValue.includes(',')) {
-                        const modelsList = newInputValue
-                          .split(',')
-                          .map((item) => ({
-                            id: item.trim(),
-                            group: t('channel_edit.customModelTip')
-                          }))
-                          .filter((item) => item.id);
-
-                        const updatedModels = [...new Set([...values.models, ...modelsList])];
-                        const event = {
-                          target: {
-                            name: 'models',
-                            value: updatedModels
-                          }
-                        };
-                        handleChange(event);
-                        setInputValue('');
-                      } else {
-                        setInputValue(newInputValue);
-                      }
-                    }}
-                    onChange={(e, value) => {
-                      const event = {
-                        target: {
-                          name: 'models',
-                          value: value.map((item) =>
-                            typeof item === 'string' ? { id: item, group: t('channel_edit.customModelTip') } : item
-                          )
-                        }
-                      };
-                      handleChange(event);
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="models"
-                        error={Boolean(errors.models)}
-                        label={customizeT(inputLabel.models)}
-                        InputProps={{
-                          ...params.InputProps
-                        }}
+                <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
+                  {!batchAdd ? (
+                    <>
+                      <InputLabel htmlFor="channel-key-label">{customizeT(inputLabel.key)}</InputLabel>
+                      <OutlinedInput
+                        id="channel-key-label"
+                        label={customizeT(inputLabel.key)}
+                        type="text"
+                        value={values.key}
+                        name="key"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        inputProps={{}}
+                        aria-describedby="helper-text-channel-key-label"
                       />
-                    )}
-                    groupBy={(option) => option.group}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') {
-                        return option;
-                      }
-                      if (option.inputValue) {
-                        return option.inputValue;
-                      }
-                      return option.id;
-                    }}
-                    filterOptions={(options, params) => {
-                      const filtered = filter(options, params);
-                      const { inputValue } = params;
-                      const isExisting = options.some((option) => inputValue === option.id);
-                      if (inputValue !== '' && !isExisting) {
-                        filtered.push({
-                          id: inputValue,
-                          group: t('channel_edit.customModelTip')
-                        });
-                      }
-                      return filtered;
-                    }}
-                    renderOption={(props, option, { selected }) => (
-                      <li {...props}>
-                        <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
-                        {option.id}
-                      </li>
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Chip label={option.id} {...getTagProps({ index })} onClick={() => copy(option.id)} />
-                        </Box>
-                      ))
-                    }
-                  />
-                </Box>
-                {errors.models ? (
-                  <FormHelperText error id="helper-tex-channel-models-label">
-                    {errors.models}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-models-label"> {customizeT(inputPrompt.models)} </FormHelperText>
-                )}
-              </FormControl>
-              <Container
-                sx={{
-                  textAlign: 'right'
-                }}
-              >
-                <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      const modelString = values.models.map((model) => model.id).join(',');
-                      copy(modelString);
-                    }}
-                  >
-                    {t('channel_edit.copyModels')}
-                  </Button>
-                  <Button
-                    disabled={hasTag}
-                    size="small"
-                    onClick={() => {
-                      setFieldValue('models', basicModels(values.type));
-                    }}
-                  >
-                    {t('channel_edit.inputChannelModel')}
-                  </Button>
-                  <Button
-                    disabled={hasTag}
-                    size="small"
-                    onClick={() => {
-                      setFieldValue('models', modelOptions);
-                    }}
-                  >
-                    {t('channel_edit.inputAllModel')}
-                  </Button>
-                  {inputLabel.provider_models_list && (
-                    <Tooltip title={customizeT(inputPrompt.provider_models_list)} placement="top">
-                      <LoadingButton
-                        loading={providerModelsLoad}
-                        disabled={hasTag}
-                        size="small"
-                        onClick={() => {
-                          getProviderModels(values, setFieldValue);
-                        }}
-                      >
-                        {customizeT(inputLabel.provider_models_list)}
-                      </LoadingButton>
-                    </Tooltip>
-                  )}
-                </ButtonGroup>
-              </Container>
-              <FormControl fullWidth error={Boolean(touched.key && errors.key)} sx={{ ...theme.typography.otherInput }}>
-                {!batchAdd ? (
-                  <>
-                    <InputLabel htmlFor="channel-key-label">{customizeT(inputLabel.key)}</InputLabel>
-                    <OutlinedInput
+                    </>
+                  ) : (
+                    <TextField
+                      multiline
                       id="channel-key-label"
                       label={customizeT(inputLabel.key)}
-                      type="text"
                       value={values.key}
                       name="key"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      inputProps={{}}
                       aria-describedby="helper-text-channel-key-label"
+                      minRows={5}
+                      placeholder={customizeT(inputPrompt.key) + t('channel_edit.batchKeytip')}
                     />
-                  </>
-                ) : (
-                  <TextField
-                    multiline
-                    id="channel-key-label"
-                    label={customizeT(inputLabel.key)}
-                    value={values.key}
-                    name="key"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    aria-describedby="helper-text-channel-key-label"
-                    minRows={5}
-                    placeholder={customizeT(inputPrompt.key) + t('channel_edit.batchKeytip')}
-                  />
-                )}
+                  )}
 
-                {touched.key && errors.key ? (
-                  <FormHelperText error id="helper-tex-channel-key-label">
-                    {errors.key}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(inputPrompt.key)} </FormHelperText>
-                )}
-              </FormControl>
+                  {touched.key && errors.key ? (
+                    <FormHelperText error id="helper-tex-channel-key-label">
+                      {errors.key}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-key-label"> {customizeT(inputPrompt.key)} </FormHelperText>
+                  )}
+                </FormControl>
 
-              {inputPrompt.model_mapping && (
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.model_mapping && errors.model_mapping)}
-                  sx={{ ...theme.typography.otherInput }}
-                >
-                  <MapInput
-                    mapValue={values.model_mapping}
-                    onChange={(newValue) => {
-                      setFieldValue('model_mapping', newValue);
-                    }}
-                    disabled={hasTag}
+                {inputPrompt.model_mapping && (
+                  <FormControl
+                    fullWidth
                     error={Boolean(touched.model_mapping && errors.model_mapping)}
-                    label={{
-                      keyName: customizeT(inputLabel.model_mapping),
-                      valueName: customizeT(inputPrompt.model_mapping),
-                      name: customizeT(inputLabel.model_mapping)
-                    }}
-                  />
-                  {touched.model_mapping && errors.model_mapping ? (
-                    <FormHelperText error id="helper-tex-channel-model_mapping-label">
-                      {errors.model_mapping}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-model_mapping-label">{customizeT(inputPrompt.model_mapping)}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-              {inputPrompt.model_headers && (
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.model_headers && errors.model_headers)}
-                  sx={{ ...theme.typography.otherInput }}
-                >
-                  <MapInput
-                    mapValue={values.model_headers}
-                    onChange={(newValue) => {
-                      setFieldValue('model_headers', newValue);
-                    }}
-                    disabled={hasTag}
-                    error={Boolean(touched.model_headers && errors.model_headers)}
-                    label={{
-                      keyName: customizeT(inputLabel.model_headers),
-                      valueName: customizeT(inputPrompt.model_headers),
-                      name: customizeT(inputLabel.model_headers)
-                    }}
-                  />
-                  {touched.model_headers && errors.model_headers ? (
-                    <FormHelperText error id="helper-tex-channel-model_headers-label">
-                      {errors.model_headers}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-model_headers-label">{customizeT(inputPrompt.model_headers)}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-              {inputPrompt.custom_parameter && (
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.custom_parameter && errors.custom_parameter)}
-                  sx={{ ...theme.typography.otherInput }}
-                >
-                  <TextField
-                    id="channel-custom_parameter-label"
-                    label={customizeT(inputLabel.custom_parameter)}
-                    multiline={Boolean(values.custom_parameter || parameterFocused)}
-                    rows={values.custom_parameter || parameterFocused ? 8 : 1}
-                    value={values.custom_parameter}
-                    name="custom_parameter"
-                    disabled={hasTag}
-                    error={Boolean(touched.custom_parameter && errors.custom_parameter)}
-                    onChange={handleChange}
-                    inputRef={parameterInputRef}
-                    onBlur={(e) => {
-                      handleBlur(e);
-                      setParameterFocused(false);
-                    }}
-                    onFocus={() => {
-                      setParameterFocused(true);
-                      // 使用setTimeout确保状态更新后重新聚焦
-                      setTimeout(() => {
-                        if (parameterInputRef.current) {
-                          parameterInputRef.current.focus();
-                        }
-                      }, 0);
-                    }}
-                    placeholder={parameterFocused ? '{\n  "temperature": 0.7,\n  "top_p": 0.9,\n  "nested_param": {\n      "key": "value"\n  }\n}' : ''}
-                  />
-                  {touched.custom_parameter && errors.custom_parameter ? (
-                    <FormHelperText error id="helper-tex-channel-custom_parameter-label">
-                      {errors.custom_parameter}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-custom_parameter-label">{customizeT(inputPrompt.custom_parameter)}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-              {inputPrompt.disabled_stream && (
-                <FormControl
-                  fullWidth
-                  error={Boolean(touched.disabled_stream && errors.disabled_stream)}
-                  sx={{ ...theme.typography.otherInput }}
-                >
-                  <ListInput
-                    listValue={values.disabled_stream}
-                    onChange={(newValue) => {
-                      setFieldValue('disabled_stream', newValue);
-                    }}
-                    disabled={hasTag}
-                    error={Boolean(touched.disabled_stream && errors.disabled_stream)}
-                    label={{
-                      name: customizeT(inputLabel.disabled_stream),
-                      itemName: customizeT(inputPrompt.disabled_stream)
-                    }}
-                  />
-                </FormControl>
-              )}
-
-              <FormControl fullWidth error={Boolean(touched.proxy && errors.proxy)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-proxy-label">{customizeT(inputLabel.proxy)}</InputLabel>
-                <OutlinedInput
-                  id="channel-proxy-label"
-                  label={customizeT(inputLabel.proxy)}
-                  disabled={hasTag}
-                  type="text"
-                  value={values.proxy}
-                  name="proxy"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  inputProps={{}}
-                  aria-describedby="helper-text-channel-proxy-label"
-                />
-                {touched.proxy && errors.proxy ? (
-                  <FormHelperText error id="helper-tex-channel-proxy-label">
-                    {errors.proxy}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText id="helper-tex-channel-proxy-label"> {customizeT(inputPrompt.proxy)} </FormHelperText>
+                    sx={{ ...theme.typography.otherInput }}
+                  >
+                    <MapInput
+                      mapValue={values.model_mapping}
+                      onChange={(newValue) => {
+                        setFieldValue('model_mapping', newValue);
+                      }}
+                      disabled={hasTag}
+                      error={Boolean(touched.model_mapping && errors.model_mapping)}
+                      label={{
+                        keyName: customizeT(inputLabel.model_mapping),
+                        valueName: customizeT(inputPrompt.model_mapping),
+                        name: customizeT(inputLabel.model_mapping)
+                      }}
+                    />
+                    {touched.model_mapping && errors.model_mapping ? (
+                      <FormHelperText error id="helper-tex-channel-model_mapping-label">
+                        {errors.model_mapping}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-model_mapping-label">{customizeT(inputPrompt.model_mapping)}</FormHelperText>
+                    )}
+                  </FormControl>
                 )}
-              </FormControl>
-              {inputPrompt.test_model && (
-                <FormControl fullWidth error={Boolean(touched.test_model && errors.test_model)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-test_model-label">{customizeT(inputLabel.test_model)}</InputLabel>
+                {inputPrompt.model_headers && (
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.model_headers && errors.model_headers)}
+                    sx={{ ...theme.typography.otherInput }}
+                  >
+                    <MapInput
+                      mapValue={values.model_headers}
+                      onChange={(newValue) => {
+                        setFieldValue('model_headers', newValue);
+                      }}
+                      disabled={hasTag}
+                      error={Boolean(touched.model_headers && errors.model_headers)}
+                      label={{
+                        keyName: customizeT(inputLabel.model_headers),
+                        valueName: customizeT(inputPrompt.model_headers),
+                        name: customizeT(inputLabel.model_headers)
+                      }}
+                    />
+                    {touched.model_headers && errors.model_headers ? (
+                      <FormHelperText error id="helper-tex-channel-model_headers-label">
+                        {errors.model_headers}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-model_headers-label">{customizeT(inputPrompt.model_headers)}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+                {inputPrompt.custom_parameter && (
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.custom_parameter && errors.custom_parameter)}
+                    sx={{ ...theme.typography.otherInput }}
+                  >
+                    <TextField
+                      id="channel-custom_parameter-label"
+                      label={customizeT(inputLabel.custom_parameter)}
+                      multiline={Boolean(values.custom_parameter || parameterFocused)}
+                      rows={values.custom_parameter || parameterFocused ? 8 : 1}
+                      value={values.custom_parameter}
+                      name="custom_parameter"
+                      disabled={hasTag}
+                      error={Boolean(touched.custom_parameter && errors.custom_parameter)}
+                      onChange={handleChange}
+                      inputRef={parameterInputRef}
+                      onBlur={(e) => {
+                        handleBlur(e);
+                        setParameterFocused(false);
+                      }}
+                      onFocus={() => {
+                        setParameterFocused(true);
+                        // 使用setTimeout确保状态更新后重新聚焦
+                        setTimeout(() => {
+                          if (parameterInputRef.current) {
+                            parameterInputRef.current.focus();
+                          }
+                        }, 0);
+                      }}
+                      placeholder={
+                        parameterFocused
+                          ? '{\n  "temperature": 0.7,\n  "top_p": 0.9,\n  "nested_param": {\n      "key": "value"\n  }\n}'
+                          : ''
+                      }
+                    />
+                    {touched.custom_parameter && errors.custom_parameter ? (
+                      <FormHelperText error id="helper-tex-channel-custom_parameter-label">
+                        {errors.custom_parameter}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-custom_parameter-label">
+                        {customizeT(inputPrompt.custom_parameter)}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+                {inputPrompt.disabled_stream && (
+                  <FormControl
+                    fullWidth
+                    error={Boolean(touched.disabled_stream && errors.disabled_stream)}
+                    sx={{ ...theme.typography.otherInput }}
+                  >
+                    <ListInput
+                      listValue={values.disabled_stream}
+                      onChange={(newValue) => {
+                        setFieldValue('disabled_stream', newValue);
+                      }}
+                      disabled={hasTag}
+                      error={Boolean(touched.disabled_stream && errors.disabled_stream)}
+                      label={{
+                        name: customizeT(inputLabel.disabled_stream),
+                        itemName: customizeT(inputPrompt.disabled_stream)
+                      }}
+                    />
+                  </FormControl>
+                )}
+
+                <FormControl fullWidth error={Boolean(touched.proxy && errors.proxy)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-proxy-label">{customizeT(inputLabel.proxy)}</InputLabel>
                   <OutlinedInput
-                    id="channel-test_model-label"
-                    label={customizeT(inputLabel.test_model)}
-                    type="text"
+                    id="channel-proxy-label"
+                    label={customizeT(inputLabel.proxy)}
                     disabled={hasTag}
-                    value={values.test_model}
-                    name="test_model"
+                    type="text"
+                    value={values.proxy}
+                    name="proxy"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     inputProps={{}}
-                    aria-describedby="helper-text-channel-test_model-label"
+                    aria-describedby="helper-text-channel-proxy-label"
                   />
-                  {touched.test_model && errors.test_model ? (
-                    <FormHelperText error id="helper-tex-channel-test_model-label">
-                      {errors.test_model}
+                  {touched.proxy && errors.proxy ? (
+                    <FormHelperText error id="helper-tex-channel-proxy-label">
+                      {errors.proxy}
                     </FormHelperText>
                   ) : (
-                    <FormHelperText id="helper-tex-channel-test_model-label"> {customizeT(inputPrompt.test_model)} </FormHelperText>
+                    <FormHelperText id="helper-tex-channel-proxy-label"> {customizeT(inputPrompt.proxy)} </FormHelperText>
                   )}
                 </FormControl>
-              )}
+                {inputPrompt.test_model && (
+                  <FormControl fullWidth error={Boolean(touched.test_model && errors.test_model)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-test_model-label">{customizeT(inputLabel.test_model)}</InputLabel>
+                    <OutlinedInput
+                      id="channel-test_model-label"
+                      label={customizeT(inputLabel.test_model)}
+                      type="text"
+                      disabled={hasTag}
+                      value={values.test_model}
+                      name="test_model"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      inputProps={{}}
+                      aria-describedby="helper-text-channel-test_model-label"
+                    />
+                    {touched.test_model && errors.test_model ? (
+                      <FormHelperText error id="helper-tex-channel-test_model-label">
+                        {errors.test_model}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-test_model-label"> {customizeT(inputPrompt.test_model)} </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
 
-              {inputPrompt.pre_cost && (
-                <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
-                  <Select
-                    id="channel-pre_cost-label"
-                    label={customizeT(inputLabel.pre_cost)}
-                    value={values.pre_cost}
-                    name="pre_cost"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    disabled={hasTag}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200
+                {inputPrompt.pre_cost && (
+                  <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
+                    <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
+                    <Select
+                      id="channel-pre_cost-label"
+                      label={customizeT(inputLabel.pre_cost)}
+                      value={values.pre_cost}
+                      name="pre_cost"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      disabled={hasTag}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200
+                          }
                         }
+                      }}
+                    >
+                      {PreCostType.map((option) => {
+                        return (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                    {touched.pre_cost && errors.pre_cost ? (
+                      <FormHelperText error id="helper-tex-channel-pre_cost-label">
+                        {errors.pre_cost}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText id="helper-tex-channel-pre_cost-label"> {customizeT(inputPrompt.pre_cost)} </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+                {inputPrompt.only_chat && (
+                  <FormControl fullWidth>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          disabled={hasTag}
+                          checked={Boolean(values.only_chat)}
+                          onChange={(event) => {
+                            setFieldValue('only_chat', event.target.checked);
+                          }}
+                        />
                       }
-                    }}
-                  >
-                    {PreCostType.map((option) => {
-                      return (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                  {touched.pre_cost && errors.pre_cost ? (
-                    <FormHelperText error id="helper-tex-channel-pre_cost-label">
-                      {errors.pre_cost}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-pre_cost-label"> {customizeT(inputPrompt.pre_cost)} </FormHelperText>
-                  )}
-                </FormControl>
-              )}
-              {inputPrompt.only_chat && (
-                <FormControl fullWidth>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        disabled={hasTag}
-                        checked={Boolean(values.only_chat)}
-                        onChange={(event) => {
-                          setFieldValue('only_chat', event.target.checked);
-                        }}
-                      />
-                    }
-                    label={customizeT(inputLabel.only_chat)}
-                  />
-                  <FormHelperText id="helper-tex-only_chat_model-label"> {customizeT(inputPrompt.only_chat)} </FormHelperText>
-                </FormControl>
-              )}
-              {pluginList[values.type] &&
-                Object.keys(pluginList[values.type]).map((pluginId) => {
-                  const plugin = pluginList[values.type][pluginId];
-                  return (
-                    <>
-                      <Box
-                        sx={{
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 2,
-                          marginTop: 2,
-                          marginBottom: 2,
-                          overflow: 'hidden'
-                        }}
-                      >
+                      label={customizeT(inputLabel.only_chat)}
+                    />
+                    <FormHelperText id="helper-tex-only_chat_model-label"> {customizeT(inputPrompt.only_chat)} </FormHelperText>
+                  </FormControl>
+                )}
+                {pluginList[values.type] &&
+                  Object.keys(pluginList[values.type]).map((pluginId) => {
+                    const plugin = pluginList[values.type][pluginId];
+                    return (
+                      <>
                         <Box
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: 2
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 2,
+                            marginTop: 2,
+                            marginBottom: 2,
+                            overflow: 'hidden'
                           }}
                         >
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="h3">{customizeT(plugin.name)}</Typography>
-                            <Typography variant="caption">{customizeT(plugin.description)}</Typography>
-                          </Box>
-                          <Button
-                            onClick={() => setExpanded(!expanded)}
-                            endIcon={
-                              expanded ? <Icon icon="solar:alt-arrow-up-line-duotone" /> : <Icon icon="solar:alt-arrow-down-line-duotone" />
-                            }
-                            sx={{ textTransform: 'none', marginLeft: 2 }}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: 2
+                            }}
                           >
-                            {expanded ? t('channel_edit.collapse') : t('channel_edit.expand')}
-                          </Button>
-                        </Box>
-
-                        <Collapse in={expanded}>
-                          <Box sx={{ padding: 2, marginTop: -3 }}>
-                            {Object.keys(plugin.params).map((paramId) => {
-                              const param = plugin.params[paramId];
-                              const name = `plugin.${pluginId}.${paramId}`;
-                              return param.type === 'bool' ? (
-                                <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
-                                  <FormControlLabel
-                                    key={name}
-                                    required
-                                    control={
-                                      <Switch
-                                        key={name}
-                                        name={name}
-                                        disabled={hasTag}
-                                        checked={values.plugin?.[pluginId]?.[paramId] || false}
-                                        onChange={(event) => {
-                                          setFieldValue(name, event.target.checked);
-                                        }}
-                                      />
-                                    }
-                                    label={t('channel_edit.isEnable')}
-                                  />
-                                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
-                                </FormControl>
-                              ) : (
-                                <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
-                                  <TextField
-                                    multiline
-                                    key={name}
-                                    name={name}
-                                    disabled={hasTag}
-                                    value={values.plugin?.[pluginId]?.[paramId] || ''}
-                                    label={customizeT(param.name)}
-                                    placeholder={customizeT(param.description)}
-                                    onChange={handleChange}
-                                  />
-                                  <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
-                                </FormControl>
-                              );
-                            })}
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h3">{customizeT(plugin.name)}</Typography>
+                              <Typography variant="caption">{customizeT(plugin.description)}</Typography>
+                            </Box>
+                            <Button
+                              onClick={() => setExpanded(!expanded)}
+                              endIcon={
+                                expanded ? (
+                                  <Icon icon="solar:alt-arrow-up-line-duotone" />
+                                ) : (
+                                  <Icon icon="solar:alt-arrow-down-line-duotone" />
+                                )
+                              }
+                              sx={{ textTransform: 'none', marginLeft: 2 }}
+                            >
+                              {expanded ? t('channel_edit.collapse') : t('channel_edit.expand')}
+                            </Button>
                           </Box>
-                        </Collapse>
-                      </Box>
-                    </>
-                  );
-                })}
-              <DialogActions>
-                <Button onClick={onCancel}>{t('common.cancel')}</Button>
-                <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  {t('common.submit')}
-                </Button>
-              </DialogActions>
-            </form>
-          )}
+
+                          <Collapse in={expanded}>
+                            <Box sx={{ padding: 2, marginTop: -3 }}>
+                              {Object.keys(plugin.params).map((paramId) => {
+                                const param = plugin.params[paramId];
+                                const name = `plugin.${pluginId}.${paramId}`;
+                                return param.type === 'bool' ? (
+                                  <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
+                                    <FormControlLabel
+                                      key={name}
+                                      required
+                                      control={
+                                        <Switch
+                                          key={name}
+                                          name={name}
+                                          disabled={hasTag}
+                                          checked={values.plugin?.[pluginId]?.[paramId] || false}
+                                          onChange={(event) => {
+                                            setFieldValue(name, event.target.checked);
+                                          }}
+                                        />
+                                      }
+                                      label={t('channel_edit.isEnable')}
+                                    />
+                                    <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
+                                  </FormControl>
+                                ) : (
+                                  <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
+                                    <TextField
+                                      multiline
+                                      key={name}
+                                      name={name}
+                                      disabled={hasTag}
+                                      value={values.plugin?.[pluginId]?.[paramId] || ''}
+                                      label={customizeT(param.name)}
+                                      placeholder={customizeT(param.description)}
+                                      onChange={handleChange}
+                                    />
+                                    <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
+                                  </FormControl>
+                                );
+                              })}
+                            </Box>
+                          </Collapse>
+                        </Box>
+                      </>
+                    );
+                  })}
+                <DialogActions>
+                  <Button onClick={onCancel}>{t('common.cancel')}</Button>
+                  <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
+                    {t('common.submit')}
+                  </Button>
+                </DialogActions>
+              </form>
+            );
+          }}
         </Formik>
+
+        {/* 模型选择器弹窗 */}
+        <ModelSelectorModal
+          open={modelSelectorOpen}
+          onClose={() => setModelSelectorOpen(false)}
+          onConfirm={(selectedModels, mappings) => {
+            // 处理普通模型选择
+            handleModelSelectorConfirm(selectedModels);
+
+            // 处理模型映射关系
+            if (mappings && mappings.length > 0) {
+              // 获取现有的映射关系
+              const existingMappings = tempFormikValues?.model_mapping || [];
+
+              // 创建新的映射关系，避免键冲突
+              const existingKeys = new Set(existingMappings.map((item) => item.key));
+              const newMappings = mappings.filter((item) => !existingKeys.has(item.key));
+
+              // 更新索引以确保连续性
+              const mergedMappings = [...existingMappings, ...newMappings].map((item, index) => ({
+                ...item,
+                index
+              }));
+
+              // 更新表单值
+              tempSetFieldValue('model_mapping', mergedMappings);
+            }
+          }}
+          channelValues={tempFormikValues}
+          prices={prices}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -1117,5 +1184,6 @@ EditModal.propTypes = {
   onOk: PropTypes.func,
   groupOptions: PropTypes.array,
   isTag: PropTypes.bool,
-  modelOptions: PropTypes.array
+  modelOptions: PropTypes.array,
+  prices: PropTypes.array
 };

@@ -112,7 +112,22 @@
     "mapAddByJson": "JSONを使用して{{name}}を追加します。",
     "mapJsonInput": "JSON 入力",
     "listJsonError": "JSON形式が間違っています。入力が配列形式であることを確認してください。",
-    "listJsonHelperText": "JSON配列形式を入力してください。例：[\"プロジェクト1\", \"プロジェクト2\", \"プロジェクト3\"]"
+    "listJsonHelperText": "JSON配列形式を入力してください。例：[\"プロジェクト1\", \"プロジェクト2\", \"プロジェクト3\"]",
+    "modelsFetched": "モデルの取得に成功しました",
+    "selectedMappingCount": "選択されたモデルマッピング{{count}}個",
+    "addMapping": "モデルマッピングを追加",
+    "addToModelMapping": "モデルマッピングに追加",
+    "modelMapping": "モデルマッピング",
+    "modelMappingSettings": "モデルマッピング設定",
+    "prefixOrSuffix": "プレフィックス／サフィックス",
+    "removePrefixHelp": "削除する前のプレフィックスを入力してください",
+    "removeSuffixHelp": "削除する後のサフィックスを入力してください",
+    "addPlusSign": "マッピング前の課金を使用",
+    "mappingPreview": "マッピングプレビュー",
+    "removePrefix": "前缀を削除",
+    "removeSuffix": "後缀を削除",
+    "collapseList": "リストを折りたたむ",
+    "expandList": "リストを展開"
   },
   "channel_index": {
     "AzureApiVersion": "Azureのバージョン番号",
