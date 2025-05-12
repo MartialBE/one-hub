@@ -2,6 +2,8 @@ package relay
 
 import (
 	"encoding/json"
+	"one-api/model"
+	"one-api/relay/relay_util"
 	"one-api/types"
 	"strings"
 	"time"
@@ -12,11 +14,13 @@ import (
 )
 
 type relayBase struct {
-	c             *gin.Context
-	provider      providersBase.ProviderInterface
-	originalModel string
-	modelName     string
-	otherArg      string
+	c              *gin.Context
+	provider       providersBase.ProviderInterface
+	originalModel  string
+	modelName      string
+	otherArg       string
+	allowHeartbeat bool
+	heartbeat      *relay_util.Heartbeat
 
 	firstResponseTime time.Time
 }
@@ -37,6 +41,7 @@ type RelayBaseInterface interface {
 
 	HandleJsonError(err *types.OpenAIErrorWithStatusCode)
 	HandleStreamError(err *types.OpenAIErrorWithStatusCode)
+	SetHeartbeat() *relay_util.Heartbeat
 }
 
 func (r *relayBase) getRequest() interface{} {
@@ -125,4 +130,32 @@ func (r *relayBase) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
 
 	r.c.Writer.Write([]byte("data: " + string(str) + "\n\n"))
 	r.c.Writer.Flush()
+}
+
+func (r *relayBase) SetHeartbeat() *relay_util.Heartbeat {
+	if !r.allowHeartbeat {
+		return nil
+	}
+
+	setting, exists := r.c.Get("token_setting")
+	if !exists {
+		return nil
+	}
+
+	tokenSetting, ok := setting.(*model.TokenSetting)
+	if !ok || !tokenSetting.Heartbeat.Enabled {
+		return nil
+	}
+
+	r.heartbeat = relay_util.NewHeartbeat(
+		r.IsStream(),
+		relay_util.HeartbeatConfig{
+			TimeoutSeconds:  tokenSetting.Heartbeat.TimeoutSeconds,
+			IntervalSeconds: 5, // 5s 发送一次心跳
+		},
+		r.c,
+	)
+	r.heartbeat.Start()
+
+	return r.heartbeat
 }

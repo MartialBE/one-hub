@@ -24,8 +24,12 @@ type relayChat struct {
 }
 
 func NewRelayChat(c *gin.Context) *relayChat {
-	relay := &relayChat{}
-	relay.c = c
+	relay := &relayChat{
+		relayBase: relayBase{
+			allowHeartbeat: true,
+			c:              c,
+		},
+	}
 	return relay
 }
 
@@ -101,6 +105,10 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		doneStr := func() string {
 			return r.getUsageResponse()
 		}
@@ -114,6 +122,11 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 		if err != nil {
 			return
 		}
+
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		err = responseJsonClient(r.c, response)
 
 	}

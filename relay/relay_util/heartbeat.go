@@ -11,7 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const HeartbeatText = "::PING\n\n"
+const HeartbeatStreamText = "::PING\n\n"
+const HeartbeatJsonText = "\n"
 
 // 心跳配置
 type HeartbeatConfig struct {
@@ -21,6 +22,7 @@ type HeartbeatConfig struct {
 
 // Heartbeat 心跳处理器
 type Heartbeat struct {
+	isStream   bool
 	config     HeartbeatConfig
 	ctx        context.Context
 	cancel     context.CancelFunc
@@ -31,13 +33,14 @@ type Heartbeat struct {
 }
 
 // NewHeartbeat 创建一个新的心跳处理器
-func NewHeartbeat(config HeartbeatConfig, c *gin.Context) *Heartbeat {
+func NewHeartbeat(isStream bool, config HeartbeatConfig, c *gin.Context) *Heartbeat {
 	if config.IntervalSeconds < 5 {
 		config.IntervalSeconds = 5 // 最低只能设置为5秒
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Heartbeat{
+		isStream:   isStream,
 		config:     config,
 		ctx:        ctx,
 		cancel:     cancel,
@@ -66,7 +69,11 @@ func (h *Heartbeat) writeHeader() bool {
 	}
 
 	// 写入头部
-	requester.SetEventStreamHeaders(h.c)
+	if h.isStream {
+		requester.SetEventStreamHeaders(h.c)
+	} else {
+		h.c.Header("Content-Type", "application/json")
+	}
 	return true
 }
 
@@ -115,8 +122,13 @@ func (h *Heartbeat) Start() {
 							return
 						}
 
+						var err error
 						// 发送心跳并处理错误
-						_, err := h.c.Writer.Write([]byte(HeartbeatText))
+						if h.isStream {
+							_, err = h.c.Writer.Write([]byte(HeartbeatStreamText))
+						} else {
+							_, err = h.c.Writer.Write([]byte(HeartbeatJsonText))
+						}
 						if err != nil {
 							// 发生错误，停止心跳
 							h.Stop()
@@ -154,5 +166,10 @@ func (h *Heartbeat) Stop() {
 // IsSafeWriteStream 检查是否可以安全地写入Stream
 func (h *Heartbeat) IsSafeWriteStream() bool {
 	h.Stop()
-	return h.HasWrittenHeader()
+
+	if h.isStream {
+		return h.HasWrittenHeader()
+	}
+
+	return false
 }

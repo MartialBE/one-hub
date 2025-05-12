@@ -26,8 +26,12 @@ type relayGeminiOnly struct {
 
 func NewRelayGeminiOnly(c *gin.Context) *relayGeminiOnly {
 	c.Set("allow_channel_type", AllowGeminiChannelType)
-	relay := &relayGeminiOnly{}
-	relay.c = c
+	relay := &relayGeminiOnly{
+		relayBase: relayBase{
+			allowHeartbeat: true,
+			c:              c,
+		},
+	}
 
 	return relay
 }
@@ -103,6 +107,10 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		doneStr := func() string {
 			return ""
 		}
@@ -113,6 +121,10 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 		response, err = chatProvider.CreateGeminiChat(r.geminiRequest)
 		if err != nil {
 			return
+		}
+
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
 		}
 
 		err = responseJsonClient(r.c, response)

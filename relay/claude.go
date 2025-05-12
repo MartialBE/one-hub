@@ -24,8 +24,12 @@ type relayClaudeOnly struct {
 
 func NewRelayClaudeOnly(c *gin.Context) *relayClaudeOnly {
 	c.Set("allow_channel_type", AllowChannelType)
-	relay := &relayClaudeOnly{}
-	relay.c = c
+	relay := &relayClaudeOnly{
+		relayBase: relayBase{
+			allowHeartbeat: true,
+			c:              c,
+		},
+	}
 
 	return relay
 }
@@ -82,6 +86,10 @@ func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		doneStr := func() string {
 			return ""
 		}
@@ -92,6 +100,10 @@ func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 		response, err = chatProvider.CreateClaudeChat(r.claudeRequest)
 		if err != nil {
 			return
+		}
+
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
 		}
 
 		openErr := responseJsonClient(r.c, response)
