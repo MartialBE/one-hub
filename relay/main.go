@@ -25,16 +25,31 @@ func Relay(c *gin.Context) {
 
 	if err := relay.setRequest(); err != nil {
 		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusBadRequest)
-		relay.HandleError(openaiErr)
+		relay.HandleJsonError(openaiErr)
 		return
 	}
 
 	c.Set("is_stream", relay.IsStream())
-
 	if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusServiceUnavailable)
-		relay.HandleError(openaiErr)
+		relay.HandleJsonError(openaiErr)
 		return
+	}
+
+	var heartbeat *relay_util.Heartbeat
+	if relay.IsStream() {
+		if setting, exists := c.Get("token_setting"); exists {
+			if tokenSetting, ok := setting.(*model.TokenSetting); ok {
+				if tokenSetting.Heartbeat.Enabled {
+					heartbeat = relay_util.NewHeartbeat(relay_util.HeartbeatConfig{
+						TimeoutSeconds:  tokenSetting.Heartbeat.TimeoutSeconds,
+						IntervalSeconds: 5, // 5s 发送一次心跳
+					}, c)
+					heartbeat.Start()
+					defer heartbeat.Close()
+				}
+			}
+		}
 	}
 
 	apiErr, done := RelayHandler(relay)
@@ -82,7 +97,12 @@ func Relay(c *gin.Context) {
 	}
 
 	if apiErr != nil {
-		relay.HandleError(apiErr)
+		if heartbeat != nil && heartbeat.IsSafeWriteStream() {
+			relay.HandleStreamError(apiErr)
+			return
+		}
+
+		relay.HandleJsonError(apiErr)
 	}
 }
 

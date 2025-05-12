@@ -1,6 +1,7 @@
 package relay
 
 import (
+	"encoding/json"
 	"one-api/types"
 	"strings"
 	"time"
@@ -31,8 +32,11 @@ type RelayBaseInterface interface {
 	getModelName() string
 	getContext() *gin.Context
 	IsStream() bool
-	HandleError(err *types.OpenAIErrorWithStatusCode)
+	// HandleError(err *types.OpenAIErrorWithStatusCode)
 	GetFirstResponseTime() time.Time
+
+	HandleJsonError(err *types.OpenAIErrorWithStatusCode)
+	HandleStreamError(err *types.OpenAIErrorWithStatusCode)
 }
 
 func (r *relayBase) getRequest() interface{} {
@@ -99,7 +103,26 @@ func (r *relayBase) SetFirstResponseTime(firstResponseTime time.Time) {
 	r.firstResponseTime = firstResponseTime
 }
 
-func (r *relayBase) HandleError(err *types.OpenAIErrorWithStatusCode) {
+func (r *relayBase) GetError(err *types.OpenAIErrorWithStatusCode) (int, any) {
 	newErr := FilterOpenAIErr(r.c, err)
-	relayResponseWithOpenAIErr(r.c, &newErr)
+	return newErr.StatusCode, types.OpenAIErrorResponse{
+		Error: newErr.OpenAIError,
+	}
+}
+
+func (r *relayBase) HandleJsonError(err *types.OpenAIErrorWithStatusCode) {
+	statusCode, response := r.GetError(err)
+	r.c.JSON(statusCode, response)
+}
+
+func (r *relayBase) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
+	_, response := r.GetError(err)
+
+	str, jsonErr := json.Marshal(response)
+	if jsonErr != nil {
+		return
+	}
+
+	r.c.Writer.Write([]byte("data: " + string(str) + "\n\n"))
+	r.c.Writer.Flush()
 }

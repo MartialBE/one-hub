@@ -1,6 +1,7 @@
 package relay
 
 import (
+	"encoding/json"
 	"math"
 	"net/http"
 	"one-api/common"
@@ -106,12 +107,28 @@ func (r *relayClaudeOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 	return
 }
 
-func (r *relayClaudeOnly) HandleError(err *types.OpenAIErrorWithStatusCode) {
+func (r *relayClaudeOnly) GetError(err *types.OpenAIErrorWithStatusCode) (int, any) {
 	newErr := FilterOpenAIErr(r.c, err)
 
 	claudeErr := claude.OpenaiErrToClaudeErr(&newErr)
 
-	r.c.JSON(newErr.StatusCode, claudeErr.ClaudeError)
+	return newErr.StatusCode, claudeErr.ClaudeError
+}
+
+func (r *relayClaudeOnly) HandleJsonError(err *types.OpenAIErrorWithStatusCode) {
+	statusCode, response := r.GetError(err)
+	r.c.JSON(statusCode, response)
+}
+
+func (r *relayClaudeOnly) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
+	_, response := r.GetError(err)
+
+	str, jsonErr := json.Marshal(response)
+	if jsonErr != nil {
+		return
+	}
+	r.c.Writer.Write([]byte("event: error\ndata: " + string(str) + "\n\n"))
+	r.c.Writer.Flush()
 }
 
 func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, error) {

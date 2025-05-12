@@ -20,7 +20,8 @@ import {
   FormControlLabel,
   FormHelperText,
   Select,
-  MenuItem
+  MenuItem,
+  Typography
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -36,7 +37,17 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required('名称 不能为空'),
   remain_quota: Yup.number().min(0, '必须大于等于0'),
   expired_time: Yup.number(),
-  unlimited_quota: Yup.boolean()
+  unlimited_quota: Yup.boolean(),
+  setting: Yup.object().shape({
+    heartbeat: Yup.object().shape({
+      enabled: Yup.boolean(),
+      timeout_seconds: Yup.number().when('enabled', {
+        is: true,
+        then: () => Yup.number().min(30, '时间 必须大于等于30秒').max(90, '时间 必须小于等于90秒').required('时间 不能为空'),
+        otherwise: () => Yup.number()
+      })
+    })
+  })
 });
 
 const originInputs = {
@@ -45,7 +56,14 @@ const originInputs = {
   remain_quota: 0,
   expired_time: -1,
   unlimited_quota: false,
-  group: ''
+  group: '',
+
+  setting: {
+    heartbeat: {
+      enabled: false,
+      timeout_seconds: 30
+    }
+  }
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
@@ -57,6 +75,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
     setSubmitting(true);
 
     values.remain_quota = parseInt(values.remain_quota);
+    values.setting.heartbeat.timeout_seconds = parseInt(values.setting.heartbeat.timeout_seconds);
     let res;
 
     try {
@@ -219,6 +238,52 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   label={t('token_index.unlimitedQuota')}
                 />
               </FormControl>
+
+              <Divider sx={{ margin: '16px 0px' }} />
+              <Typography variant="h4">{t('token_index.heartbeat')}</Typography>
+              <Typography variant="caption">{t('token_index.heartbeatTip')}</Typography>
+
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values?.setting?.heartbeat?.enabled === true}
+                      onClick={() => {
+                        setFieldValue('setting.heartbeat.enabled', !values.setting?.heartbeat?.enabled);
+                      }}
+                    />
+                  }
+                  label={t('token_index.heartbeat')}
+                />
+              </FormControl>
+
+              {values?.setting?.heartbeat?.enabled && (
+                <FormControl fullWidth>
+                  <InputLabel>{t('token_index.heartbeatTimeout')}</InputLabel>
+                  <OutlinedInput
+                    id="channel-heartbeat-timeout-label"
+                    label={t('token_index.heartbeatTimeout')}
+                    type="number"
+                    value={values?.setting?.heartbeat?.timeout_seconds}
+                    onChange={(e) => {
+                      setFieldValue('setting.heartbeat.timeout_seconds', e.target.value);
+                    }}
+                  />
+
+                  {touched.setting?.heartbeat?.timeout_seconds && errors.setting?.heartbeat?.timeout_seconds ? (
+                    <FormHelperText error id="helper-tex-channel-heartbeat-timeout-label">
+                      {errors.setting?.heartbeat?.timeout_seconds}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-heartbeat-timeout-label">
+                      {t('token_index.heartbeatTimeoutHelperText')}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              )}
+
+              <Divider sx={{ margin: '16px 0px' }} />
+
               <FormControl fullWidth>
                 <InputLabel>{t('token_index.userGroup')}</InputLabel>
                 <Select
