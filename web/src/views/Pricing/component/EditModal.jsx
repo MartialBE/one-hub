@@ -279,12 +279,19 @@ const EditModal = ({
     if (!singleMode) return; // 单一模式专用
 
     const { name, value, checked } = event.target;
+
+    let finalValue;
+    if (name === 'input' || name === 'output') {
+      finalValue = value === '' ? 0 : Number(value);
+    } else {
+      finalValue = name === 'locked' ? checked : value;
+    }
+
     setInputs((prev) => ({
       ...prev,
-      [name]: name === 'locked' ? checked : value
+      [name]: finalValue
     }));
 
-    // 清除对应字段的错误
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
