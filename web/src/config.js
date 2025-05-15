@@ -6,6 +6,9 @@ const config = {
   fontFamily: `'Roboto', Helvetica, sans-serif`,
   borderRadius: 12,
   siteInfo: {
+    UptimeEnabled: false,
+    UptimeDomain: '',
+    UptimePageName: '',
     UserInvoiceMonth: false,
     chat_link: '',
     display_in_currency: true,

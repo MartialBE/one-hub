@@ -37,7 +37,7 @@ const Header = () => {
   const [open, setOpen] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { t } = useTranslation();
-
+  const siteInfo = useSelector((state) => state.siteInfo);
   const handleOpenMenu = (event) => {
     setOpen(open ? null : event.currentTarget);
   };
@@ -141,6 +141,24 @@ const Header = () => {
             >
               {t('menu.about')}
             </Button>
+            {siteInfo.UptimeEnabled && (
+              <Button
+                component="a"
+                variant="text"
+                href={siteInfo.UptimeDomain}
+                target="_blank"
+                rel="noopener noreferrer"
+                color={pathname === '/status' ? 'primary' : 'inherit'}
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  textTransform: 'none'
+                }}
+              >
+                {t('menu.status')}
+              </Button>
+            )}
+
             <NoticeButton sx={{ color: theme.palette.text.primary, ml: 1 }} />
             <ThemeButton sx={{ color: theme.palette.text.primary, ml: 0.5 }} />
             <I18nButton sx={{ color: theme.palette.text.primary, ml: 0.5 }} />
@@ -300,6 +318,28 @@ const Header = () => {
                         }
                       />
                     </ListItemButton>
+                    {siteInfo.UptimeEnabled && (
+                      <ListItemButton 
+                        component="a" 
+                        href={siteInfo.UptimeDomain}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ListItemText
+                          primary={
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                fontWeight: pathname === '/status' ? 500 : 400,
+                                color: pathname === '/status' ? theme.palette.primary.main : theme.palette.text.primary
+                              }}
+                            >
+                              {t('menu.status')}
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
+                    )}
                     <Divider sx={{ my: 1 }} />
                     {account.user ? (
                       <ListItemButton
