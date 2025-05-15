@@ -46,8 +46,8 @@ func (r *relayChat) setRequest() error {
 		r.c.Set("skip_only_chat", true)
 	}
 
-	if !r.chatRequest.Stream && r.chatRequest.StreamOptions != nil {
-		return errors.New("the 'stream_options' parameter is only allowed when 'stream' is enabled")
+	if !r.chatRequest.Stream {
+		r.chatRequest.StreamOptions = nil
 	}
 
 	r.setOriginalModel(r.chatRequest.Model)
