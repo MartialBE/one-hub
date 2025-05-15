@@ -19,6 +19,9 @@ func InitConf() {
 	UserInvoiceMonth = viper.GetBool("user_invoice_month")
 	GitHubProxy = viper.GetString("github_proxy")
 	MCP_ENABLE = viper.GetBool("mcp.enable") != false
+	UPTIMEKUMA_ENABLE = viper.GetBool("uptime_kuma.enable") != false
+	UPTIMEKUMA_DOMAIN = viper.GetString("uptime_kuma.domain")
+	UPTIMEKUMA_STATUS_PAGE_NAME = viper.GetString("uptime_kuma.status_page_name")
 }
 
 func setEnv() {
@@ -44,4 +47,8 @@ func defaultConfig() {
 	viper.SetDefault("language", "zh_CN")
 	viper.SetDefault("favicon", "")
 	viper.SetDefault("user_invoice_month", false)
+	viper.SetDefault("mcp.enable", false)
+	viper.SetDefault("uptime_kuma.enable", false)
+	viper.SetDefault("uptime_kuma.domain", "")
+	viper.SetDefault("uptime_kuma.status_page_name", "")
 }

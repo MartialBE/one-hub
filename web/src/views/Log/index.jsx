@@ -209,6 +209,11 @@ export default function Log() {
             variant="scrollable"
             scrollButtons="auto"
             allowScrollButtonsMobile
+            sx={{
+              '& .MuiTabs-indicator': {
+                display: 'none'
+              }
+            }}
           >
             {Object.values(LogType).map((option) => {
               return <Tab key={option.value} label={option.text} value={option.value} />;

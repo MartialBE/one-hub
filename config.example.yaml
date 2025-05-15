@@ -117,4 +117,8 @@ search:
 mcp:
   enable: false # 开启mcp服务
 
+uptime_kuma:
+  enable: false # 是否开启uptime kuma状态展示
+  domain: ""     # uptime-kuma项目地址 例如https://status.xxxxx.com
+  status_page_name: "" #  uptime-kuma状态页面slug
 

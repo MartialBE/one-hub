@@ -25,6 +25,7 @@
   "menu": {
     "home": "首页",
     "about": "关于",
+    "status": "状态",
     "login": "登录",
     "signup": "注册",
     "signout": "注销",
@@ -56,10 +57,13 @@
     "alreadyHaveAccount": "已经有帐号了?点击登录"
   },
   "dashboard_index": {
+    "title": "仪表盘",
     "model_price": "当前可用模型",
     "today_requests": "今日请求",
     "today_consumption": "今日消费",
     "today_tokens": "今日Token",
+    "tab_dashboard": "概览",
+    "tab_status": "状态",
     "no_data": "无数据",
     "statistics": "统计",
     "no_data_available": "暂无数据",
@@ -85,7 +89,10 @@
     "ComparedWithYesterday": "相比昨日",
     "usage": "使用率",
     "RPM": "当前RPM",
-    "TPM": "当前TPM"
+    "TPM": "当前TPM",
+    "availability": "可用率",
+    "status_normal": "正常",
+    "status_abnormal": "异常"
   },
   "analytics_index": {
     "startTime": "开始时间",
