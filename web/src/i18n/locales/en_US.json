@@ -314,7 +314,11 @@
     "usage": "Usage",
     "RPM": "Current RPM",
     "TPM": "Current TPM",
-    "total": "Total number"
+    "total": "Total number",
+    "availability": "Availability",
+    "tab_status": "Status",
+    "tab_dashboard": "Dashboard",
+    "title": "Dashboard"
   },
   "description": "All-in-one OpenAI interface\nIntegrates various API access methods\nOne-click deployment, ready to use",
   "echo 映射": "echo mapping",

@@ -128,7 +128,8 @@ const MainLayout = () => {
             xs: matchDownMd && leftDrawerOpened ? 0 : theme.zIndex.drawer - 1,
             md: theme.zIndex.drawer + 1
           },
-          width: '100%'
+          width: '100%',
+          borderRadius: 0
         }}
       >
         <Toolbar sx={{ px: { xs: 1.5, sm: 2, md: 3 }, minHeight: '64px', height: '64px' }}>

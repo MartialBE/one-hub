@@ -224,10 +224,11 @@ const Header = () => {
             <ClickAwayListener onClickAway={handleCloseMenu}>
               <Paper
                 sx={{
-                  width: { xs: '100vw', sm: '320px' },
-                  borderRadius: '12px',
+                  width: { xs: '30vw', sm: '320px' },
+                  borderRadius: '8px',
                   overflow: 'hidden',
-                  boxShadow: theme.shadows[8]
+                  boxShadow: theme.shadows[8],
+                  textAlign: 'center'
                 }}
               >
                 <MainCard border={false} elevation={0} content={false} boxShadow>
@@ -238,7 +239,7 @@ const Header = () => {
                       backgroundColor: theme.palette.background.paper,
                       py: 1,
                       '& .MuiListItemButton-root': {
-                        py: 1.25,
+                        py: 0.75,
                         px: 2.5,
                         '&:hover': {
                           backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)'
@@ -260,6 +261,7 @@ const Header = () => {
                             variant="body1"
                             sx={{
                               fontWeight: pathname === '/' ? 500 : 400,
+                              textAlign: 'center',
                               color: pathname === '/' ? theme.palette.primary.main : theme.palette.text.primary
                             }}
                           >
@@ -277,6 +279,7 @@ const Header = () => {
                               variant="body1"
                               sx={{
                                 fontWeight: pathname === '/playground' ? 500 : 400,
+                                textAlign: 'center',
                                 color: pathname === '/playground' ? theme.palette.primary.main : theme.palette.text.primary
                               }}
                             >
@@ -294,6 +297,7 @@ const Header = () => {
                             variant="body1"
                             sx={{
                               fontWeight: pathname === '/price' ? 500 : 400,
+                              textAlign: 'center',
                               color: pathname === '/price' ? theme.palette.primary.main : theme.palette.text.primary
                             }}
                           >
@@ -310,6 +314,7 @@ const Header = () => {
                             variant="body1"
                             sx={{
                               fontWeight: pathname === '/about' ? 500 : 400,
+                              textAlign: 'center',
                               color: pathname === '/about' ? theme.palette.primary.main : theme.palette.text.primary
                             }}
                           >
@@ -319,8 +324,8 @@ const Header = () => {
                       />
                     </ListItemButton>
                     {siteInfo.UptimeEnabled && (
-                      <ListItemButton 
-                        component="a" 
+                      <ListItemButton
+                        component="a"
                         href={siteInfo.UptimeDomain}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -331,6 +336,7 @@ const Header = () => {
                               variant="body1"
                               sx={{
                                 fontWeight: pathname === '/status' ? 500 : 400,
+                                textAlign: 'center',
                                 color: pathname === '/status' ? theme.palette.primary.main : theme.palette.text.primary
                               }}
                             >
@@ -346,15 +352,8 @@ const Header = () => {
                         component={Link}
                         to="/panel"
                         sx={{
-                          backgroundColor: theme.palette.primary.light,
-                          borderRadius: '8px',
-                          mx: 1.5,
-                          '&:hover': {
-                            backgroundColor: theme.palette.primary.main,
-                            '& .MuiTypography-root': {
-                              color: '#fff'
-                            }
-                          }
+                          fontWeight: pathname === '/panel' ? 500 : 400,
+                          color: pathname === '/panel' ? theme.palette.primary.main : theme.palette.text.primary
                         }}
                       >
                         <ListItemText
@@ -378,15 +377,8 @@ const Header = () => {
                         component={Link}
                         to="/login"
                         sx={{
-                          backgroundColor: theme.palette.primary.light,
-                          borderRadius: '8px',
-                          mx: 1.5,
-                          '&:hover': {
-                            backgroundColor: theme.palette.primary.main,
-                            '& .MuiTypography-root': {
-                              color: '#fff'
-                            }
-                          }
+                          fontWeight: pathname === '/login' ? 500 : 400,
+                          color: pathname === '/login' ? theme.palette.primary.main : theme.palette.text.primary
                         }}
                       >
                         <ListItemText
