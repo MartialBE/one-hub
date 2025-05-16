@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Grid, Typography, IconButton, Tooltip, LinearProgress, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, IconButton, LinearProgress } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -10,7 +10,7 @@ import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
 import { useTranslation } from 'react-i18next';
 import { API } from 'utils/api';
 import { showError } from 'utils/common';
-import { IconRefresh } from '@tabler/icons-react';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
   borderRadius: '16px',
@@ -28,7 +28,6 @@ const RPM = () => {
   const [rateData, setRateData] = useState({ rpm: 0, maxRPM: 0, tpm: 0, maxTPM: 0, usageRpmRate: 0, usageTpmRate: 0 });
   const [localLoading, setLocalLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-
   const fetchRPMData = async () => {
     setLocalLoading(true);
     try {
@@ -76,18 +75,6 @@ const RPM = () => {
               position: 'relative'
             }}
           >
-            {localLoading && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  zIndex: 1
-                }}
-              >
-                <CircularProgress size={20} />
-              </Box>
-            )}
             <Grid container alignItems="center" spacing={2} sx={{ height: '100%' }}>
               <Grid item xs>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -102,11 +89,33 @@ const RPM = () => {
                   >
                     {rateData.rpm} RPM
                   </Typography>
-                  <Tooltip title="Refresh" placement="top">
-                    <IconButton size="small" color="primary" onClick={fetchRPMData} disabled={localLoading}>
-                      <IconRefresh size={16} />
-                    </IconButton>
-                  </Tooltip>
+                  <IconButton
+                    onClick={fetchRPMData}
+                    disabled={localLoading}
+                    size="small"
+                    sx={{
+                      p: 0.5,
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      }
+                    }}
+                  >
+                    <RefreshIcon
+                      fontSize="small"
+                      sx={{
+                        color: localLoading ? theme.palette.primary.main : theme.palette.text.secondary,
+                        animation: localLoading ? 'spin 1s linear infinite' : 'none',
+                        '@keyframes spin': {
+                          '0%': {
+                            transform: 'rotate(0deg)'
+                          },
+                          '100%': {
+                            transform: 'rotate(360deg)'
+                          }
+                        }
+                      }}
+                    />
+                  </IconButton>
                 </Box>
 
                 <Typography

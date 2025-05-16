@@ -4,6 +4,7 @@ import { Avatar, Box, ButtonBase, Hidden, Menu, MenuItem, Typography } from '@mu
 import i18nList from 'i18n/i18nList';
 import useI18n from 'hooks/useI18n';
 import Flags from 'country-flag-icons/react/3x2';
+import { height } from '@mui/system';
 
 export default function I18nButton() {
   const theme = useTheme();
@@ -69,13 +70,12 @@ export default function I18nButton() {
                 width: '1.45rem',
                 height: '1.125rem',
                 overflow: 'hidden',
-                borderRadius: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <CurrentFlag style={{ width: '100%' }} />
+              <CurrentFlag style={{ width: '95%', height: '85%', borderRadius: '0.25rem' }} />
             </Box>
           )}
         </Avatar>
@@ -111,13 +111,13 @@ export default function I18nButton() {
                     width: '1.45rem',
                     height: '1.125rem',
                     overflow: 'hidden',
-                    borderRadius: '4px',
+                    borderRadius: '0.25rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <FlagComponent style={{ width: '100%' }} />
+                  <FlagComponent style={{ width:'90%',height:'77%',borderRadius: '0.25rem' }} />
                 </Box>
               )}
               <Typography variant="body1">{item.name}</Typography>

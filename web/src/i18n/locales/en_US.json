@@ -34,6 +34,18 @@
     "modified": "Edit",
     "removed": "Delete"
   },
+  "menu": {
+    "home": "Home",
+    "about": "About",
+    "status": "Status",
+    "login": "Login",
+    "signup": "Sign up",
+    "signout": "Sign out",
+    "console": "Console",
+    "error": "Error",
+    "unknownVersion": "Unknown Version",
+    "welcomeBack": "Welcome Back"
+  },
   "sidebar": {
     "totalQuota": "Total Quota",
     "remainingBalance": "Remaining Balance"
@@ -247,6 +259,7 @@
     "close": "closure",
     "copyUrl": "Copy address",
     "create": "create",
+    "currency": "USD",
     "delete": "delete",
     "deleteConfirm": "Delete {{title}}?",
     "disable": "disabled",
@@ -300,6 +313,7 @@
     "used": "Used",
     "week_model_statistics": "Week Model Statistics",
     "week_consumption_log": "Week Consumption Log",
+    "week_total_consumption": "Week Total Consumption",
     "7days_model_usage_pie": "7 Days Model Usage Pie",
     "date": "Date",
     "request_count": "Request Count",
@@ -461,17 +475,6 @@
     "usernameRequired": "Username/Email is required",
     "wechatLoginInfo": "Please use WeChat to scan the QR code to follow the official account and enter the \"verification code\" to obtain the verification code (valid within three minutes)",
     "wechatVerificationCodeLogin": "WeChat verification code login"
-  },
-  "menu": {
-    "about": "About",
-    "console": "Console",
-    "error": "Error",
-    "home": "Home",
-    "login": "Login",
-    "signout": "Signout",
-    "signup": "Signup",
-    "unknownVersion": "Unknown Version",
-    "welcomeBack": "Welcome Back"
   },
   "midjourneyPage": {
     "channel": "Channel",
