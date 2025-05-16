@@ -314,7 +314,11 @@
     "usage": "使用率",
     "RPM": "現在のRPM",
     "TPM": "現在のTPM",
-    "total": "総回数"
+    "total": "総回数",
+    "availability": "稼働率",
+    "tab_status": "ステータス",
+    "tab_dashboard": "ダッシュボード",
+    "title": "ダッシュボード"
   },
   "description": "All in one の OpenAI インターフェース\nさまざまな API アクセス方法を統合\nワンクリックで展開、即座に使用可能",
   "echo 映射": "エコーマッピング",

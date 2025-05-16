@@ -19,7 +19,7 @@ export function NoticeButton() {
         }
       }}
     >
-      <ButtonBase sx={{ borderRadius: '12px' }}>
+      <ButtonBase sx={{ borderRadius: '12px'}}>
         <Avatar
           variant="rounded"
           sx={{

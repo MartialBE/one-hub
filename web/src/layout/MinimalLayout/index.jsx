@@ -24,7 +24,8 @@ const MinimalLayout = () => {
           boxShadow: 'none',
           borderBottom: 'none',
           zIndex: theme.zIndex.drawer + 1,
-          width: '100%'
+          width: '100%',
+          borderRadius:0
         }}
       >
         <Container maxWidth="xl">
