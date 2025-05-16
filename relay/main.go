@@ -25,16 +25,20 @@ func Relay(c *gin.Context) {
 
 	if err := relay.setRequest(); err != nil {
 		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusBadRequest)
-		relay.HandleError(openaiErr)
+		relay.HandleJsonError(openaiErr)
 		return
 	}
 
 	c.Set("is_stream", relay.IsStream())
-
 	if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 		openaiErr := common.StringErrorWrapperLocal(err.Error(), "one_hub_error", http.StatusServiceUnavailable)
-		relay.HandleError(openaiErr)
+		relay.HandleJsonError(openaiErr)
 		return
+	}
+
+	heartbeat := relay.SetHeartbeat()
+	if heartbeat != nil {
+		defer heartbeat.Close()
 	}
 
 	apiErr, done := RelayHandler(relay)
@@ -82,7 +86,12 @@ func Relay(c *gin.Context) {
 	}
 
 	if apiErr != nil {
-		relay.HandleError(apiErr)
+		if heartbeat != nil && heartbeat.IsSafeWriteStream() {
+			relay.HandleStreamError(apiErr)
+			return
+		}
+
+		relay.HandleJsonError(apiErr)
 	}
 }
 

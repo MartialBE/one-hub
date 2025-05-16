@@ -295,51 +295,74 @@ const Single = ({ ownedby, prices, reloadData }) => {
             mb: 2
           }}
         >
-          {/* 表头 */}
+          {/* 添加滚动容器 */}
           <Box
             sx={{
-              display: 'flex',
-              px: 2,
-              py: 1.5,
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
-              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`
+              width: '100%',
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch', // 为iOS设备提供平滑滚动
+              msOverflowStyle: 'none', // 隐藏IE和Edge的滚动条
+              scrollbarWidth: 'none', // 隐藏Firefox的滚动条
+              '&::-webkit-scrollbar': {
+                // 隐藏Chrome、Safari和Opera的滚动条
+                display: 'none'
+              }
             }}
           >
-            <Box width="25%" px={1}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('modelpricePage.model')}
-              </Typography>
+            {/* 表头 */}
+            <Box
+              sx={{
+                display: 'flex',
+                px: 2,
+                py: 1.5,
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                minWidth: { xs: '800px', sm: '100%' } // 设置最小宽度确保在小屏幕上内容不会挤压
+              }}
+            >
+              <Box width="25%" px={1}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('modelpricePage.model')}
+                </Typography>
+              </Box>
+              <Box width="20%" px={1}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('modelpricePage.price')} ({unit})
+                </Typography>
+              </Box>
+              <Box width="45%" px={1}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('modelpricePage.extraRatios')}
+                </Typography>
+              </Box>
+              <Box width="10%" px={1} textAlign="right">
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('common.actions')}
+                </Typography>
+              </Box>
             </Box>
-            <Box width="20%" px={1}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('modelpricePage.price')} ({unit})
-              </Typography>
-            </Box>
-            <Box width="45%" px={1}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('modelpricePage.extraRatios')}
-              </Typography>
-            </Box>
-            <Box width="10%" px={1} textAlign="right">
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('common.actions')}
-              </Typography>
-            </Box>
-          </Box>
 
-          {/* 表格内容 */}
-          <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
-            <Box component="tbody">
-              {paginatedRows.map((price) => (
-                <PriceCard
-                  key={price.id}
-                  price={price}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                  ownedby={ownedby}
-                  unit={unit}
-                />
-              ))}
+            {/* 表格内容 */}
+            <Box
+              component="table"
+              sx={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                minWidth: { xs: '800px', sm: '100%' } // 设置最小宽度确保在小屏幕上内容不会挤压
+              }}
+            >
+              <Box component="tbody">
+                {paginatedRows.map((price) => (
+                  <PriceCard
+                    key={price.id}
+                    price={price}
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteClick}
+                    ownedby={ownedby}
+                    unit={unit}
+                  />
+                ))}
+              </Box>
             </Box>
           </Box>
 

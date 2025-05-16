@@ -1,6 +1,7 @@
 package relay
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"net/http"
@@ -25,8 +26,12 @@ type relayGeminiOnly struct {
 
 func NewRelayGeminiOnly(c *gin.Context) *relayGeminiOnly {
 	c.Set("allow_channel_type", AllowGeminiChannelType)
-	relay := &relayGeminiOnly{}
-	relay.c = c
+	relay := &relayGeminiOnly{
+		relayBase: relayBase{
+			allowHeartbeat: true,
+			c:              c,
+		},
+	}
 
 	return relay
 }
@@ -102,6 +107,10 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		doneStr := func() string {
 			return ""
 		}
@@ -114,6 +123,10 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		err = responseJsonClient(r.c, response)
 	}
 
@@ -124,12 +137,28 @@ func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done boo
 	return
 }
 
-func (r *relayGeminiOnly) HandleError(err *types.OpenAIErrorWithStatusCode) {
+func (r *relayGeminiOnly) GetError(err *types.OpenAIErrorWithStatusCode) (int, any) {
 	newErr := FilterOpenAIErr(r.c, err)
 
 	geminiErr := gemini.OpenaiErrToGeminiErr(&newErr)
 
-	r.c.JSON(newErr.StatusCode, geminiErr.GeminiErrorResponse)
+	return newErr.StatusCode, geminiErr.GeminiErrorResponse
+}
+
+func (r *relayGeminiOnly) HandleJsonError(err *types.OpenAIErrorWithStatusCode) {
+	statusCode, response := r.GetError(err)
+	r.c.JSON(statusCode, response)
+}
+
+func (r *relayGeminiOnly) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
+	_, response := r.GetError(err)
+
+	str, jsonErr := json.Marshal(response)
+	if jsonErr != nil {
+		return
+	}
+	r.c.Writer.Write([]byte("data: " + string(str) + "\n\n"))
+	r.c.Writer.Flush()
 }
 
 func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int) (int, error) {

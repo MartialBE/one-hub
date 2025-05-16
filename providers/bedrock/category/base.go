@@ -44,14 +44,18 @@ func GetModelName(modelName string) string {
 		"us.claude-3-5-sonnet-20240620": "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
 		"us.claude-3-5-sonnet-20241022": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
 		"us.claude-3-5-haiku-20241022":  "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+		"us.claude-3-7-sonnet-20250219": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
 
 		"eu.claude-3-sonnet-20240229":   "eu.anthropic.claude-3-sonnet-20240229-v1:0",
 		"eu.claude-3-5-sonnet-20240620": "eu.anthropic.claude-3-5-sonnet-20240620-v1:0",
 		"eu.claude-3-haiku-20240307":    "eu.anthropic.claude-3-haiku-20240307-v1:0",
+		"eu.claude-3-7-sonnet-20250219": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
 
 		"apac.claude-3-sonnet-20240229":   "apac.anthropic.claude-3-sonnet-20240229-v1:0",
 		"apac.claude-3-5-sonnet-20240620": "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
 		"apac.claude-3-haiku-20240307":    "apac.anthropic.claude-3-haiku-20240307-v1:0",
+		"apac.claude-3-7-sonnet-20250219": "apac.anthropic.claude-3-7-sonnet-20250219-v1:0",
+
 		//base model id
 		"claude-3-7-sonnet-20250219": "anthropic.claude-3-7-sonnet-20250219-v1:0",
 		"claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0",

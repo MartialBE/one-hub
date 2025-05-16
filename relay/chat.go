@@ -24,8 +24,12 @@ type relayChat struct {
 }
 
 func NewRelayChat(c *gin.Context) *relayChat {
-	relay := &relayChat{}
-	relay.c = c
+	relay := &relayChat{
+		relayBase: relayBase{
+			allowHeartbeat: true,
+			c:              c,
+		},
+	}
 	return relay
 }
 
@@ -42,8 +46,8 @@ func (r *relayChat) setRequest() error {
 		r.c.Set("skip_only_chat", true)
 	}
 
-	if !r.chatRequest.Stream && r.chatRequest.StreamOptions != nil {
-		return errors.New("the 'stream_options' parameter is only allowed when 'stream' is enabled")
+	if !r.chatRequest.Stream {
+		r.chatRequest.StreamOptions = nil
 	}
 
 	r.setOriginalModel(r.chatRequest.Model)
@@ -101,6 +105,10 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 			return
 		}
 
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		doneStr := func() string {
 			return r.getUsageResponse()
 		}
@@ -114,6 +122,11 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 		if err != nil {
 			return
 		}
+
+		if r.heartbeat != nil {
+			r.heartbeat.Stop()
+		}
+
 		err = responseJsonClient(r.c, response)
 
 	}

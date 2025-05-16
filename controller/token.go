@@ -116,7 +116,15 @@ func AddToken(c *gin.Context) {
 				"success": false,
 				"message": err.Error(),
 			})
+			return
 		}
+	}
+
+	setting := token.Setting.Data()
+	err = validateTokenSetting(&setting)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
 	}
 
 	cleanToken := model.Token{
@@ -129,6 +137,7 @@ func AddToken(c *gin.Context) {
 		RemainQuota:    token.RemainQuota,
 		UnlimitedQuota: token.UnlimitedQuota,
 		Group:          token.Group,
+		Setting:        token.Setting,
 	}
 	err = cleanToken.Insert()
 	if err != nil {
@@ -180,6 +189,14 @@ func UpdateToken(c *gin.Context) {
 		})
 		return
 	}
+
+	setting := token.Setting.Data()
+	err = validateTokenSetting(&setting)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
 	cleanToken, err := model.GetTokenByIds(token.Id, userId)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -225,6 +242,7 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.RemainQuota = token.RemainQuota
 		cleanToken.UnlimitedQuota = token.UnlimitedQuota
 		cleanToken.Group = token.Group
+		cleanToken.Setting = token.Setting
 	}
 	err = cleanToken.Update()
 	if err != nil {
@@ -254,6 +272,20 @@ func validateTokenGroup(tokenGroup string, userId int) error {
 
 	if !groupRatio.Public && userGroup != tokenGroup {
 		return errors.New("当前用户组无权使用指定的分组")
+	}
+
+	return nil
+}
+
+func validateTokenSetting(setting *model.TokenSetting) error {
+	if setting == nil {
+		return nil
+	}
+
+	if setting.Heartbeat.Enabled {
+		if setting.Heartbeat.TimeoutSeconds < 30 || setting.Heartbeat.TimeoutSeconds > 90 {
+			return errors.New("heartbeat timeout seconds must be between 30 and 90")
+		}
 	}
 
 	return nil

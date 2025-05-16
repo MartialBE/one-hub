@@ -54,6 +54,9 @@ func GetStatus(c *gin.Context) {
 			"SafeToolName":        config.SafeToolName,
 			"SafeKeyWords":        config.SafeKeyWords,
 			"UserInvoiceMonth":    config.UserInvoiceMonth,
+			"UptimeDomain":        config.UPTIMEKUMA_DOMAIN,
+			"UptimePageName":      config.UPTIMEKUMA_STATUS_PAGE_NAME,
+			"UptimeEnabled":       config.UPTIMEKUMA_ENABLE,
 		},
 	})
 }

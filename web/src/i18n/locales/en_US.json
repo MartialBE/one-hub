@@ -1153,7 +1153,11 @@
     "usedQuota": "Used Quota",
     "userGroup": "group",
     "apiRate": "",
-    "apiRateTip": ""
+    "apiRateTip": "",
+    "heartbeat": "Heartbeat setting (Experimental)",
+    "heartbeatTip": "Heartbeat setting means that when you make a stream request, if there is no response for a long time, your client may disconnect due to the timeout mechanism. To prevent this, you can enable the heartbeat setting. When the request exceeds the start time you set and there is no response, we will send a heartbeat request every 5 seconds to keep the connection. Note: If you are using a relay program, please do not enable this setting, it may cause unexpected issues.",
+    "heartbeatTimeout": "Heartbeat start time (unit: seconds)",
+    "heartbeatTimeoutHelperText": "Minimum value: 30 seconds, maximum value: 90 seconds"
   },
   "topup": "Top-up",
   "topupCard": {

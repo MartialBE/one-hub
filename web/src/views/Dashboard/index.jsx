@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, Stack, Typography, Button } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from 'ui-component/chart/ApexCharts';
@@ -13,6 +13,29 @@ import InviteCard from './component/InviteCard';
 import QuotaLogWeek from './component/QuotaLogWeek';
 import QuickStartCard from './component/QuickStartCard';
 import RPM from './component/RPM';
+import StatusPanel from './component/StatusPanel';
+import { useSelector } from 'react-redux';
+
+// TabPanel component for tab content
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`dashboard-tabpanel-${index}`}
+      aria-labelledby={`dashboard-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ pt: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
@@ -22,8 +45,14 @@ const Dashboard = () => {
   const [tokenChart, setTokenChart] = useState(null);
   const { t } = useTranslation();
   const [modelUsageData, setModelUsageData] = useState([]);
+  const [currentTab, setCurrentTab] = useState(0);
 
   const [dashboardData, setDashboardData] = useState(null);
+  const siteInfo = useSelector((state) => state.siteInfo);
+
+  const handleTabChange = (newValue) => {
+    setCurrentTab(newValue);
+  };
 
   const userDashboard = async () => {
     try {
@@ -52,7 +81,8 @@ const Dashboard = () => {
     userDashboard();
   }, []);
 
-  return (
+  // Dashboard content
+  const dashboardContent = (
     <Grid container spacing={gridSpacing}>
       {/* 支持的模型   */}
       <Grid item xs={12}>
@@ -122,6 +152,73 @@ const Dashboard = () => {
         </Grid>
       </Grid>
     </Grid>
+  );
+
+  return (
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Stack direction="row" alignItems="center" spacing={3}>
+          <Stack direction="column" spacing={1}>
+            <Typography variant="h2">{t('dashboard_index.title')}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              Dashboard
+            </Typography>
+          </Stack>
+
+          {siteInfo.UptimeEnabled && (
+            <Stack direction="row" spacing={1}>
+              <Button 
+                onClick={() => handleTabChange(0)}
+                variant={currentTab === 0 ? "contained" : "text"}
+                size="small"
+                disableElevation
+                sx={{
+                  padding: '6px 16px',
+                  borderRadius: '4px',
+                  backgroundColor: currentTab === 0 ? 'primary.main' : 'transparent',
+                  color: currentTab === 0 ? 'white' : 'text.primary',
+                  '&:hover': {
+                    backgroundColor: currentTab === 0 ? 'primary.dark' : 'action.hover'
+                  }
+                }}
+              >
+                {t('dashboard_index.tab_dashboard')}
+              </Button>
+              <Button 
+                onClick={() => handleTabChange(1)}
+                variant={currentTab === 1 ? "contained" : "text"}
+                size="small"
+                disableElevation
+                sx={{
+                  padding: '6px 16px',
+                  borderRadius: '4px',
+                  backgroundColor: currentTab === 1 ? 'primary.main' : 'transparent',
+                  color: currentTab === 1 ? 'white' : 'text.primary',
+                  '&:hover': {
+                    backgroundColor: currentTab === 1 ? 'primary.dark' : 'action.hover'
+                  }
+                }}
+              >
+                {t('dashboard_index.tab_status')}
+              </Button>
+            </Stack>
+          )}
+        </Stack>
+      </Stack>
+
+      {siteInfo.UptimeEnabled ? (
+        <>
+          <TabPanel value={currentTab} index={0}>
+            {dashboardContent}
+          </TabPanel>
+          <TabPanel value={currentTab} index={1}>
+            <StatusPanel />
+          </TabPanel>
+        </>
+      ) : (
+        dashboardContent
+      )}
+    </>
   );
 };
 
