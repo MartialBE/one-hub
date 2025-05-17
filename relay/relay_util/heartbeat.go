@@ -2,9 +2,7 @@ package relay_util
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"one-api/common/logger"
 	"one-api/common/requester"
 	"sync/atomic"
 	"time"
@@ -81,10 +79,8 @@ func (h *Heartbeat) writeHeader() bool {
 
 // Start 启动心跳机制，在指定的超时时间后开始发送心跳
 func (h *Heartbeat) Start() {
-	logger.LogDebug(h.c.Request.Context(), "Start")
 	// 如果已停止，不允许启动
 	if atomic.LoadInt32(&h.stopped) == 1 {
-		logger.LogDebug(h.c.Request.Context(), "Start: stopped")
 		return
 	}
 
@@ -99,13 +95,11 @@ func (h *Heartbeat) Start() {
 			case <-timer.C:
 				// 检查是否已停止
 				if atomic.LoadInt32(&h.stopped) == 1 {
-					logger.LogDebug(h.c.Request.Context(), "Start: stopped 2")
 					return
 				}
 
 				// 写入头部
 				if !h.writeHeader() {
-					logger.LogDebug(h.c.Request.Context(), "Start: writeHeader failed")
 					return
 				}
 
@@ -116,18 +110,15 @@ func (h *Heartbeat) Start() {
 				for {
 					select {
 					case <-h.ctx.Done():
-						logger.LogDebug(h.c.Request.Context(), "Start: ctx.Done")
 						// 心跳被取消
 						return
 					case <-h.c.Request.Context().Done():
 						// 客户端已断开
-						logger.LogDebug(h.c.Request.Context(), "Start: c.Request.Context().Done")
 						h.Stop() // 确保停止
 						return
 					case <-ticker.C:
 						// 检查是否已停止
 						if atomic.LoadInt32(&h.stopped) == 1 {
-							logger.LogDebug(h.c.Request.Context(), "Start: stopped 3")
 							return
 						}
 
@@ -140,7 +131,6 @@ func (h *Heartbeat) Start() {
 						}
 						if err != nil {
 							// 发生错误，停止心跳
-							logger.LogDebug(h.c.Request.Context(), fmt.Sprintf("Start: Write failed: %v", err))
 							h.Stop()
 							return
 						}
@@ -148,11 +138,9 @@ func (h *Heartbeat) Start() {
 					}
 				}
 			case <-h.ctx.Done():
-				logger.LogDebug(h.c.Request.Context(), "Start: ctx.Done 2")
 				return
 			case <-h.c.Request.Context().Done():
 				// 客户端已断开
-				logger.LogDebug(h.c.Request.Context(), "Start: c.Request.Context().Done 2")
 				h.Stop()
 				return
 			}
@@ -180,10 +168,8 @@ func (h *Heartbeat) IsSafeWriteStream() bool {
 	h.Stop()
 
 	if h.isStream {
-		logger.LogDebug(h.c.Request.Context(), "IsSafeWriteStream: isStream")
 		return h.HasWrittenHeader()
 	}
 
-	logger.LogDebug(h.c.Request.Context(), "IsSafeWriteStream: false")
 	return false
 }
