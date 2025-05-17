@@ -2,6 +2,7 @@ package relay
 
 import (
 	"encoding/json"
+	"one-api/common/logger"
 	"one-api/model"
 	"one-api/relay/relay_util"
 	"one-api/types"
@@ -134,16 +135,19 @@ func (r *relayBase) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
 
 func (r *relayBase) SetHeartbeat(isStream bool) *relay_util.Heartbeat {
 	if !r.allowHeartbeat {
+		logger.LogDebug(r.c.Request.Context(), "SetHeartbeat: allowHeartbeat is false")
 		return nil
 	}
 
 	setting, exists := r.c.Get("token_setting")
 	if !exists {
+		logger.LogDebug(r.c.Request.Context(), "SetHeartbeat: token_setting not found")
 		return nil
 	}
 
 	tokenSetting, ok := setting.(*model.TokenSetting)
 	if !ok || !tokenSetting.Heartbeat.Enabled {
+		logger.LogDebug(r.c.Request.Context(), "SetHeartbeat: token_setting.Heartbeat.Enabled is false")
 		return nil
 	}
 

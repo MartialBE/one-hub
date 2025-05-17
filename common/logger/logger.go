@@ -20,6 +20,7 @@ const (
 	loggerINFO  = "INFO"
 	loggerWarn  = "WARN"
 	loggerError = "ERR"
+	loggerDEBUG = "DEBUG"
 )
 const (
 	RequestIdKey = "X-Oneapi-Request-Id"
@@ -142,6 +143,10 @@ func SysError(s string) {
 	Logger.Error("[SYS] | " + s)
 }
 
+func SysDebug(s string) {
+	Logger.Debug("[SYS] | " + s)
+}
+
 func LogInfo(ctx context.Context, msg string) {
 	logHelper(ctx, loggerINFO, msg)
 }
@@ -152,6 +157,10 @@ func LogWarn(ctx context.Context, msg string) {
 
 func LogError(ctx context.Context, msg string) {
 	logHelper(ctx, loggerError, msg)
+}
+
+func LogDebug(ctx context.Context, msg string) {
+	logHelper(ctx, loggerDEBUG, msg)
 }
 
 func logHelper(ctx context.Context, level string, msg string) {
@@ -170,6 +179,8 @@ func logHelper(ctx context.Context, level string, msg string) {
 		Logger.Warn(logMsg)
 	case loggerError:
 		Logger.Error(logMsg)
+	case loggerDEBUG:
+		Logger.Debug(logMsg)
 	default:
 		Logger.Info(logMsg)
 	}
