@@ -3,6 +3,7 @@ package relay_util
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"one-api/common/logger"
 	"one-api/common/requester"
 	"sync/atomic"
@@ -72,7 +73,8 @@ func (h *Heartbeat) writeHeader() bool {
 	if h.isStream {
 		requester.SetEventStreamHeaders(h.c)
 	} else {
-		h.c.Header("Content-Type", "application/json")
+		h.c.Writer.Header().Set("Content-Type", "application/json")
+		h.c.Writer.WriteHeader(http.StatusOK)
 	}
 	return true
 }
