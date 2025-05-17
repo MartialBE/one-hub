@@ -117,7 +117,7 @@ export default function I18nButton() {
                     justifyContent: 'center'
                   }}
                 >
-                  <FlagComponent style={{ width:'90%',height:'77%',borderRadius: '0.25rem' }} />
+                  <FlagComponent style={{ width: '90%', height: '77%', borderRadius: '0.25rem' }} />
                 </Box>
               )}
               <Typography variant="body1">{item.name}</Typography>

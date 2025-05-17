@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/database"
 	"one-api/common/logger"
 	"one-api/common/redis"
 	"one-api/common/stmp"
 	"one-api/common/utils"
 
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -38,7 +38,7 @@ type Token struct {
 	Group          string         `json:"group" gorm:"default:''"`
 	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Setting datatypes.JSONType[TokenSetting] `json:"setting" form:"setting" gorm:"type:json"`
+	Setting database.JSONType[TokenSetting] `json:"setting" form:"setting" gorm:"type:json"`
 }
 
 var allowedTokenOrderFields = map[string]bool{
