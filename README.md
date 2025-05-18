@@ -72,6 +72,11 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 - 支持支付
 - 支持配置用户组 RPM
 - 支持`Prometheus`监控
+- 支持`Uptime Kuma`状态监控(通过环境变量或者配置文件开启)
+- 支持用户分组自动升级
+- 支持用户月度账单生成(通过环境变量或者配置文件开启)
+- 支持多策略(`覆盖更新`,`只更新现有价格`,`只新增价格`)模型价格自动更新(通过环境变量或者配置文件开启）
+- 支持`Gemini`、`Claude`格式API请求（详见[文档](https://one-hub-doc.vercel.app/)）
 
 ## 当前支持的供应商
 
