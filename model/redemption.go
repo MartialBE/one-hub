@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/logger"
 	"one-api/common/utils"
 
 	"gorm.io/gorm"
@@ -85,6 +86,13 @@ func Redeem(key string, userId int, ip string) (quota int, err error) {
 	if err != nil {
 		return 0, errors.New("兑换失败，" + err.Error())
 	}
+
+	// Try to upgrade user group based on cumulative recharge amount
+	err = CheckAndUpgradeUserGroup(userId, redemption.Quota)
+	if err != nil {
+		logger.SysError("failed to check and upgrade user group: " + err.Error())
+	}
+
 	RecordQuotaLog(userId, LogTypeTopup, redemption.Quota, ip, fmt.Sprintf("通过兑换码充值 %s", common.LogQuota(redemption.Quota)))
 	return redemption.Quota, nil
 }
