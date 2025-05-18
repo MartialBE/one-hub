@@ -26,7 +26,10 @@ const validationSchema = Yup.object().shape({
   is_edit: Yup.boolean(),
   symbol: Yup.string().required('symbol is required'),
   name: Yup.string().required('name is required'),
-  ratio: Yup.number().required('ratio is required')
+  ratio: Yup.number().required('ratio is required'),
+  promotion: Yup.boolean(),
+  min: Yup.number(),
+  max: Yup.number()
 });
 
 const originInputs = {
@@ -35,7 +38,10 @@ const originInputs = {
   name: '',
   ratio: 1,
   public: false,
-  api_rate: 300
+  api_rate: 300,
+  promotion: false,
+  min: 0,
+  max: 0
 };
 
 const EditModal = ({ open, userGroupId, onCancel, onOk }) => {
@@ -198,6 +204,63 @@ const EditModal = ({ open, userGroupId, onCancel, onOk }) => {
                 <FormControlLabel
                   control={
                     <Switch
+                      checked={values.promotion}
+                      onClick={() => {
+                        setFieldValue('promotion', !values.promotion);
+                      }}
+                    />
+                  }
+                  label={t('userGroup.promotion')}
+                />
+                <FormHelperText id="helper-tex-channel-promotion-label"> {t('userGroup.promotionTip')} </FormHelperText>
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.min && errors.min)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-min-label">{t('userGroup.min')}</InputLabel>
+                <OutlinedInput
+                  id="channel-min-label"
+                  label={t('userGroup.min')}
+                  type="number"
+                  value={values.min}
+                  name="min"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  aria-describedby="helper-text-channel-min-label"
+                />
+                {touched.min && errors.min ? (
+                  <FormHelperText error id="helper-tex-channel-min-label">
+                    {t(errors.min)}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText id="helper-tex-channel-min-label"> {t('userGroup.minTip')} </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.max && errors.max)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-max-label">{t('userGroup.max')}</InputLabel>
+                <OutlinedInput
+                  id="channel-max-label"
+                  label={t('userGroup.max')}
+                  type="number"
+                  value={values.max}
+                  name="max"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  aria-describedby="helper-text-channel-max-label"
+                />
+                {touched.max && errors.max ? (
+                  <FormHelperText error id="helper-tex-channel-max-label">
+                    {t(errors.max)}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText id="helper-tex-channel-max-label"> {t('userGroup.maxTip')} </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
                       checked={values.public}
                       onClick={() => {
                         setFieldValue('public', !values.public);
@@ -207,6 +270,7 @@ const EditModal = ({ open, userGroupId, onCancel, onOk }) => {
                   label={t('userGroup.public')}
                 />
               </FormControl>
+
               <DialogActions>
                 <Button onClick={onCancel}>{t('userPage.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
