@@ -29,6 +29,7 @@ func getGithubConfig() base.ProviderConfig {
 		BaseURL:         "https://models.inference.ai.azure.com",
 		ChatCompletions: "/chat/completions",
 		Embeddings:      "/embeddings",
+		ModelList:       "/models",
 	}
 }
 
