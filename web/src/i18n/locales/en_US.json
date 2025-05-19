@@ -139,7 +139,15 @@
     "removePrefix": "Remove prefix",
     "removeSuffix": "Remove suffix",
     "collapseList": "Collapse list",
-    "expandList": "Expand list"
+    "expandList": "Expand list",
+    "convertToLowercase": "Convert model names to lowercase",
+    "filterMappedModels": "Do not fill the model name before mapping.",
+    "overwriteModels": "Overwrite existing model list",
+    "overwriteModelsTip": "When enabled, the existing model list will be cleared and only the selected models will be preserved",
+    "overwriteMappings": "Overwrite existing mappings",
+    "overwriteMappingsTip": "When enabled, existing mappings will be cleared and only new mappings will be preserved",
+    "clearModels": "Reset",
+    "clearModelsTip": "Reset all selected models"
   },
   "channel_index": {
     "AzureApiVersion": "Azure version number",
@@ -279,6 +287,7 @@
     "processing": "Processing...",
     "registerOk": "registration success!",
     "registerTip": "The verification code was sent successfully, please check your email!",
+    "reset": "Reset",
     "saveSuccess": "Saved successfully!",
     "serverError": "Server Error",
     "show": "show",

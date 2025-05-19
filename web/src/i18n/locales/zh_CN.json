@@ -228,7 +228,15 @@
     "removePrefix": "删除前缀",
     "removeSuffix": "删除后缀",
     "collapseList": "收起列表",
-    "expandList": "展开列表"
+    "expandList": "展开列表",
+    "convertToLowercase": "模型名称转小写",
+    "filterMappedModels": "不填充映射前的模型名称",
+    "overwriteModels": "覆盖原有模型列表",
+    "overwriteModelsTip": "启用后将清空原有的模型列表，仅保留此次选择的模型",
+    "overwriteMappings": "覆盖原有映射关系",
+    "overwriteMappingsTip": "启用后将清空原有的映射关系，仅保留此次创建的映射",
+    "clearModels": "重置",
+    "clearModelsTip": "重置所有已选择的模型"
   },
   "token_index": {
     "token": "令牌",
@@ -1057,6 +1065,7 @@
     "back": "返回",
     "none": "无",
     "show": "显示",
+    "reset": "重置",
     "copyUrl": "复制地址",
     "downImg": "下载图片",
     "newWindos": "新窗口打开",
