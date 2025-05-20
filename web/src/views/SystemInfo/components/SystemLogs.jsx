@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Stack,
@@ -74,8 +74,7 @@ const SystemLogs = () => {
   };
 
   // Fetch logs from the API
-  let fetchLogs;
-  fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const response = await axios.post('/api/system_info/log', {
         count: maxEntries
@@ -91,14 +90,33 @@ const SystemLogs = () => {
     } catch (error) {
       console.error('Error fetching logs:', error);
     }
-  };
+  }, [maxEntries, processLogEntry]);
 
-  // Fetch logs on component mount and when parameters change
+  // Fetch logs on component mount (only once)
   useEffect(() => {
-    // Initial fetch
+    // Initial fetch only when component mounts
     fetchLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);  // Empty dependency array means this runs once on mount
 
-    // Set up interval for periodic updates
+  // Fetch logs when maxEntries changes
+  useEffect(() => {
+    // Only fetch logs when maxEntries changes, not on initial render
+    const controller = new AbortController();
+
+    // Skip the initial render
+    if (maxEntries !== 50) { // 50 is the default value
+      fetchLogs();
+    }
+
+    return () => {
+      controller.abort();
+    };
+  }, [maxEntries, fetchLogs]);
+
+  // Set up auto-refresh interval
+  useEffect(() => {
+    // Only set up interval if autoRefresh is enabled
     let interval;
     if (autoRefresh) {
       interval = setInterval(fetchLogs, refreshInterval);
@@ -107,7 +125,7 @@ const SystemLogs = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [autoRefresh, fetchLogs, maxEntries, refreshInterval]);
+  }, [autoRefresh, fetchLogs, refreshInterval]);
 
   // Filter logs based on search term
   useEffect(() => {
