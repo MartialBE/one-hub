@@ -30,7 +30,9 @@ import {
   Paper,
   Skeleton,
   Tooltip,
-  Alert
+  Alert,
+  Container,
+  ButtonGroup
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useTranslation } from 'react-i18next';
@@ -54,6 +56,10 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
   const [removePrefixOrSuffix, setRemovePrefixOrSuffix] = useState(true);
   const [prefixOrSuffix, setPrefixOrSuffix] = useState('');
   const [addPlusSign, setAddPlusSign] = useState(false);
+  const [convertToLowercase, setConvertToLowercase] = useState(false);
+  const [filterMappedModels, setFilterMappedModels] = useState(false);
+  const [overwriteMappings, setOverwriteMappings] = useState(false);
+  const [overwriteModels, setOverwriteModels] = useState(false);
   const [mappingPreview, setMappingPreview] = useState({});
   const [modelsListCollapsed, setModelsListCollapsed] = useState(false);
 
@@ -78,7 +84,10 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
           setSelectedModels(modelsList);
         } catch (e) {
           console.error('Error parsing existing models', e);
+          setSelectedModels([]);
         }
+      } else {
+        setSelectedModels([]);
       }
 
       if (channelValues?.base_url) {
@@ -89,6 +98,10 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
       setRemovePrefixOrSuffix(true);
       setPrefixOrSuffix('');
       setAddPlusSign(false);
+      setConvertToLowercase(false);
+      setFilterMappedModels(false);
+      setOverwriteMappings(false);
+      setOverwriteModels(false);
       setMappingPreview({});
     }
   }, [open, channelValues, t]);
@@ -121,15 +134,21 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
         key = key.split('/').pop();
       }
 
+      if (convertToLowercase) {
+        key = key.toLowerCase();
+      }
+
       if (addPlusSign) {
         value = `+${value}`;
       }
 
-      preview[key] = value;
+      if (key !== value) {
+        preview[key] = value;
+      }
     });
 
     setMappingPreview(preview);
-  }, [selectedModels, addToMapping, removePrefixOrSuffix, prefixOrSuffix, addPlusSign]);
+  }, [selectedModels, addToMapping, removePrefixOrSuffix, prefixOrSuffix, addPlusSign, convertToLowercase]);
 
   const handleOpenAIModeChange = (event) => {
     const isChecked = event.target.checked;
@@ -287,16 +306,33 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
   const filteredModelsByGroup = getFilteredModelsByGroup();
 
   const handleConfirm = () => {
-    if (addToMapping) {
-      const mappings = Object.entries(mappingPreview).map(([key, value], index) => ({
-        index,
-        key,
-        value
-      }));
-      onConfirm(selectedModels, mappings);
-    } else {
-      onConfirm(selectedModels);
+    const mappings = addToMapping
+      ? Object.entries(mappingPreview).map(([key, value], index) => ({
+          index,
+          key,
+          value
+        }))
+      : [];
+
+    let modelsToSubmit = [...selectedModels];
+
+    if (addToMapping && mappings.length > 0) {
+      if (filterMappedModels) {
+        const mappedValues = mappings.map(m => m.value.startsWith('+') ? m.value.substring(1) : m.value);
+        modelsToSubmit = selectedModels.filter(model => !mappedValues.includes(model.id));
+      }
+
+      const mappedModels = mappings.map(mapping => {
+        return { id: mapping.key, group: t('channel_edit.customModelTip') };
+      });
+
+      const existingIds = new Set(modelsToSubmit.map(model => model.id));
+      const newMappedModels = mappedModels.filter(model => !existingIds.has(model.id));
+
+      modelsToSubmit = [...modelsToSubmit, ...newMappedModels];
     }
+    
+    onConfirm(modelsToSubmit, mappings, overwriteModels, overwriteMappings);
     onClose();
   };
 
@@ -308,6 +344,10 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
     setAddToMapping(false);
     setPrefixOrSuffix('');
     setAddPlusSign(false);
+    setConvertToLowercase(false);
+    setFilterMappedModels(false);
+    setOverwriteMappings(false);
+    setOverwriteModels(false);
     setMappingPreview({});
     onClose();
   };
@@ -563,6 +603,21 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
                   </span>
                 </Tooltip>
 
+                <Tooltip title={t('channel_edit.clearModelsTip')} placement="top">
+                    <span>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setSelectedModels([])}
+                        startIcon={<Icon icon="mdi:refresh" />}
+                        disabled={selectedModels.length === 0}
+                        size="small"
+                        sx={{ whiteSpace: 'nowrap', flex: { xs: 1, sm: 'none' } }}
+                      >
+                        {t('common.reset')}
+                      </Button>
+                    </span>
+                  </Tooltip>
+
                 <Tooltip title={modelsListCollapsed ? t('channel_edit.expandList') : t('channel_edit.collapseList')}>
                   <span>
                     <IconButton
@@ -717,6 +772,19 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
                 maxHeight: modelsListCollapsed ? { xs: '300px', sm: '400px' } : 'none'
               }}
             >
+              <FormControlLabel
+                control={<Switch checked={overwriteModels} onChange={(e) => setOverwriteModels(e.target.checked)} color="primary" />}
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Icon icon="mdi:playlist-remove" style={{ marginRight: 8 }} />
+                    {t('channel_edit.overwriteModels')}
+                    <Tooltip title={t('channel_edit.overwriteModelsTip')} placement="top" arrow>
+                      <Icon icon="mdi:help-circle-outline" style={{ marginLeft: 4, opacity: 0.7 }} />
+                    </Tooltip>
+                  </Box>
+                }
+                sx={{ m: 0 }}
+              />
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                 <FormControlLabel
                   control={<Switch checked={addToMapping} onChange={(e) => setAddToMapping(e.target.checked)} color="primary" />}
@@ -776,6 +844,31 @@ const ModelSelectorModal = ({ open, onClose, onConfirm, channelValues, prices })
                   <FormControlLabel
                     control={<Switch checked={addPlusSign} onChange={(e) => setAddPlusSign(e.target.checked)} />}
                     label={t('channel_edit.addPlusSign')}
+                    sx={{ my: 0 }}
+                  />
+
+                  <FormControlLabel
+                    control={<Switch checked={convertToLowercase} onChange={(e) => setConvertToLowercase(e.target.checked)} />}
+                    label={t('channel_edit.convertToLowercase')}
+                    sx={{ my: 0 }}
+                  />
+
+                  <FormControlLabel
+                    control={<Switch checked={filterMappedModels} onChange={(e) => setFilterMappedModels(e.target.checked)} />}
+                    label={t('channel_edit.filterMappedModels')}
+                    sx={{ my: 0 }}
+                  />
+                  
+                  <FormControlLabel
+                    control={<Switch checked={overwriteMappings} onChange={(e) => setOverwriteMappings(e.target.checked)} />}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {t('channel_edit.overwriteMappings')}
+                        <Tooltip title={t('channel_edit.overwriteMappingsTip')} placement="top" arrow>
+                          <Icon icon="mdi:help-circle-outline" style={{ marginLeft: 4, opacity: 0.7 }} />
+                        </Tooltip>
+                      </Box>
+                    }
                     sx={{ my: 0 }}
                   />
 
