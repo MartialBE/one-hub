@@ -19,11 +19,11 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
 import axios from 'axios';
 
-
 // System Logs Component
-const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
+const SystemLogs = () => {
   const { t } = useTranslation();
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState(5000); // Default: 5 seconds
   const [maxEntries, setMaxEntries] = useState(50);
   const [logs, setLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,7 +74,8 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
   };
 
   // Fetch logs from the API
-  const fetchLogs = async () => {
+  let fetchLogs;
+  fetchLogs = async () => {
     try {
       const response = await axios.post('/api/system_info/log', {
         count: maxEntries
@@ -106,7 +107,7 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [autoRefresh, maxEntries, refreshInterval]);
+  }, [autoRefresh, fetchLogs, maxEntries, refreshInterval]);
 
   // Filter logs based on search term
   useEffect(() => {
@@ -136,8 +137,6 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
     const value = parseInt(event.target.value);
     if (!isNaN(value) && value > 0 && value <= 500) {
       setMaxEntries(value);
-      // Fetch new logs with updated maxEntries
-      // The useEffect will handle this when maxEntries changes
     }
   };
 
@@ -149,13 +148,17 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
   // Clear logs display
   const handleClearLogs = () => {
     setLogs([]);
-    // Optionally fetch a smaller number of logs
-    // fetchLogs();
   };
 
   // Clear search
   const handleClearSearch = () => {
     setSearchTerm('');
+  };
+
+  // Handle refresh interval change
+  const handleRefreshIntervalChange = (event) => {
+    const value = parseInt(event.target.value);
+    setRefreshInterval(value);
   };
 
   // Get log type color
@@ -194,7 +197,7 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
             <Select
               labelId="refresh-interval-label"
               value={refreshInterval}
-              onChange={onRefreshIntervalChange}
+              onChange={handleRefreshIntervalChange}
               label={t('Refresh Interval')}
               size="small"
               variant={'outlined'}
@@ -222,6 +225,11 @@ const SystemLogs = ({ refreshInterval = 3000, onRefreshIntervalChange }) => {
         </Stack>
       }
     >
+      {/* Prompt Message */}
+      <Typography variant="caption" color="textSecondary" sx={{ display: 'block', textAlign: 'center', mb: 2 }}>
+        {t('view_more_logs_on_server')}
+      </Typography>
+
       {/* Search Box */}
       <Box sx={{ mb: 2 }}>
         <TextField

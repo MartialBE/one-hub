@@ -1,4 +1,5 @@
 {
+  "view_more_logs_on_server": "To view more system logs, please go to the server",
   "invite_count": "Invite Count",
   "invite_reward": "Invite Reward",
   "AZURE_OPENAI_ENDPOINT": "AZURE_OPENAI_ENDPOINT",
