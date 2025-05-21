@@ -175,6 +175,61 @@ func (p *OpenAIProvider) GetRequestHeaders() (headers map[string]string) {
 	return headers
 }
 
+// mergeCustomParams 将自定义参数合并到请求体中
+func (p *OpenAIProvider) mergeCustomParams(requestMap map[string]interface{}, customParams map[string]interface{}) map[string]interface{} {
+	// 检查是否需要覆盖已有参数
+	shouldOverwrite := false
+	if overwriteValue, exists := customParams["overwrite"]; exists {
+		if boolValue, ok := overwriteValue.(bool); ok {
+			shouldOverwrite = boolValue
+		}
+	}
+
+	// 检查是否按照模型粒度控制
+	perModel := false
+	if perModelValue, exists := customParams["per_model"]; exists {
+		if boolValue, ok := perModelValue.(bool); ok {
+			perModel = boolValue
+		}
+	}
+
+	customParamsModel := customParams
+	if perModel {
+		if modelValue, ok := requestMap["model"].(string); ok {
+			if v, exists := customParams[modelValue]; exists {
+				if modelConfig, ok := v.(map[string]interface{}); ok {
+					customParamsModel = modelConfig
+				} else {
+					customParamsModel = map[string]interface{}{}
+				}
+			} else {
+				customParamsModel = map[string]interface{}{}
+			}
+		}
+	}
+
+	// 添加额外参数
+	for key, value := range customParamsModel {
+		// 忽略 keys "stream", "overwrite", and "per_model"
+		if key == "stream" || key == "overwrite" || key == "per_model" {
+			continue
+		}
+		// 根据覆盖设置决定如何添加参数
+		if shouldOverwrite {
+			// 覆盖模式：直接添加/覆盖参数
+			requestMap[key] = value
+		} else {
+			// 非覆盖模式：仅当参数不存在时添加
+			if _, exists := requestMap[key]; !exists {
+				requestMap[key] = value
+			}
+		}
+	}
+
+	return requestMap
+}
+
+// 修改GetRequestTextBody函数中的对应部分
 func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, request any) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url, errWithCode := p.GetSupportedAPIUri(relayMode)
 	if errWithCode != nil {
@@ -205,34 +260,8 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 			return nil, common.ErrorWrapper(err, "unmarshal_request_failed", http.StatusInternalServerError)
 		}
 
-		// 检查是否需要覆盖已有参数
-		shouldOverwrite := false
-		if overwriteValue, exists := customParams["overwrite"]; exists {
-			if boolValue, ok := overwriteValue.(bool); ok {
-				shouldOverwrite = boolValue
-			}
-		}
-
-		// 添加额外参数（不覆盖现有参数）
-		for key, value := range customParams {
-			// 忽略key为stream的参数
-			if key == "stream" {
-				continue
-			}
-			if key == "overwrite" {
-				continue
-			}
-			// 根据覆盖设置决定如何添加参数
-			if shouldOverwrite {
-				// 覆盖模式：直接添加/覆盖参数
-				requestMap[key] = value
-			} else {
-				// 非覆盖模式：仅当参数不存在时添加
-				if _, exists := requestMap[key]; !exists {
-					requestMap[key] = value
-				}
-			}
-		}
+		// 处理自定义额外参数
+		requestMap = p.mergeCustomParams(requestMap, customParams)
 
 		// 使用修改后的请求体创建请求
 		req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(requestMap), p.Requester.WithHeader(headers))
