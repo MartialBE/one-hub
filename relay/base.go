@@ -41,7 +41,7 @@ type RelayBaseInterface interface {
 
 	HandleJsonError(err *types.OpenAIErrorWithStatusCode)
 	HandleStreamError(err *types.OpenAIErrorWithStatusCode)
-	SetHeartbeat() *relay_util.Heartbeat
+	SetHeartbeat(isStream bool) *relay_util.Heartbeat
 }
 
 func (r *relayBase) getRequest() interface{} {
@@ -132,7 +132,7 @@ func (r *relayBase) HandleStreamError(err *types.OpenAIErrorWithStatusCode) {
 	r.c.Writer.Flush()
 }
 
-func (r *relayBase) SetHeartbeat() *relay_util.Heartbeat {
+func (r *relayBase) SetHeartbeat(isStream bool) *relay_util.Heartbeat {
 	if !r.allowHeartbeat {
 		return nil
 	}
@@ -148,7 +148,7 @@ func (r *relayBase) SetHeartbeat() *relay_util.Heartbeat {
 	}
 
 	r.heartbeat = relay_util.NewHeartbeat(
-		r.IsStream(),
+		isStream,
 		relay_util.HeartbeatConfig{
 			TimeoutSeconds:  tokenSetting.Heartbeat.TimeoutSeconds,
 			IntervalSeconds: 5, // 5s 发送一次心跳

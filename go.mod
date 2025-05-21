@@ -17,7 +17,7 @@ require (
 	github.com/bytedance/gopkg v0.1.2
 	github.com/coocood/freecache v1.2.4
 	github.com/coreos/go-oidc/v3 v3.14.1
-	github.com/eko/gocache/lib/v4 v4.1.6
+	github.com/eko/gocache/lib/v4 v4.2.0
 	github.com/eko/gocache/store/freecache/v4 v4.2.2
 	github.com/eko/gocache/store/redis/v4 v4.2.2
 	github.com/gin-contrib/cors v1.7.0
@@ -43,6 +43,7 @@ require (
 	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/stripe/stripe-go/v80 v80.2.0
+	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.20
 	github.com/wneessen/go-mail v0.5.0
 	go.uber.org/zap v1.27.0
@@ -104,7 +105,6 @@ require (
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
@@ -113,6 +113,7 @@ require (
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
+	go.uber.org/mock v0.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
 	golang.org/x/time v0.5.0 // indirect

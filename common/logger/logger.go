@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"one-api/common/utils"
@@ -20,10 +21,73 @@ const (
 	loggerINFO  = "INFO"
 	loggerWarn  = "WARN"
 	loggerError = "ERR"
+	loggerDEBUG = "DEBUG"
 )
 const (
 	RequestIdKey = "X-Oneapi-Request-Id"
 )
+
+// LogEntry represents a single log entry in memory
+type LogEntry struct {
+	Timestamp time.Time
+	Level     string
+	Message   string
+}
+
+// LogHistory stores the latest logs in memory
+type LogHistory struct {
+	entries []LogEntry
+	mutex   sync.RWMutex
+	maxSize int
+}
+
+// Global log history instance with a default capacity of 500 entries
+var logHistory = &LogHistory{
+	entries: make([]LogEntry, 0, 500),
+	maxSize: 500,
+}
+
+// AddEntry adds a new log entry to the history
+func (lh *LogHistory) AddEntry(level, message string) {
+	lh.mutex.Lock()
+	defer lh.mutex.Unlock()
+
+	entry := LogEntry{
+		Timestamp: time.Now(),
+		Level:     level,
+		Message:   message,
+	}
+
+	// Add the new entry
+	lh.entries = append(lh.entries, entry)
+
+	// If we've exceeded the max size, remove the oldest entry
+	if len(lh.entries) > lh.maxSize {
+		lh.entries = lh.entries[1:]
+	}
+}
+
+// GetLatestEntries returns the latest n entries from the log history
+func (lh *LogHistory) GetLatestEntries(n int) []LogEntry {
+	lh.mutex.RLock()
+	defer lh.mutex.RUnlock()
+
+	if n <= 0 || n > len(lh.entries) {
+		n = len(lh.entries)
+	}
+
+	// Get the latest n entries
+	startIdx := len(lh.entries) - n
+	if startIdx < 0 {
+		startIdx = 0
+	}
+
+	// Create a copy of the entries to avoid race conditions
+	result := make([]LogEntry, len(lh.entries)-startIdx)
+	copy(result, lh.entries[startIdx:])
+
+	return result
+}
 
 var Logger *zap.Logger
 
@@ -126,10 +190,16 @@ func getLogDir() string {
 }
 
 func SysLog(s string) {
+	message := "[SYS] | " + s
+
+	// Add to in-memory log history
+	logHistory.AddEntry(loggerINFO, message)
+
+	// Write to log file
 	entry := zapcore.Entry{
 		Level:   zapcore.InfoLevel,
 		Time:    time.Now(),
-		Message: "[SYS] | " + s,
+		Message: message,
 	}
 
 	// 使用 Logger 的核心来直接写入日志，绕过等级检查
@@ -139,7 +209,23 @@ func SysLog(s string) {
 }
 
 func SysError(s string) {
-	Logger.Error("[SYS] | " + s)
+	message := "[SYS] | " + s
+
+	// Add to in-memory log history
+	logHistory.AddEntry(loggerError, message)
+
+	// Write to log file
+	Logger.Error(message)
+}
+
+func SysDebug(s string) {
+	message := "[SYS] | " + s
+
+	// Add to in-memory log history
+	logHistory.AddEntry(loggerDEBUG, message)
+
+	// Write to log file
+	Logger.Debug(message)
 }
 
 func LogInfo(ctx context.Context, msg string) {
@@ -154,8 +240,11 @@ func LogError(ctx context.Context, msg string) {
 	logHelper(ctx, loggerError, msg)
 }
 
-func logHelper(ctx context.Context, level string, msg string) {
+func LogDebug(ctx context.Context, msg string) {
+	logHelper(ctx, loggerDEBUG, msg)
+}
 
+func logHelper(ctx context.Context, level string, msg string) {
 	id, ok := ctx.Value(RequestIdKey).(string)
 	if !ok {
 		id = "unknown"
@@ -163,6 +252,10 @@ func logHelper(ctx context.Context, level string, msg string) {
 
 	logMsg := fmt.Sprintf("%s | %s \n", id, msg)
 
+	// Add to in-memory log history
+	logHistory.AddEntry(level, logMsg)
+
+	// Write to log file
 	switch level {
 	case loggerINFO:
 		Logger.Info(logMsg)
@@ -170,16 +263,30 @@ func logHelper(ctx context.Context, level string, msg string) {
 		Logger.Warn(logMsg)
 	case loggerError:
 		Logger.Error(logMsg)
+	case loggerDEBUG:
+		Logger.Debug(logMsg)
 	default:
 		Logger.Info(logMsg)
 	}
-
 }
 
 func FatalLog(v ...any) {
+	message := fmt.Sprintf("[FATAL] %v | %v \n", time.Now().Format("2006/01/02 - 15:04:05"), v)
 
-	Logger.Fatal(fmt.Sprintf("[FATAL] %v | %v \n", time.Now().Format("2006/01/02 - 15:04:05"), v))
+	// Add to in-memory log history
+	logHistory.AddEntry("FATAL", message)
+
+	// Write to log file
+	Logger.Fatal(message)
 	// t := time.Now()
 	// _, _ = fmt.Fprintf(gin.DefaultErrorWriter, "[FATAL] %v | %v \n", t.Format("2006/01/02 - 15:04:05"), v)
 	os.Exit(1)
+}
+
+// GetLatestLogs gets the latest n logs from memory
+func GetLatestLogs(n int) ([]LogEntry, error) {
+	// Get the latest entries from the in-memory log history
+	entries := logHistory.GetLatestEntries(n)
+
+	return entries, nil
 }

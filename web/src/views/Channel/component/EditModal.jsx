@@ -157,16 +157,22 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
     return modelList;
   };
 
-  const handleModelSelectorConfirm = (selectedModels) => {
+  const handleModelSelectorConfirm = (selectedModels, overwriteModels) => {
     if (tempSetFieldValue && tempFormikValues) {
-      const existingModels = tempFormikValues.models || [];
-      const existingModelIds = new Set(existingModels.map((model) => model.id));
+      if (overwriteModels) {
+        // 覆盖模式：清空现有的模型列表，使用选择器中的模型
+        tempSetFieldValue('models', selectedModels);
+      } else {
+        // 追加模式：合并现有模型和新选择的模型，避免重复
+        const existingModels = tempFormikValues.models || [];
+        const existingModelIds = new Set(existingModels.map((model) => model.id));
 
-      // 过滤掉已存在的模型，避免重复
-      const newModels = selectedModels.filter((model) => !existingModelIds.has(model.id));
+        // 过滤掉已存在的模型，避免重复
+        const newModels = selectedModels.filter((model) => !existingModelIds.has(model.id));
 
-      // 合并模型列表
-      tempSetFieldValue('models', [...existingModels, ...newModels]);
+        // 合并模型列表
+        tempSetFieldValue('models', [...existingModels, ...newModels]);
+      }
     }
   };
 
@@ -1144,27 +1150,26 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
         <ModelSelectorModal
           open={modelSelectorOpen}
           onClose={() => setModelSelectorOpen(false)}
-          onConfirm={(selectedModels, mappings) => {
+          onConfirm={(selectedModels, mappings, overwriteModels, overwriteMappings) => {
             // 处理普通模型选择
-            handleModelSelectorConfirm(selectedModels);
+            handleModelSelectorConfirm(selectedModels, overwriteModels);
 
-            // 处理模型映射关系
+            // 处理映射关系
             if (mappings && mappings.length > 0) {
-              // 获取现有的映射关系
-              const existingMappings = tempFormikValues?.model_mapping || [];
-
-              // 创建新的映射关系，避免键冲突
-              const existingKeys = new Set(existingMappings.map((item) => item.key));
-              const newMappings = mappings.filter((item) => !existingKeys.has(item.key));
-
-              // 更新索引以确保连续性
-              const mergedMappings = [...existingMappings, ...newMappings].map((item, index) => ({
-                ...item,
-                index
-              }));
-
-              // 更新表单值
-              tempSetFieldValue('model_mapping', mergedMappings);
+              if (overwriteMappings) {
+                // 覆盖映射模式：清空现有映射，使用新的
+                tempSetFieldValue('model_mapping', mappings);
+              } else {
+                // 追加映射模式：
+                const existingMappings = tempFormikValues?.model_mapping || [];
+                const existingKeys = new Set(existingMappings.map((item) => item.key));
+                const newMappings = mappings.filter((item) => !existingKeys.has(item.key));
+                const mergedMappings = [...existingMappings, ...newMappings].map((item, index) => ({
+                  ...item,
+                  index
+                }));
+                tempSetFieldValue('model_mapping', mergedMappings);
+              }
             }
           }}
           channelValues={tempFormikValues}

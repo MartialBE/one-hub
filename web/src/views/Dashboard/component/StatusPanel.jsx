@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Card, Divider, CircularProgress, Alert, IconButton, Chip } from '@mui/material';
+import { Box, Typography, Grid, Card, Divider, CircularProgress, Alert, IconButton, Chip, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -72,15 +72,79 @@ const StatusPanel = () => {
   // Helper function to determine status color based on uptime percentage
   const getStatusColor = (uptimePercentage) => {
     if (uptimePercentage === null) return theme.palette.grey[500];
-    if (uptimePercentage >= 95) return theme.palette.success.main; // Green for high uptime
-    if (uptimePercentage > 90 && uptimePercentage < 95) return theme.palette.warning.main; // Warning for medium uptime
+    if (uptimePercentage >= 90) return theme.palette.success.main; // Green for high uptime
+    if (uptimePercentage > 70 && uptimePercentage < 90) return theme.palette.warning.main; // Warning for medium uptime
     return theme.palette.error.main; // Error for low uptime
   };
   const getStatusToBgColor = (uptimePercentage) => {
+    // 获取当前主题
+    if (theme.palette.mode === 'dark') {
+      return theme.palette.background.paper;
+    }
+
     if (uptimePercentage === null) return theme.palette.grey[500];
-    if (uptimePercentage >= 95) return theme.palette.success.lighter; // Green for high uptime
-    if (uptimePercentage > 90 && uptimePercentage < 95) return theme.palette.warning.light; // Warning for medium uptime
+    if (uptimePercentage >= 90) return theme.palette.success.light; // Green for high uptime
+    if (uptimePercentage > 70 && uptimePercentage < 90) return theme.palette.warning.light; // Warning for medium uptime
     return theme.palette.error.light; // Error for low uptime
+  };
+
+  // Helper function to render uptime history boxes
+  const renderUptimeHistory = (monitorId) => {
+    if (!heartbeatData || !heartbeatData.heartbeatList || !heartbeatData.heartbeatList[monitorId]) {
+      return null;
+    }
+
+    // Get last 24 heartbeats (or fewer if not available)
+    const heartbeats = heartbeatData.heartbeatList[monitorId];
+    const lastHeartbeats = heartbeats.slice(-40);
+
+    return (
+      <Box sx={{ display: 'flex', mt: 1, gap: '2px' }}>
+        {lastHeartbeats.map((heartbeat, index) => {
+          const status = heartbeat.status === 1 ? 'Up' : heartbeat.status === 2 ? 'Warn' : 'Down';
+          const statusColor =
+            heartbeat.status === 1
+              ? theme.palette.success.main
+              : heartbeat.status === 2
+                ? theme.palette.warning.main
+                : theme.palette.error.main;
+          const beijingTime = new Date(new Date(heartbeat.time).getTime() + 8 * 60 * 60 * 1000);
+          const upTime = beijingTime.toLocaleString();
+          return (
+            <Tooltip key={index} title={`${status} - ${upTime}(UTC+8)`}>
+              <Box
+                sx={{
+                  width: '8px',
+                  height: '20px',
+                  backgroundColor: statusColor,
+                  borderRadius: '4px',
+                  flexGrow: 1,
+                  maxWidth: '8px',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'scale(1.2)'
+                  }
+                }}
+              />
+            </Tooltip>
+          );
+        })}
+        {/* Add empty boxes if less than 40 heartbeats */}
+        {Array.from({ length: Math.max(0, 40 - lastHeartbeats.length) }).map((_, index) => (
+          <Box
+            key={`empty-${index}`}
+            sx={{
+              width: '8px',
+              height: '20px',
+              backgroundColor: theme.palette.grey[300],
+              borderRadius: '4px',
+              flexGrow: 1,
+              maxWidth: '8px'
+            }}
+          />
+        ))}
+      </Box>
+    );
   };
 
   // Render status card for a monitor
@@ -98,7 +162,11 @@ const StatusPanel = () => {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: isNormal ? statusBgColor : theme.palette.error.lighter,
+            backgroundColor: isNormal
+              ? statusBgColor
+              : theme.palette.mode === 'dark'
+                ? theme.palette.background.paper
+                : theme.palette.error.lighter,
             boxShadow: 'none',
             borderRadius: 1,
             p: 1.5,
@@ -116,7 +184,7 @@ const StatusPanel = () => {
                   mr: 1.5
                 }}
               />
-              <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: '#333333' }}>
+              <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: 'text.primary' }}>
                 {monitor.name}
               </Typography>
             </Box>
@@ -128,16 +196,22 @@ const StatusPanel = () => {
                     label={tag.value ? tag.value : tag.name}
                     size="small"
                     sx={{
-                      backgroundColor: tag.color,
-                      color: '#fff',
-                      ml: 0.3
+                      backgroundColor: `${tag.color}40`,
+                      color: tag.color,
+                      ml: 0.3,
+                      height: '18px',
+                      border: `1px solid ${tag.color}`,
+                      '& .MuiChip-label': {
+                        fontSize: '0.7rem',
+                        padding: '0 6px'
+                      }
                     }}
                   />
                 ))}
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography
               variant="body1"
               sx={{
@@ -145,8 +219,9 @@ const StatusPanel = () => {
                 fontWeight: 500
               }}
             >
-              {uptimePercentage}% {t('dashboard_index.availability')}
+              {uptimePercentage}% {t('dashboard_index.availability')}(24H)
             </Typography>
+            {renderUptimeHistory(monitor.id)}
           </Box>
         </Card>
       </Grid>

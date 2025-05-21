@@ -70,7 +70,13 @@ export default function UserGroupTableRow({ item, manageUserGroup, handleOpenMod
             {item.public ? '是' : '否'}
           </Label>
         </TableCell>
-
+        <TableCell>
+          <Label variant="outlined" color={item.promotion ? 'primary' : 'error'}>
+            {item.promotion ? '是' : '否'}
+          </Label>
+        </TableCell>
+        <TableCell>{item.min}</TableCell>
+        <TableCell>{item.max}</TableCell>
         <TableCell>
           {' '}
           <TableSwitch id={`switch-${item.id}`} checked={statusSwitch} onChange={handleStatus} />

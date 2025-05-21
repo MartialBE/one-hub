@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Box, ButtonBase, Menu, MenuItem } from '@mui/material';
-import { Icon } from '@iconify/react';
+import { Avatar, Box, ButtonBase, Hidden, Menu, MenuItem, Typography } from '@mui/material';
 import i18nList from 'i18n/i18nList';
 import useI18n from 'hooks/useI18n';
+import Flags from 'country-flag-icons/react/3x2';
+import { height } from '@mui/system';
 
 export default function I18nButton() {
   const theme = useTheme();
@@ -23,6 +24,16 @@ export default function I18nButton() {
     i18n.changeLanguage(lng);
     handleMenuClose();
   };
+
+  // 获取当前语言的国家代码
+  const getCurrentCountryCode = () => {
+    const currentLang = i18n.language || 'zh_CN';
+    const langItem = i18nList.find((item) => item.lng === currentLang) || i18nList[0];
+    return langItem.countryCode;
+  };
+
+  // 动态获取当前语言的国旗组件
+  const CurrentFlag = Flags[getCurrentCountryCode()];
 
   return (
     <Box
@@ -45,16 +56,28 @@ export default function I18nButton() {
             borderColor: theme.typography.menuChip.background,
             borderRadius: '50%',
             background: 'transparent',
-            // color: 'inherit',
+            overflow: 'hidden',
             '&[aria-controls="menu-list-grow"],&:hover': {
               boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
               background: 'transparent !important'
-              // color: theme.palette.primary.main
             }
           }}
           color="inherit"
         >
-          <Icon icon="mingcute:translate-2-fill" width="1.3rem" />
+          {CurrentFlag && (
+            <Box
+              sx={{
+                width: '1.45rem',
+                height: '1.125rem',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <CurrentFlag style={{ width: '95%', height: '85%', borderRadius: '0.25rem' }} />
+            </Box>
+          )}
         </Avatar>
       </ButtonBase>
       <Menu
@@ -70,11 +93,37 @@ export default function I18nButton() {
           horizontal: 'center'
         }}
       >
-        {i18nList.map((item) => (
-          <MenuItem key={item.lng} onClick={() => handleLanguageChange(item.lng)}>
-            {item.name}
-          </MenuItem>
-        ))}
+        {i18nList.map((item) => {
+          const FlagComponent = Flags[item.countryCode];
+          return (
+            <MenuItem
+              key={item.lng}
+              onClick={() => handleLanguageChange(item.lng)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}
+            >
+              {FlagComponent && (
+                <Box
+                  sx={{
+                    width: '1.45rem',
+                    height: '1.125rem',
+                    overflow: 'hidden',
+                    borderRadius: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <FlagComponent style={{ width: '90%', height: '77%', borderRadius: '0.25rem' }} />
+                </Box>
+              )}
+              <Typography variant="body1">{item.name}</Typography>
+            </MenuItem>
+          );
+        })}
       </Menu>
     </Box>
   );

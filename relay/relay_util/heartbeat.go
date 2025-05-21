@@ -2,8 +2,8 @@ package relay_util
 
 import (
 	"context"
+	"net/http"
 	"one-api/common/requester"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -26,7 +26,6 @@ type Heartbeat struct {
 	config     HeartbeatConfig
 	ctx        context.Context
 	cancel     context.CancelFunc
-	mutex      sync.Mutex
 	stopped    int32 // 是否已停止
 	headerSent int32 // 头部是否已发送
 	c          *gin.Context
@@ -72,7 +71,8 @@ func (h *Heartbeat) writeHeader() bool {
 	if h.isStream {
 		requester.SetEventStreamHeaders(h.c)
 	} else {
-		h.c.Header("Content-Type", "application/json")
+		h.c.Writer.Header().Set("Content-Type", "application/json")
+		h.c.Writer.WriteHeader(http.StatusOK)
 	}
 	return true
 }
