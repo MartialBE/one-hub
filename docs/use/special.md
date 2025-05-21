@@ -82,3 +82,26 @@ curl -X POST https://api.onehub.cn/v1/chat/completions \
 	]
   }'
 ```
+
+## Gemini 模型 开启网页上下文提取
+
+在请求时，增加 `tools` 参数，并设置 `name` 为 `urlContext` 即可开启代码执行。
+
+```bash
+curl -X POST https://api.onehub.cn/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-proj-1234567890" \
+  -d '{
+    "model": "gemini-1.5-flash-002",
+    "messages": [{"role": "user", "content": "解析这个url的内容，https://github.com/MartialBE/one-hub"}],
+    "tools": [
+		{
+			"function": {
+				"name": "urlContext",
+				"parameters": {}
+			},
+			"type": "function"
+		}
+	]
+  }'
+```

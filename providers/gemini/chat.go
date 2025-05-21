@@ -176,6 +176,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		var geminiChatTools GeminiChatTools
 		googleSearch := false
 		codeExecution := false
+		urlContext := false
 		for _, function := range functions {
 			if function.Name == "googleSearch" {
 				googleSearch = true
@@ -183,6 +184,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			}
 			if function.Name == "codeExecution" {
 				codeExecution = true
+				continue
+			}
+			if function.Name == "urlContext" {
+				urlContext = true
 				continue
 			}
 
@@ -195,14 +200,20 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, *function)
 		}
 
-		if googleSearch && len(geminiRequest.Tools) == 0 {
-			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
-				GoogleSearch: &GeminiCodeExecution{},
-			})
-		}
 		if codeExecution && len(geminiRequest.Tools) == 0 {
 			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
 				CodeExecution: &GeminiCodeExecution{},
+			})
+		}
+		if urlContext && len(geminiRequest.Tools) == 0 {
+			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
+				UrlContext: &GeminiCodeExecution{},
+			})
+		}
+
+		if googleSearch {
+			geminiRequest.Tools = append(geminiRequest.Tools, GeminiChatTools{
+				GoogleSearch: &GeminiCodeExecution{},
 			})
 		}
 
