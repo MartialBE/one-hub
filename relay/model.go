@@ -93,7 +93,7 @@ func ListGeminiModelsByToken(c *gin.Context) {
 		price := model.PricingInstance.GetPrice(modelName)
 		if price.ChannelType == config.ChannelTypeGemini {
 			geminiModels = append(geminiModels, gemini.ModelDetails{
-				Name: modelName,
+				Name: fmt.Sprintf("models/%s", modelName),
 			})
 		}
 	}
