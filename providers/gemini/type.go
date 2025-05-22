@@ -283,6 +283,7 @@ type GeminiChatTools struct {
 	FunctionDeclarations  []types.ChatCompletionFunction `json:"functionDeclarations,omitempty"`
 	CodeExecution         *GeminiCodeExecution           `json:"codeExecution,omitempty"`
 	GoogleSearch          any                            `json:"googleSearch,omitempty"`
+	UrlContext            any                            `json:"urlContext,omitempty"`
 	GoogleSearchRetrieval any                            `json:"googleSearchRetrieval,omitempty"`
 }
 

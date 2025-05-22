@@ -6,11 +6,25 @@ import userBackground from 'assets/images/users/background-1.webp';
 import { useSelector } from 'react-redux';
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import { keyframes } from '@emotion/react';
 import React from 'react';
 
 export default function UserCard({ children }) {
   const account = useSelector((state) => state.account);
   const theme = useTheme();
+
+  // Define the gradient animation
+  const gradientAnimation = keyframes`
+    0% {
+      background-position: 0 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  `;
   return (
     <Card
       sx={{
@@ -38,23 +52,36 @@ export default function UserCard({ children }) {
           top: '80px',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '80px',
-          height: '80px',
+          width: '84px',
+          height: '84px',
           borderRadius: '50%',
           display: 'flex',
-          padding: '2px',
           alignItems: 'center',
           justifyContent: 'center',
-          border: '1px solid rgba(255, 255, 255, 0.15)'
+          background: `linear-gradient(90deg, 
+            ${theme.palette.primary.main}, 
+            ${theme.palette.secondary.main}, 
+            ${theme.palette.primary.light}, 
+            ${theme.palette.primary.main})`,
+          backgroundSize: '300% 300%',
+          animation: `${gradientAnimation} 5s ease infinite`,
+          '&:hover': {
+            animation: `${gradientAnimation} 5s ease infinite`,
+          }
         }}
       >
         <Avatar
           src={account.user?.avatar_url || userAvatar}
           sx={{
-            width: '100%',
-            height: '100%',
-            border: `2px solid ${theme.palette.primary.dark}`,
-            bgcolor: '#1a2027'
+            width: '80px',
+            height: '80px',
+            border: '2px solid #FFFFFF',
+            bgcolor: '#FFFFFF',
+            variant: 'rounded',
+            transition: 'transform 0.2s ease-in-out, background-color 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.03)'
+            }
           }}
         />
       </Box>

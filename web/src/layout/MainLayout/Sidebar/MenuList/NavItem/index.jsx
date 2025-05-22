@@ -24,12 +24,12 @@ const NavItem = ({ item, level }) => {
 
   const Icon = item.icon;
   const itemIcon = item?.icon ? (
-    <Icon stroke={1.5} size="1.3rem" />
+    <Icon stroke={1.5} size="1.5rem" />
   ) : (
     <FiberManualRecordIcon
       sx={{
-        width: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 8 : 6,
-        height: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 8 : 6
+        width: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 10 : 8,
+        height: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 10 : 8
       }}
       fontSize={level > 0 ? 'inherit' : 'medium'}
     />

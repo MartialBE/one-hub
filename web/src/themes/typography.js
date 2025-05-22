@@ -146,9 +146,9 @@ export default function themeTypography(theme) {
       fontSize: '0.875rem'
     },
     mediumAvatar: {
-      width: '32px',
-      height: '32px',
-      fontSize: '1rem'
+      width: '40px',
+      height: '40px',
+      fontSize: '1.2rem'
     },
     largeAvatar: {
       width: '40px',

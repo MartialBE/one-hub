@@ -3,6 +3,7 @@ package middleware
 import (
 	"one-api/common/logger"
 	"one-api/metrics"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -21,6 +22,19 @@ func GinzapWithConfig() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
+		// 如果query的值包含key=sk-fsdfsdfsdf 则把sk-fsdfsdfsdf脱敏处理
+		if query != "" {
+			if i := strings.Index(query, "key=sk-"); i >= 0 {
+				start := i + 4 // "key=" length
+				end := strings.Index(query[start:], "&")
+				if end == -1 {
+					end = len(query)
+				} else {
+					end += start
+				}
+				query = query[:start] + "sk-***" + query[end:]
+			}
+		}
 		c.Next()
 		end := time.Now()
 		latency := end.Sub(start)
