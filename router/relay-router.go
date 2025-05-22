@@ -113,6 +113,7 @@ func setClaudeRouter(router *gin.Engine) {
 	relayV1Router.Use(middleware.APIEnabled("claude"), middleware.RelayCluadePanicRecover(), middleware.ClaudeAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/messages", relay.Relay)
+		relayV1Router.GET("/models", relay.ListClaudeModelsByToken)
 	}
 }
 
@@ -121,6 +122,7 @@ func setGeminiRouter(router *gin.Engine) {
 	relayGeminiRouter.Use(middleware.APIEnabled("gemini"), middleware.RelayGeminiPanicRecover(), middleware.GeminiAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayGeminiRouter.POST("/:version/models/:model", relay.Relay)
+		relayGeminiRouter.GET("/:version/models", relay.ListGeminiModelsByToken)
 	}
 }
 
