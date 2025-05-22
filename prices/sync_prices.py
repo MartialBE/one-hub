@@ -48,9 +48,8 @@ def parse_price_table(html_content):
                 "type": "tokens",
                 "channel_type": 1,
                 "input": input_price / 1000 / 0.002,
+                temp_price['output'] = output_price / 1000 / 0.002
             }
-            if output_price:
-              temp_price['output'] = output_price / 1000 / 0.002
             if cached_price:
               temp_price['extra_ratios'] = {
                  "cached_tokens": cached_price / 1000 / 0.002,
