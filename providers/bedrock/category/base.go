@@ -67,6 +67,8 @@ func GetModelName(modelName string) string {
 		"claude-2.1":                 "anthropic.claude-v2:1",
 		"claude-2.0":                 "anthropic.claude-v2",
 		"claude-instant-1.2":         "anthropic.claude-instant-v1",
+		"claude-sonnet-4-20250514":   "anthropic.claude-sonnet-4-20250514-v1:0",
+		"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
 	}
 
 	if value, exists := bedrockMap[modelName]; exists {

@@ -130,9 +130,21 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		Stream:        request.Stream,
 	}
 
+	if request.Stop != nil {
+		stopBytes, err := json.Marshal(request.Stop)
+		if err == nil {
+			var stopSequences []string
+			if err := json.Unmarshal(stopBytes, &stopSequences); err == nil {
+				claudeRequest.StopSequences = stopSequences
+			} else if stop, ok := request.Stop.(string); ok {
+				claudeRequest.StopSequences = []string{stop}
+			}
+		}
+	}
+
 	systemMessage := ""
 	mgsLen := len(request.Messages) - 1
-	isThink := strings.Contains(request.Model, "claude-3-7-sonnet") && (request.OneOtherArg == "thinking" || request.Reasoning != nil)
+	isThink := (request.OneOtherArg == "thinking" || request.Reasoning != nil)
 
 	for index, msg := range request.Messages {
 		if isThink && index == mgsLen && (msg.Role == types.ChatMessageRoleAssistant || msg.Role == types.ChatMessageRoleSystem) {
@@ -175,7 +187,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	}
 
 	// 如果是3-7 默认开启thinking
-	if strings.Contains(request.Model, "claude-3-7-sonnet") && (request.OneOtherArg == "thinking" || request.Reasoning != nil) {
+	if request.OneOtherArg == "thinking" || request.Reasoning != nil {
 		var opErr *types.OpenAIErrorWithStatusCode
 		claudeRequest.MaxTokens, claudeRequest.Thinking, opErr = getThinking(claudeRequest.MaxTokens, request.Reasoning)
 
@@ -243,13 +255,6 @@ func ConvertToolChoice(toolType, toolFunc string) *ToolChoice {
 	}
 
 	return choice
-}
-
-func defaultMaxTokens(maxTokens int) int {
-	if maxTokens == 0 {
-		return 4096
-	}
-	return maxTokens
 }
 
 func convertMessageContent(msg *types.ChatCompletionMessage) (*Message, error) {
