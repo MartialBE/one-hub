@@ -205,12 +205,18 @@ const SystemLogs = () => {
     <MainCard
       title={t('System Logs')}
       secondary={
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          spacing={2} 
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          sx={{ flexWrap: 'wrap' }}
+        >
           <FormControlLabel
             control={<Switch checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} color="primary" />}
             label={t('Auto Refresh')}
+            sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
           />
-          <FormControl variant="outlined" size="small" sx={{ width: '150px', minWidth: '150px' }}>
+          <FormControl variant="outlined" size="small" sx={{ width: { xs: '100%', sm: '150px' }, minWidth: { xs: '100%', sm: '150px' } }}>
             <InputLabel id="refresh-interval-label">{t('Refresh Interval')}</InputLabel>
             <Select
               labelId="refresh-interval-label"
@@ -235,9 +241,15 @@ const SystemLogs = () => {
             value={maxEntries}
             onChange={handleMaxEntriesChange}
             InputProps={{ inputProps: { min: 1, max: 500 } }}
-            sx={{ width: '120px' }}
+            sx={{ width: { xs: '100%', sm: '120px' } }}
           />
-          <Button variant="outlined" color="error" onClick={handleClearLogs} startIcon={<Icon icon="solar:trash-bin-trash-bold" />}>
+          <Button 
+            variant="outlined" 
+            color="error" 
+            onClick={handleClearLogs} 
+            startIcon={<Icon icon="solar:trash-bin-trash-bold" />}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
             {t('Clear')}
           </Button>
         </Stack>
@@ -295,20 +307,26 @@ const SystemLogs = () => {
         ) : (
           filteredLogs.map((log, index) => (
             <Box key={index} sx={{ mb: 1, p: 1, borderRadius: 1, bgcolor: 'background.paper' }}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="caption" color="textSecondary">
-                  {formatTimestamp(log.timestamp)}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: getLogTypeColor(log.type),
-                    textTransform: 'uppercase',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {log.type}
-                </Typography>
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={1} 
+                alignItems={{ xs: 'flex-start', sm: 'center' }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+                  <Typography variant="caption" color="textSecondary">
+                    {formatTimestamp(log.timestamp)}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: getLogTypeColor(log.type),
+                      textTransform: 'uppercase',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {log.type}
+                  </Typography>
+                </Box>
                 <Typography variant="body2" sx={{ flexGrow: 1 }}>
                   {log.message}
                 </Typography>

@@ -7,7 +7,16 @@ import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/materia
 
 // constant
 const headerSX = {
-  '& .MuiCardHeader-action': { mr: 0 }
+  '& .MuiCardHeader-action': { mr: 0 },
+  // Make header responsive for small screens
+  '@media (max-width: 600px)': {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    '& .MuiCardHeader-action': {
+      padding: '16px 0 0 0',
+      width: '100%'
+    }
+  }
 };
 
 // ==============================|| CUSTOM MAIN CARD ||============================== //

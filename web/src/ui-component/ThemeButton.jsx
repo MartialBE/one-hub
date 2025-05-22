@@ -48,9 +48,9 @@ export default function ThemeButton() {
           color="inherit"
         >
           {defaultTheme === 'light' ? (
-            <Icon icon="solar:sun-2-bold-duotone" width="1.3rem" />
+            <Icon icon="solar:sun-2-bold-duotone" width="1.5rem" />
           ) : (
-            <Icon icon="solar:moon-bold-duotone" width="1.3rem" />
+            <Icon icon="solar:moon-bold-duotone" width="1.5rem" />
           )}
         </Avatar>
       </ButtonBase>

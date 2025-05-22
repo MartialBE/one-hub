@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box } from '@mui/material';
+import { keyframes } from '@emotion/react';
 import User1 from 'assets/images/users/user-round.svg';
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -13,19 +14,54 @@ const Profile = ({ toggleProfileDrawer }) => {
   const account = useSelector((state) => state.account);
   const anchorRef = useRef(null);
 
+  // Define the gradient animation
+  const gradientAnimation = keyframes`
+    0% {
+      background-position: 0 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  `;
+
   return (
     <>
       {/* 用户头像按钮 */}
-      <Box component="div" onClick={toggleProfileDrawer} sx={{ cursor: 'pointer' }}>
+      <Box
+        component="div"
+        onClick={toggleProfileDrawer}
+        sx={{
+          cursor: 'pointer',
+          position: 'relative',
+          width: '48px',
+          height: '48px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: '50%',
+          background: `linear-gradient(90deg, 
+            ${theme.palette.primary.main}, 
+            ${theme.palette.secondary.main}, 
+            ${theme.palette.primary.light}, 
+            ${theme.palette.primary.main})`,
+          backgroundSize: '300% 300%',
+          animation: `${gradientAnimation} 5s ease infinite`,
+          '&:hover': {
+            animation: `${gradientAnimation} 5s ease infinite`
+          }
+        }}
+      >
         <Avatar
           src={account.user?.avatar_url || User1}
           sx={{
             ...theme.typography.mediumAvatar,
             cursor: 'pointer',
-            // 滚动渐变边框
-            border: `1px solid ${theme.palette.primary.dark}`,
             width: '45px',
             height: '45px',
+            border: '2px solid #FFFFFF',
             bgcolor: '#FFFFFF',
             variant: 'rounded',
             transition: 'transform 0.2s ease-in-out, background-color 0.2s ease-in-out',
