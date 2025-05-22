@@ -41,7 +41,7 @@ export function NoticeButton() {
           onClick={openNotice}
           color="inherit"
         >
-          <Icon icon="lets-icons:message-duotone" width="1.3rem" />
+          <Icon icon="lets-icons:message-duotone" width="1.6rem" />
         </Avatar>
       </ButtonBase>
     </Box>

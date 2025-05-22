@@ -67,15 +67,16 @@ export default function I18nButton() {
           {CurrentFlag && (
             <Box
               sx={{
-                width: '1.45rem',
-                height: '1.125rem',
+                width: '1.8rem',
+                height: '1.4rem',
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                position: 'relative'
               }}
             >
-              <CurrentFlag style={{ width: '95%', height: '85%', borderRadius: '0.25rem' }} />
+              <CurrentFlag style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </Box>
           )}
         </Avatar>
@@ -111,13 +112,13 @@ export default function I18nButton() {
                     width: '1.45rem',
                     height: '1.125rem',
                     overflow: 'hidden',
-                    borderRadius: '0.25rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    position: 'relative'
                   }}
                 >
-                  <FlagComponent style={{ width: '90%', height: '77%', borderRadius: '0.25rem' }} />
+                  <FlagComponent style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </Box>
               )}
               <Typography variant="body1">{item.name}</Typography>
