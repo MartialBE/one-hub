@@ -1,0 +1,55 @@
+name: Sync Prices
+
+on:
+  push:
+    branches:
+      - main  # 或者您的主分支名称
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 添加写入权限
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}  # 使用默认的GITHUB_TOKEN
+        fetch-depth: 0  # 获取完整历史记录
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+        
+    - name: Run sync script
+      run: |
+        python prices/sync_prices.py
+        
+    - name: Commit and push if changed
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add prices/prices.json
+        
+        # 检查是否有更改
+        if git diff --staged --quiet; then
+          echo "没有新的更改需要提交"
+          exit 0
+        fi
+        
+        # 提交更改
+        git commit -m "Update prices data [skip ci]"
+        
+        # 推送更改
+        git push || {
+          echo "推送失败，尝试拉取最新更改后重试"
+          git pull --rebase origin main
+          git push origin main
+        } 
