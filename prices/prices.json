@@ -1730,8 +1730,23 @@
     "type": "tokens",
     "channel_type": 1,
     "input": 2.5,
+    "output": 0.0,
     "extra_ratios": {
       "cached_tokens": 0.625
     }
+  },
+  {
+    "model": "claude-sonnet-4-20250514",
+    "type": "tokens",
+    "channel_type": 14,
+    "input": 1.5,
+    "output": 7.5
+  },
+  {
+    "model": "claude-opus-4-20250514",
+    "type": "tokens",
+    "channel_type": 14,
+    "input": 7.5,
+    "output": 37.5
   }
 ]
