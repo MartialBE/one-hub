@@ -51,7 +51,7 @@ const defaultConfig = {
     model_mapping: '模型映射关系：例如用户请求A模型，实际转发给渠道的模型为B。在B模型加前缀+，表示使用传入模型计费，例如：+gpt-3.5-turbo',
     model_headers: '自定义模型请求头，例如：{"key": "value"}',
     custom_parameter:
-      '额外参数，添加到请求体中，支持嵌套JSON结构，例如：{"temperature": 0.7, "nested": {"key": "value"}}，如果参数中存在"overwrite":true，系统则会用额外参数覆盖现有参数，如果"overwrite"不存在或者false系统则只会增加相关参数',
+      '额外参数，添加到请求体中，支持嵌套JSON结构，例如：{"temperature": 0.7, "nested": {"key": "value"}}。如果参数中存在"overwrite":true，系统则会用额外参数覆盖现有参数，如果"overwrite"不存在或者false系统则只会增加相关参数。如果参数中存在"per_model":true，系统会进一步根据模型名进行参数覆盖，例如：{"per_model":true,"gpt-3.5-turbo":{"temperature": 0.7},"gpt-4":{"temperature": 0.5}}',
     groups: '请选择该渠道所支持的用户组',
     only_chat: '如果选择了仅支持聊天，那么遇到有函数调用的请求会跳过该渠道',
     provider_models_list: '必须填写所有数据后才能获取模型列表',
