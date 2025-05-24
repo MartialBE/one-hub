@@ -156,14 +156,15 @@ func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWith
 	// 将data转换为 JSON
 	responseBody, err := json.Marshal(data)
 	if err != nil {
-		return common.ErrorWrapperLocal(err, "marshal_response_body_failed", http.StatusInternalServerError)
+		logger.LogError(c.Request.Context(), "marshal_response_body_failed:"+err.Error())
+		return nil
 	}
 
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusOK)
 	_, err = c.Writer.Write(responseBody)
 	if err != nil {
-		return common.ErrorWrapperLocal(err, "write_response_body_failed", http.StatusInternalServerError)
+		logger.LogError(c.Request.Context(), "write_response_body_failed:"+err.Error())
 	}
 
 	return nil
