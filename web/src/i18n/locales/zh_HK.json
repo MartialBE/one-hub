@@ -455,6 +455,22 @@
       "old_log": "舊版log",
       "illustrate": "* 本筆記錄為系統升級前所記錄的log"
     },
+    "quotaDetail": {
+      "saved": "節省 ",
+      "originalPrice": "原始價格",
+      "inputPrice": "輸入價格",
+      "outputPrice": "輸出價格",
+      "groupRatio": "分組倍率",
+      "groupRatioValue": "分組倍率",
+      "actualPrice": "實際價格",
+      "input": "輸入",
+      "output": "輸出",
+      "finalCalculation": "最終計算",
+      "originalBilling": "原始計費",
+      "actualBilling": "實際計費",
+      "calculationNote": "PS：本系統按照積分計算，所有金額均為積分換算而來，1積分=$0.000002，最低消費為1積分，本計算步驟僅供參考，以實際扣費為準。",
+      "times": "倍"
+    },
     "cachedReadTokens": "緩存讀取Tokens (* {{ ratio }})",
     "reasoningTokens": "推理Tokens (* {{ ratio }})",
     "cachedWriteTokens": "緩存寫入 Tokens (* {{ ratio }})"
