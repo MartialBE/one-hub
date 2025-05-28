@@ -1,16 +1,21 @@
 import PropTypes from 'prop-types';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Decimal from 'decimal.js';
 
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 
-import { TableRow, TableCell, Stack, Tooltip, Typography } from '@mui/material';
+import { TableRow, TableCell, Stack, Tooltip, Typography, Box, IconButton, Collapse } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
 import { useLogType } from '../type/LogType';
 import { useTranslation } from 'react-i18next';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PercentIcon from '@mui/icons-material/Percent';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import CalculateIcon from '@mui/icons-material/Calculate';
 
 function renderType(type, logTypes) {
   const typeOption = logTypes[type];
@@ -81,6 +86,13 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
 
   const { totalInputTokens, totalOutputTokens, show, tokenDetails } = useMemo(() => calculateTokens(item), [item]);
 
+  // 计算当前显示的列数
+  const colCount = Object.values(columnVisibility).filter(Boolean).length;
+
+  // 展开状态（仅type=2时才有展开）
+  const [open, setOpen] = useState(false);
+  const showExpand = item.type === 2 && columnVisibility.quota;
+
   return (
     <>
       <TableRow tabIndex={item.id}>
@@ -137,12 +149,32 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
           <TableCell sx={{ p: '10px 8px' }}>{viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails)}</TableCell>
         )}
         {columnVisibility.completion && <TableCell sx={{ p: '10px 8px' }}>{item.completion_tokens || ''}</TableCell>}
-        {columnVisibility.quota && <TableCell sx={{ p: '10px 8px' }}>{item.quota ? renderQuota(item.quota, 6) : '$0'}</TableCell>}
+        {columnVisibility.quota && (
+          <TableCell sx={{ p: '10px 8px' }}>
+            {item.type === 2 ? (
+              <QuotaWithDetailRow item={item} open={open} setOpen={setOpen} />
+            ) : item.quota ? (
+              renderQuota(item.quota, 6)
+            ) : (
+              '$0'
+            )}
+          </TableCell>
+        )}
         {columnVisibility.source_ip && <TableCell sx={{ p: '10px 8px' }}>{item.source_ip || ''}</TableCell>}
         {columnVisibility.detail && (
           <TableCell sx={{ p: '10px 8px' }}>{viewLogContent(item, t, totalInputTokens, totalOutputTokens)}</TableCell>
         )}
       </TableRow>
+      {/* 展开行 */}
+      {showExpand && (
+        <TableRow>
+          <TableCell colSpan={colCount} sx={{ p: 0, border: 0, bgcolor: 'transparent' }}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <QuotaWithDetailContent item={item} />
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      )}
     </>
   );
 }
@@ -187,44 +219,22 @@ function viewModelName(model_name, isStream) {
     </Label>
   );
 }
-
-const MetadataTypography = styled(Typography)(({ theme }) => ({
+styled(Typography)(({ theme }) => ({
   fontSize: 12,
   color: theme.palette.grey[300],
   '&:not(:last-child)': {
     marginBottom: theme.spacing(0.5)
   }
 }));
-
-function viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails) {
+function viewInput(item, t, totalInputTokens, totalOutputTokens, show) {
   const { prompt_tokens } = item;
 
   if (!prompt_tokens) return '';
   if (!show) return prompt_tokens;
 
-  const tooltipContent = tokenDetails.map(({ key, label, tokens, value, rate, labelParams }) => (
-    <MetadataTypography key={key}>{`${t(label, labelParams)}: ${value} *  (${rate} - 1) = ${tokens}`}</MetadataTypography>
-  ));
-
   return (
     <Badge variant="dot" color="primary">
-      <Tooltip
-        title={
-          <>
-            {tooltipContent}
-            <MetadataTypography>
-              {t('logPage.totalInputTokens')}: {totalInputTokens}
-            </MetadataTypography>
-            <MetadataTypography>
-              {t('logPage.totalOutputTokens')}: {totalOutputTokens}
-            </MetadataTypography>
-          </>
-        }
-        placement="top"
-        arrow
-      >
-        <span style={{ cursor: 'help' }}>{prompt_tokens}</span>
-      </Tooltip>
+      <span>{prompt_tokens}</span>
     </Badge>
   );
 }
@@ -327,56 +337,41 @@ function calculateTokens(item) {
   };
 }
 
-function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
+function viewLogContent(item, t, totalInputTokens) {
+  // Check if we have the necessary data to calculate prices
   if (!item?.metadata?.input_ratio) {
     let free = false;
-    if (item.quota === 0 && item.type === 2) {
+    if ((item.quota === 0 || item.quota === undefined) && item.type === 2) {
       free = true;
     }
-    const tips = (
-      <>
-        <MetadataTypography>{item.content}</MetadataTypography>
-        {item.quota !== 0 && <MetadataTypography>{t('logPage.content.illustrate')}</MetadataTypography>}
-        <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
-      </>
-    );
     return free ? (
-      <Tooltip title={tips} placement="top" arrow>
-        <Stack direction="column" spacing={0.3}>
-          <Label color={free ? 'success' : 'secondary'} variant="soft">
-            {t('logPage.content.free')}
-          </Label>
-        </Stack>
-      </Tooltip>
+      <Stack direction="column" spacing={0.3}>
+        <Label color={free ? 'success' : 'secondary'} variant="soft">
+          {t('logPage.content.free')}
+        </Label>
+      </Stack>
     ) : (
-      <>{item.content}</>
+      <>{item.content || ''}</>
     );
   }
-  const groupDiscount = item?.metadata?.group_ratio || 1;
 
-  const priceType = item?.metadata?.price_type;
-  const originalCompletionRatio = item?.metadata?.output_ratio;
-  const originalInputRatio = item?.metadata?.input_ratio;
+  // Ensure we have valid values with appropriate defaults
+  const groupDiscount = item?.metadata?.group_ratio || 1;
+  const priceType = item?.metadata?.price_type || '';
+  const originalCompletionRatio = item?.metadata?.output_ratio || 0;
+  const originalInputRatio = item?.metadata?.input_ratio || 0;
 
   let inputPriceInfo = '';
   let outputPriceInfo = '';
-  let calculateSteps = '';
-  let originalInputPriceInfo = '';
-  let originalOutputPriceInfo = '';
-
   if (priceType === 'times') {
+    // Calculate prices for 'times' price type
     const inputPrice = calculatePrice(originalInputRatio, groupDiscount, true);
 
     inputPriceInfo = t('logPage.content.times_price', {
       times: inputPrice
     });
-
-    const originalInputPrice = calculatePrice(originalInputRatio, 1, 1, true, true);
-
-    originalInputPriceInfo = t('logPage.content.original_times_price', {
-      times: originalInputPrice
-    });
   } else {
+    // Calculate prices for standard price type
     const inputPrice = calculatePrice(originalInputRatio, groupDiscount, false);
     const outputPrice = calculatePrice(originalCompletionRatio, groupDiscount, false);
 
@@ -387,81 +382,285 @@ function viewLogContent(item, t, totalInputTokens, totalOutputTokens) {
       price: outputPrice
     });
 
-    const originalInputPrice = calculatePrice(originalInputRatio, 1, false);
-
-    originalInputPriceInfo = t('logPage.content.original_input_price', {
-      price: originalInputPrice
-    });
-
-    const originalOutputPrice = calculatePrice(originalCompletionRatio, 1, false);
-
-    originalOutputPriceInfo = t('logPage.content.original_output_price', {
-      price: originalOutputPrice
-    });
-
-    calculateSteps = `${t('logPage.content.calculate_steps')}( ${totalInputTokens} / 1000000 * ${inputPrice}) `;
-
-    if (totalOutputTokens > 0) {
-      calculateSteps += `+ (${totalOutputTokens} / 1000000 * ${outputPrice})`;
-    }
-
-    calculateSteps += ` = ${renderQuota(item.quota, 6)}`;
+    // Create calculation explanation string
+    `${t('logPage.content.calculate_steps')}( ${totalInputTokens} / 1000000 * ${inputPrice}) `;
   }
 
-  const tips = (
-    <>
-      {originalInputPriceInfo && <MetadataTypography>{originalInputPriceInfo}</MetadataTypography>}
-      {originalOutputPriceInfo && <MetadataTypography>{originalOutputPriceInfo}</MetadataTypography>}
-      {groupDiscount > 0 && groupDiscount !== 1 && (
-        <MetadataTypography>
-          {t('logPage.content.group_discount', {
-            discount: getDiscountLang(groupDiscount, 1)
-          })}
-        </MetadataTypography>
-      )}
-      {calculateSteps && (
-        <>
-          <MetadataTypography>{calculateSteps}</MetadataTypography>
-          <MetadataTypography>{t('logPage.content.calculate_steps_tip')}</MetadataTypography>
-        </>
-      )}
-    </>
-  );
-
   return (
-    <Tooltip title={tips} placement="top" arrow>
-      <Stack direction="column" spacing={0.3}>
-        {inputPriceInfo && (
-          <Label color="info" variant="soft">
-            {inputPriceInfo}
-          </Label>
-        )}
-        {outputPriceInfo && (
-          <Label color="info" variant="soft">
-            {outputPriceInfo}
-          </Label>
-        )}
-      </Stack>
-    </Tooltip>
+    <Stack direction="column" spacing={0.3}>
+      {inputPriceInfo && (
+        <Label color="info" variant="soft">
+          {inputPriceInfo}
+        </Label>
+      )}
+      {outputPriceInfo && (
+        <Label color="info" variant="soft">
+          {outputPriceInfo}
+        </Label>
+      )}
+    </Stack>
   );
 }
 
 function calculatePrice(ratio, groupDiscount, isTimes) {
+  // Ensure inputs are valid numbers
+  ratio = ratio || 0;
+  groupDiscount = groupDiscount || 0;
+
   let discount = new Decimal(ratio).mul(groupDiscount);
 
   if (!isTimes) {
     discount = discount.mul(1000);
   }
 
-  let price = discount.mul(0.002).toFixed(6);
-  price = price.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+  // Calculate the price as a Decimal
+  let priceDecimal = discount.mul(0.002);
 
-  return price;
+  // For display purposes, format with 6 decimal places and trim trailing zeros
+  let priceString = priceDecimal.toFixed(6);
+  priceString = priceString.replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1');
+
+  // For calculations, return the actual number value
+  return priceString;
 }
 
+// Function to calculate price as a number for calculations
 export function getDiscountLang(value1, value2) {
   const discount = new Decimal(value1).mul(value2);
 
   const discountMultiplier = discount.toFixed(2);
   return `${discountMultiplier} 倍`;
+}
+
+// Helper function to calculate the original quota based on actual price and group ratio
+function calculateOriginalQuota(item) {
+  // If we don't have the necessary data, return the metadata value or 0
+  if (!item?.quota || !item?.metadata?.group_ratio) {
+    return item.metadata?.original_quota || item.metadata?.origin_quota || 0;
+  }
+
+  const quota = item.quota || 0;
+  const groupRatio = item.metadata?.group_ratio || 1;
+
+  // Simple formula: original price = actual price / group ratio
+  // Avoid division by zero
+  if (groupRatio === 0) {
+    return quota;
+  }
+
+  // Calculate original quota by dividing actual quota by group ratio
+  const calculatedOriginalQuota = quota / groupRatio;
+
+  // Return the calculated original quota, or the metadata value if calculation is 0
+  return calculatedOriginalQuota || item.metadata?.original_quota || item.metadata?.origin_quota || 0;
+}
+
+// QuotaWithDetailRow 只负责主行的价格和小三角
+function QuotaWithDetailRow({ item, open, setOpen }) {
+  // Calculate the original quota based on the formula
+  const originalQuota = calculateOriginalQuota(item);
+  // Ensure quota has a fallback value
+  const quota = item.quota || 0;
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box onClick={() => setOpen((o) => !o)} sx={{ display: 'flex', flexDirection: 'column', mr: 1 }}>
+        <Typography variant="caption" sx={{ color: (theme) => theme.palette.text.secondary, textDecoration: 'line-through', fontSize: 12 }}>
+          {renderQuota(originalQuota, 6)}
+        </Typography>
+        <Typography sx={{ color: (theme) => theme.palette.success.main, fontWeight: 500, fontSize: 13 }}>
+          {renderQuota(quota, 6)}
+        </Typography>
+      </Box>
+      <IconButton
+        size="small"
+        onClick={() => setOpen((o) => !o)}
+        sx={{
+          ml: 0.5,
+          bgcolor: (theme) => (open ? theme.palette.action.hover : 'transparent'),
+          '&:hover': { bgcolor: (theme) => theme.palette.action.hover }
+        }}
+      >
+        <ExpandMoreIcon
+          style={{
+            transition: '0.2s',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)'
+          }}
+          fontSize="small"
+        />
+      </IconButton>
+    </Box>
+  );
+}
+
+// QuotaWithDetailContent 负责渲染详细内容
+function QuotaWithDetailContent({ item }) {
+  // Calculate the original quota based on the formula
+  const originalQuota = calculateOriginalQuota(item);
+  const quota = item.quota || 0;
+
+  // Get input/output prices from metadata with appropriate defaults
+  const originalInputPrice =
+    item.metadata?.input_price_origin ||
+    (item.metadata?.input_ratio ? `$${calculatePrice(item.metadata.input_ratio, 1, false)} /M` : '$0 /M');
+  const originalOutputPrice =
+    item.metadata?.output_price_origin ||
+    (item.metadata?.output_ratio ? `$${calculatePrice(item.metadata.output_ratio, 1, false)} /M` : '$0 /M');
+
+  // Calculate actual prices based on ratios and group discount
+  const groupRatio = item.metadata?.group_ratio || 1;
+  const inputPrice =
+    item.metadata?.input_price ||
+    (item.metadata?.input_ratio ? `$${calculatePrice(item.metadata.input_ratio, groupRatio, false)} /M` : '$0 /M');
+  const outputPrice =
+    item.metadata?.output_price ||
+    (item.metadata?.output_ratio ? `$${calculatePrice(item.metadata.output_ratio, groupRatio, false)} /M` : '$0 /M');
+
+  const inputTokens = item.prompt_tokens || 0;
+  const outputTokens = item.completion_tokens || 0;
+
+  // Create a calculation explanation string
+  const stepStr = `(${inputTokens} / 1,000,000 * ${inputPrice})${outputTokens > 0 ? ` + (${outputTokens} / 1,000,000 * ${outputPrice})` : ''} = ${renderQuota(quota, 6)}`;
+
+  let savePercent = '';
+  if (originalQuota > 0 && quota > 0) {
+    savePercent = `节省${((1 - quota / originalQuota) * 100).toFixed(0)}%`;
+  }
+  return (
+    <Box
+      sx={{
+        mt: 2,
+        mb: 2,
+        mx: 2,
+        boxShadow: (theme) => `0 2px 8px 0 ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)'}`,
+        borderRadius: 2,
+        background: (theme) => theme.palette.background.paper,
+        p: 0
+      }}
+    >
+      {/* 上方三栏 */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#fafbfc'),
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8
+        }}
+      >
+        {/* 原始价格 */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 2,
+            borderRight: { xs: 'none', sm: (theme) => `1px solid ${theme.palette.divider}` },
+            borderBottom: { xs: (theme) => `1px solid ${theme.palette.divider}`, sm: 'none' }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <AttachMoneyIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.text.secondary }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>原始价格</Typography>
+          </Box>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 0.5, textAlign: 'left' }}>
+            输入价格：{originalInputPrice}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
+            输出价格：{originalOutputPrice}
+          </Typography>
+        </Box>
+        {/* 分组倍率 */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 2,
+            borderRight: { xs: 'none', sm: (theme) => `1px solid ${theme.palette.divider}` },
+            borderBottom: { xs: (theme) => `1px solid ${theme.palette.divider}`, sm: 'none' }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <PercentIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.info.main }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>分组倍率</Typography>
+          </Box>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
+            分组倍率：{groupRatio}
+          </Typography>
+        </Box>
+        {/* 实际价格 */}
+        <Box sx={{ flex: 1, minWidth: 0, p: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <CreditCardIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.primary.main }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>实际价格</Typography>
+          </Box>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 0.5, textAlign: 'left' }}>
+            输入：{inputPrice}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
+            输出：{outputPrice}
+          </Typography>
+        </Box>
+      </Box>
+      {/* 下方最终计算区域 */}
+      <Box
+        sx={{
+          p: 2,
+          background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#f7f8fa'),
+          borderBottomLeftRadius: 8,
+          borderBottomRightRadius: 8
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <CalculateIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.success.main }} />
+          <Typography sx={{ fontWeight: 600, fontSize: 15 }}>最终计算</Typography>
+        </Box>
+        <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 1, textAlign: 'left' }}>{stepStr}</Typography>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, mb: 1 }}>
+          <Typography
+            sx={{
+              fontSize: 13,
+              color: (theme) => theme.palette.text.secondary,
+              textDecoration: 'line-through',
+              mr: 2,
+              mb: { xs: 0.5, sm: 0 },
+              textAlign: 'left'
+            }}
+          >
+            原始计费：{renderQuota(originalQuota, 6)}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: 13,
+              color: (theme) => theme.palette.success.main,
+              fontWeight: 500,
+              mr: 2,
+              mb: { xs: 0.5, sm: 0 },
+              textAlign: 'left'
+            }}
+          >
+            实际计费：{renderQuota(quota, 6)}
+          </Typography>
+          {savePercent && (
+            <Box
+              sx={{
+                display: 'inline-block',
+                bgcolor: (theme) => theme.palette.success.dark,
+                color: (theme) => theme.palette.success.contrastText,
+                fontSize: 12,
+                fontWeight: 500,
+                borderRadius: 1,
+                px: 1.2,
+                py: 0.2
+              }}
+            >
+              {savePercent}
+            </Box>
+          )}
+        </Box>
+        <Typography sx={{ fontSize: 12, color: (theme) => theme.palette.text.disabled, textAlign: 'left' }}>
+          PS：本系统按积分分计算，所有金额均为积分换算，1积分=$0.000002，最低消费为1积分，本计算步骤仅供参考，以实际扣费为准
+        </Typography>
+      </Box>
+    </Box>
+  );
 }
