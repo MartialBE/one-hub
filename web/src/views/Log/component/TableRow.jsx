@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 
 import Badge from '@mui/material/Badge';
 
-import { TableRow, TableCell, Stack, Collapse } from '@mui/material';
+import { TableRow, TableCell, Stack, Collapse, Tooltip, Typography } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import QuotaWithDetailRow from './QuotaWithDetailRow';
 import QuotaWithDetailContent from './QuotaWithDetailContent';
 import { calculatePrice } from './QuotaWithDetailContent';
+import { styled } from '@mui/material/styles';
 
 function renderType(type, logTypes, t) {
   const typeOption = logTypes[type];
@@ -217,16 +218,43 @@ function viewModelName(model_name, isStream) {
   );
 }
 
-function viewInput(item, t, totalInputTokens, totalOutputTokens, show) {
-  // tokenDetails is passed but not used in this function
+const MetadataTypography = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  color: theme.palette.grey[300],
+  '&:not(:last-child)': {
+    marginBottom: theme.spacing(0.5)
+  }
+}));
+
+function viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDetails) {
   const { prompt_tokens } = item;
 
   if (!prompt_tokens) return '';
   if (!show) return prompt_tokens;
 
+  const tooltipContent = tokenDetails.map(({ key, label, tokens, value, rate, labelParams }) => (
+    <MetadataTypography key={key}>{`${t(label, labelParams)}: ${value} *  (${rate} - 1) = ${tokens}`}</MetadataTypography>
+  ));
+
   return (
     <Badge variant="dot" color="primary">
-      <span>{prompt_tokens}</span>
+      <Tooltip
+        title={
+          <>
+            {tooltipContent}
+            <MetadataTypography>
+              {t('logPage.totalInputTokens')}: {totalInputTokens}
+            </MetadataTypography>
+            <MetadataTypography>
+              {t('logPage.totalOutputTokens')}: {totalOutputTokens}
+            </MetadataTypography>
+          </>
+        }
+        placement="top"
+        arrow
+      >
+        <span style={{ cursor: 'help' }}>{prompt_tokens}</span>
+      </Tooltip>
     </Badge>
   );
 }
