@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 
-import { TableRow, TableCell, Stack, Tooltip, Typography, Box, IconButton, Collapse } from '@mui/material';
+import { TableRow, TableCell, Stack, Typography, Box, IconButton, Collapse } from '@mui/material';
 
 import { timestamp2string, renderQuota } from 'utils/common';
 import Label from 'ui-component/Label';
@@ -17,7 +17,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import CalculateIcon from '@mui/icons-material/Calculate';
 
-function renderType(type, logTypes) {
+function renderType(type, logTypes, t) {
   const typeOption = logTypes[type];
   if (typeOption) {
     return (
@@ -30,7 +30,7 @@ function renderType(type, logTypes) {
     return (
       <Label variant="filled" color="error">
         {' '}
-        未知{' '}
+        {t('logPage.unknown')}{' '}
       </Label>
     );
   }
@@ -131,7 +131,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
             )}
           </TableCell>
         )}
-        {columnVisibility.type && <TableCell sx={{ p: '10px 8px' }}>{renderType(item.type, LogType)}</TableCell>}
+        {columnVisibility.type && <TableCell sx={{ p: '10px 8px' }}>{renderType(item.type, LogType, t)}</TableCell>}
         {columnVisibility.model_name && <TableCell sx={{ p: '10px 8px' }}>{viewModelName(item.model_name, item.is_stream)}</TableCell>}
 
         {columnVisibility.duration && (
@@ -170,7 +170,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
         <TableRow>
           <TableCell colSpan={colCount} sx={{ p: 0, border: 0, bgcolor: 'transparent' }}>
             <Collapse in={open} timeout="auto" unmountOnExit>
-              <QuotaWithDetailContent item={item} />
+              <QuotaWithDetailContent item={item} t={t} />
             </Collapse>
           </TableCell>
         </TableRow>
@@ -425,11 +425,11 @@ function calculatePrice(ratio, groupDiscount, isTimes) {
 }
 
 // Function to calculate price as a number for calculations
-export function getDiscountLang(value1, value2) {
+export function getDiscountLang(value1, value2, t) {
   const discount = new Decimal(value1).mul(value2);
 
   const discountMultiplier = discount.toFixed(2);
-  return `${discountMultiplier} 倍`;
+  return `${discountMultiplier} ${t ? t('logPage.quotaDetail.times') : '倍'}`;
 }
 
 // Helper function to calculate the original quota based on actual price and group ratio
@@ -455,7 +455,7 @@ function calculateOriginalQuota(item) {
   return calculatedOriginalQuota || item.metadata?.original_quota || item.metadata?.origin_quota || 0;
 }
 
-// QuotaWithDetailRow 只负责主行的价格和小三角
+// QuotaWithDetailRow is only responsible for the price in the main row and the small triangle
 function QuotaWithDetailRow({ item, open, setOpen }) {
   // Calculate the original quota based on the formula
   const originalQuota = calculateOriginalQuota(item);
@@ -492,8 +492,8 @@ function QuotaWithDetailRow({ item, open, setOpen }) {
   );
 }
 
-// QuotaWithDetailContent 负责渲染详细内容
-function QuotaWithDetailContent({ item }) {
+// QuotaWithDetailContent is responsible for rendering the detailed content
+function QuotaWithDetailContent({ item, t }) {
   // Calculate the original quota based on the formula
   const originalQuota = calculateOriginalQuota(item);
   const quota = item.quota || 0;
@@ -523,7 +523,7 @@ function QuotaWithDetailContent({ item }) {
 
   let savePercent = '';
   if (originalQuota > 0 && quota > 0) {
-    savePercent = `节省${((1 - quota / originalQuota) * 100).toFixed(0)}%`;
+    savePercent = `${t('logPage.quotaDetail.saved')}${((1 - quota / originalQuota) * 100).toFixed(0)}%`;
   }
   return (
     <Box
@@ -534,18 +534,28 @@ function QuotaWithDetailContent({ item }) {
         boxShadow: (theme) => `0 2px 8px 0 ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)'}`,
         borderRadius: 2,
         background: (theme) => theme.palette.background.paper,
-        p: 0
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2
       }}
     >
       {/* 上方三栏 */}
       <Box
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-          background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#fafbfc'),
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8
+          gap: 2,
+          overflowX: 'auto',
+          '&::-webkit-scrollbar': {
+            height: '6px'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: (theme) => theme.palette.divider,
+            borderRadius: '3px'
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'transparent'
+          }
         }}
       >
         {/* 原始价格 */}
@@ -554,65 +564,75 @@ function QuotaWithDetailContent({ item }) {
             flex: 1,
             minWidth: 0,
             p: 2,
-            borderRight: { xs: 'none', sm: (theme) => `1px solid ${theme.palette.divider}` },
-            borderBottom: { xs: (theme) => `1px solid ${theme.palette.divider}`, sm: 'none' }
+            borderRadius: 1,
+            background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#fafbfc')
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <AttachMoneyIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.text.secondary }} />
-            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>原始价格</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>{t('logPage.quotaDetail.originalPrice')}</Typography>
           </Box>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 0.5, textAlign: 'left' }}>
-            输入价格：{originalInputPrice}
+            {t('logPage.quotaDetail.inputPrice')}: {originalInputPrice}
           </Typography>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
-            输出价格：{originalOutputPrice}
+            {t('logPage.quotaDetail.outputPrice')}: {originalOutputPrice}
           </Typography>
         </Box>
-        {/* 分组倍率 */}
+        {/* Group Ratio */}
         <Box
           sx={{
             flex: 1,
             minWidth: 0,
             p: 2,
-            borderRight: { xs: 'none', sm: (theme) => `1px solid ${theme.palette.divider}` },
-            borderBottom: { xs: (theme) => `1px solid ${theme.palette.divider}`, sm: 'none' }
+            borderRadius: 1,
+            background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#fafbfc')
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <PercentIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.info.main }} />
-            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>分组倍率</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>{t('logPage.quotaDetail.groupRatio')}</Typography>
           </Box>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
-            分组倍率：{groupRatio}
+            {t('logPage.groupLabel')}: {item.metadata?.group_name}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
+            {t('logPage.quotaDetail.groupRatioValue')}: {groupRatio}
           </Typography>
         </Box>
-        {/* 实际价格 */}
-        <Box sx={{ flex: 1, minWidth: 0, p: 2 }}>
+        {/* Actual Price */}
+        <Box 
+          sx={{ 
+            flex: 1,
+            minWidth: 0, 
+            p: 2,
+            borderRadius: 1,
+            background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#fafbfc')
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <CreditCardIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.primary.main }} />
-            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>实际价格</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 15 }}>{t('logPage.quotaDetail.actualPrice')}</Typography>
           </Box>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 0.5, textAlign: 'left' }}>
-            输入：{inputPrice}
+            {t('logPage.quotaDetail.input')}: {inputPrice}
           </Typography>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
-            输出：{outputPrice}
+            {t('logPage.quotaDetail.output')}: {outputPrice}
           </Typography>
         </Box>
       </Box>
-      {/* 下方最终计算区域 */}
+      {/* Final Calculation Area */}
       <Box
         sx={{
           p: 2,
-          background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#f7f8fa'),
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8
+          borderRadius: 1,
+          background: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.default : '#f7f8fa')
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <CalculateIcon sx={{ fontSize: 20, mr: 1, color: (theme) => theme.palette.success.main }} />
-          <Typography sx={{ fontWeight: 600, fontSize: 15 }}>最终计算</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 15 }}>{t('logPage.quotaDetail.finalCalculation')}</Typography>
         </Box>
         <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 1, textAlign: 'left' }}>{stepStr}</Typography>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, mb: 1 }}>
@@ -626,7 +646,7 @@ function QuotaWithDetailContent({ item }) {
               textAlign: 'left'
             }}
           >
-            原始计费：{renderQuota(originalQuota, 6)}
+            {t('logPage.quotaDetail.originalBilling')}: {renderQuota(originalQuota, 6)}
           </Typography>
           <Typography
             sx={{
@@ -638,7 +658,7 @@ function QuotaWithDetailContent({ item }) {
               textAlign: 'left'
             }}
           >
-            实际计费：{renderQuota(quota, 6)}
+            {t('logPage.quotaDetail.actualBilling')}: {renderQuota(quota, 6)}
           </Typography>
           {savePercent && (
             <Box
@@ -658,7 +678,7 @@ function QuotaWithDetailContent({ item }) {
           )}
         </Box>
         <Typography sx={{ fontSize: 12, color: (theme) => theme.palette.text.disabled, textAlign: 'left' }}>
-          PS：本系统按积分分计算，所有金额均为积分换算，1积分=$0.000002，最低消费为1积分，本计算步骤仅供参考，以实际扣费为准
+          {t('logPage.quotaDetail.calculationNote')}
         </Typography>
       </Box>
     </Box>
