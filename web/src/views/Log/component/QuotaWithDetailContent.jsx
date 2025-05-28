@@ -50,11 +50,13 @@ export default function QuotaWithDetailContent({ item }) {
   // Calculate actual prices based on ratios and group discount
   const groupRatio = item.metadata?.group_ratio || 1;
   const inputPrice =
-    item.metadata?.input_price ||
-    (item.metadata?.input_ratio ? `$${calculatePrice(item.metadata.input_ratio, groupRatio, false)} /M` : '$0 /M');
+    item.metadata?.input_price || (item.metadata?.input_ratio ? `$${calculatePrice(item.metadata.input_ratio, groupRatio, false)} ` : '$0');
   const outputPrice =
     item.metadata?.output_price ||
-    (item.metadata?.output_ratio ? `$${calculatePrice(item.metadata.output_ratio, groupRatio, false)} /M` : '$0 /M');
+    (item.metadata?.output_ratio ? `$${calculatePrice(item.metadata.output_ratio, groupRatio, false)}` : '$0');
+
+  const inputPriceUnit = inputPrice + ' /M';
+  const outputPriceUnit = outputPrice + ' /M';
 
   const inputTokens = item.prompt_tokens || 0;
   const outputTokens = item.completion_tokens || 0;
@@ -156,10 +158,10 @@ export default function QuotaWithDetailContent({ item }) {
             <Typography sx={{ fontWeight: 600, fontSize: 15 }}>{t('logPage.quotaDetail.actualPrice')}</Typography>
           </Box>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, mb: 0.5, textAlign: 'left' }}>
-            {t('logPage.quotaDetail.input')}: {inputPrice}
+            {t('logPage.quotaDetail.input')}: {inputPriceUnit}
           </Typography>
           <Typography sx={{ fontSize: 13, color: (theme) => theme.palette.text.secondary, textAlign: 'left' }}>
-            {t('logPage.quotaDetail.output')}: {outputPrice}
+            {t('logPage.quotaDetail.output')}: {outputPriceUnit}
           </Typography>
         </Box>
       </Box>
@@ -181,7 +183,6 @@ export default function QuotaWithDetailContent({ item }) {
             sx={{
               fontSize: 13,
               color: (theme) => theme.palette.text.secondary,
-              textDecoration: 'line-through',
               mr: 2,
               mb: { xs: 0.5, sm: 0 },
               textAlign: 'left'
