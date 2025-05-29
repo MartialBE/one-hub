@@ -176,7 +176,7 @@ func (l *MemoryLimiter) allowTokenBucket(keyPrefix string, n int) bool {
 	// Add tokens based on time elapsed
 	elapsed := now.Sub(data.lastUpdate).Seconds()
 	newTokens := elapsed * float64(l.rate)
-	data.tokens = min(float64(l.burst), data.tokens+newTokens)
+	data.tokens = minValue(float64(l.burst), data.tokens+newTokens)
 	data.lastUpdate = now
 
 	// Update RPM tracking
@@ -259,8 +259,8 @@ func (l *MemoryLimiter) Stop() {
 	close(l.stopCleanup)
 }
 
-// min returns the minimum of two float64 values.
-func min(a, b float64) float64 {
+// minValue returns the minimum of two float64 values.
+func minValue(a, b float64) float64 {
 	if a < b {
 		return a
 	}
