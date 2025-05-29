@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"one-api/common/config"
 	"one-api/common/redis"
 	"time"
 )
@@ -50,6 +51,9 @@ func (l *SlidingWindowLimiter) AllowN(keyPrefix string, n int) bool {
 
 // GetCurrentRate 获取当前速率
 func (l *SlidingWindowLimiter) GetCurrentRate(keyPrefix string) (int, error) {
+	if !config.RedisEnabled {
+		return 0, fmt.Errorf("Redis未配置，API限速功能未生效，无法获取实时RPM")
+	}
 	slidingKey := fmt.Sprintf(slidingWindowFormat, keyPrefix)
 	nowSec := time.Now().Unix()
 
