@@ -55,8 +55,9 @@ type VertexAIProvider struct {
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:         "https://%saiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:%s",
-		ChatCompletions: "/",
+		BaseURL:           "https://%saiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:%s",
+		ChatCompletions:   "/",
+		ImagesGenerations: "/predict",
 	}
 }
 
