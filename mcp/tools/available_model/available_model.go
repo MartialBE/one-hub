@@ -61,7 +61,7 @@ func (c *AvailableModel) HandleRequest(ctx context.Context, req *protocol.CallTo
 	// 返回查询结果
 	return &protocol.CallToolResult{
 		Content: []protocol.Content{
-			protocol.TextContent{
+			&protocol.TextContent{
 				Type: "text",
 				Text: fmt.Sprintf("%s", modelsStr),
 			},
