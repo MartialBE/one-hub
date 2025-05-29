@@ -13,6 +13,7 @@ import (
 
 func SetWebRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte) {
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	router.Use(middleware.GlobalWebRateLimit())
 	router.Use(middleware.Cache())
 	// 特别处理favicon.ico请求
 	router.GET("/favicon.ico", controller.Favicon(buildFS))
@@ -23,7 +24,6 @@ func SetWebRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte) {
 		panic("无法创建嵌入文件系统: " + err.Error())
 	}
 	router.Use(static.Serve("/", embedFS))
-	router.Use(middleware.GlobalWebRateLimit()) //web限速器放在静态资源后面防止加载静态资源除法限速
 
 	router.NoRoute(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.RequestURI, "/v1") || strings.HasPrefix(c.Request.RequestURI, "/api") {
