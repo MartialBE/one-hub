@@ -379,6 +379,22 @@
       "free": "免费",
       "old_log": "旧版记录",
       "illustrate": "* 本条记录为系统升级前所记录的log"
+    },
+    "quotaDetail": {
+      "saved": "节省 ",
+      "originalPrice": "原始价格",
+      "inputPrice": "原输入价格",
+      "outputPrice": "原输出价格",
+      "groupRatio": "分组倍率",
+      "groupRatioValue": "分组倍率",
+      "actualPrice": "实际价格",
+      "input": "实际输入价格",
+      "output": "实际输出价格",
+      "finalCalculation": "最终计算",
+      "originalBilling": "原始计费",
+      "actualBilling": "实际计费",
+      "calculationNote": "PS：本系统按照积分计算，所有金额均为积分换算而来，1积分=$0.000002，最低消费为1积分，本计算步骤仅供参考，以实际扣费为准",
+      "times": "倍"
     }
   },
   "redemptionPage": {

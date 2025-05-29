@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"one-api/common/config"
 	"one-api/common/redis"
 	"time"
 )
@@ -45,8 +46,10 @@ func (l *CountLimiter) AllowN(keyPrefix string, n int) bool {
 }
 
 func (l *CountLimiter) GetCurrentRate(keyPrefix string) (int, error) {
+	if !config.RedisEnabled {
+		return 0, fmt.Errorf("Redis未配置，API限速功能未生效，无法获取实时RPM")
+	}
 	countKey := fmt.Sprintf(countFormat, keyPrefix)
-
 	result, err := redis.ScriptRunCtx(context.Background(),
 		countGetScript,
 		[]string{
