@@ -11,7 +11,7 @@ COPY ./web .
 COPY ./VERSION .
 RUN DISABLE_ESLINT_PLUGIN='true' VITE_APP_VERSION=$(cat VERSION) npm run build
 
-FROM golang:1.24 AS builder2
+FROM golang:1.24.2 AS builder2
 
 ENV GO111MODULE=on \
     CGO_ENABLED=1 \
