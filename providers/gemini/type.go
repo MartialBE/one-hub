@@ -227,6 +227,8 @@ func (candidate *GeminiChatCandidate) ToOpenAIChoice(request *types.ChatCompleti
 			// 		Data: part.InlineData.Data,
 			// 	}
 			// }
+		} else if part.Thought {
+			choice.Message.ReasoningContent = part.Text
 		} else {
 			if part.ExecutableCode != nil {
 				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
