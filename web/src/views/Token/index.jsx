@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { showError, showSuccess, trims } from 'utils/common';
+import { showError, showSuccess, trims, copy } from 'utils/common';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -147,7 +147,7 @@ export default function Token() {
 
       return res.data;
     } catch (error) {
-      return;
+      showError(error);
     }
   };
 
@@ -192,7 +192,25 @@ export default function Token() {
       <Stack mb={5}>
         <Alert severity="info">
           {t('token_index.replaceApiAddress1')}
-          <b>{siteInfo.server_address}</b>
+          <Box
+            component="span"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.08)',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              margin: '0 4px',
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.12)'
+              }
+            }}
+            onClick={() => copy(siteInfo.server_address, 'API地址')}
+          >
+            <b>{siteInfo.server_address}</b>
+            <Icon icon="solar:copy-line-duotone" style={{ marginLeft: '8px', fontSize: '18px' }} />
+          </Box>
           {t('token_index.replaceApiAddress2')}
         </Alert>
       </Stack>
