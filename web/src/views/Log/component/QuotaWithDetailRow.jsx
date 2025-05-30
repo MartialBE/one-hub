@@ -33,7 +33,7 @@ export default function QuotaWithDetailRow({ item, open, setOpen }) {
   // Ensure quota has a fallback value
   const quota = item.quota || 0;
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Box onClick={() => setOpen((o) => !o)} sx={{ display: 'flex', flexDirection: 'column', mr: 1, cursor: 'pointer' }}>
         <Typography
           variant="caption"

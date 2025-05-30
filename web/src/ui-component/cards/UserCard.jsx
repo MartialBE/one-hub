@@ -75,7 +75,8 @@ export default function UserCard({ children }) {
           sx={{
             width: '80px',
             height: '80px',
-            border: '2px solid #FFFFFF',
+            border: '1px solid',
+            borderColor: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.paper : '#ffffff'),
             bgcolor: '#FFFFFF',
             variant: 'rounded',
             transition: 'transform 0.2s ease-in-out, background-color 0.2s ease-in-out',
