@@ -84,6 +84,7 @@ type GeminiPart struct {
 	FileData            *GeminiFileData                `json:"fileData,omitempty"`
 	ExecutableCode      *GeminiPartExecutableCode      `json:"executableCode,omitempty"`
 	CodeExecutionResult *GeminiPartCodeExecutionResult `json:"codeExecutionResult,omitempty"`
+	Thought             bool                           `json:"thought,omitempty"`
 }
 
 type GeminiPartExecutableCode struct {
@@ -115,6 +116,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 
 	var content []string
 	isTools := false
+	isThought := false
 	images := make([]types.MultimediaData, 0)
 
 	for _, part := range candidate.Content.Parts {
@@ -144,6 +146,9 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 			// 		Data: part.InlineData.Data,
 			// 	}
 			// }
+		} else if part.Thought {
+			isThought = true
+			content = append(content, part.Text)
 		} else {
 			if part.ExecutableCode != nil {
 				content = append(content, "```"+part.ExecutableCode.Language+"\n"+part.ExecutableCode.Code+"\n```")
@@ -159,8 +164,11 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 		choice.Delta.Image = images
 	}
 
-	choice.Delta.Content = strings.Join(content, "\n")
-
+	if isThought {
+		choice.Delta.ReasoningContent = strings.Join(content, "\n")
+	} else {
+		choice.Delta.Content = strings.Join(content, "\n")
+	}
 	if isTools {
 		choice.FinishReason = types.FinishReasonToolCalls
 	}
