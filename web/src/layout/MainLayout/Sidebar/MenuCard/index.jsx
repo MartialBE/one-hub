@@ -133,10 +133,11 @@ const MenuCard = () => {
             <Avatar
               src={user?.avatar_url || User1}
               sx={{
-                width: '35px',
-                height: '35px',
+                width: '36px',
+                height: '36px',
                 cursor: 'pointer',
-                border: '2px solid #FFFFFF',
+                border: '1px solid',
+                borderColor: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.paper : '#ffffff'),
                 bgcolor: '#FFFFFF',
                 variant: 'rounded',
                 transition: 'transform 0.2s ease-in-out, background-color 0.2s ease-in-out',

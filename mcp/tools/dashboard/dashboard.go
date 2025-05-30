@@ -65,7 +65,7 @@ func (c *Dashboard) HandleRequest(ctx context.Context, req *protocol.CallToolReq
 	// 返回查询结果
 	return &protocol.CallToolResult{
 		Content: []protocol.Content{
-			protocol.TextContent{
+			&protocol.TextContent{
 				Type: "text",
 				Text: fmt.Sprintf("%v", result),
 			},

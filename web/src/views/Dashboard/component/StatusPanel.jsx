@@ -96,7 +96,7 @@ const StatusPanel = () => {
 
     // Get last 24 heartbeats (or fewer if not available)
     const heartbeats = heartbeatData.heartbeatList[monitorId];
-    const lastHeartbeats = heartbeats.slice(-40);
+    const lastHeartbeats = heartbeats.slice(-50);
 
     return (
       <Box sx={{ display: 'flex', mt: 1, gap: '2px' }}>
@@ -114,12 +114,12 @@ const StatusPanel = () => {
             <Tooltip key={index} title={`${status} - ${upTime}(UTC+8)`}>
               <Box
                 sx={{
-                  width: '8px',
-                  height: '20px',
-                  backgroundColor: statusColor,
-                  borderRadius: '4px',
+                  width: '10px',
+                  height: '12px',
+                  backgroundColor: statusColor + 'af',
+                  borderRadius: '8px',
                   flexGrow: 1,
-                  maxWidth: '8px',
+                  maxWidth: '10px',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
                     transform: 'scale(1.2)'
@@ -130,7 +130,7 @@ const StatusPanel = () => {
           );
         })}
         {/* Add empty boxes if less than 40 heartbeats */}
-        {Array.from({ length: Math.max(0, 40 - lastHeartbeats.length) }).map((_, index) => (
+        {Array.from({ length: Math.max(0, 50 - lastHeartbeats.length) }).map((_, index) => (
           <Box
             key={`empty-${index}`}
             sx={{
@@ -163,14 +163,14 @@ const StatusPanel = () => {
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: isNormal
-              ? statusBgColor
+              ? statusBgColor + '40'
               : theme.palette.mode === 'dark'
-                ? theme.palette.background.paper
-                : theme.palette.error.lighter,
+                ? theme.palette.background.paper + '40'
+                : theme.palette.error.lighter + '40',
             boxShadow: 'none',
             borderRadius: 1,
             p: 1.5,
-            border: `1px solid ${isNormal ? statusColor : theme.palette.error.main}`
+            border: `1px solid ${isNormal ? statusColor + '40' : theme.palette.error.main + '40'}`
           }}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -181,10 +181,10 @@ const StatusPanel = () => {
                   height: 10,
                   borderRadius: '50%',
                   backgroundColor: isNormal ? statusColor : theme.palette.error.main,
-                  mr: 1.5
+                  mr: 1
                 }}
               />
-              <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: 'text.primary' }}>
+              <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: 'text.primary',fontSize: '13px' }}>
                 {monitor.name}
               </Typography>
             </Box>
@@ -196,14 +196,14 @@ const StatusPanel = () => {
                     label={tag.value ? tag.value : tag.name}
                     size="small"
                     sx={{
-                      backgroundColor: `${tag.color}40`,
+                      backgroundColor: `${tag.color}30`,
                       color: tag.color,
-                      ml: 0.3,
-                      height: '18px',
-                      border: `1px solid ${tag.color}`,
+                      ml: 0.5,
+                      maxHeight: '15px',
+                      border: `1px solid ${tag.color}30`,
                       '& .MuiChip-label': {
                         fontSize: '0.7rem',
-                        padding: '0 6px'
+                        padding: '0px 2px'
                       }
                     }}
                   />
@@ -215,11 +215,27 @@ const StatusPanel = () => {
             <Typography
               variant="body1"
               sx={{
-                color: isNormal ? statusColor : theme.palette.error.main,
-                fontWeight: 500
+                fontWeight: 400
               }}
             >
-              {uptimePercentage}% {t('dashboard_index.availability')}(24H)
+              <Typography
+                variant="caption"
+                sx={{
+                  color: isNormal ? statusColor : theme.palette.error.main
+                }}
+                component="span"
+              >
+                {uptimePercentage}%
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary'
+                }}
+                component="span"
+              >
+                {` ${t('dashboard_index.availability')}(24H)`}
+              </Typography>
             </Typography>
             {renderUptimeHistory(monitor.id)}
           </Box>

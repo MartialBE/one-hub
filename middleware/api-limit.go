@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"one-api/common/config"
 	"one-api/model"
 	"time"
 
@@ -19,11 +18,6 @@ const (
 
 func DynamicRedisRateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !config.RedisEnabled {
-			c.Next()
-			return
-		}
-
 		userID := c.GetInt("id")
 		userGroup := c.GetString("group")
 

@@ -25,6 +25,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/redis"
 	"strconv"
@@ -77,6 +78,9 @@ func (lim *TokenLimiter) AllowN(keyPrefix string, n int) bool {
 
 // GetCurrentRate 获取当前速率使用情况，返回已使用的速率
 func (lim *TokenLimiter) GetCurrentRate(keyPrefix string) (int, error) {
+	if !config.RedisEnabled {
+		return 0, fmt.Errorf("Redis未配置，API限速功能未生效，无法获取实时RPM")
+	}
 	tokenKey := fmt.Sprintf(tokenFormat, keyPrefix)
 	timestampKey := fmt.Sprintf(timestampFormat, keyPrefix)
 	counterKey := fmt.Sprintf(counterFormat, keyPrefix)

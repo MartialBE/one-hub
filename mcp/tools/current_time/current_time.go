@@ -45,7 +45,7 @@ func (c *CurrentTime) HandleRequest(_ context.Context, _ *protocol.CallToolReque
 	// Return time result
 	return &protocol.CallToolResult{
 		Content: []protocol.Content{
-			protocol.TextContent{
+			&protocol.TextContent{
 				Type: "text",
 				Text: fmt.Sprintf("当前时间: %s", result),
 			},

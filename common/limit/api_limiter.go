@@ -1,6 +1,7 @@
 package limit
 
 import (
+	"one-api/common/config"
 	"time"
 )
 
@@ -18,6 +19,19 @@ const (
 // 实现复杂度	  低	            高
 // 适用场景	对突刺不敏感的高吞吐场景	对流量敏感的关键业务场景
 func NewAPILimiter(rpm int) RateLimiter {
+	// 如果Redis未启用，使用内存限流器
+	if !config.RedisEnabled {
+		if rpm < RPMThreshold {
+			// 对于低RPM，使用固定窗口方式
+			return NewMemoryLimiter(rpm, rpm, window, false)
+		} else {
+			// 对于高RPM，使用令牌桶方式
+			ratePerSecond := float64(rpm) / 60
+			return NewMemoryLimiter(int(ratePerSecond), rpm, window, true)
+		}
+	}
+
+	// Redis启用时，使用Redis限流器
 	if rpm < RPMThreshold {
 		// 如果是rpm设定值较小，说明并发较小，使用固定窗口
 		return NewCountLimiter(rpm, rpm, window)
@@ -42,6 +56,8 @@ func GetMaxRate(limiter RateLimiter) int {
 	case *TokenLimiter:
 		return l.rpm
 	case *SlidingWindowLimiter:
+		return l.rpm
+	case *MemoryLimiter:
 		return l.rpm
 	default:
 		return 0

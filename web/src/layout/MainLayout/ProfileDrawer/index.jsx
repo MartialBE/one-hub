@@ -26,6 +26,7 @@ import { calculateQuota } from 'utils/common';
 
 // assets
 import { Icon } from '@iconify/react';
+import { keyframes } from '@emotion/react';
 
 // ==============================|| PROFILE DRAWER ||============================== //
 
@@ -46,6 +47,18 @@ const ProfileDrawer = ({ open, onClose }) => {
     navigate(path);
     if (onClose) onClose();
   };
+
+  const gradientAnimation = keyframes`
+    0% {
+      background-position: 0 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  `;
 
   return (
     <SwipeableDrawer
@@ -77,15 +90,43 @@ const ProfileDrawer = ({ open, onClose }) => {
 
         {/* 用户信息头部 */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, pb: 2 }}>
-          <Avatar
-            src={user?.avatar_url || User1}
+
+          <Box
+            component="div"
             sx={{
-              border: `1px solid ${theme.palette.primary.dark}`,
-              width: 64,
-              height: 64,
-              mb: 1.5
+              cursor: 'pointer',
+              position: 'relative',
+              width: '64px',
+              height: '64px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: '50%',
+              background: `linear-gradient(90deg, 
+            ${theme.palette.primary.main}, 
+            ${theme.palette.secondary.main}, 
+            ${theme.palette.primary.light}, 
+            ${theme.palette.primary.main})`,
+              backgroundSize: '300% 300%',
+              animation: `${gradientAnimation} 5s ease infinite`,
+              '&:hover': {
+                animation: `${gradientAnimation} 5s ease infinite`
+              }
             }}
-          />
+          >
+            <Avatar
+              src={user?.avatar_url || User1}
+              sx={{
+                border: '1px solid',
+                borderColor: (theme) => (theme.palette.mode === 'dark' ? theme.palette.background.paper : '#ffffff'),
+                bgcolor: '#FFFFFF',
+                width: 62,
+                height: 62
+              }}
+            />
+          </Box>
+
+
           <Typography variant="h5" sx={{ fontWeight: 500, mb: 0.5 }}>
             {user?.display_name || user?.username || 'Unknown'}
           </Typography>
