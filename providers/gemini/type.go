@@ -116,6 +116,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 
 	var content []string
 	isTools := false
+	isThought := false
 	images := make([]types.MultimediaData, 0)
 
 	for _, part := range candidate.Content.Parts {
