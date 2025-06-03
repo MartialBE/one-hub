@@ -2,34 +2,34 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTheme } from '@mui/material/styles';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Alert,
+  Autocomplete,
   Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
   FormHelperText,
-  Select,
-  Autocomplete,
-  TextField,
-  Checkbox,
+  InputAdornment,
+  InputLabel,
   MenuItem,
-  Stack,
-  Alert,
+  OutlinedInput,
   Paper,
+  Select,
+  Stack,
+  TextField,
   Typography
 } from '@mui/material';
 
-import { showSuccess, showError, trims } from 'utils/common';
+import { showError, showSuccess, trims } from 'utils/common';
 import { API } from 'utils/api';
 import { createFilterOptions } from '@mui/material/Autocomplete';
-import { ValueFormatter, priceType } from './util';
+import { priceType, ValueFormatter } from './util';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'react-i18next';
@@ -340,7 +340,7 @@ const EditModal = ({
 
   // 渲染类型选择表单
   const renderTypeSelector = (formProps) => {
-    const { errors = {}, touched = {}, handleBlur, handleChange, values = {} } = formProps || {};
+    const { errors = {}, touched = {}, handleBlur, handleChange: formikHandleChange, values = {} } = formProps || {};
 
     return (
       <FormControl
@@ -355,7 +355,7 @@ const EditModal = ({
           value={singleMode ? inputs.type : values?.type}
           name="type"
           onBlur={handleBlur}
-          onChange={singleMode ? handleChange : handleChange}
+          onChange={singleMode ? handleChange : formikHandleChange}
           MenuProps={{
             PaperProps: {
               style: {
@@ -381,7 +381,7 @@ const EditModal = ({
 
   // 渲染渠道类型选择表单
   const renderChannelTypeSelector = (formProps) => {
-    const { errors = {}, touched = {}, handleBlur, handleChange, values = {} } = formProps || {};
+    const { errors = {}, touched = {}, handleBlur, handleChange: formikHandleChange, values = {} } = formProps || {};
 
     return (
       <FormControl
@@ -396,7 +396,7 @@ const EditModal = ({
           value={singleMode ? inputs.channel_type : values?.channel_type}
           name="channel_type"
           onBlur={handleBlur}
-          onChange={singleMode ? handleChange : handleChange}
+          onChange={singleMode ? handleChange : formikHandleChange}
           MenuProps={{
             PaperProps: {
               style: {
