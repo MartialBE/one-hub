@@ -234,6 +234,7 @@ type ChatCompletionRequest struct {
 	EnableThinking *bool `json:"enable_thinking,omitempty"` // qwen3 思考开关
 	ThinkingBudget *int  `json:"thinking_budget,omitempty"` // qwen3 思考长度，只有enable_thinking开启才生效
 	EnableSearch   *bool `json:"enable_search,omitempty"`   // qwen 搜索开关
+	IncludeThoughts bool `json:"include_thoughts,omitempty"` // gemini 输出思考开关
 
 	OneOtherArg string `json:"-"`
 }
