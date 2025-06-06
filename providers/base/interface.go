@@ -39,6 +39,7 @@ type ProviderInterface interface {
 	GetRequester() *requester.HTTPRequester
 	SetOtherArg(otherArg string)
 	GetOtherArg() string
+	CustomParameterHandler() (map[string]interface{}, error)
 }
 
 // 完成接口

@@ -185,6 +185,11 @@ func (p *OpenAIProvider) mergeCustomParams(requestMap map[string]interface{}, cu
 		}
 	}
 
+	// 如果配置是pre_add，而不是发送阶段，则此处跳过所有处理
+	if preAdd, exists := customParams["pre_add"]; exists && preAdd == true {
+		return requestMap
+	}
+
 	// 检查是否按照模型粒度控制
 	perModel := false
 	if perModelValue, exists := customParams["per_model"]; exists {
@@ -211,7 +216,7 @@ func (p *OpenAIProvider) mergeCustomParams(requestMap map[string]interface{}, cu
 	// 添加额外参数
 	for key, value := range customParamsModel {
 		// 忽略 keys "stream", "overwrite", and "per_model"
-		if key == "stream" || key == "overwrite" || key == "per_model" {
+		if key == "stream" || key == "overwrite" || key == "per_model" || key == "pre_add" {
 			continue
 		}
 		// 根据覆盖设置决定如何添加参数
