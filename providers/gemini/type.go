@@ -319,7 +319,7 @@ type GeminiChatGenerationConfig struct {
 }
 
 type ThinkingConfig struct {
-	ThinkingBudget  int  `json:"thinkingBudget"`
+	ThinkingBudget  *int `json:"thinkingBudget"`
 	IncludeThoughts bool `json:"includeThoughts,omitempty"`
 }
 
