@@ -636,7 +636,7 @@ export default function ModelPrice() {
                       </Stack>
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex',  alignItems: 'center', gap: 1, justifyContent: 'center' }}>
                         <Avatar
                           src={getIconByName(row.provider)}
                           alt={row.provider}
