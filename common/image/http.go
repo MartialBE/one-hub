@@ -33,12 +33,12 @@ type CFResponse struct {
 }
 
 func RequestFile(url, action string) (*http.Response, error) {
-	var resCF *CFRequest
 	reqUrl := url
 	method := http.MethodGet
+	var requestBody any
 
 	if config.CFWorkerImageUrl != "" {
-		resCF = &CFRequest{
+		requestBody = &CFRequest{
 			Action: action,
 			APIKey: config.CFWorkerImageKey,
 			URL:    url,
@@ -47,7 +47,7 @@ func RequestFile(url, action string) (*http.Response, error) {
 		method = http.MethodPost
 	}
 
-	res, err := utils.RequestBuilder(utils.SetProxy(config.ChatImageRequestProxy, nil), method, reqUrl, resCF, nil)
+	res, err := utils.RequestBuilder(utils.SetProxy(config.ChatImageRequestProxy, nil), method, reqUrl, requestBody, nil)
 
 	if err != nil {
 		return nil, err
