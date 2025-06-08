@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/common/config"
 	"one-api/common/requester"
 	"one-api/common/utils"
 	"one-api/providers/base"
@@ -166,8 +167,15 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 
 	if request.Reasoning != nil {
 		geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
-			ThinkingBudget: request.Reasoning.MaxTokens,
+			ThinkingBudget: &request.Reasoning.MaxTokens,
 		}
+	}
+
+	if config.GeminiSettingsInstance.GetOpenThink(request.Model) {
+		if geminiRequest.GenerationConfig.ThinkingConfig == nil {
+			geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{}
+		}
+		geminiRequest.GenerationConfig.ThinkingConfig.IncludeThoughts = true
 	}
 
 	functions := request.GetFunctions()
