@@ -167,7 +167,7 @@ func (candidate *GeminiChatCandidate) ToOpenAIStreamChoice(request *types.ChatCo
 	if candidate.GroundingMetadata != nil && showGoogleSearchMeta(request) {
 		groundingMarkdown := formatGroundingMetadataAsMarkdown(candidate.GroundingMetadata)
 		if groundingMarkdown != "" {
-			content = append(content, groundingMarkdown)
+			content = append(content, "\n\n" + groundingMarkdown)
 		}
 	}
 
