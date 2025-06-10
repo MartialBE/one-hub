@@ -2,7 +2,6 @@ package gemini
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
@@ -303,7 +302,7 @@ func removeAdditionalPropertiesWithDepth(schema interface{}, depth int) interfac
 
 func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatResponse, request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
 	openaiResponse = &types.ChatCompletionResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		ID:      response.ResponseId,
 		Object:  "chat.completion",
 		Created: utils.GetTimestamp(),
 		Model:   request.Model,
@@ -320,7 +319,7 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *GeminiChatRe
 	}
 
 	usage := provider.GetUsage()
-	*usage = convertOpenAIUsage(response.UsageMetadata)
+	*usage = ConvertOpenAIUsage(response.UsageMetadata)
 	openaiResponse.Usage = usage
 
 	return
@@ -356,7 +355,7 @@ func (h *GeminiStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 
 func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatResponse, dataChan chan string) {
 	streamResponse := types.ChatCompletionStreamResponse{
-		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		ID:      geminiResponse.ResponseId,
 		Object:  "chat.completion.chunk",
 		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
@@ -454,7 +453,7 @@ var modelAdjustRatios = map[string]int{
 // 	usage.TotalTokenCount = usage.PromptTokenCount + usage.CandidatesTokenCount
 // }
 
-func convertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
+func ConvertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
 	return types.Usage{
 		PromptTokens:     geminiUsage.PromptTokenCount,
 		CompletionTokens: geminiUsage.CandidatesTokenCount + geminiUsage.ThoughtsTokenCount,

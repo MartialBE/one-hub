@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AllowGeminiChannelType = []int{config.ChannelTypeGemini}
+var AllowGeminiChannelType = []int{config.ChannelTypeGemini, config.ChannelTypeVertexAI}
 
 type relayGeminiOnly struct {
 	relayBase
@@ -179,15 +179,19 @@ func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int
 			}
 
 			if part.InlineData != nil {
-				if preCostType == config.PreCostNotImage {
-					continue
+				if strings.HasPrefix(part.InlineData.MimeType, "image") {
+					if preCostType == config.PreCostNotImage {
+						continue
+					}
+					width, height, err := image.GetImageSizeFromBase64(part.InlineData.Data)
+					if err != nil {
+						return 0, err
+					}
+					tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
+				} else {
+					// 其他类型的，暂时按200个token计算
+					tokenNum += 200
 				}
-
-				width, height, err := image.GetImageSizeFromBase64(part.InlineData.Data)
-				if err != nil {
-					return 0, err
-				}
-				tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
 			}
 		}
 	}
