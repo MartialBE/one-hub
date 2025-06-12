@@ -4,6 +4,7 @@ import (
 	"one-api/common"
 	"one-api/types"
 	"strconv"
+	"strings"
 )
 
 func StringErrorWrapper(err string, code string, statusCode int, localError bool) *ClaudeErrorWithStatusCode {
@@ -93,12 +94,13 @@ func ClaudeUsageToOpenaiUsage(cUsage *Usage, usage *types.Usage) bool {
 }
 
 func ClaudeOutputUsage(response *ClaudeResponse) int {
-	text := ""
+	var textMsg strings.Builder
+
 	for _, c := range response.Content {
 		if c.Type == "text" {
-			text += c.Text
+			textMsg.WriteString(c.Text + "\n")
 		}
 	}
 
-	return common.CountTokenText(text, response.Model)
+	return common.CountTokenText(textMsg.String(), response.Model)
 }

@@ -170,12 +170,13 @@ func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int
 
 	tokenNum := 0
 	tokensPerMessage := 4
+	var textMsg strings.Builder
 
 	for _, message := range request.Contents {
 		tokenNum += tokensPerMessage
 		for _, part := range message.Parts {
 			if part.Text != "" {
-				tokenNum += common.GetTokenNum(tokenEncoder, part.Text)
+				textMsg.WriteString(part.Text)
 			}
 
 			if part.InlineData != nil {
@@ -196,5 +197,8 @@ func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int
 		}
 	}
 
+	if textMsg.Len() > 0 {
+		tokenNum += common.GetTokenNum(tokenEncoder, textMsg.String())
+	}
 	return tokenNum, nil
 }

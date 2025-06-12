@@ -201,6 +201,6 @@ func (h *tencentStreamHandler) convertToOpenaiStream(tencentChatResponse *Tencen
 	responseBody, _ := json.Marshal(streamResponse)
 	dataChan <- string(responseBody)
 
-	h.Usage.CompletionTokens += common.CountTokenText(tencentChatResponse.Choices[0].Delta.Content, h.Request.Model)
-	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+	h.Usage.TextBuilder.WriteString(tencentChatResponse.Choices[0].Delta.Content)
+
 }

@@ -188,8 +188,7 @@ func (h *CozeStreamHandler) convertToOpenaiStream(chatResponse *CozeStreamRespon
 		choice.FinishReason = types.FinishReasonStop
 	} else {
 		choice.Delta.Content = chatResponse.Message.Content
-		h.Usage.CompletionTokens += common.CountTokenText(chatResponse.Message.Content, h.Request.Model)
-		h.Usage.TotalTokens = h.Usage.CompletionTokens + h.Usage.PromptTokens
+		h.Usage.TextBuilder.WriteString(chatResponse.Message.Content)
 	}
 
 	streamResponse.Choices = []types.ChatCompletionStreamChoice{choice}

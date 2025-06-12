@@ -94,8 +94,7 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 
 	switch openaiResponse.Type {
 	case "response.output_text.delta":
-		h.Usage.CompletionTokens += common.CountTokenText(openaiResponse.Delta, h.Model)
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		h.Usage.TextBuilder.WriteString(openaiResponse.Delta)
 	case "response.completed":
 		if openaiResponse.Response != nil {
 			usage := openaiResponse.Response.Usage
