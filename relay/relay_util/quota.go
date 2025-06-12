@@ -3,7 +3,6 @@ package relay_util
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"one-api/common"
@@ -33,6 +32,7 @@ type Quota struct {
 
 	startTime         time.Time
 	firstResponseTime time.Time
+	extraBillingData  map[string]ExtraBillingData
 }
 
 func NewQuota(c *gin.Context, modelName string, promptTokens int) *Quota {
@@ -107,7 +107,7 @@ func (q *Quota) UpdateUserRealtimeQuota(usage *types.UsageEvent, nowUsage *types
 	}
 
 	promptTokens, completionTokens := q.getComputeTokensByUsageEvent(nowUsage)
-	increaseQuota := q.GetTotalQuota(promptTokens, completionTokens)
+	increaseQuota := q.GetTotalQuota(promptTokens, completionTokens, nil)
 
 	cacheQuota, err := model.CacheIncreaseUserRealtimeQuota(q.userId, increaseQuota)
 	if err != nil {
@@ -158,7 +158,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		q.modelName,
 		tokenName,
 		quota,
-		q.getLogContent(),
+		"",
 		q.getRequestTime(),
 		isStream,
 		q.GetLogMeta(usage),
@@ -222,6 +222,10 @@ func (q *Quota) GetLogMeta(usage *types.Usage) map[string]any {
 		}
 	}
 
+	if q.extraBillingData != nil {
+		meta["extra_billing"] = q.extraBillingData
+	}
+
 	return meta
 }
 
@@ -229,29 +233,28 @@ func (q *Quota) getRequestTime() int {
 	return int(time.Since(q.startTime).Milliseconds())
 }
 
-func (q *Quota) getLogContent() string {
-	modelRatioStr := ""
-
-	if q.price.Type == model.TimesPriceType {
-		modelRatioStr = fmt.Sprintf("$%s/次", q.price.FetchInputCurrencyPrice(model.DollarRate))
-	} else {
-		// 如果输入费率和输出费率一样，则只显示一个费率
-		if q.price.GetInput() == q.price.GetOutput() {
-			modelRatioStr = fmt.Sprintf("$%s/1k", q.price.FetchInputCurrencyPrice(model.DollarRate))
-		} else {
-			modelRatioStr = fmt.Sprintf("$%s/1k (输入) | $%s/1k (输出)", q.price.FetchInputCurrencyPrice(model.DollarRate), q.price.FetchOutputCurrencyPrice(model.DollarRate))
-		}
-	}
-
-	return fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
-}
-
 // 通过 token 数获取消费配额
-func (q *Quota) GetTotalQuota(promptTokens, completionTokens int) (quota int) {
+func (q *Quota) GetTotalQuota(promptTokens, completionTokens int, extraBilling map[string]types.ExtraBilling) (quota int) {
 	if q.price.Type == model.TimesPriceType {
 		quota = int(1000 * q.inputRatio)
 	} else {
 		quota = int(math.Ceil((float64(promptTokens) * q.inputRatio) + (float64(completionTokens) * q.outputRatio)))
+	}
+
+	q.GetExtraBillingData(extraBilling)
+	extraBillingQuota := 0
+	if q.extraBillingData != nil {
+		for _, value := range q.extraBillingData {
+			extraBillingQuota += int(math.Ceil(
+				float64(value.Price)*float64(config.QuotaPerUnit),
+			)) * value.CallCount
+		}
+	}
+
+	if extraBillingQuota > 0 {
+		quota += int(math.Ceil(
+			float64(extraBillingQuota) * q.groupRatio,
+		))
 	}
 
 	if q.inputRatio != 0 && quota <= 0 {
@@ -306,7 +309,7 @@ func (q *Quota) getComputeTokensByUsageEvent(usage *types.UsageEvent) (promptTok
 // 通过 usage 获取消费配额
 func (q *Quota) GetTotalQuotaByUsage(usage *types.Usage) (quota int) {
 	promptTokens, completionTokens := q.getComputeTokensByUsage(usage)
-	return q.GetTotalQuota(promptTokens, completionTokens)
+	return q.GetTotalQuota(promptTokens, completionTokens, usage.ExtraBilling)
 }
 
 func (q *Quota) GetFirstResponseTime() int64 {
@@ -320,4 +323,32 @@ func (q *Quota) GetFirstResponseTime() int64 {
 
 func (q *Quota) SetFirstResponseTime(firstResponseTime time.Time) {
 	q.firstResponseTime = firstResponseTime
+}
+
+type ExtraBillingData struct {
+	Type      string  `json:"type"`
+	CallCount int     `json:"call_count"`
+	Price     float64 `json:"price"`
+}
+
+func (q *Quota) GetExtraBillingData(extraBilling map[string]types.ExtraBilling) {
+	if extraBilling == nil {
+		return
+	}
+
+	extraBillingData := make(map[string]ExtraBillingData)
+	for serviceType, value := range extraBilling {
+		extraBillingData[serviceType] = ExtraBillingData{
+			Type:      value.Type,
+			CallCount: value.CallCount,
+			Price:     getDefaultExtraServicePrice(serviceType, q.modelName, value.Type),
+		}
+
+	}
+
+	if len(extraBillingData) == 0 {
+		return
+	}
+
+	q.extraBillingData = extraBillingData
 }

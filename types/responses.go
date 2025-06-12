@@ -1,5 +1,12 @@
 package types
 
+const (
+	APITollTypeWebSearchPreview = "web_search_preview"
+	APITollTypeFileSearch       = "file_search"
+	APITollTypeCodeInterpreter  = "code_interpreter"
+	APITollTypeImageGeneration  = "image_generation"
+)
+
 type OpenAIResponsesRequest struct {
 	Input               any              `json:"input,omitempty"`
 	Model               string           `json:"model" binding:"required"`
@@ -13,7 +20,7 @@ type OpenAIResponsesRequest struct {
 	Temperature         *float64         `json:"temperature,omitempty"`
 	Text                any              `json:"text,omitempty"`
 	ToolChoice          any              `json:"tool_choice,omitempty"`
-	Tools               any              `json:"tools,omitempty"`
+	Tools               []ResponsesTools `json:"tools,omitempty"`
 	TopP                *float64         `json:"top_p,omitempty"`
 	Truncation          string           `json:"truncation,omitempty"`
 }
@@ -40,7 +47,7 @@ type OpenAIResponsesResponses struct {
 	Temperature        *float64          `json:"temperature,omitempty"`
 	Text               any               `json:"text,omitempty"`
 	ToolChoice         any               `json:"tool_choice,omitempty"`
-	Tools              any               `json:"tools,omitempty"`
+	Tools              []ResponsesTools  `json:"tools,omitempty"`
 	TopP               *float64          `json:"top_p,omitempty"`
 	Truncation         string            `json:"truncation,omitempty"`
 
@@ -151,4 +158,45 @@ func (u *ResponsesUsage) ToOpenAIUsage() *Usage {
 	}
 
 	return usage
+}
+
+type ResponsesTools struct {
+	Type string `json:"type"`
+	// Web Search
+	UserLocation      any    `json:"user_location,omitempty"`
+	SearchContextSize string `json:"search_context_size,omitempty"`
+	// File Search
+	VectorStoreIds []string `json:"vector_store_ids,omitempty"`
+	MaxNumResults  uint     `json:"max_num_results,omitempty"`
+	Filters        any      `json:"filters,omitempty"`
+	RankingOptions any      `json:"ranking_options,omitempty"`
+	// Computer Use
+	DisplayWidth  uint   `json:"display_width,omitempty"`
+	DisplayHeight uint   `json:"display_height,omitempty"`
+	Environment   string `json:"environment,omitempty"`
+	// Function
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Parameters  any    `json:"parameters,omitempty"`
+	Strict      any    `json:"strict,omitempty"`
+
+	//MCP
+	ServerLabel     string `json:"server_label,omitempty"`
+	ServerURL       string `json:"server_url,omitempty"`
+	AllowedTools    any    `json:"allowed_tools,omitempty"`
+	Headers         any    `json:"headers,omitempty"`
+	RequireApproval any    `json:"require_approval,omitempty"`
+
+	// Code interpreter
+	Container any `json:"container,omitempty"`
+	// Image generation tool
+	Background        any    `json:"background,omitempty"`
+	InputImageMask    any    `json:"input_image_mask,omitempty"`
+	Model             string `json:"model,omitempty"`
+	Moderation        any    `json:"moderation,omitempty"`
+	OutputCompression any    `json:"output_compression,omitempty"`
+	OutputFormat      any    `json:"output_format,omitempty"`
+	PartialImages     any    `json:"partial_images,omitempty"`
+	Quality           any    `json:"quality,omitempty"`
+	Size              any    `json:"size,omitempty"`
 }

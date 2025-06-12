@@ -168,7 +168,7 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
         <TableRow>
           <TableCell colSpan={colCount} sx={{ p: 0, border: 0, bgcolor: 'transparent' }}>
             <Collapse in={open} timeout="auto" unmountOnExit>
-              <QuotaWithDetailContent item={item} t={t} />
+              <QuotaWithDetailContent item={item} t={t} totalInputTokens={totalInputTokens} totalOutputTokens={totalOutputTokens} />
             </Collapse>
           </TableCell>
         </TableRow>

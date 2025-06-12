@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"one-api/common/config"
+	"strings"
 )
 
 type Usage struct {
@@ -13,7 +14,14 @@ type Usage struct {
 	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details"`
 	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details"`
 
-	ExtraTokens map[string]int `json:"-"`
+	ExtraTokens  map[string]int          `json:"-"`
+	ExtraBilling map[string]ExtraBilling `json:"-"`
+	TextBuilder  strings.Builder         `json:"-"`
+}
+
+type ExtraBilling struct {
+	Type      string `json:"type"`
+	CallCount int    `json:"call_count"`
 }
 
 func (u *Usage) GetExtraTokens() map[string]int {
@@ -149,4 +157,20 @@ type OpenAIErrorResponse struct {
 
 type StreamOptions struct {
 	IncludeUsage bool `json:"include_usage,omitempty"`
+}
+
+func (u *Usage) IncExtraBilling(key string, bType string) {
+	if u.ExtraBilling == nil {
+		u.ExtraBilling = make(map[string]ExtraBilling)
+		if _, ok := u.ExtraTokens[key]; !ok {
+			u.ExtraBilling[key] = ExtraBilling{
+				Type:      bType,
+				CallCount: 0,
+			}
+		}
+	}
+
+	billing := u.ExtraBilling[key]
+	billing.CallCount++
+	u.ExtraBilling[key] = billing
 }
