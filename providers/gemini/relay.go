@@ -37,7 +37,7 @@ func (p *GeminiProvider) CreateGeminiChat(request *GeminiChatRequest) (*GeminiCh
 	}
 
 	usage := p.GetUsage()
-	*usage = convertOpenAIUsage(geminiResponse.UsageMetadata)
+	*usage = ConvertOpenAIUsage(geminiResponse.UsageMetadata)
 
 	return geminiResponse, nil
 }

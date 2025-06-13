@@ -355,7 +355,6 @@ func (h *zhipuStreamHandler) convertToOpenaiStream(zhipuResponse *ZhipuStreamRes
 	if zhipuResponse.Usage != nil {
 		*h.Usage = *zhipuResponse.Usage
 	} else {
-		h.Usage.CompletionTokens += common.CountTokenText(zhipuResponse.GetResponseText(), h.Request.Model)
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		h.Usage.TextBuilder.WriteString(zhipuResponse.GetResponseText())
 	}
 }

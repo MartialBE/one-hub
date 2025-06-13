@@ -174,9 +174,7 @@ func (h *CloudflareAIStreamHandler) convertToOpenaiStream(chatResponse *ChatResu
 		choice.FinishReason = types.FinishReasonStop
 	} else {
 		choice.Delta.Content = chatResponse.Response
-
-		h.Usage.CompletionTokens += common.CountTokenText(chatResponse.Response, h.Request.Model)
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		h.Usage.TextBuilder.WriteString(chatResponse.Response)
 	}
 
 	streamResponse.Choices = []types.ChatCompletionStreamChoice{choice}

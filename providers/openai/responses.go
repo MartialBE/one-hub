@@ -43,6 +43,8 @@ func (p *OpenAIProvider) CreateResponses(request *types.OpenAIResponsesRequest) 
 
 	*p.Usage = *response.Usage.ToOpenAIUsage()
 
+	getResponsesExtraBilling(request.Tools, p.Usage)
+
 	return response, nil
 }
 
@@ -92,14 +94,35 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 
 	switch openaiResponse.Type {
 	case "response.output_text.delta":
-		h.Usage.CompletionTokens += common.CountTokenText(openaiResponse.Delta, h.Model)
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		h.Usage.TextBuilder.WriteString(openaiResponse.Delta)
 	case "response.completed":
 		if openaiResponse.Response != nil {
 			usage := openaiResponse.Response.Usage
 			*h.Usage = *usage.ToOpenAIUsage()
+			getResponsesExtraBilling(openaiResponse.Response.Tools, h.Usage)
 		}
 	}
 
 	dataChan <- rawStr
+}
+
+func getResponsesExtraBilling(tools []types.ResponsesTools, usage *types.Usage) {
+	if len(tools) == 0 || usage == nil {
+		return
+	}
+
+	for _, tool := range tools {
+		switch tool.Type {
+		case types.APITollTypeWebSearchPreview:
+			searchType := "medium"
+			if tool.SearchContextSize != "" {
+				searchType = tool.SearchContextSize
+			}
+			usage.IncExtraBilling(types.APITollTypeWebSearchPreview, searchType)
+		case types.APITollTypeCodeInterpreter:
+			usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
+		case types.APITollTypeFileSearch:
+			usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+		}
+	}
 }

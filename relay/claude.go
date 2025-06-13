@@ -11,6 +11,7 @@ import (
 	"one-api/providers/claude"
 	"one-api/safty"
 	"one-api/types"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -153,18 +154,19 @@ func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, er
 	tokenNum := 0
 
 	tokensPerMessage := 4
+	var textMsg strings.Builder
 
 	for _, message := range request.Messages {
 		tokenNum += tokensPerMessage
 		switch v := message.Content.(type) {
 		case string:
-			tokenNum += common.GetTokenNum(tokenEncoder, v)
+			textMsg.WriteString(v)
 		case []any:
 			for _, m := range v {
 				content := m.(map[string]any)
 				switch content["type"] {
 				case "text":
-					tokenNum += common.GetTokenNum(tokenEncoder, content["text"].(string))
+					textMsg.WriteString(content["text"].(string))
 				case "image":
 					if preCostType == config.PreCostNotImage {
 						continue
@@ -185,6 +187,10 @@ func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, er
 				}
 			}
 		}
+	}
+
+	if textMsg.Len() > 0 {
+		tokenNum += common.GetTokenNum(tokenEncoder, textMsg.String())
 	}
 
 	return tokenNum, nil

@@ -189,6 +189,6 @@ func (h *palmStreamHandler) convertToOpenaiStream(palmChatResponse *PaLMChatResp
 	responseBody, _ := json.Marshal(streamResponse)
 	dataChan <- string(responseBody)
 
-	h.Usage.CompletionTokens += common.CountTokenText(palmChatResponse.Candidates[0].Content, h.Request.Model)
-	h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+	h.Usage.TextBuilder.WriteString(palmChatResponse.Candidates[0].Content)
+
 }

@@ -105,17 +105,19 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string, pr
 		tokensPerName = 1
 	}
 	tokenNum := 0
+	var textMsg strings.Builder
+
 	for _, message := range messages {
 		tokenNum += tokensPerMessage
 		switch v := message.Content.(type) {
 		case string:
-			tokenNum += GetTokenNum(tokenEncoder, v)
+			textMsg.WriteString(v + "\n")
 		case []any:
 			for _, it := range v {
 				m := it.(map[string]any)
 				switch m["type"] {
 				case "text":
-					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
+					textMsg.WriteString(m["text"].(string) + "\n")
 				case "image_url":
 					if preCostType == config.PreCostNotImage {
 						continue
@@ -140,12 +142,18 @@ func CountTokenMessages(messages []types.ChatCompletionMessage, model string, pr
 				}
 			}
 		}
-		tokenNum += GetTokenNum(tokenEncoder, message.Role)
+		textMsg.WriteString(message.Role + "\n")
+
 		if message.Name != nil {
 			tokenNum += tokensPerName
-			tokenNum += GetTokenNum(tokenEncoder, *message.Name)
+			textMsg.WriteString(*message.Name + "\n")
 		}
 	}
+
+	if textMsg.Len() > 0 {
+		tokenNum += GetTokenNum(tokenEncoder, textMsg.String())
+	}
+
 	tokenNum += 3 // Every reply is primed with <|start|>assistant<|message|>
 	return tokenNum
 }
@@ -187,6 +195,7 @@ func CountTokenInputMessages(input any, model string, preCostType int) int {
 		return 0
 	}
 
+	var textMsg strings.Builder
 	var messages []types.ChatCompletionMessage
 	err = json.Unmarshal(jsonStr, &messages)
 	if err != nil {
@@ -198,13 +207,13 @@ func CountTokenInputMessages(input any, model string, preCostType int) int {
 		tokenNum += tokensPerMessage
 		switch v := message.Content.(type) {
 		case string:
-			tokenNum += GetTokenNum(tokenEncoder, v)
+			textMsg.WriteString(v + "\n")
 		case []any:
 			for _, it := range v {
 				m := it.(map[string]any)
 				switch m["type"] {
 				case "text":
-					tokenNum += GetTokenNum(tokenEncoder, m["text"].(string))
+					textMsg.WriteString(m["text"].(string) + "\n")
 				case "image_url":
 					if preCostType == config.PreCostNotImage {
 						continue
@@ -229,11 +238,15 @@ func CountTokenInputMessages(input any, model string, preCostType int) int {
 				}
 			}
 		}
-		tokenNum += GetTokenNum(tokenEncoder, message.Role)
+		textMsg.WriteString(message.Role + "\n")
 		if message.Name != nil {
 			tokenNum += tokensPerName
-			tokenNum += GetTokenNum(tokenEncoder, *message.Name)
+			textMsg.WriteString(*message.Name + "\n")
 		}
+	}
+
+	if textMsg.Len() > 0 {
+		tokenNum += GetTokenNum(tokenEncoder, textMsg.String())
 	}
 
 	tokenNum += 3 // Every reply is primed with <|start|>assistant<|message|>
@@ -247,25 +260,30 @@ func CountTokenRerankMessages(messages types.RerankRequest, model string, preCos
 
 	tokenEncoder := GetTokenEncoder(model)
 	tokenNum := 0
+	var textMsg strings.Builder
 
-	tokenNum += GetTokenNum(tokenEncoder, messages.Query)
+	textMsg.WriteString(messages.Query + "\n")
 
 	for _, document := range messages.Documents {
 		docStr, ok := document.(string)
 		if ok {
-			tokenNum += GetTokenNum(tokenEncoder, docStr)
+			textMsg.WriteString(docStr + "\n")
 		} else {
 			docMultimodal, ok := document.(map[string]string)
 			if ok {
 				text := docMultimodal["text"]
 				if text != "" {
-					tokenNum += GetTokenNum(tokenEncoder, text)
+					textMsg.WriteString(text + "\n")
 				} else {
 					// 意思意思加点
 					tokenNum += 10
 				}
 			}
 		}
+	}
+
+	if textMsg.Len() > 0 {
+		tokenNum += GetTokenNum(tokenEncoder, textMsg.String())
 	}
 
 	return tokenNum

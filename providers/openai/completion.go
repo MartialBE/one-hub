@@ -117,7 +117,7 @@ func (h *OpenAIStreamHandler) handlerCompletionStream(rawLine *[]byte, dataChan 
 	if h.Usage.TotalTokens == 0 {
 		h.Usage.TotalTokens = h.Usage.PromptTokens
 	}
-	countTokenText := common.CountTokenText(openaiResponse.getResponseText(), h.ModelName)
-	h.Usage.CompletionTokens += countTokenText
-	h.Usage.TotalTokens += countTokenText
+
+	h.Usage.TextBuilder.WriteString(openaiResponse.getResponseText())
+
 }

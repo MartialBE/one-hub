@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"one-api/common"
 	"one-api/common/requester"
 	"one-api/types"
 	"strings"
@@ -119,8 +118,7 @@ func (h *ClaudeRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		ClaudeUsageMerge(&claudeResponse.Usage, h.StartUsage)
 		ClaudeUsageToOpenaiUsage(&claudeResponse.Usage, h.Usage)
 	case "content_block_delta":
-		h.Usage.CompletionTokens += common.CountTokenText(claudeResponse.Delta.Text, h.ModelName)
-		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+		h.Usage.TextBuilder.WriteString(claudeResponse.Delta.Text)
 	}
 
 	dataChan <- rawStr
