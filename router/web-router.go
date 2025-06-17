@@ -18,7 +18,10 @@ func SetWebRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte) {
 	// 特别处理favicon.ico请求
 	router.GET("/favicon.ico", controller.Favicon(buildFS))
 
-	embedFS := static.EmbedFolder(buildFS, "web/build")
+	embedFS, err := static.EmbedFolder(buildFS, "web/build")
+	if err != nil {
+		panic("加载嵌入式资源失败")
+	}
 	router.Use(static.Serve("/", embedFS))
 
 	router.NoRoute(func(c *gin.Context) {
