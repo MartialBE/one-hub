@@ -5,7 +5,6 @@ import { LOGIN } from 'store/actions';
 
 export const API = axios.create({
   // ... 其他代码 ...
-  withCredentials: true, // 确保携带 cookie
 
   baseURL: import.meta.env.VITE_APP_SERVER || '/'
 });
@@ -29,7 +28,6 @@ API.interceptors.response.use(
 
 export const LoginCheckAPI = axios.create({
   // ... 其他代码 ...
-  withCredentials: true, // 确保携带 cookie
 
   baseURL: import.meta.env.VITE_APP_SERVER || '/'
 });
