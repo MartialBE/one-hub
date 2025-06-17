@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"net/http"
 	"one-api/cli"
 	"one-api/common"
 	"one-api/common/cache"
@@ -128,6 +129,13 @@ func initHttpServer() {
 	}
 
 	store := cookie.NewStore([]byte(config.SessionSecret))
+	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   2592000, // 30 days
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteStrictMode,
+	})
 	server.Use(sessions.Sessions("session", store))
 
 	router.SetRouter(server, buildFS, indexPage)
