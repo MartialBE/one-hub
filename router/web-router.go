@@ -20,8 +20,7 @@ func SetWebRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte) {
 
 	embedFS, err := static.EmbedFolder(buildFS, "web/build")
 	if err != nil {
-		// 处理错误，可以选择记录日志或者 panic
-		panic("无法创建嵌入文件系统: " + err.Error())
+		panic("加载嵌入式资源失败")
 	}
 	router.Use(static.Serve("/", embedFS))
 

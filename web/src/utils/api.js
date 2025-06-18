@@ -1,6 +1,6 @@
 import { showError } from './common';
 import axios from 'axios';
-import { store } from 'store/index';
+import { store } from '../store';
 import { LOGIN } from 'store/actions';
 
 export const API = axios.create({
