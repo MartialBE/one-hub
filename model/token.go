@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/database"
@@ -10,8 +11,6 @@ import (
 	"one-api/common/redis"
 	"one-api/common/stmp"
 	"one-api/common/utils"
-
-	"gorm.io/gorm"
 )
 
 var (
@@ -114,7 +113,8 @@ func GetTokenModel(key string) (token *Token, err error) {
 
 	token, err = CacheGetTokenByKey(key)
 	if err != nil {
-		logger.SysError(fmt.Sprintf("DB Not Found: userId=%d, tokenId=%d, key=%s, err=%s", userId, tokenId, key, err.Error()))
+		maskedKey := key[:3] + "*********" + key[len(key)-3:]
+		logger.SysError(fmt.Sprintf("DB Not Found: userId=%d, tokenId=%d, key=%s, err=%s", userId, tokenId, maskedKey, err.Error()))
 		return nil, ErrTokenInvalid
 	}
 

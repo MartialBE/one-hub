@@ -28,6 +28,7 @@ const SystemLogs = () => {
   const [logs, setLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredLogs, setFilteredLogs] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false); // 添加初始化标志
   const logsEndRef = useRef(null);
   const logsContainerRef = useRef(null);
 
@@ -90,42 +91,35 @@ const SystemLogs = () => {
     } catch (error) {
       console.error('Error fetching logs:', error);
     }
-  }, [maxEntries, processLogEntry]);
+  }, [maxEntries]);
 
-  // Fetch logs on component mount (only once)
+  // 初始化时只加载一次
   useEffect(() => {
-    // Initial fetch only when component mounts
-    fetchLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  // Empty dependency array means this runs once on mount
+    if (!isInitialized) {
+      fetchLogs();
+      setIsInitialized(true);
+    }
+  }, [fetchLogs, isInitialized]);
 
-  // Fetch logs when maxEntries changes
+  // 当 maxEntries 变化时重新获取日志（但不在初始化时触发）
   useEffect(() => {
-    // Only fetch logs when maxEntries changes, not on initial render
-    const controller = new AbortController();
-
-    // Skip the initial render
-    if (maxEntries !== 50) { // 50 is the default value
+    if (isInitialized) {
       fetchLogs();
     }
-
-    return () => {
-      controller.abort();
-    };
-  }, [maxEntries, fetchLogs]);
+  }, [maxEntries, fetchLogs, isInitialized]);
 
   // Set up auto-refresh interval
   useEffect(() => {
     // Only set up interval if autoRefresh is enabled
     let interval;
-    if (autoRefresh) {
+    if (autoRefresh && isInitialized) {
       interval = setInterval(fetchLogs, refreshInterval);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [autoRefresh, fetchLogs, refreshInterval]);
+  }, [autoRefresh, fetchLogs, refreshInterval, isInitialized]);
 
   // Filter logs based on search term
   useEffect(() => {
