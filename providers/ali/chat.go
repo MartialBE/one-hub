@@ -119,7 +119,6 @@ func (p *AliProvider) convertToChatOpenai(response *AliChatResponse, request *ty
 
 // 阿里云聊天请求体
 func (p *AliProvider) convertFromChatOpenai(request *types.ChatCompletionRequest) *AliChatRequest {
-	request.ClearEmptyMessages()
 	messages := make([]AliMessage, 0, len(request.Messages))
 	for i := 0; i < len(request.Messages); i++ {
 		message := request.Messages[i]

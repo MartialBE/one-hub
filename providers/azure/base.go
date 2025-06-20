@@ -15,9 +15,10 @@ func (f AzureProviderFactory) Create(channel *model.Channel) base.ProviderInterf
 	return &AzureProvider{
 		OpenAIProvider: openai.OpenAIProvider{
 			BaseProvider: base.BaseProvider{
-				Config:    config,
-				Channel:   channel,
-				Requester: requester.NewHTTPRequester(*channel.Proxy, openai.RequestErrorHandle),
+				Config:          config,
+				Channel:         channel,
+				Requester:       requester.NewHTTPRequester(*channel.Proxy, openai.RequestErrorHandle),
+				SupportResponse: true,
 			},
 			IsAzure:              true,
 			BalanceAction:        false,

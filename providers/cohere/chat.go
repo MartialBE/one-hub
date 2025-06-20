@@ -91,7 +91,6 @@ func (p *CohereProvider) getChatRequest(request *types.ChatCompletionRequest) (*
 }
 
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*V2ChatRequest, *types.OpenAIErrorWithStatusCode) {
-	request.ClearEmptyMessages()
 
 	cohereRequest := V2ChatRequest{
 		Model:            request.Model,

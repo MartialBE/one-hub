@@ -39,6 +39,7 @@ type Channel struct {
 	TestModel          string  `json:"test_model" form:"test_model" gorm:"type:varchar(50);default:''"`
 	OnlyChat           bool    `json:"only_chat" form:"only_chat" gorm:"default:false"`
 	PreCost            int     `json:"pre_cost" form:"pre_cost" gorm:"default:1"`
+	CompatibleResponse bool    `json:"compatible_response" gorm:"default:false"`
 
 	DisabledStream *datatypes.JSONSlice[string] `json:"disabled_stream,omitempty" gorm:"type:json"`
 

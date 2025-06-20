@@ -106,7 +106,6 @@ func (p *HunyuanProvider) convertToChatOpenai(response *ChatCompletionsResponse,
 }
 
 func convertFromChatOpenai(request *types.ChatCompletionRequest) *ChatCompletionsRequest {
-	request.ClearEmptyMessages()
 
 	messages := make([]*Message, 0, len(request.Messages))
 	for _, message := range request.Messages {

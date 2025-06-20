@@ -472,6 +472,9 @@ func OpenAIToGeminiChatContent(openaiContents []types.ChatCompletionMessage) ([]
 			imageNum := 0
 			for _, openaiPart := range openaiMessagePart {
 				if openaiPart.Type == types.ContentTypeText {
+					if openaiPart.Text == "" {
+						continue
+					}
 					imageSymbols := ImageSymbolAcMachines.MultiPatternSearch([]rune(openaiPart.Text), false)
 					if len(imageSymbols) > 0 {
 						lastEndPos := 0 // 上一段文本的结束位置
