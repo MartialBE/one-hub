@@ -390,6 +390,18 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 
 	}
 
+	if len(choices) == 0 {
+		// 如果没有内容，则返回一个空的响应
+		choices = append(choices, types.ChatCompletionChoice{
+			Index: 0,
+			Message: types.ChatCompletionMessage{
+				Role:    response.Role,
+				Content: "",
+			},
+			FinishReason: stopReasonClaude2OpenAI(response.StopReason),
+		})
+	}
+
 	openaiResponse = &types.ChatCompletionResponse{
 		ID:      response.Id,
 		Object:  "chat.completion",

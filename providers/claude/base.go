@@ -95,6 +95,8 @@ func stopReasonClaude2OpenAI(reason string) string {
 		return types.FinishReasonLength
 	case "tool_use":
 		return types.FinishReasonToolCalls
+	case "refusal":
+		return types.FinishReasonContentFilter
 	default:
 		return reason
 	}
