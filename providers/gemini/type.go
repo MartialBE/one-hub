@@ -573,6 +573,7 @@ type ModelListResponse struct {
 
 type ModelDetails struct {
 	Name                       string   `json:"name"`
+	DisplayName                string   `json:"displayName"`
 	SupportedGenerationMethods []string `json:"supportedGenerationMethods"`
 }
 
