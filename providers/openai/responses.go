@@ -94,7 +94,10 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 
 	switch openaiResponse.Type {
 	case "response.output_text.delta":
-		h.Usage.TextBuilder.WriteString(openaiResponse.Delta)
+		delta, ok := openaiResponse.Delta.(string)
+		if ok {
+			h.Usage.TextBuilder.WriteString(delta)
+		}
 	case "response.completed":
 		if openaiResponse.Response != nil {
 			usage := openaiResponse.Response.Usage

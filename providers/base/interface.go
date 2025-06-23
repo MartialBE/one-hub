@@ -40,6 +40,7 @@ type ProviderInterface interface {
 	SetOtherArg(otherArg string)
 	GetOtherArg() string
 	CustomParameterHandler() (map[string]interface{}, error)
+	GetSupportedResponse() bool
 }
 
 // 完成接口

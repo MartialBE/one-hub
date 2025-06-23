@@ -49,7 +49,7 @@ type ChatCompletionsResponseParams struct {
 type Choice struct {
 	// 结束标志位，可能为 stop 或 sensitive。
 	// stop 表示输出正常结束，sensitive 只在开启流式输出审核时会出现，表示安全审核未通过。
-	FinishReason *string `json:"FinishReason,omitempty" name:"FinishReason"`
+	FinishReason string `json:"FinishReason,omitempty" name:"FinishReason"`
 
 	// 增量返回值，流式调用时使用该字段。
 	// 注意：此字段可能返回 null，表示取不到有效值。

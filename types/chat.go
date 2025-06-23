@@ -1,5 +1,7 @@
 package types
 
+import "encoding/json"
+
 const (
 	ContentTypeText     = "text"
 	ContentTypeImageURL = "image_url"
@@ -91,42 +93,13 @@ func (m ChatCompletionMessage) ParseContent() []ChatMessagePart {
 		})
 		return contentList
 	}
-	anyList, ok := m.Content.([]any)
-	if ok {
-		for _, contentItem := range anyList {
-			contentMap, ok := contentItem.(map[string]any)
-			if !ok {
-				continue
-			}
-
-			if subStr, ok := contentMap["text"].(string); ok && subStr != "" {
-				contentList = append(contentList, ChatMessagePart{
-					Type: ContentTypeText,
-					Text: subStr,
-				})
-			} else if subObj, ok := contentMap["image_url"].(map[string]any); ok {
-				urlValue, ok := subObj["url"].(string)
-				if !ok {
-					continue
-				}
-				contentList = append(contentList, ChatMessagePart{
-					Type: ContentTypeImageURL,
-					ImageURL: &ChatMessageImageURL{
-						URL: urlValue,
-					},
-				})
-			} else if subObj, ok := contentMap["image"].(string); ok {
-				contentList = append(contentList, ChatMessagePart{
-					Type: ContentTypeImageURL,
-					ImageURL: &ChatMessageImageURL{
-						URL: subObj,
-					},
-				})
-			}
-		}
+	msgJson, err := json.Marshal(m.Content)
+	if err != nil {
 		return contentList
 	}
-	return nil
+
+	json.Unmarshal(msgJson, &contentList)
+	return contentList
 }
 
 // 将FunctionCall转换为ToolCalls
@@ -174,10 +147,15 @@ type ChatMessagePart struct {
 	Type       string               `json:"type,omitempty"`
 	Text       string               `json:"text,omitempty"`
 	ImageURL   *ChatMessageImageURL `json:"image_url,omitempty"`
-	InputAudio any                  `json:"input_audio,omitempty"`
+	InputAudio *InputAudio          `json:"input_audio,omitempty"`
 	Refusal    string               `json:"refusal,omitempty"`
 
 	File *ChatMessageFile `json:"file,omitempty"`
+}
+
+type InputAudio struct {
+	Data   string `json:"data"`
+	Format string `json:"format"`
 }
 
 type ChatMessageFile struct {
@@ -289,20 +267,12 @@ func (r *ChatCompletionRequest) GetFunctions() []*ChatCompletionFunction {
 
 	return r.Functions
 }
-func (r *ChatCompletionRequest) ClearEmptyMessages() {
-	var messages []ChatCompletionMessage
-	for _, message := range r.Messages {
-		if message.StringContent() != "" || message.ToolCalls != nil || message.FunctionCall != nil {
-			messages = append(messages, message)
-		}
-	}
-	r.Messages = messages
-}
 
 type ChatCompletionFunction struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Parameters  any    `json:"parameters"`
+	Strict      *bool  `json:"strict,omitempty"`
 }
 
 type ChatCompletionTool struct {
@@ -314,7 +284,7 @@ type ChatCompletionChoice struct {
 	Index                int                   `json:"index"`
 	Message              ChatCompletionMessage `json:"message"`
 	LogProbs             any                   `json:"logprobs,omitempty"`
-	FinishReason         any                   `json:"finish_reason,omitempty"`
+	FinishReason         string                `json:"finish_reason,omitempty"`
 	ContentFilterResults any                   `json:"content_filter_results,omitempty"`
 	FinishDetails        any                   `json:"finish_details,omitempty"`
 }

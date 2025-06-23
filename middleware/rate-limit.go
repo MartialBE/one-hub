@@ -19,10 +19,10 @@ var inMemoryRateLimiter common.InMemoryRateLimiter
 // All duration's unit is seconds
 // Shouldn't larger then RateLimitKeyExpirationDuration
 var (
-	GlobalApiRateLimitNum            = 180
+	GlobalApiRateLimitNum            = 300
 	GlobalApiRateLimitDuration int64 = 3 * 60
 
-	GlobalWebRateLimitNum            = 100
+	GlobalWebRateLimitNum            = 180
 	GlobalWebRateLimitDuration int64 = 3 * 60
 
 	UploadRateLimitNum            = 10

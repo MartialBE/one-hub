@@ -263,8 +263,11 @@ func GetUserInvoices(params *StatisticsMonthSearchParams) (*DataResult[Statistic
 		}
 	}
 
-	// Apply the validated order
-	query = query.Order(orderField + " " + orderDir)
+	if orderDir == "DESC" {
+		query = query.Order(fmt.Sprintf("%s DESC", orderField))
+	} else {
+		query = query.Order(fmt.Sprintf("%s ASC", orderField))
+	}
 
 	// Apply pagination
 	query = query.Limit(params.Size).Offset(offset)

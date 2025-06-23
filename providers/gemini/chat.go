@@ -120,7 +120,6 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRela
 }
 
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
-	request.ClearEmptyMessages()
 
 	threshold := "BLOCK_NONE"
 

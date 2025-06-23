@@ -118,7 +118,6 @@ func (p *ClaudeProvider) getChatRequest(claudeRequest *ClaudeRequest) (*http.Req
 }
 
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest, *types.OpenAIErrorWithStatusCode) {
-	request.ClearEmptyMessages()
 	claudeRequest := ClaudeRequest{
 		Model:         request.Model,
 		Messages:      make([]Message, 0),
@@ -388,6 +387,18 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 			choices = append(choices, choice)
 		}
 
+	}
+
+	if len(choices) == 0 {
+		// 如果没有内容，则返回一个空的响应
+		choices = append(choices, types.ChatCompletionChoice{
+			Index: 0,
+			Message: types.ChatCompletionMessage{
+				Role:    response.Role,
+				Content: "",
+			},
+			FinishReason: stopReasonClaude2OpenAI(response.StopReason),
+		})
 	}
 
 	openaiResponse = &types.ChatCompletionResponse{

@@ -70,13 +70,14 @@ func (pc *ProviderConfig) SetAPIUri(customMapping map[string]interface{}) {
 }
 
 type BaseProvider struct {
-	OriginalModel string
-	Usage         *types.Usage
-	Config        ProviderConfig
-	Context       *gin.Context
-	Channel       *model.Channel
-	Requester     *requester.HTTPRequester
-	OtherArg      string
+	OriginalModel   string
+	Usage           *types.Usage
+	Config          ProviderConfig
+	Context         *gin.Context
+	Channel         *model.Channel
+	Requester       *requester.HTTPRequester
+	OtherArg        string
+	SupportResponse bool
 }
 
 // 获取基础URL
@@ -232,4 +233,8 @@ func (p *BaseProvider) GetOtherArg() string {
 
 func (p *BaseProvider) SetOtherArg(otherArg string) {
 	p.OtherArg = otherArg
+}
+
+func (p *BaseProvider) GetSupportedResponse() bool {
+	return p.SupportResponse
 }
