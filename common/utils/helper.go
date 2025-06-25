@@ -205,6 +205,40 @@ func GetOrDefault[T any](env string, defaultValue T) T {
 			return v
 		}
 	}
+	// 处理常见的类型转换场景
+	switch any(defaultValue).(type) {
+	case int:
+		if intVal := viper.GetInt(env); intVal != 0 || viper.GetString(env) == "0" {
+			if result, ok := any(intVal).(T); ok {
+				return result
+			}
+		}
+	case int64:
+		if int64Val := viper.GetInt64(env); int64Val != 0 || viper.GetString(env) == "0" {
+			if result, ok := any(int64Val).(T); ok {
+				return result
+			}
+		}
+	case float64:
+		if floatVal := viper.GetFloat64(env); floatVal != 0 || viper.GetString(env) == "0" {
+			if result, ok := any(floatVal).(T); ok {
+				return result
+			}
+		}
+	case string:
+		if strVal := viper.GetString(env); strVal != "" || viper.IsSet(env) {
+			if result, ok := any(strVal).(T); ok {
+				return result
+			}
+		}
+	case bool:
+		if boolVal := viper.GetBool(env); boolVal || viper.GetString(env) == "false" {
+			if result, ok := any(boolVal).(T); ok {
+				return result
+			}
+		}
+	}
+
 	return defaultValue
 }
 
