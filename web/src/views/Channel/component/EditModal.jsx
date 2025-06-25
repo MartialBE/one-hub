@@ -993,43 +993,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     )}
                   </FormControl>
                 )}
-
-                {inputPrompt.pre_cost && (
-                  <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
-                    <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
-                    <Select
-                      id="channel-pre_cost-label"
-                      label={customizeT(inputLabel.pre_cost)}
-                      value={values.pre_cost}
-                      name="pre_cost"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      disabled={hasTag}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200
-                          }
-                        }
-                      }}
-                    >
-                      {PreCostType.map((option) => {
-                        return (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                    {touched.pre_cost && errors.pre_cost ? (
-                      <FormHelperText error id="helper-tex-channel-pre_cost-label">
-                        {errors.pre_cost}
-                      </FormHelperText>
-                    ) : (
-                      <FormHelperText id="helper-tex-channel-pre_cost-label"> {customizeT(inputPrompt.pre_cost)} </FormHelperText>
-                    )}
-                  </FormControl>
-                )}
                 {inputPrompt.only_chat && (
                   <FormControl fullWidth>
                     <FormControlLabel
@@ -1047,7 +1010,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     <FormHelperText id="helper-tex-only_chat_model-label"> {customizeT(inputPrompt.only_chat)} </FormHelperText>
                   </FormControl>
                 )}
-
                 {inputPrompt.pre_cost && (
                   <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
                     <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
@@ -1098,10 +1060,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                       }
                       label={customizeT(inputLabel.compatible_response)}
                     />
-                    <FormHelperText id="helper-tex-compatible_response-label">
-                      {' '}
-                      {customizeT(inputPrompt.compatible_response)}{' '}
-                    </FormHelperText>
+                    <FormHelperText id="helper-tex-compatible_response-label">{customizeT(inputPrompt.compatible_response)}</FormHelperText>
                   </FormControl>
                 )}
                 {pluginList[values.type] &&
