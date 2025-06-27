@@ -24,9 +24,9 @@ lastUpdated: true
 
 - [woodchen-ink 维护](https://github.com/MartialBE/one-hub/issues/562#issuecomment-2746243372)
 
-  - 价格链接(全部)：<https://aimodels-prices.q58.club/api/one_hub/rates>
-  - 价格链接(只含原版供应商,即厂商ID小于1000): <https://aimodels-prices.q58.club/api/one_hub/official-rates> 
-  - 供应商信息: <https://aimodels-prices.q58.club/providers>
+  - 价格链接(全部)：<https://ai-prices.sunai.net/api/one_hub/rates>
+  - 价格链接(只含原版供应商,即厂商ID小于1000): <https://ai-prices.sunai.net/api/one_hub/official-rates> 
+  - 供应商信息: <https://ai-prices.sunai.net/providers>
 
 需要明确的是，除了项目官方默认提供的供应商列表（`运营 --> 模型归属`）外，即 `id > 1000`的供应商，需要和项目价格表的供应商 id 能够匹配的上才可以正确显示价格。所以你需要同时关注：
 
