@@ -133,7 +133,7 @@ func (p *OpenAIProvider) GetFullRequestURL(requestURL string, modelName string) 
 
 	if p.IsAzure {
 		apiVersion := p.Channel.Other
-		if modelName != "" {
+		if modelName != "" && modelName != "o3-pro" {
 			// 检测模型是是否包含 . 如果有则直接去掉
 			// modelName = strings.Replace(modelName, ".", "", -1)
 
