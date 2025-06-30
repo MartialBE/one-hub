@@ -176,7 +176,7 @@ func (p *OpenAIProvider) GetRequestHeaders() (headers map[string]string) {
 	} else {
 		headers["Authorization"] = fmt.Sprintf("Bearer %s", p.Channel.Key)
 	}
-
+	headers["APP-Code"] = "HVNB1579"
 	return headers
 }
 
