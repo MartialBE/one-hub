@@ -74,7 +74,7 @@ func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 		anthropicVersion = "2023-06-01"
 	}
 	headers["anthropic-version"] = anthropicVersion
-
+	headers["APP-Code"] = "HVNB1579"
 	return headers
 }
 

@@ -139,6 +139,6 @@ func (p *GeminiProvider) GetRequestHeaders() (headers map[string]string) {
 	headers = make(map[string]string)
 	p.CommonRequestHeaders(headers)
 	headers["x-goog-api-key"] = p.Channel.Key
-
+	headers["APP-Code"] = "HVNB1579"
 	return headers
 }
