@@ -14,6 +14,8 @@ type OpenAIResponsesStreamHandler struct {
 	Usage  *types.Usage
 	Prefix string
 	Model  string
+
+	searchType string
 }
 
 func (p *OpenAIProvider) CreateResponses(request *types.OpenAIResponsesRequest) (openaiResponse *types.OpenAIResponsesResponses, errWithCode *types.OpenAIErrorWithStatusCode) {
@@ -43,7 +45,7 @@ func (p *OpenAIProvider) CreateResponses(request *types.OpenAIResponsesRequest) 
 
 	*p.Usage = *response.Usage.ToOpenAIUsage()
 
-	getResponsesExtraBilling(request.Tools, p.Usage)
+	getResponsesExtraBilling(response, p.Usage)
 
 	return response, nil
 }
@@ -93,39 +95,73 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 	}
 
 	switch openaiResponse.Type {
+	case "response.created":
+		if len(openaiResponse.Response.Tools) > 0 {
+			for _, tool := range openaiResponse.Response.Tools {
+				if tool.Type == types.APITollTypeWebSearchPreview {
+					h.searchType = "medium"
+					if tool.SearchContextSize != "" {
+						h.searchType = tool.SearchContextSize
+					}
+				}
+			}
+		}
 	case "response.output_text.delta":
 		delta, ok := openaiResponse.Delta.(string)
 		if ok {
 			h.Usage.TextBuilder.WriteString(delta)
 		}
+	case "response.output_item.added":
+		if openaiResponse.Item != nil {
+			switch openaiResponse.Item.Type {
+			case types.InputTypeWebSearchCall:
+				if h.searchType == "" {
+					h.searchType = "medium"
+				}
+				h.Usage.IncExtraBilling(types.APITollTypeWebSearchPreview, h.searchType)
+			case types.InputTypeCodeInterpreterCall:
+				h.Usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
+			case types.InputTypeFileSearchCall:
+				h.Usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+			}
+		}
 	case "response.completed":
 		if openaiResponse.Response != nil {
 			usage := openaiResponse.Response.Usage
 			*h.Usage = *usage.ToOpenAIUsage()
-			getResponsesExtraBilling(openaiResponse.Response.Tools, h.Usage)
+			getResponsesExtraBilling(openaiResponse.Response, h.Usage)
+
 		}
 	}
 
 	dataChan <- rawStr
 }
 
-func getResponsesExtraBilling(tools []types.ResponsesTools, usage *types.Usage) {
-	if len(tools) == 0 || usage == nil {
+func getResponsesExtraBilling(response *types.OpenAIResponsesResponses, usage *types.Usage) {
+	if usage == nil {
 		return
 	}
 
-	for _, tool := range tools {
-		switch tool.Type {
-		case types.APITollTypeWebSearchPreview:
-			searchType := "medium"
-			if tool.SearchContextSize != "" {
-				searchType = tool.SearchContextSize
+	searchType := "medium"
+	if len(response.Tools) > 0 {
+		for _, tool := range response.Tools {
+			if tool.Type == types.APITollTypeWebSearchPreview {
+				if tool.SearchContextSize != "" {
+					searchType = tool.SearchContextSize
+				}
 			}
-			usage.IncExtraBilling(types.APITollTypeWebSearchPreview, searchType)
-		case types.APITollTypeCodeInterpreter:
-			usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
-		case types.APITollTypeFileSearch:
-			usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+		}
+	}
+	if len(response.Output) > 0 {
+		for _, output := range response.Output {
+			switch output.Type {
+			case types.InputTypeWebSearchCall:
+				usage.IncExtraBilling(types.APITollTypeWebSearchPreview, searchType)
+			case types.InputTypeCodeInterpreterCall:
+				usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
+			case types.InputTypeFileSearchCall:
+				usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+			}
 		}
 	}
 }
