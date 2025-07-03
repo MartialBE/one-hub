@@ -301,6 +301,7 @@ const (
 	ChannelTypeRecraft      = 51
 	ChannelTypeReplicate    = 52
 	ChannelTypeKling        = 53
+	ChannelTypeAzureDatabricks = 54
 )
 
 const (
