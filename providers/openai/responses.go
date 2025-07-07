@@ -125,8 +125,8 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 				h.Usage.IncExtraBilling(types.APITollTypeFileSearch, "")
 			}
 		}
-	case "response.completed":
-		if openaiResponse.Response != nil {
+	default:
+		if openaiResponse.Response != nil && openaiResponse.Response.Usage != nil {
 			usage := openaiResponse.Response.Usage
 			*h.Usage = *usage.ToOpenAIUsage()
 			getResponsesExtraBilling(openaiResponse.Response, h.Usage)
