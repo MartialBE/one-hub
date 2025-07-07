@@ -175,6 +175,7 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 		if openaiResponse.Response != nil {
 			if h.MessageID == "" {
 				h.MessageID = openaiResponse.Response.ID
+				chatRes.ID = h.MessageID
 			}
 		}
 		if len(openaiResponse.Response.Tools) > 0 {
@@ -187,6 +188,11 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 				}
 			}
 		}
+		chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: types.ChatCompletionStreamChoiceDelta{},
+		})
+		needOutput = true
 	case "response.output_text.delta": // 处理文本输出的增量
 		delta, ok := openaiResponse.Delta.(string)
 		if ok {
@@ -304,7 +310,11 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 			return
 		}
 		dataChan <- string(jsonData)
+
+		return
 	}
+
+	*rawLine = nil
 }
 
 func getResponsesExtraBilling(response *types.OpenAIResponsesResponses, usage *types.Usage) {
