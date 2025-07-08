@@ -44,7 +44,7 @@ func (p *AzureDatabricksProvider) GetFullRequestURL(modelName string) string {
 	return fmt.Sprintf("%s/serving-endpoints/%s/invocations", baseURL, modelName)
 }
 
-func (p *AzureDatabricksProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+func (p *AzureDatabricksProvider) prepareRequest(request *types.ChatCompletionRequest) (*http.Response, *types.OpenAIErrorWithStatusCode) {
 	req, errWithCode := p.convertRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
@@ -52,6 +52,15 @@ func (p *AzureDatabricksProvider) CreateChatCompletion(request *types.ChatComple
 
 	requestURL := p.GetFullRequestURL(request.Model)
 	httpResponse, errWithCode := p.doRequest(req, requestURL)
+	if errWithCode != nil {
+		return nil, errWithCode
+	}
+
+	return httpResponse, nil
+}
+
+func (p *AzureDatabricksProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (*types.ChatCompletionResponse, *types.OpenAIErrorWithStatusCode) {
+	httpResponse, errWithCode := p.prepareRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -85,9 +94,77 @@ func (p *AzureDatabricksProvider) convertRequest(request *types.ChatCompletionRe
 		})
 	}
 
-	return &databricksChatRequest{
+	databricksRequest := &databricksChatRequest{
 		Messages: messages,
-	}, nil
+		Stream:   request.Stream,
+	}
+
+	if request.MaxTokens != 0 {
+		databricksRequest.MaxTokens = request.MaxTokens
+	}
+	if request.Temperature != nil {
+		databricksRequest.Temperature = float64(*request.Temperature)
+	}
+	if request.TopP != nil {
+		databricksRequest.TopP = float64(*request.TopP)
+	}
+	if request.N != nil {
+		databricksRequest.N = *request.N
+	}
+	if request.Stop != nil {
+		if stop, ok := request.Stop.([]string); ok {
+			databricksRequest.Stop = stop
+		}
+	}
+	if request.PresencePenalty != nil {
+		databricksRequest.PresencePenalty = float64(*request.PresencePenalty)
+	}
+	if request.FrequencyPenalty != nil {
+		databricksRequest.FrequencyPenalty = float64(*request.FrequencyPenalty)
+	}
+
+	if request.Reasoning != nil {
+		var opErr *types.OpenAIErrorWithStatusCode
+		databricksRequest.MaxTokens, databricksRequest.Thinking, opErr = getThinking(databricksRequest.MaxTokens, request.Reasoning)
+		if opErr != nil {
+			return nil, opErr
+		}
+	}
+
+	return databricksRequest, nil
+}
+
+func getThinking(maxTokens int, reasoning *types.ChatReasoning) (newMaxTokens int, thinking *Thinking, err *types.OpenAIErrorWithStatusCode) {
+	newMaxTokens = maxTokens
+	thinking = &Thinking{
+		Type: "enabled",
+	}
+	if reasoning == nil || (reasoning.MaxTokens == 0 && reasoning.Effort == "") {
+		thinking.BudgetTokens = int(float64(maxTokens) * 0.8)
+	} else if reasoning.MaxTokens > 0 {
+		if reasoning.MaxTokens > maxTokens {
+			err = common.StringErrorWrapper(fmt.Sprintf("budget_token cannot be greater than the max_token, max_token: %d, budget_token: %d", maxTokens, reasoning.MaxTokens), "budget_tokens_too_large", http.StatusBadRequest)
+			return
+		}
+		thinking.BudgetTokens = reasoning.MaxTokens
+	} else {
+		switch reasoning.Effort {
+		case "low":
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.2)
+		case "medium":
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.5)
+		default:
+			thinking.BudgetTokens = int(float64(maxTokens) * 0.8)
+		}
+	}
+	if thinking.BudgetTokens < 128 {
+		thinking.BudgetTokens = 128
+	}
+	if newMaxTokens <= thinking.BudgetTokens {
+		newMaxTokens = thinking.BudgetTokens + 128
+	}
+
+	return
 }
 
 func (p *AzureDatabricksProvider) convertResponse(resp *http.Response) (response *types.ChatCompletionResponse, err error) {
@@ -133,13 +210,7 @@ func (p *AzureDatabricksProvider) convertResponse(resp *http.Response) (response
 }
 
 func (p *AzureDatabricksProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
-	req, errWithCode := p.convertRequest(request)
-	if errWithCode != nil {
-		return nil, errWithCode
-	}
-
-	requestURL := p.GetFullRequestURL(request.Model)
-	httpResponse, errWithCode := p.doRequest(req, requestURL)
+	httpResponse, errWithCode := p.prepareRequest(request)
 	if errWithCode != nil {
 		return nil, errWithCode
 	}
@@ -181,7 +252,21 @@ func requestErrorHandle(resp *http.Response) *types.OpenAIError {
 
 // databricksChatRequest is the request body for Azure Databricks
 type databricksChatRequest struct {
-	Messages []types.ChatCompletionMessage `json:"messages"`
+	Messages         []types.ChatCompletionMessage `json:"messages"`
+	Stream           bool                          `json:"stream,omitempty"`
+	MaxTokens        int                           `json:"max_tokens,omitempty"`
+	Temperature      float64                       `json:"temperature,omitempty"`
+	TopP             float64                       `json:"top_p,omitempty"`
+	N                int                           `json:"n,omitempty"`
+	Stop             []string                      `json:"stop,omitempty"`
+	PresencePenalty  float64                       `json:"presence_penalty,omitempty"`
+	FrequencyPenalty float64                       `json:"frequency_penalty,omitempty"`
+	Thinking         *Thinking                     `json:"thinking,omitempty"`
+}
+
+type Thinking struct {
+	Type         string `json:"type,omitempty"`
+	BudgetTokens int    `json:"budget_tokens,omitempty"`
 }
 
 // databricksChatResponse is the response body for Azure Databricks
