@@ -6,16 +6,19 @@ import (
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/requester"
+	"one-api/common/utils"
 	"one-api/types"
 	"strings"
 )
 
 type OpenAIResponsesStreamHandler struct {
-	Usage  *types.Usage
-	Prefix string
-	Model  string
+	Usage     *types.Usage
+	Prefix    string
+	Model     string
+	MessageID string
 
 	searchType string
+	toolIndex  int
 }
 
 func (p *OpenAIProvider) CreateResponses(request *types.OpenAIResponsesRequest) (openaiResponse *types.OpenAIResponsesResponses, errWithCode *types.OpenAIErrorWithStatusCode) {
@@ -65,14 +68,18 @@ func (p *OpenAIProvider) CreateResponsesStream(request *types.OpenAIResponsesReq
 
 	chatHandler := OpenAIResponsesStreamHandler{
 		Usage:  p.Usage,
-		Prefix: `data: {"type"`,
+		Prefix: `data: `,
 		Model:  request.Model,
 	}
 
-	return requester.RequestNoTrimStream(p.Requester, resp, chatHandler.HandlerChatStream)
+	if request.ConvertChat {
+		return requester.RequestStream(p.Requester, resp, chatHandler.HandlerChatStream)
+	}
+
+	return requester.RequestNoTrimStream(p.Requester, resp, chatHandler.HandlerResponsesStream)
 }
 
-func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
+func (h *OpenAIResponsesStreamHandler) HandlerResponsesStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
 	rawStr := string(*rawLine)
 
 	// 如果rawLine 前缀不为data:，则直接返回
@@ -125,8 +132,8 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 				h.Usage.IncExtraBilling(types.APITollTypeFileSearch, "")
 			}
 		}
-	case "response.completed":
-		if openaiResponse.Response != nil {
+	default:
+		if openaiResponse.Response != nil && openaiResponse.Response.Usage != nil {
 			usage := openaiResponse.Response.Usage
 			*h.Usage = *usage.ToOpenAIUsage()
 			getResponsesExtraBilling(openaiResponse.Response, h.Usage)
@@ -135,6 +142,179 @@ func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataCh
 	}
 
 	dataChan <- rawStr
+}
+
+func (h *OpenAIResponsesStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
+	// 如果rawLine 前缀不为data:，则直接返回
+	if !strings.HasPrefix(string(*rawLine), h.Prefix) {
+		*rawLine = nil
+		return
+	}
+
+	// 去除前缀
+	*rawLine = (*rawLine)[6:]
+
+	var openaiResponse types.OpenAIResponsesStreamResponses
+	err := json.Unmarshal(*rawLine, &openaiResponse)
+	if err != nil {
+		errChan <- common.ErrorToOpenAIError(err)
+		return
+	}
+
+	chatRes := types.ChatCompletionStreamResponse{
+		ID:      h.MessageID,
+		Object:  "chat.completion.chunk",
+		Created: utils.GetTimestamp(),
+		Model:   h.Model,
+		Choices: make([]types.ChatCompletionStreamChoice, 0),
+	}
+	needOutput := false
+
+	switch openaiResponse.Type {
+	case "response.created":
+		if openaiResponse.Response != nil {
+			if h.MessageID == "" {
+				h.MessageID = openaiResponse.Response.ID
+				chatRes.ID = h.MessageID
+			}
+		}
+		if len(openaiResponse.Response.Tools) > 0 {
+			for _, tool := range openaiResponse.Response.Tools {
+				if tool.Type == types.APITollTypeWebSearchPreview {
+					h.searchType = "medium"
+					if tool.SearchContextSize != "" {
+						h.searchType = tool.SearchContextSize
+					}
+				}
+			}
+		}
+		chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: types.ChatCompletionStreamChoiceDelta{},
+		})
+		needOutput = true
+	case "response.output_text.delta": // 处理文本输出的增量
+		delta, ok := openaiResponse.Delta.(string)
+		if ok {
+			h.Usage.TextBuilder.WriteString(delta)
+		}
+		chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: types.ChatCompletionStreamChoiceDelta{
+				Content: delta,
+			},
+		})
+		needOutput = true
+	case "response.reasoning_summary_text.delta": // 处理文本输出的增量
+		delta, ok := openaiResponse.Delta.(string)
+		if ok {
+			h.Usage.TextBuilder.WriteString(delta)
+		}
+		chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: types.ChatCompletionStreamChoiceDelta{
+				ReasoningContent: delta,
+			},
+		})
+		needOutput = true
+	case "response.function_call_arguments.delta": // 处理函数调用参数的增量
+		delta, ok := openaiResponse.Delta.(string)
+		if ok {
+			h.Usage.TextBuilder.WriteString(delta)
+		}
+		chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+			Index: 0,
+			Delta: types.ChatCompletionStreamChoiceDelta{
+				Role: types.ChatMessageRoleAssistant,
+				ToolCalls: []*types.ChatCompletionToolCalls{
+					{
+						Index: h.toolIndex,
+						Function: &types.ChatCompletionToolCallsFunction{
+							Arguments: delta,
+						},
+					},
+				},
+			},
+		})
+		needOutput = true
+	case "response.function_call_arguments.done":
+		h.toolIndex++
+	case "response.output_item.added":
+		if openaiResponse.Item != nil {
+			switch openaiResponse.Item.Type {
+			case types.InputTypeWebSearchCall:
+				if h.searchType == "" {
+					h.searchType = "medium"
+				}
+				h.Usage.IncExtraBilling(types.APITollTypeWebSearchPreview, h.searchType)
+			case types.InputTypeCodeInterpreterCall:
+				h.Usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
+			case types.InputTypeFileSearchCall:
+				h.Usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+
+			case types.InputTypeMessage, types.InputTypeReasoning:
+				chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+					Index: 0,
+					Delta: types.ChatCompletionStreamChoiceDelta{
+						Role:    types.ChatMessageRoleAssistant,
+						Content: "",
+					},
+				})
+				needOutput = true
+			case types.InputTypeFunctionCall:
+				arguments := ""
+				if openaiResponse.Item.Arguments != nil {
+					arguments = *openaiResponse.Item.Arguments
+				}
+
+				chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+					Index: 0,
+					Delta: types.ChatCompletionStreamChoiceDelta{
+						Role: types.ChatMessageRoleAssistant,
+						ToolCalls: []*types.ChatCompletionToolCalls{
+							{
+								Index: h.toolIndex,
+								Id:    openaiResponse.Item.CallID,
+								Type:  "function",
+								Function: &types.ChatCompletionToolCallsFunction{
+									Name:      openaiResponse.Item.Name,
+									Arguments: arguments,
+								},
+							},
+						},
+					},
+				})
+				needOutput = true
+			}
+		}
+	default:
+		if openaiResponse.Response != nil && openaiResponse.Response.Usage != nil {
+			usage := openaiResponse.Response.Usage
+			*h.Usage = *usage.ToOpenAIUsage()
+
+			getResponsesExtraBilling(openaiResponse.Response, h.Usage)
+			chatRes.Choices = append(chatRes.Choices, types.ChatCompletionStreamChoice{
+				Index:        0,
+				Delta:        types.ChatCompletionStreamChoiceDelta{},
+				FinishReason: types.ConvertResponsesStatusToChat(openaiResponse.Response.Status),
+			})
+			needOutput = true
+
+		}
+	}
+
+	if needOutput {
+		jsonData, err := json.Marshal(chatRes)
+		if err != nil {
+			errChan <- common.ErrorToOpenAIError(err)
+			return
+		}
+		dataChan <- string(jsonData)
+
+		return
+	}
+
+	*rawLine = nil
 }
 
 func getResponsesExtraBilling(response *types.OpenAIResponsesResponses, usage *types.Usage) {

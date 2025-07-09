@@ -25,7 +25,8 @@ import (
 
 var (
 	embeddingsRegex = regexp.MustCompile(`(?:^text-|embed|Embed|rerank|davinci|babbage|bge-|e5-|LLM2Vec|retrieval|uae-|gte-|jina-clip|jina-embeddings)`)
-	imageRegex      = regexp.MustCompile(`flux|diffusion|stabilityai|sd-|dall|cogview|janus`)
+	imageRegex      = regexp.MustCompile(`flux|diffusion|stabilityai|sd-|dall|cogview|janus|image`)
+	responseRegex   = regexp.MustCompile(`(?:^o[1-9])`)
 	noSupportRegex  = regexp.MustCompile(`(?:^tts|rerank|whisper|speech|^mj_|^chirp)`)
 )
 
@@ -48,6 +49,8 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 		url = "/v1/images/generations"
 	case "chat":
 		url = "/v1/chat/completions"
+	case "response":
+		url = "/v1/responses"
 	default:
 		return nil, errors.New("不支持的模型类型")
 	}
@@ -105,6 +108,19 @@ func testChannel(channel *model.Channel, testModel string) (openaiErr *types.Ope
 			N:      1,
 		}
 		response, openAIErrorWithStatusCode = imageProvider.CreateImageGenerations(testRequest)
+	case "response":
+		responseProvider, ok := provider.(providers_base.ResponsesInterface)
+		if !ok {
+			return nil, errors.New("channel not implemented")
+		}
+
+		testRequest := &types.OpenAIResponsesRequest{
+			Input:  "You just need to output 'hi' next.",
+			Model:  newModelName,
+			Stream: false,
+		}
+
+		response, openAIErrorWithStatusCode = responseProvider.CreateResponses(testRequest)
 	case "chat":
 		chatProvider, ok := provider.(providers_base.ChatInterface)
 		if !ok {
@@ -148,6 +164,10 @@ func getModelType(modelName string) string {
 
 	if imageRegex.MatchString(modelName) {
 		return "image"
+	}
+
+	if responseRegex.MatchString(modelName) {
+		return "response"
 	}
 
 	return "chat"

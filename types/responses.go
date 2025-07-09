@@ -71,6 +71,8 @@ type OpenAIResponsesRequest struct {
 	Tools              []ResponsesTools              `json:"tools,omitempty"`
 	TopP               *float64                      `json:"top_p,omitempty"`
 	Truncation         string                        `json:"truncation,omitempty"`
+
+	ConvertChat bool `json:"-"`
 }
 
 func (r *OpenAIResponsesRequest) ToChatCompletionRequest() (*ChatCompletionRequest, error) {
@@ -493,6 +495,20 @@ func (m ResponsesOutput) StringContent() string {
 	return ""
 }
 
+func (m ResponsesOutput) GetSummaryString() string {
+	if m.Type != InputTypeReasoning {
+		return ""
+	}
+
+	summary := ""
+	for _, item := range m.Summary {
+		if item.Type == ContentTypeSummaryText {
+			summary += item.Text
+		}
+	}
+	return summary
+}
+
 type IncompleteDetail struct {
 	Reason string `json:"reason,omitempty"`
 }
@@ -629,16 +645,16 @@ func (u *Usage) ToResponsesUsage() *ResponsesUsage {
 	return responsesUsage
 }
 
-// func convertResponsesStatusToChat(status string) string {
-// 	switch status {
-// 	case ResponseStatusFailed:
-// 		return FinishReasonContentFilter
-// 	case ResponseStatusIncomplete:
-// 		return FinishReasonLength
-// 	default:
-// 		return FinishReasonStop
-// 	}
-// }
+func ConvertResponsesStatusToChat(status string) string {
+	switch status {
+	case ResponseStatusFailed:
+		return FinishReasonContentFilter
+	case ResponseStatusIncomplete:
+		return FinishReasonLength
+	default:
+		return FinishReasonStop
+	}
+}
 
 func ConvertChatStatusToResponses(status string) string {
 	switch status {
@@ -753,4 +769,57 @@ func (cc *ChatCompletionResponse) ToResponses(request *OpenAIResponsesRequest) *
 	res.Output = outputs
 
 	return res
+}
+
+func (r *OpenAIResponsesResponses) ToChat() *ChatCompletionResponse {
+	resp := &ChatCompletionResponse{
+		Created: r.CreatedAt,
+		ID:      r.ID,
+		Model:   r.Model,
+		Object:  "chat.completion",
+		Usage:   r.Usage.ToOpenAIUsage(),
+		Choices: make([]ChatCompletionChoice, 0),
+	}
+
+	choice := ChatCompletionChoice{
+		Message: ChatCompletionMessage{
+			Role: ChatMessageRoleAssistant,
+		},
+		FinishReason: FinishReasonStop,
+	}
+
+	for _, output := range r.Output {
+		switch output.Type {
+		case InputTypeMessage:
+			choice.Message.Content = output.StringContent()
+		case InputTypeReasoning:
+			choice.Message.ReasoningContent = output.GetSummaryString()
+		case InputTypeFunctionCall:
+			if choice.Message.ToolCalls == nil {
+				choice.Message.ToolCalls = make([]*ChatCompletionToolCalls, 0)
+			}
+			arguments := ""
+			if output.Arguments != nil {
+				arguments = *output.Arguments
+			}
+			choice.Message.ToolCalls = append(choice.Message.ToolCalls, &ChatCompletionToolCalls{
+				Id:   output.CallID,
+				Type: "function",
+				Function: &ChatCompletionToolCallsFunction{
+					Name:      output.Name,
+					Arguments: arguments,
+				},
+			})
+			choice.FinishReason = FinishReasonToolCalls
+		}
+
+		if output.Status == ResponseStatusFailed || output.Status == ResponseStatusIncomplete {
+			choice.FinishReason = ConvertResponsesStatusToChat(output.Status)
+		}
+
+	}
+
+	resp.Choices = append(resp.Choices, choice)
+
+	return resp
 }
