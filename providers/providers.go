@@ -5,6 +5,7 @@ import (
 	"one-api/model"
 	"one-api/providers/ali"
 	"one-api/providers/azure"
+	"one-api/providers/azuredatabricks"
 	azurespeech "one-api/providers/azureSpeech"
 	"one-api/providers/baichuan"
 	"one-api/providers/baidu"
@@ -87,6 +88,7 @@ func init() {
 		config.ChannelTypeRecraft:      recraftAI.RecraftProviderFactory{},
 		config.ChannelTypeReplicate:    replicate.ReplicateProviderFactory{},
 		config.ChannelTypeOpenRouter:   openrouter.OpenRouterProviderFactory{},
+		config.ChannelTypeAzureDatabricks: azuredatabricks.AzureDatabricksProviderFactory{},
 	}
 }
 
