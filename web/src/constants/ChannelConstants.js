@@ -20,6 +20,13 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: 'https://oai.azure.com/'
   },
+  55: {
+    key: 55,
+    text: 'Azure OpenAI V1',
+    value: 55,
+    color: 'secondary',
+    url: 'https://oai.azure.com/'
+  },
   11: {
     key: 11,
     text: 'Google PaLM2',
