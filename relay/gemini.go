@@ -37,32 +37,37 @@ func NewRelayGeminiOnly(c *gin.Context) *relayGeminiOnly {
 }
 
 func (r *relayGeminiOnly) setRequest() error {
-	modelAction := r.c.Param("model")
+    modelAction := r.c.Param("model")
 
-	if modelAction == "" {
-		return errors.New("model is required")
-	}
+    if modelAction == "" {
+        return errors.New("model is required")
+    }
 
-	modelList := strings.Split(modelAction, ":")
-	if len(modelList) != 2 {
-		return errors.New("model error")
-	}
+    modelList := strings.Split(modelAction, ":")
+    if len(modelList) != 2 {
+        return errors.New("model error")
+    }
 
-	isStream := false
-	if modelList[1] == "streamGenerateContent" {
-		isStream = true
-	}
+    isStream := false
+    if modelList[1] == "streamGenerateContent" {
+        isStream = true
+    }
 
-	r.geminiRequest = &gemini.GeminiChatRequest{}
-	if err := common.UnmarshalBodyReusable(r.c, r.geminiRequest); err != nil {
-		return err
-	}
-	r.geminiRequest.SetJsonRaw(r.c)
-	r.geminiRequest.Model = modelList[0]
-	r.geminiRequest.Stream = isStream
-	r.setOriginalModel(r.geminiRequest.Model)
+    r.geminiRequest = &gemini.GeminiChatRequest{}
+    if err := common.UnmarshalBodyReusable(r.c, r.geminiRequest); err != nil {
+        return err
+    }
+    r.geminiRequest.SetJsonRaw(r.c)
+    r.geminiRequest.Model = modelList[0]
+    r.geminiRequest.Stream = isStream
+    r.setOriginalModel(r.geminiRequest.Model)
 
-	return nil
+    // Grounding search: Validate or enrich the request
+    if err := r.performGroundingSearch(); err != nil {
+        return err
+    }
+
+    return nil
 }
 
 func (r *relayGeminiOnly) getRequest() interface{} {
@@ -76,6 +81,30 @@ func (r *relayGeminiOnly) IsStream() bool {
 func (r *relayGeminiOnly) getPromptTokens() (int, error) {
 	channel := r.provider.GetChannel()
 	return CountGeminiTokenMessages(r.geminiRequest, channel.PreCost)
+}
+
+func (r *relayGeminiOnly) performGroundingSearch() error {
+    // Example: Validate the model against a database or external service
+    if !isValidModel(r.geminiRequest.Model) {
+        return errors.New("invalid model specified")
+    }
+
+    // Example: Enrich the request with additional context
+    // r.geminiRequest.Context = "Additional context or data for grounding"
+
+    return nil
+}
+
+func isValidModel(model string) bool {
+    // Placeholder for model validation logic
+    // This could query a database or check against a predefined list
+    validModels := []string{"modelA", "modelB", "modelC"}
+    for _, validModel := range validModels {
+        if model == validModel {
+            return true
+        }
+    }
+    return false
 }
 
 func (r *relayGeminiOnly) send() (err *types.OpenAIErrorWithStatusCode, done bool) {

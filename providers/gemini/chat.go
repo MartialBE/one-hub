@@ -121,7 +121,8 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRela
 
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatRequest, *types.OpenAIErrorWithStatusCode) {
 
-	threshold := "BLOCK_NONE"
+	// threshold := "BLOCK_NONE"
+	threshold := "OFF"
 
 	// if strings.HasPrefix(request.Model, "gemini-2.0") && !strings.Contains(request.Model, "thinking") {
 	// 	threshold = "OFF"
@@ -148,7 +149,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 			},
 			{
 				Category:  "HARM_CATEGORY_CIVIC_INTEGRITY",
-				Threshold: threshold,
+				Threshold: "BLOCK_NONE",
 			},
 		},
 		GenerationConfig: GeminiChatGenerationConfig{
