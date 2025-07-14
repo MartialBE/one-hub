@@ -83,7 +83,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: registry.ap-northeast-1.aliyuncs.com
+          registry: registry.cn-hangzhou.aliyuncs.com
           username: ${{ secrets.ALY_HUB_USERNAME }}
           password: ${{ secrets.ALY_HUB_PASSWORD }} # Replace with your Docker Hub password secret
 
@@ -93,7 +93,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            registry.ap-northeast-1.aliyuncs.com/sijinhui/one-hub
+            registry.cn-hangzhou.aliyuncs.com/sijinhui/one-hub
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=dev,enable=${{ github.ref == 'refs/heads/main' }}

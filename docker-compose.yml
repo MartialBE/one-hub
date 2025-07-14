@@ -3,7 +3,7 @@ version: "3.4"
 services:
   one-hub:
     #image: registry.xiaosi.cc/sijinhui/one-hub
-    image: registry.ap-northeast-1.aliyuncs.com/sijinhui/one-hub
+    image: registry-vpc.cn-hangzhou.aliyuncs.com/sijinhui/one-hub
     container_name: one-hub
     restart: always
     network_mode: "host"
