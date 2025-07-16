@@ -513,17 +513,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     )}
                   </FormControl>
                 )}
-                {channelId === 0 && (
-                  <Container
-                    sx={{
-                      textAlign: 'right'
-                    }}
-                  >
-                    <Switch checked={Boolean(batchAdd)} onChange={(e) => setBatchAdd(e.target.checked)} />
-                    {t('channel_edit.batchAdd')}
-                  </Container>
-                )}
-
                 {inputPrompt.base_url && (
                   <FormControl fullWidth error={Boolean(touched.base_url && errors.base_url)} sx={{ ...theme.typography.otherInput }}>
                     <InputLabel htmlFor="channel-base_url-label">{customizeT(inputLabel.base_url)}</InputLabel>
@@ -819,7 +808,21 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                       {errors.key}
                     </FormHelperText>
                   ) : (
-                    <FormHelperText id="helper-tex-channel-key-label"> {customizeT(inputPrompt.key)} </FormHelperText>
+                    <FormHelperText id="helper-tex-channel-key-label">
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{customizeT(inputPrompt.key)}</span>
+                        {channelId === 0 && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Switch 
+                              size="small"
+                              checked={Boolean(batchAdd)} 
+                              onChange={(e) => setBatchAdd(e.target.checked)} 
+                            />
+                            <Typography variant="body2">{t('channel_edit.batchAdd')}</Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </FormHelperText>
                   )}
                 </FormControl>
 
