@@ -533,6 +533,16 @@ const typeConfig = {
     },
     modelGroup: 'Kling'
   },
+  54: {
+    inputLabel: {
+      base_url: 'Azure Databricks Endpoint',
+      key: 'DATABRICKS_TOKEN'
+    },
+    prompt: {
+      base_url: '请填写Azure Databricks Endpoint',
+      key: '请输入DATABRICKS_TOKEN'
+    }
+  },
   20: {
     inputLabel: {
       provider_models_list: '从OR获取模型列表'

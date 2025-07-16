@@ -257,6 +257,13 @@ export const CHANNEL_OPTIONS = {
     color: 'warning',
     url: 'https://api.kling.ai'
   },
+  54: {
+    key: 54,
+    text: 'Azure Databricks',
+    value: 54,
+    color: 'orange',
+    url: ''
+  },
   8: {
     key: 8,
     text: '自定义渠道',

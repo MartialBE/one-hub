@@ -9,6 +9,7 @@ const IconWrapperStyled = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  margin: 'auto',
   backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 1)' : 'transparent',
   '& img': {
     width: '20px',
