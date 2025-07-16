@@ -495,11 +495,9 @@ export default function componentStyleOverrides(theme) {
             width: '100%',
             '& th:first-of-type': {
               borderTopLeftRadius: 0,
-              paddingLeft: '24px'
             },
             '& th:last-of-type': {
               borderTopRightRadius: 0,
-              paddingRight: '24px'
             }
           }
         }
