@@ -322,25 +322,28 @@ func getResponsesExtraBilling(response *types.OpenAIResponsesResponses, usage *t
 		return
 	}
 
-	searchType := "medium"
-	if len(response.Tools) > 0 {
-		for _, tool := range response.Tools {
-			if tool.Type == types.APITollTypeWebSearchPreview {
-				if tool.SearchContextSize != "" {
-					searchType = tool.SearchContextSize
-				}
-			}
-		}
-	}
 	if len(response.Output) > 0 {
 		for _, output := range response.Output {
 			switch output.Type {
 			case types.InputTypeWebSearchCall:
+				searchType := "medium"
+				if len(response.Tools) > 0 {
+					for _, tool := range response.Tools {
+						if tool.Type == types.APITollTypeWebSearchPreview {
+							if tool.SearchContextSize != "" {
+								searchType = tool.SearchContextSize
+							}
+						}
+					}
+				}
 				usage.IncExtraBilling(types.APITollTypeWebSearchPreview, searchType)
 			case types.InputTypeCodeInterpreterCall:
 				usage.IncExtraBilling(types.APITollTypeCodeInterpreter, "")
 			case types.InputTypeFileSearchCall:
 				usage.IncExtraBilling(types.APITollTypeFileSearch, "")
+			case types.InputTypeImageGenerationCall:
+				imageType := output.Quality + "-" + output.Size
+				usage.IncExtraBilling(types.APITollTypeImageGeneration, imageType)
 			}
 		}
 	}
