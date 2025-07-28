@@ -167,6 +167,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		geminiRequest.GenerationConfig.ResponseModalities = []string{"Text", "Image"}
 	}
 
+	if strings.HasSuffix(request.Model, "-tts") {
+		geminiRequest.GenerationConfig.ResponseModalities = []string{"AUDIO"}
+	}
+
 	if request.Reasoning != nil {
 		geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
 			ThinkingBudget: &request.Reasoning.MaxTokens,
