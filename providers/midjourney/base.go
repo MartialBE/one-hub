@@ -43,7 +43,12 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 	var nullBytes []byte
 	var mapResult map[string]interface{}
 	if p.Context.Request.Method != "GET" {
-		err := json.NewDecoder(p.Context.Request.Body).Decode(&mapResult)
+		body, exists := p.GetRawBody()
+		if !exists {
+			return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "request_body_not_found", http.StatusInternalServerError), nullBytes, nil
+		}
+
+		err := json.Unmarshal(body, &mapResult)
 		if err != nil {
 			return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "read_request_body_failed", http.StatusInternalServerError), nullBytes, err
 		}
@@ -99,10 +104,7 @@ func (p *MidjourneyProvider) Send(timeout int, requestURL string) (*MidjourneyRe
 	if err != nil {
 		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "close_request_body_failed", statusCode), nullBytes, err
 	}
-	err = p.Context.Request.Body.Close()
-	if err != nil {
-		return MidjourneyErrorWithStatusCodeWrapper(MjErrorUnknown, "close_request_body_failed", statusCode), nullBytes, err
-	}
+
 	var midjResponse MidjourneyResponse
 
 	var midjourneyUploadsResponse MidjourneyUploadResponse

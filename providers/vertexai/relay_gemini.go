@@ -82,7 +82,10 @@ func (p *VertexAIProvider) getGeminiRequest(request *gemini.GeminiChatRequest) (
 		headers["Accept"] = "text/event-stream"
 	}
 
-	body := request.GetJsonRaw()
+	body, exists := p.GetRawBody()
+	if !exists {
+		return nil, common.StringErrorWrapperLocal("request body not found", "request_body_not_found", http.StatusInternalServerError)
+	}
 
 	// 错误处理
 	p.Requester.ErrorHandler = RequestErrorHandle(p.Category.ErrorHandler)

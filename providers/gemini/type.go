@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	goahocorasick "github.com/anknown/ahocorasick"
-	"github.com/gin-gonic/gin"
 )
 
 const GeminiImageSymbol = "![one-hub-gemini-image]"
@@ -44,18 +43,6 @@ type GeminiChatRequest struct {
 	SystemInstruction any                        `json:"systemInstruction,omitempty"`
 
 	JsonRaw []byte `json:"-"`
-}
-
-func (r *GeminiChatRequest) GetJsonRaw() []byte {
-	return r.JsonRaw
-}
-
-func (r *GeminiChatRequest) SetJsonRaw(c *gin.Context) {
-	rawData, err := c.GetRawData()
-	if err != nil {
-		return
-	}
-	r.JsonRaw = rawData
 }
 
 type GeminiToolConfig struct {

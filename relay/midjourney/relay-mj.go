@@ -163,14 +163,6 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 	}
 	requestURL := getMjRequestPath(c.Request.URL.String())
 
-	// 保存一份
-	bodyBytes, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		// 处理错误
-		return provider.MidjourneyErrorWrapper(provider.MjRequestError, "read_request_body_failed")
-	}
-	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-
 	mjResp, _, err := mjProvider.Send(60, requestURL)
 	if err != nil {
 		quotaInstance.Undo(c)
@@ -204,7 +196,6 @@ func RelaySwapFace(c *gin.Context) *provider.MidjourneyResponse {
 				Description: errWithOA.Message,
 			}
 		}
-		c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 		mjResp, _, err = mjProvider.Send(60, requestURL)
 		if err != nil {
 			quotaInstance.Undo(c)
@@ -463,14 +454,6 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 		}
 	}
 
-	// 保存一份
-	bodyBytes, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		// 处理错误
-		return provider.MidjourneyErrorWrapper(provider.MjRequestError, "read_request_body_failed")
-	}
-	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-
 	midjResponseWithStatus, responseBody, err := mjProvider.Send(60, requestURL)
 	if err != nil {
 		quotaInstance.Undo(c)
@@ -503,7 +486,6 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *provider.MidjourneyRe
 				Description: errWithOA.Message,
 			}
 		}
-		c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		midjResponseWithStatus, responseBody, err = mjProvider.Send(60, requestURL)
 		if err != nil {
