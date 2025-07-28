@@ -2,8 +2,6 @@ package relay
 
 import (
 	"fmt"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
@@ -14,6 +12,9 @@ import (
 	"one-api/types"
 	"sort"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,9 +97,11 @@ func ListGeminiModelsByToken(c *gin.Context) {
 		price := model.PricingInstance.GetPrice(modelName)
 		if price.ChannelType == config.ChannelTypeGemini {
 			geminiModels = append(geminiModels, gemini.ModelDetails{
-				Name:                       fmt.Sprintf("models/%s", modelName),
-				DisplayName:                cases.Title(language.Und).String(strings.ReplaceAll(modelName, "-", " ")),
-				SupportedGenerationMethods: []string{},
+				Name:        fmt.Sprintf("models/%s", modelName),
+				DisplayName: cases.Title(language.Und).String(strings.ReplaceAll(modelName, "-", " ")),
+				SupportedGenerationMethods: []string{
+					"generateContent",
+				},
 			})
 		}
 	}
