@@ -92,10 +92,15 @@ func (p *OpenAIProvider) getRequestAudioBody(relayMode int, ModelName string, re
 			p.Requester.WithContentType(builder.FormDataContentType()))
 		req.ContentLength = int64(formBody.Len())
 	} else {
+		body, exists := p.GetRawBody()
+		if !exists {
+			return nil, common.StringErrorWrapperLocal("request body not found", "request_body_not_found", http.StatusInternalServerError)
+		}
+
 		req, err = p.Requester.NewRequest(
 			http.MethodPost,
 			fullRequestURL,
-			p.Requester.WithBody(p.Context.Request.Body),
+			p.Requester.WithBody(body),
 			p.Requester.WithHeader(headers),
 			p.Requester.WithContentType(p.Context.Request.Header.Get("Content-Type")))
 		req.ContentLength = p.Context.Request.ContentLength

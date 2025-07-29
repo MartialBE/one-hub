@@ -104,7 +104,11 @@ func (p *GeminiProvider) getChatRequest(geminiRequest *GeminiChatRequest, isRela
 
 	var body any
 	if isRelay {
-		body = geminiRequest.GetJsonRaw()
+		var exists bool
+		body, exists = p.GetRawBody()
+		if !exists {
+			return nil, common.StringErrorWrapperLocal("request body not found", "request_body_not_found", http.StatusInternalServerError)
+		}
 	} else {
 		p.pluginHandle(geminiRequest)
 		body = geminiRequest
@@ -161,6 +165,10 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 
 	if strings.HasPrefix(request.Model, "gemini-2.0-flash-exp") {
 		geminiRequest.GenerationConfig.ResponseModalities = []string{"Text", "Image"}
+	}
+
+	if strings.HasSuffix(request.Model, "-tts") {
+		geminiRequest.GenerationConfig.ResponseModalities = []string{"AUDIO"}
 	}
 
 	if request.Reasoning != nil {

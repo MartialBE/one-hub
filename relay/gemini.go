@@ -3,11 +3,9 @@ package relay
 import (
 	"encoding/json"
 	"errors"
-	"math"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
-	"one-api/common/image"
 	"one-api/common/requester"
 	"one-api/providers/gemini"
 	"one-api/safty"
@@ -57,7 +55,6 @@ func (r *relayGeminiOnly) setRequest() error {
 	if err := common.UnmarshalBodyReusable(r.c, r.geminiRequest); err != nil {
 		return err
 	}
-	r.geminiRequest.SetJsonRaw(r.c)
 	r.geminiRequest.Model = modelList[0]
 	r.geminiRequest.Stream = isStream
 	r.setOriginalModel(r.geminiRequest.Model)
@@ -180,19 +177,8 @@ func CountGeminiTokenMessages(request *gemini.GeminiChatRequest, preCostType int
 			}
 
 			if part.InlineData != nil {
-				if strings.HasPrefix(part.InlineData.MimeType, "image") {
-					if preCostType == config.PreCostNotImage {
-						continue
-					}
-					width, height, err := image.GetImageSizeFromBase64(part.InlineData.Data)
-					if err != nil {
-						return 0, err
-					}
-					tokenNum += int(math.Ceil((float64(width) * float64(height)) / 750))
-				} else {
-					// 其他类型的，暂时按200个token计算
-					tokenNum += 200
-				}
+				// 其他类型的，暂时按200个token计算
+				tokenNum += 200
 			}
 		}
 	}

@@ -16,11 +16,15 @@ func (p *RecraftProvider) CreateRelay(url string) (*http.Response, *types.OpenAI
 
 	// 获取请求头
 	headers := p.GetRequestHeaders()
+	body, exists := p.GetRawBody()
+	if !exists {
+		return nil, common.StringErrorWrapperLocal("request body not found", "request_body_not_found", http.StatusInternalServerError)
+	}
 
 	req, err := p.Requester.NewRequest(
 		http.MethodPost,
 		fullRequestURL,
-		p.Requester.WithBody(p.Context.Request.Body),
+		p.Requester.WithBody(body),
 		p.Requester.WithHeader(headers),
 		p.Requester.WithContentType(p.Context.Request.Header.Get("Content-Type")))
 	req.ContentLength = p.Context.Request.ContentLength
