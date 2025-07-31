@@ -303,6 +303,7 @@ const (
 	ChannelTypeKling           = 53
 	ChannelTypeAzureDatabricks = 54
 	ChannelTypeAzureV1         = 55
+	ChannelTypeXAI             = 56
 )
 
 const (

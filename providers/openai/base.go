@@ -16,6 +16,9 @@ import (
 
 type OpenAIProviderFactory struct{}
 
+type UsageHandler func(usage *types.Usage) (ForcedFormatting bool)
+type RequestHandleBefore func(request *types.ChatCompletionRequest) (errWithCode *types.OpenAIErrorWithStatusCode)
+
 type OpenAIProvider struct {
 	base.BaseProvider
 	IsAzure              bool
@@ -23,6 +26,9 @@ type OpenAIProvider struct {
 	SupportStreamOptions bool
 	StreamEscapeJSON     bool
 	ReasoningHandler     bool
+
+	UsageHandler        UsageHandler
+	RequestHandleBefore RequestHandleBefore
 }
 
 // 创建 OpenAIProvider
