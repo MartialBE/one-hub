@@ -38,6 +38,7 @@ import (
 	"one-api/providers/suno"
 	"one-api/providers/tencent"
 	"one-api/providers/vertexai"
+	"one-api/providers/xAI"
 	"one-api/providers/xunfei"
 	"one-api/providers/zhipu"
 
@@ -91,6 +92,7 @@ func init() {
 		config.ChannelTypeOpenRouter:      openrouter.OpenRouterProviderFactory{},
 		config.ChannelTypeAzureDatabricks: azuredatabricks.AzureDatabricksProviderFactory{},
 		config.ChannelTypeAzureV1:         azure_v1.AzureV1ProviderFactory{},
+		config.ChannelTypeXAI:             xAI.XAIProviderFactory{},
 	}
 }
 

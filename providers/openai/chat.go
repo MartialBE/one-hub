@@ -21,9 +21,16 @@ type OpenAIStreamHandler struct {
 
 	ReasoningHandler bool
 	ExtraBilling     map[string]types.ExtraBilling `json:"-"`
+	UsageHandler     UsageHandler
 }
 
 func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionRequest) (openaiResponse *types.ChatCompletionResponse, errWithCode *types.OpenAIErrorWithStatusCode) {
+	if p.RequestHandleBefore != nil {
+		errWithCode = p.RequestHandleBefore(request)
+		if errWithCode != nil {
+			return nil, errWithCode
+		}
+	}
 	otherProcessing(request, p.GetOtherArg())
 
 	req, errWithCode := p.GetRequestTextBody(config.RelayModeChatCompletions, request.Model, request)
@@ -58,6 +65,8 @@ func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionReque
 		// 那么需要计算
 		response.Usage.CompletionTokens = common.CountTokenText(response.GetContent(), request.Model)
 		response.Usage.TotalTokens = response.Usage.PromptTokens + response.Usage.CompletionTokens
+	} else if p.UsageHandler != nil {
+		p.UsageHandler(response.Usage)
 	}
 
 	*p.Usage = *response.Usage
@@ -68,6 +77,12 @@ func (p *OpenAIProvider) CreateChatCompletion(request *types.ChatCompletionReque
 }
 
 func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletionRequest) (requester.StreamReaderInterface[string], *types.OpenAIErrorWithStatusCode) {
+	if p.RequestHandleBefore != nil {
+		errWithCode := p.RequestHandleBefore(request)
+		if errWithCode != nil {
+			return nil, errWithCode
+		}
+	}
 	otherProcessing(request, p.GetOtherArg())
 	streamOptions := request.StreamOptions
 	// 如果支持流式返回Usage 则需要更改配置：
@@ -101,6 +116,7 @@ func (p *OpenAIProvider) CreateChatCompletionStream(request *types.ChatCompletio
 		EscapeJSON: p.StreamEscapeJSON,
 
 		ExtraBilling: getChatExtraBilling(request),
+		UsageHandler: p.UsageHandler,
 	}
 
 	return requester.RequestStream(p.Requester, resp, chatHandler.HandlerChatStream)
@@ -139,6 +155,9 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 
 	if openaiResponse.Usage != nil {
 		if openaiResponse.Usage.CompletionTokens > 0 {
+			if h.UsageHandler != nil && h.UsageHandler(openaiResponse.Usage) {
+				h.EscapeJSON = true
+			}
 			*h.Usage = *openaiResponse.Usage
 
 			if h.ExtraBilling != nil {
@@ -153,6 +172,9 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 	} else {
 		if len(openaiResponse.Choices) > 0 && openaiResponse.Choices[0].Usage != nil {
 			if openaiResponse.Choices[0].Usage.CompletionTokens > 0 {
+				if h.UsageHandler != nil && h.UsageHandler(openaiResponse.Choices[0].Usage) {
+					h.EscapeJSON = true
+				}
 				*h.Usage = *openaiResponse.Choices[0].Usage
 				if h.ExtraBilling != nil {
 					h.Usage.ExtraBilling = h.ExtraBilling

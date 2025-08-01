@@ -264,6 +264,13 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: ''
   },
+  56: {
+    key: 56,
+    text: 'xAI',
+    value: 56,
+    color: 'orange',
+    url: 'https://x.ai'
+  },
   8: {
     key: 8,
     text: '自定义渠道',
