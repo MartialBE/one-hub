@@ -210,15 +210,18 @@ func (h *OpenAIStreamHandler) HandlerChatStream(rawLine *[]byte, dataChan chan s
 
 func otherProcessing(request *types.ChatCompletionRequest, otherArg string) {
 	matched, _ := regexp.MatchString(`^o[1-9]`, request.Model)
-	if matched && request.MaxTokens > 0 {
-		request.MaxCompletionTokens = request.MaxTokens
-		request.MaxTokens = 0
+	if matched || strings.HasPrefix(request.Model, "gpt-5") {
+		if request.MaxTokens > 0 {
+			request.MaxCompletionTokens = request.MaxTokens
+			request.MaxTokens = 0
+		}
 
-		if strings.HasPrefix(request.Model, "o3") {
+		if request.Model != "gpt-5-chat-latest" {
 			request.Temperature = nil
-			if otherArg != "" {
-				request.ReasoningEffort = &otherArg
-			}
+		}
+
+		if otherArg != "" {
+			request.ReasoningEffort = &otherArg
 		}
 	}
 }
