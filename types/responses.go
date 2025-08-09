@@ -56,23 +56,39 @@ const (
 )
 
 type OpenAIResponsesRequest struct {
-	Input              any                           `json:"input,omitempty"`
-	Model              string                        `json:"model" binding:"required"`
-	Include            any                           `json:"include,omitempty"`
-	Instructions       string                        `json:"instructions,omitempty"`
-	MaxOutputTokens    int                           `json:"max_output_tokens,omitempty"`
-	ParallelToolCalls  bool                          `json:"parallel_tool_calls,omitempty"`
-	PreviousResponseID string                        `json:"previous_response_id,omitempty"`
-	Reasoning          *ReasoningEffort              `json:"reasoning,omitempty"`
-	Stream             bool                          `json:"stream,omitempty"`
-	Temperature        *float64                      `json:"temperature,omitempty"`
-	Text               *ChatCompletionResponseFormat `json:"text,omitempty"`
-	ToolChoice         any                           `json:"tool_choice,omitempty"`
-	Tools              []ResponsesTools              `json:"tools,omitempty"`
-	TopP               *float64                      `json:"top_p,omitempty"`
-	Truncation         string                        `json:"truncation,omitempty"`
+	Input              any              `json:"input,omitempty"`
+	Model              string           `json:"model" binding:"required"`
+	Include            any              `json:"include,omitempty"`
+	Instructions       string           `json:"instructions,omitempty"`
+	MaxOutputTokens    int              `json:"max_output_tokens,omitempty"`
+	MaxToolCalls       *int             `json:"max_tool_calls,omitempty"`
+	ParallelToolCalls  bool             `json:"parallel_tool_calls,omitempty"`
+	PreviousResponseID string           `json:"previous_response_id,omitempty"`
+	Reasoning          *ReasoningEffort `json:"reasoning,omitempty"`
+	Store              *bool            `json:"store,omitempty"` // 是否存储响应结果
+	Stream             bool             `json:"stream,omitempty"`
+	Temperature        *float64         `json:"temperature,omitempty"`
+	Text               *ResponsesText   `json:"text,omitempty"`
+	ToolChoice         any              `json:"tool_choice,omitempty"`
+	Tools              []ResponsesTools `json:"tools,omitempty"`
+	TopLogProbs        any              `json:"top_logprobs,omitempty"` // The number of top log probabilities to return for each token in the response.
+	TopP               *float64         `json:"top_p,omitempty"`
+	Truncation         string           `json:"truncation,omitempty"`
 
 	ConvertChat bool `json:"-"`
+}
+
+type ResponsesText struct {
+	Format    *ResponsesTextFormat `json:"format,omitempty"`
+	Verbosity string               `json:"verbosity,omitempty"`
+}
+
+type ResponsesTextFormat struct {
+	Type        string `json:"type,omitempty"`
+	Name        string `json:"name,omitempty"` // The name of the text format. This is used to identify the text format in the response.
+	Schema      any    `json:"schema,omitempty"`
+	Description string `json:"description,omitempty"`
+	Strict      any    `json:"strict,omitempty"`
 }
 
 func (r *OpenAIResponsesRequest) ToChatCompletionRequest() (*ChatCompletionRequest, error) {
@@ -83,9 +99,24 @@ func (r *OpenAIResponsesRequest) ToChatCompletionRequest() (*ChatCompletionReque
 		ParallelToolCalls: r.ParallelToolCalls,
 		Stream:            r.Stream,
 		Temperature:       r.Temperature,
-		ResponseFormat:    r.Text,
-		ToolChoice:        r.ToolChoice,
-		TopP:              r.TopP,
+		// ResponseFormat:    r.Text,
+		ToolChoice: r.ToolChoice,
+		TopP:       r.TopP,
+	}
+
+	if r.Text != nil && r.Text.Format != nil {
+		chat.ResponseFormat = &ChatCompletionResponseFormat{
+			Type: r.Text.Format.Type,
+		}
+
+		if r.Text.Format.Type == "json_schema" {
+			chat.ResponseFormat.JsonSchema = &FormatJsonSchema{
+				Description: r.Text.Format.Description,
+				Name:        r.Text.Format.Name,
+				Schema:      r.Text.Format.Schema,
+				Strict:      r.Text.Format.Strict,
+			}
+		}
 	}
 
 	if len(r.Tools) > 0 {
@@ -267,6 +298,8 @@ type InputResponses struct {
 	ApprovalRequestID string `json:"approval_request_id,omitempty"`
 	Approve           bool   `json:"approve,omitempty"`
 	Reason            string `json:"reason,omitempty"`
+
+	Input any `json:"input,omitempty"` // The input to the tool call. This can be a string or a list of ContentResponses.
 }
 
 func (i *InputResponses) ParseContent() ([]ContentResponses, error) {
@@ -309,6 +342,7 @@ type ContentResponses struct {
 
 	// input_file
 	FileData string `json:"file_data,omitempty"` // The content of the file to be sent to the model.
+	FileUrl  string `json:"file_url,omitempty"`  // The URL of the file to be sent to the model.
 	FileName string `json:"file_name,omitempty"` // The name of the file to be sent to the model.
 
 	// output_text
@@ -528,8 +562,7 @@ type ResponsesOutput struct {
 	Action              any                `json:"action,omitempty"`
 	PendingSafetyChecks any                `json:"pending_safety_checks,omitempty"`
 	Summary             []SummaryResponses `json:"summary,omitempty"`
-
-	EncryptedContent *string `json:"encrypted_content,omitempty"`
+	EncryptedContent    *string            `json:"encrypted_content,omitempty"`
 
 	Code        any    `json:"code,omitempty"`
 	ContainerID string `json:"container_id,omitempty"`

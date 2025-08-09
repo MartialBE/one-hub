@@ -47,6 +47,7 @@ func GetModelName(modelName string) string {
 		"us.claude-3-7-sonnet-20250219": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
 		"us.claude-sonnet-4-20250514":   "us.anthropic.claude-sonnet-4-20250514-v1:0",
 		"us.claude-opus-4-20250514":     "us.anthropic.claude-opus-4-20250514-v1:0",
+		"us.claude-opus-4-1-20250805":   "us.anthropic.claude-opus-4-1-20250805-v1:0",
 
 		"eu.claude-3-sonnet-20240229":   "eu.anthropic.claude-3-sonnet-20240229-v1:0",
 		"eu.claude-3-5-sonnet-20240620": "eu.anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -75,6 +76,7 @@ func GetModelName(modelName string) string {
 		"claude-instant-1.2":         "anthropic.claude-instant-v1",
 		"claude-sonnet-4-20250514":   "anthropic.claude-sonnet-4-20250514-v1:0",
 		"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
+		"claude-opus-4-1-20250805":   "anthropic.claude-opus-4-1-20250805-v1:0",
 	}
 
 	if value, exists := bedrockMap[modelName]; exists {
