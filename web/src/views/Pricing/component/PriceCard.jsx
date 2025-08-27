@@ -34,7 +34,8 @@ const PriceCard = ({ price, onEdit, onDelete, ownedby, unit = 'K' }) => {
       reasoning_tokens: t('modelpricePage.reasoning_tokens'),
       input_text_tokens: t('modelpricePage.input_text_tokens'),
       output_text_tokens: t('modelpricePage.output_text_tokens'),
-      input_image_tokens: t('modelpricePage.input_image_tokens')
+      input_image_tokens: t('modelpricePage.input_image_tokens'),
+      output_image_tokens: t('modelpricePage.output_image_tokens')
     };
 
     return ratioNames[key] || key;

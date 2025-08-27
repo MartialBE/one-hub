@@ -259,13 +259,6 @@ function viewInput(item, t, totalInputTokens, totalOutputTokens, show, tokenDeta
   );
 }
 
-const TOKEN_RATIOS = {
-  INPUT_AUDIO: 20,
-  OUTPUT_AUDIO: 10,
-  CACHED: 0.5,
-  TEXT: 1
-};
-
 function calculateTokens(item) {
   const { prompt_tokens, completion_tokens, metadata } = item;
 
@@ -282,15 +275,17 @@ function calculateTokens(item) {
   let totalOutputTokens = completion_tokens;
   let show = false;
 
-  const input_audio_tokens = metadata?.input_audio_tokens_ratio || TOKEN_RATIOS.INPUT_AUDIO;
-  const output_audio_tokens = metadata?.output_audio_tokens_ratio || TOKEN_RATIOS.OUTPUT_AUDIO;
+  const input_audio_tokens = metadata?.input_audio_tokens_ratio || 1;
+  const output_audio_tokens = metadata?.output_audio_tokens_ratio || 1;
+  const input_image_tokens = metadata?.input_image_tokens_ratio || 1;
+  const output_image_tokens = metadata?.output_image_tokens_ratio || 1;
 
-  const cached_ratio = metadata?.cached_tokens_ratio || TOKEN_RATIOS.CACHED;
-  const cached_write_ratio = metadata?.cached_write_tokens_ratio || 0;
-  const cached_read_ratio = metadata?.cached_read_tokens_ratio || 0;
-  const reasoning_tokens = metadata?.reasoning_tokens_ratio || 0;
-  const input_text_tokens_ratio = metadata?.input_text_tokens_ratio || TOKEN_RATIOS.TEXT;
-  const output_text_tokens_ratio = metadata?.output_text_tokens_ratio || TOKEN_RATIOS.TEXT;
+  const cached_ratio = metadata?.cached_tokens_ratio || 1;
+  const cached_write_ratio = metadata?.cached_write_tokens_ratio || 1;
+  const cached_read_ratio = metadata?.cached_read_tokens_ratio || 1;
+  const reasoning_tokens = metadata?.reasoning_tokens_ratio || 1;
+  const input_text_tokens_ratio = metadata?.input_text_tokens_ratio || 1;
+  const output_text_tokens_ratio = metadata?.output_text_tokens_ratio || 1;
 
   const tokenDetails = [
     {
@@ -325,7 +320,19 @@ function calculateTokens(item) {
       labelParams: { ratio: cached_write_ratio }
     },
     { key: 'cached_read_tokens', label: 'logPage.cachedReadTokens', rate: cached_read_ratio, labelParams: { ratio: cached_read_ratio } },
-    { key: 'reasoning_tokens', label: 'logPage.reasoningTokens', rate: reasoning_tokens, labelParams: { ratio: reasoning_tokens } }
+    { key: 'reasoning_tokens', label: 'logPage.reasoningTokens', rate: reasoning_tokens, labelParams: { ratio: reasoning_tokens } },
+    {
+      key: 'input_image_tokens',
+      label: 'log.inputImageTokens',
+      rate: input_image_tokens,
+      labelParams: { ratio: input_image_tokens }
+    },
+    {
+      key: 'output_image_tokens',
+      label: 'log.outputImageTokens',
+      rate: output_image_tokens,
+      labelParams: { ratio: output_image_tokens }
+    }
   ]
     .filter(({ key }) => metadata[key] > 0)
     .map(({ key, label, rate, labelParams }) => {
@@ -338,10 +345,11 @@ function calculateTokens(item) {
         'input_audio_tokens',
         'cached_tokens',
         'cached_write_tokens',
-        'cached_read_tokens'
+        'cached_read_tokens',
+        'input_image_tokens'
       ].includes(key);
 
-      const isOutputToken = ['output_audio_tokens', 'reasoning_tokens'].includes(key);
+      const isOutputToken = ['output_audio_tokens', 'reasoning_tokens', 'output_image_tokens'].includes(key);
 
       if (isInputToken) {
         totalInputTokens += tokens;

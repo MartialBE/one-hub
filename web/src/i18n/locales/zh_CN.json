@@ -355,6 +355,8 @@
     "cachedWriteTokens": "缓存写入Tokens (* {{ ratio }})",
     "cachedReadTokens": "缓存读取Tokens (* {{ ratio }})",
     "reasoningTokens": "推理Tokens (* {{ ratio }})",
+    "inputImageTokens": "输入图像Tokens (* {{ ratio }})",
+    "outputImageTokens": "输出图像Tokens (* {{ ratio }})",
     "totalInputTokens": "计算输入Tokens",
     "totalOutputTokens": "计算输出Tokens",
     "sourceIp": "来源IP",

@@ -43,6 +43,11 @@ const extraRatiosConfig = [
     name: '输入图像令牌',
     key: 'input_image_tokens',
     isPrompt: true
+  },
+  {
+    name: '输出图像令牌',
+    key: 'output_image_tokens',
+    isPrompt: false
   }
 ];
 
