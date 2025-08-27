@@ -91,6 +91,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
   const [tempFormikValues, setTempFormikValues] = useState(null);
   const [tempSetFieldValue, setTempSetFieldValue] = useState(null);
+  
+  // 用于追踪模型的原始名称映射关系 { displayName: originalName }
+  const [modelOriginalMapping, setModelOriginalMapping] = useState({});
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -106,6 +109,138 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
     }
 
     return typeConfig[typeValue]?.input;
+  };
+  
+  // 解析模型映射配置的工具函数
+  const parseModelMapping = (mappingArray) => {
+    if (!mappingArray || !Array.isArray(mappingArray) || mappingArray.length === 0) {
+      return null;
+    }
+    
+    try {
+      const mapping = mappingArray.reduce((acc, item) => {
+        if (item.key && item.value) {
+          acc[item.key] = item.value;
+        }
+        return acc;
+      }, {});
+      
+      if (Object.keys(mapping).length === 0) {
+        return null;
+      }
+      return mapping;
+    } catch (error) {
+      console.warn('模型重定向解析失败:', error);
+      return null;
+    }
+  };
+
+  // 更新模型列表的统一方法
+  const updateModelsList = (newModels, newMapping, setFieldValue) => {
+    const uniqueModels = Array.from(new Set(newModels.filter(model => model && model.id && model.id.trim())));
+    
+    setFieldValue('models', uniqueModels);
+    setModelOriginalMapping(newMapping);
+  };
+
+  // 恢复模型到原始名称
+  const restoreModelsToOriginalNames = (currentModels, setFieldValue) => {
+    const restoredModels = currentModels.map(model => {
+      const originalName = modelOriginalMapping[model.id] || model.id;
+      return {
+        ...model,
+        id: originalName
+      };
+    });
+    
+    // 检查是否有变化
+    const hasChanges = currentModels.some((model, index) => {
+      return model.id !== restoredModels[index].id;
+    });
+    
+    if (hasChanges) {
+      updateModelsList(restoredModels, {}, setFieldValue);
+    }
+  };
+
+  // 应用模型映射的核心逻辑
+  const applyModelMapping = (mapping, currentModels, currentMapping, setFieldValue) => {
+    let updatedModels = [...currentModels];
+    let newMapping = { ...currentMapping };
+    let hasChanges = false;
+
+    // 遍历重定向映射
+    Object.entries(mapping).forEach(([key, mappedValue]) => {
+      if (typeof key === 'string' && typeof mappedValue === 'string') {
+        const keyTrimmed = key.trim();
+        const valueTrimmed = mappedValue.trim();
+
+        if (keyTrimmed && valueTrimmed) {
+          // 查找模型配置中是否存在重定向的"值"（原始模型名）
+          const valueIndex = updatedModels.findIndex(model => {
+            return model.id === valueTrimmed || newMapping[model.id] === valueTrimmed;
+          });
+
+          if (valueIndex !== -1) {
+            const currentDisplayName = updatedModels[valueIndex].id;
+            if (currentDisplayName !== keyTrimmed) {
+              // 记录原始映射关系
+              if (!newMapping[keyTrimmed]) {
+                newMapping[keyTrimmed] = newMapping[currentDisplayName] || currentDisplayName;
+              }
+              // 清理旧的映射关系
+              if (newMapping[currentDisplayName]) {
+                delete newMapping[currentDisplayName];
+              }
+              // 更新显示名称为重定向的键
+              updatedModels[valueIndex] = {
+                ...updatedModels[valueIndex],
+                id: keyTrimmed
+              };
+              hasChanges = true;
+            }
+          }
+        }
+      }
+    });
+
+    // 处理不在映射中的模型，恢复为原始名称
+    const mappingKeys = new Set(Object.keys(mapping).map(key => key.trim()));
+    updatedModels = updatedModels.map(model => {
+      if (!mappingKeys.has(model.id) && newMapping[model.id]) {
+        const originalName = newMapping[model.id];
+        delete newMapping[model.id];
+        hasChanges = true;
+        return {
+          ...model,
+          id: originalName
+        };
+      }
+      return model;
+    });
+
+    return { updatedModels, newMapping, hasChanges };
+  };
+
+  // 实时同步模型重定向到模型配置的函数
+  const syncModelMappingToModels = (mappingArray, currentModels, setFieldValue) => {
+    const mapping = parseModelMapping(mappingArray);
+    
+    if (!mapping) {
+      restoreModelsToOriginalNames(currentModels, setFieldValue);
+      return;
+    }
+
+    const { updatedModels, newMapping, hasChanges } = applyModelMapping(
+      mapping, 
+      currentModels, 
+      modelOriginalMapping,
+      setFieldValue
+    );
+
+    if (hasChanges) {
+      updateModelsList(updatedModels, newMapping, setFieldValue);
+    }
   };
 
   const handleTypeChange = (setFieldValue, typeValue, values) => {
@@ -351,6 +486,21 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                 value
               }))
             : [];
+        // 初始化模型原始映射关系
+        const mapping = parseModelMapping(data.model_mapping);
+        if (mapping) {
+          const initialMapping = {};
+          // 根据当前的模型映射和模型列表，建立原始映射关系
+          Object.entries(mapping).forEach(([key, value]) => {
+            const modelExists = data.models.some(model => model.id === key);
+            if (modelExists) {
+              initialMapping[key] = value;
+            }
+          });
+          setModelOriginalMapping(initialMapping);
+        } else {
+          setModelOriginalMapping({});
+        }
         // if (data.model_headers) {
         data.model_headers =
           data.model_headers !== ''
@@ -404,6 +554,8 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
         setHasTag(false);
         initChannel(1);
         setInitialInput({ ...defaultConfig.input, is_edit: false });
+        // 重置模型原始映射关系
+        setModelOriginalMapping({});
       }
     }
 
@@ -836,6 +988,8 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                       mapValue={values.model_mapping}
                       onChange={(newValue) => {
                         setFieldValue('model_mapping', newValue);
+                        // 实时同步模型重定向到模型配置
+                        syncModelMappingToModels(newValue, values.models, setFieldValue);
                       }}
                       disabled={hasTag}
                       error={Boolean(touched.model_mapping && errors.model_mapping)}
