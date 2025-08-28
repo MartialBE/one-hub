@@ -163,7 +163,7 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 		},
 	}
 
-	if strings.HasPrefix(request.Model, "gemini-2.0-flash-exp") {
+	if strings.HasPrefix(request.Model, "gemini-2.0-flash-exp") || strings.HasPrefix(request.Model, "gemini-2.5-flash-image-preview") {
 		geminiRequest.GenerationConfig.ResponseModalities = []string{"Text", "Image"}
 	}
 
@@ -407,15 +407,17 @@ func (h *GeminiStreamHandler) convertToOpenaiStream(geminiResponse *GeminiChatRe
 		dataChan <- string(responseBody)
 	}
 
+	h.Usage.TextBuilder.WriteString(streamResponse.GetResponseText())
+
 	// 和ExecutableCode的tokens共用，所以跳过
 	if geminiResponse.UsageMetadata == nil {
 		return
 	}
 
-	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
-	h.Usage.CompletionTokens = geminiResponse.UsageMetadata.CandidatesTokenCount + geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.CompletionTokensDetails.ReasoningTokens = geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.TotalTokens = geminiResponse.UsageMetadata.TotalTokenCount
+	usage := ConvertOpenAIUsage(geminiResponse.UsageMetadata)
+
+	usage.TextBuilder = h.Usage.TextBuilder
+	*h.Usage = usage
 }
 
 const tokenThreshold = 1000000
@@ -461,7 +463,15 @@ var modelAdjustRatios = map[string]int{
 // }
 
 func ConvertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
-	return types.Usage{
+	if geminiUsage == nil {
+		return types.Usage{
+			PromptTokens:     0,
+			CompletionTokens: 0,
+			TotalTokens:      0,
+		}
+	}
+
+	usage := types.Usage{
 		PromptTokens:     geminiUsage.PromptTokenCount,
 		CompletionTokens: geminiUsage.CandidatesTokenCount + geminiUsage.ThoughtsTokenCount,
 		TotalTokens:      geminiUsage.TotalTokenCount,
@@ -470,6 +480,28 @@ func ConvertOpenAIUsage(geminiUsage *GeminiUsageMetadata) types.Usage {
 			ReasoningTokens: geminiUsage.ThoughtsTokenCount,
 		},
 	}
+
+	for _, p := range geminiUsage.PromptTokensDetails {
+		switch p.Modality {
+		case "TEXT":
+			usage.PromptTokensDetails.TextTokens = p.TokenCount
+		case "AUDIO":
+			usage.PromptTokensDetails.AudioTokens = p.TokenCount
+		}
+	}
+
+	for _, c := range geminiUsage.CandidatesTokensDetails {
+		switch c.Modality {
+		case "TEXT":
+			usage.CompletionTokensDetails.TextTokens = c.TokenCount
+		case "AUDIO":
+			usage.CompletionTokensDetails.AudioTokens = c.TokenCount
+		case "IMAGE":
+			usage.CompletionTokensDetails.ImageTokens = c.TokenCount
+		}
+	}
+
+	return usage
 }
 
 func (p *GeminiProvider) pluginHandle(request *GeminiChatRequest) {

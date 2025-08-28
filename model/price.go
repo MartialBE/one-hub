@@ -26,15 +26,16 @@ func GetIncreaseTokens(tokens int, ratio float64) int {
 }
 
 var ExtraKeyIsPrompt = map[string]bool{
-	config.UsageExtraCache:            true,
-	config.UsageExtraCachedWrite:      true,
-	config.UsageExtraCachedRead:       true,
-	config.UsageExtraInputAudio:       true,
-	config.UsageExtraOutputAudio:      false,
-	config.UsageExtraReasoning:        false,
-	config.UsageExtraInputTextTokens:  true,
-	config.UsageExtraOutputTextTokens: false,
-	config.UsageExtraInputImageTokens: true,
+	config.UsageExtraCache:             true,
+	config.UsageExtraCachedWrite:       true,
+	config.UsageExtraCachedRead:        true,
+	config.UsageExtraInputAudio:        true,
+	config.UsageExtraOutputAudio:       false,
+	config.UsageExtraReasoning:         false,
+	config.UsageExtraInputTextTokens:   true,
+	config.UsageExtraOutputTextTokens:  false,
+	config.UsageExtraInputImageTokens:  true,
+	config.UsageExtraOutputImageTokens: false,
 }
 
 func GetExtraPriceIsPrompt(key string) bool {
@@ -42,11 +43,11 @@ func GetExtraPriceIsPrompt(key string) bool {
 }
 
 var defaultExtraPrice = map[string]float64{
-	config.UsageExtraCache:            0.5,
+	config.UsageExtraCache:            1,
 	config.UsageExtraCachedWrite:      1.25,
 	config.UsageExtraCachedRead:       0.1,
-	config.UsageExtraInputAudio:       40,
-	config.UsageExtraOutputAudio:      40,
+	config.UsageExtraInputAudio:       1,
+	config.UsageExtraOutputAudio:      1,
 	config.UsageExtraReasoning:        1,
 	config.UsageExtraInputTextTokens:  1,
 	config.UsageExtraOutputTextTokens: 1,

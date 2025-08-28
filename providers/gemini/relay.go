@@ -96,16 +96,17 @@ func (h *GeminiRelayStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan 
 		errChan <- geminiResponse.ErrorInfo
 		return
 	}
+	h.Usage.TextBuilder.WriteString(geminiResponse.GetResponseText())
 
 	if geminiResponse.UsageMetadata == nil {
 		dataChan <- rawStr
 		return
 	}
 
-	h.Usage.PromptTokens = geminiResponse.UsageMetadata.PromptTokenCount
-	h.Usage.CompletionTokens = geminiResponse.UsageMetadata.CandidatesTokenCount + geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.CompletionTokensDetails.ReasoningTokens = geminiResponse.UsageMetadata.ThoughtsTokenCount
-	h.Usage.TotalTokens = geminiResponse.UsageMetadata.TotalTokenCount
+	usage := ConvertOpenAIUsage(geminiResponse.UsageMetadata)
+
+	usage.TextBuilder = h.Usage.TextBuilder
+	*h.Usage = usage
 
 	dataChan <- rawStr
 }

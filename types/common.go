@@ -61,6 +61,11 @@ func (u *Usage) GetExtraTokens() map[string]int {
 		u.ExtraTokens[config.UsageExtraInputImageTokens] = u.PromptTokensDetails.ImageTokens
 	}
 
+	// 输出图像
+	if u.CompletionTokensDetails.ImageTokens > 0 && u.ExtraTokens[config.UsageExtraOutputImageTokens] == 0 {
+		u.ExtraTokens[config.UsageExtraOutputImageTokens] = u.CompletionTokensDetails.ImageTokens
+	}
+
 	// 输出音频
 	if u.CompletionTokensDetails.AudioTokens > 0 && u.ExtraTokens[config.UsageExtraOutputAudio] == 0 {
 		u.ExtraTokens[config.UsageExtraOutputAudio] = u.CompletionTokensDetails.AudioTokens
@@ -104,6 +109,7 @@ type CompletionTokensDetails struct {
 	ReasoningTokens          int `json:"reasoning_tokens"`
 	AcceptedPredictionTokens int `json:"accepted_prediction_tokens"`
 	RejectedPredictionTokens int `json:"rejected_prediction_tokens"`
+	ImageTokens              int `json:"image_tokens,omitempty"`
 }
 
 func (i *PromptTokensDetails) Merge(other *PromptTokensDetails) {
