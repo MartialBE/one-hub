@@ -598,13 +598,16 @@ func (user *User) WebAuthnCredentials() []webauthn.Credential {
 
 // WebAuthnCredential 表示WebAuthn凭据
 type WebAuthnCredential struct {
-	Id              int                    `json:"id" gorm:"primaryKey"`
-	UserId          int                    `json:"user_id" gorm:"index"`
-	CredentialId    string                 `json:"credential_id" gorm:"type:varbinary(255);uniqueIndex"` // 使用 varbinary
-	PublicKey       []byte                 `json:"public_key"`
-	AttestationType string                 `json:"attestation_type"`
-	Authenticator   webauthn.Authenticator `json:"authenticator" gorm:"embedded"`
-	CreatedTime     int64                  `json:"created_time"`
+	Id              int    `json:"id" gorm:"primaryKey"`
+	UserId          int    `json:"user_id" gorm:"index"`
+	CredentialId    string `json:"credential_id" gorm:"type:varbinary(255);uniqueIndex"` // 使用 varbinary
+	PublicKey       []byte `json:"public_key"`
+	AttestationType string `json:"attestation_type"`
+	// Persist essential authenticator state and flags used during login validation
+	BackupEligible bool                   `json:"backup_eligible" gorm:"column:backup_eligible;default:false"`
+	BackupState    bool                   `json:"backup_state" gorm:"column:backup_state;default:false"`
+	Authenticator  webauthn.Authenticator `json:"authenticator" gorm:"embedded"`
+	CreatedTime    int64                  `json:"created_time"`
 }
 
 func (WebAuthnCredential) TableName() string {
@@ -630,6 +633,12 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 			PublicKey:       cred.PublicKey,
 			AttestationType: cred.AttestationType,
 			Authenticator:   cred.Authenticator,
+			Flags: webauthn.CredentialFlags{
+				UserPresent:    false, // will be updated by library during validation
+				UserVerified:   false, // will be updated by library during validation
+				BackupEligible: cred.BackupEligible,
+				BackupState:    cred.BackupState,
+			},
 		})
 	}
 	return webauthnCredentials
@@ -643,6 +652,8 @@ func SaveWebAuthnCredential(userId int, credential *webauthn.Credential) error {
 		CredentialId:    credentialIdBase64,
 		PublicKey:       credential.PublicKey,
 		AttestationType: credential.AttestationType,
+		BackupEligible:  credential.Flags.BackupEligible,
+		BackupState:     credential.Flags.BackupState,
 		Authenticator:   credential.Authenticator,
 		CreatedTime:     time.Now().Unix(),
 	}

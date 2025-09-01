@@ -173,7 +173,6 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
         }
         return bytes;
       } catch (error) {
-        console.error('Base64URL decode error:', error, 'Input:', base64url);
         throw new Error('Failed to decode base64url data: ' + error.message);
       }
     };
@@ -188,7 +187,6 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
         let base64 = btoa(binary);
         return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       } catch (error) {
-        console.error('Base64URL encode error:', error);
         throw new Error('Failed to encode to base64url');
       }
     };
@@ -203,7 +201,6 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
     });
 
     const beginData = await beginResponse.json();
-    console.log('Begin login response:', beginData);
 
     if (!beginData.success) {
       showError(beginData.message || 'WebAuthn登录开始失败');
@@ -216,20 +213,16 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
       challenge: base64urlToUint8Array(beginData.data.publicKey.challenge),
       allowCredentials:
         beginData.data.publicKey.allowCredentials?.map((cred, index) => {
-          console.log(`处理凭据 ${index}:`, cred);
           try {
             return {
               ...cred,
               id: base64urlToUint8Array(cred.id)
             };
           } catch (error) {
-            console.error(`凭据 ${index} ID 解码失败:`, cred.id, error);
             throw error;
           }
         }) || []
     };
-
-    console.log('Processed options:', publicKeyCredentialRequestOptions);
 
     // 调用WebAuthn API进行认证
     const credential = await navigator.credentials.get({
@@ -276,7 +269,6 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
     }
     window.location.reload();
   } catch (error) {
-    console.error('WebAuthn登录错误:', error);
     if (error.name === 'NotAllowedError') {
       showError('WebAuthn认证被拒绝或超时');
     } else if (error.name === 'NotSupportedError') {
@@ -309,7 +301,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
     });
 
     const beginData = await beginResponse.json();
-    console.log('Begin registration response:', beginData);
     if (!beginData.success) {
       showError(beginData.message || 'WebAuthn注册开始失败');
       return;
@@ -341,7 +332,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
         }
         return bytes;
       } catch (error) {
-        console.error('Base64URL decode error:', error, 'Input:', base64url);
         throw new Error('Failed to decode base64url data');
       }
     };
@@ -361,7 +351,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
         // Convert to base64url
         return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       } catch (error) {
-        console.error('Base64URL encode error:', error);
         throw new Error('Failed to encode to base64url');
       }
     };
@@ -381,8 +370,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
         })) || []
     };
 
-    console.log('Credential creation options:', publicKeyCredentialCreationOptions);
-
     // 调用WebAuthn API创建凭据
     const credential = await navigator.credentials.create({
       publicKey: publicKeyCredentialCreationOptions
@@ -392,8 +379,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
       showError('WebAuthn注册被取消');
       return;
     }
-
-    console.log('Created credential:', credential);
 
     // 准备发送给后端的数据 - 使用base64url编码
     const credentialData = {
@@ -406,8 +391,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
       }
     };
 
-    console.log('Sending credential data:', credentialData);
-
     // 完成注册流程
     const finishResponse = await fetch('/api/webauthn/registration/finish', {
       method: 'POST',
@@ -419,7 +402,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
     });
 
     const finishData = await finishResponse.json();
-    console.log('Finish registration response:', finishData);
 
     if (!finishData.success) {
       showError(finishData.message || 'WebAuthn注册验证失败');
@@ -432,7 +414,6 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
       onSuccess();
     }
   } catch (error) {
-    console.error('WebAuthn注册错误:', error);
     if (error.name === 'NotAllowedError') {
       showError('WebAuthn注册被拒绝或超时');
     } else if (error.name === 'NotSupportedError') {
@@ -461,7 +442,6 @@ export async function getWebAuthnCredentials() {
       return [];
     }
   } catch (error) {
-    console.error('获取WebAuthn凭据失败:', error);
     return [];
   }
 }
@@ -485,7 +465,6 @@ export async function deleteWebAuthnCredential(credentialId, showError, showSucc
       showError(data.message || '删除WebAuthn凭据失败');
     }
   } catch (error) {
-    console.error('删除WebAuthn凭据错误:', error);
     showError('删除WebAuthn凭据失败: ' + error.message);
   }
 }

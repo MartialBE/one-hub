@@ -284,22 +284,13 @@ func WebauthnFinishLogin(c *gin.Context) {
 		return
 	}
 
-	// 设置用户登录状态
-	setupLogin(user, c)
-
 	// 清除会话
 	sess.Delete("webauthn_login_session")
 	sess.Delete("webauthn_user_id")
 	sess.Save()
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "登录成功",
-		"data": gin.H{
-			"username":    user.Username,
-			"displayName": user.DisplayName,
-		},
-	})
+	// 设置用户登录状态
+	setupLogin(user, c)
 }
 
 // 获取用户的WebAuthn凭据列表
