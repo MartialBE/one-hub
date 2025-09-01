@@ -165,7 +165,7 @@ func WebauthnBeginLogin(c *gin.Context) {
 	err = user.FillUserByUsername()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": "用户不存在",
+			"message": "登陆失败",
 			"success": false,
 		})
 		return
@@ -227,7 +227,7 @@ func WebauthnFinishLogin(c *gin.Context) {
 	userId, err := strconv.Atoi(userIdStr.(string))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "用户ID解析失败",
+			"message": "登陆失败",
 			"success": false,
 		})
 		return
@@ -236,7 +236,7 @@ func WebauthnFinishLogin(c *gin.Context) {
 	user, err := model.GetUserById(userId, false)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": "用户不存在",
+			"message": "登陆失败",
 			"success": false,
 		})
 		return
@@ -264,7 +264,7 @@ func WebauthnFinishLogin(c *gin.Context) {
 	// 检查用户状态
 	if user.Status != 1 {
 		c.JSON(http.StatusForbidden, gin.H{
-			"message": "用户已被封禁",
+			"message": "登陆失败",
 			"success": false,
 		})
 		return
