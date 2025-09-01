@@ -283,7 +283,7 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
   }
 }
 
-export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
+export async function onWebAuthnRegister(showError, showSuccess, onSuccess, alias = '') {
   try {
     // 检查浏览器是否支持WebAuthn
     if (!window.PublicKeyCredential) {
@@ -297,7 +297,8 @@ export async function onWebAuthnRegister(showError, showSuccess, onSuccess) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: localStorage.getItem('token')
-      }
+      },
+      body: JSON.stringify({ alias })
     });
 
     const beginData = await beginResponse.json();
