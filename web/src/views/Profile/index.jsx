@@ -13,7 +13,12 @@ import {
   Chip,
   Typography,
   SvgIcon,
-  useMediaQuery
+  useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import SubCard from 'ui-component/cards/SubCard';
@@ -47,6 +52,8 @@ export default function Profile() {
   const [openEmail, setOpenEmail] = useState(false);
   const [webAuthnCredentials, setWebAuthnCredentials] = useState([]);
   const [loadingWebAuthn, setLoadingWebAuthn] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [credentialToDelete, setCredentialToDelete] = useState(null);
   const status = useSelector((state) => state.siteInfo);
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -96,10 +103,24 @@ export default function Profile() {
     });
   };
 
-  const handleDeleteWebAuthnCredential = async (credentialId) => {
-    await deleteWebAuthnCredential(credentialId, showError, showSuccess, () => {
-      loadWebAuthnCredentials();
-    });
+  const handleDeleteWebAuthnCredential = (credentialId) => {
+    setCredentialToDelete(credentialId);
+    setConfirmDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (credentialToDelete) {
+      await deleteWebAuthnCredential(credentialToDelete, showError, showSuccess, () => {
+        loadWebAuthnCredentials();
+      });
+    }
+    setConfirmDeleteOpen(false);
+    setCredentialToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setConfirmDeleteOpen(false);
+    setCredentialToDelete(null);
   };
 
   const bindWeChat = async (code) => {
@@ -423,6 +444,29 @@ export default function Profile() {
           setOpenEmail(false);
         }}
       />
+      <Dialog
+        open={confirmDeleteOpen}
+        onClose={cancelDelete}
+        aria-labelledby="confirm-delete-dialog-title"
+        aria-describedby="confirm-delete-dialog-description"
+      >
+        <DialogTitle id="confirm-delete-dialog-title">
+          确认删除
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-delete-dialog-description">
+            您确定要删除这个 WebAuthn 凭据吗？此操作无法撤销。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} color="primary">
+            取消
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            删除
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
