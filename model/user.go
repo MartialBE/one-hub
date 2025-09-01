@@ -603,6 +603,7 @@ type WebAuthnCredential struct {
 	CredentialId    string `json:"credential_id" gorm:"type:varbinary(255);uniqueIndex"` // 使用 varbinary
 	PublicKey       []byte `json:"public_key"`
 	AttestationType string `json:"attestation_type"`
+	Alias           string `json:"alias" gorm:"type:varchar(255);default:''"`
 	// Persist essential authenticator state and flags used during login validation
 	BackupEligible bool                   `json:"backup_eligible" gorm:"column:backup_eligible;default:false"`
 	BackupState    bool                   `json:"backup_state" gorm:"column:backup_state;default:false"`
@@ -645,13 +646,17 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 }
 
 // 保存WebAuthn凭据
-func SaveWebAuthnCredential(userId int, credential *webauthn.Credential) error {
+func SaveWebAuthnCredential(userId int, credential *webauthn.Credential, alias string) error {
+	if alias == "" {
+		alias = time.Now().Format("2006-01-02 15:04:05")
+	}
 	credentialIdBase64 := base64.StdEncoding.EncodeToString(credential.ID)
 	webauthnCred := WebAuthnCredential{
 		UserId:          userId,
 		CredentialId:    credentialIdBase64,
 		PublicKey:       credential.PublicKey,
 		AttestationType: credential.AttestationType,
+		Alias:           alias,
 		BackupEligible:  credential.Flags.BackupEligible,
 		BackupState:     credential.Flags.BackupState,
 		Authenticator:   credential.Authenticator,

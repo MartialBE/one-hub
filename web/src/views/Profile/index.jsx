@@ -18,14 +18,25 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  TextField
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import SubCard from 'ui-component/cards/SubCard';
 import { IconBrandWechat, IconBrandGithub, IconMail, IconBrandTelegram, IconBrandOauth } from '@tabler/icons-react';
 import Label from 'ui-component/Label';
 import { API } from 'utils/api';
-import { showError, showSuccess, onGitHubOAuthClicked, copy, trims, onLarkOAuthClicked, onWebAuthnRegister, getWebAuthnCredentials, deleteWebAuthnCredential } from 'utils/common';
+import {
+  showError,
+  showSuccess,
+  onGitHubOAuthClicked,
+  copy,
+  trims,
+  onLarkOAuthClicked,
+  onWebAuthnRegister,
+  getWebAuthnCredentials,
+  deleteWebAuthnCredential
+} from 'utils/common';
 import * as Yup from 'yup';
 import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
@@ -97,10 +108,37 @@ export default function Profile() {
     }
   };
 
+  // WebAuthn 注册 - 别名对话框逻辑
+  const [openAliasDialog, setOpenAliasDialog] = useState(false);
+  const [aliasInput, setAliasInput] = useState('');
+  const [aliasSubmitting, setAliasSubmitting] = useState(false);
+
   const handleWebAuthnRegister = async () => {
-    await onWebAuthnRegister(showError, showSuccess, () => {
-      loadWebAuthnCredentials();
-    });
+    setAliasInput('');
+    setOpenAliasDialog(true);
+  };
+
+  const closeAliasDialog = () => {
+    if (!aliasSubmitting) setOpenAliasDialog(false);
+  };
+
+  const confirmAliasAndRegister = async () => {
+    try {
+      setAliasSubmitting(true);
+      await onWebAuthnRegister(
+        showError,
+        showSuccess,
+        () => {
+          loadWebAuthnCredentials();
+        },
+        aliasInput.trim()
+      );
+      setOpenAliasDialog(false);
+    } catch (e) {
+      // 错误已在 onWebAuthnRegister 内部处理
+    } finally {
+      setAliasSubmitting(false);
+    }
   };
 
   const handleDeleteWebAuthnCredential = (credentialId) => {
@@ -353,16 +391,10 @@ export default function Profile() {
             <SubCard title="WebAuthn 凭据管理">
               <Grid container spacing={2}>
                 <Grid xs={12}>
-                  <Alert severity="info">
-                    WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。
-                  </Alert>
+                  <Alert severity="info">WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。</Alert>
                 </Grid>
                 <Grid xs={12}>
-                  <Button 
-                    variant="contained" 
-                    onClick={handleWebAuthnRegister}
-                    disabled={loadingWebAuthn}
-                  >
+                  <Button variant="contained" onClick={handleWebAuthnRegister} disabled={loadingWebAuthn}>
                     注册 WebAuthn 凭据
                   </Button>
                 </Grid>
@@ -372,19 +404,25 @@ export default function Profile() {
                       已注册的凭据
                     </Typography>
                     {webAuthnCredentials.map((credential) => (
-                      <Card 
-                        key={credential.id} 
-                        sx={{ 
-                          mb: 2, 
-                          p: 2, 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center' 
+                      <Card
+                        key={credential.id}
+                        sx={{
+                          mb: 2,
+                          p: 2,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
                         }}
                       >
                         <Stack>
                           <Typography variant="body1">
-                            凭据 ID: {credential.credential_id.substring(0, 20)}...
+                            别名:{' '}
+                            {credential.alias && credential.alias.trim() !== ''
+                              ? credential.alias
+                              : new Date(credential.created_time * 1000).toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            凭据 ID: {credential.credential_id}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             注册时间: {new Date(credential.created_time * 1000).toLocaleString()}
@@ -405,9 +443,7 @@ export default function Profile() {
                 )}
                 {webAuthnCredentials.length === 0 && !loadingWebAuthn && (
                   <Grid xs={12}>
-                    <Alert severity="info">
-                      您还没有注册任何 WebAuthn 凭据。点击上方按钮开始注册。
-                    </Alert>
+                    <Alert severity="info">您还没有注册任何 WebAuthn 凭据。点击上方按钮开始注册。</Alert>
                   </Grid>
                 )}
               </Grid>
@@ -444,19 +480,55 @@ export default function Profile() {
           setOpenEmail(false);
         }}
       />
+      {/* 别名输入对话框 */}
+      <Dialog
+        open={openAliasDialog}
+        onClose={closeAliasDialog}
+        aria-labelledby="alias-dialog-title"
+        aria-describedby="alias-dialog-description"
+      >
+        <DialogTitle id="alias-dialog-title">设置凭据别名</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alias-dialog-description">
+            为新的 WebAuthn 凭据设置一个易于识别的别名（可选）。不设置将使用当前时间作为默认别名。
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="alias"
+            label="别名（可选）"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={aliasInput}
+            onChange={(e) => setAliasInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                confirmAliasAndRegister();
+              }
+            }}
+            disabled={aliasSubmitting || loadingWebAuthn}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeAliasDialog} color="primary" disabled={aliasSubmitting}>
+            取消
+          </Button>
+          <Button onClick={confirmAliasAndRegister} color="primary" variant="contained" disabled={aliasSubmitting || loadingWebAuthn}>
+            确认
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={confirmDeleteOpen}
         onClose={cancelDelete}
         aria-labelledby="confirm-delete-dialog-title"
         aria-describedby="confirm-delete-dialog-description"
       >
-        <DialogTitle id="confirm-delete-dialog-title">
-          确认删除
-        </DialogTitle>
+        <DialogTitle id="confirm-delete-dialog-title">确认删除</DialogTitle>
         <DialogContent>
-          <DialogContentText id="confirm-delete-dialog-description">
-            您确定要删除这个 WebAuthn 凭据吗？此操作无法撤销。
-          </DialogContentText>
+          <DialogContentText id="confirm-delete-dialog-description">您确定要删除这个 WebAuthn 凭据吗？此操作无法撤销。</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} color="primary">

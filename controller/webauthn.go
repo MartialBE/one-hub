@@ -42,7 +42,13 @@ func WebauthnBeginRegistration(c *gin.Context) {
 		return
 	}
 
-	// 将session存储到用户会话中
+	// 读取可选别名，并将session与别名存储到用户会话中
+	type BeginRegReq struct {
+		Alias string `json:"alias"`
+	}
+	var req BeginRegReq
+	_ = c.ShouldBindJSON(&req) // 忽略错误，别名为可选
+
 	sess := sessions.Default(c)
 	sessionData, err := json.Marshal(session)
 	if err != nil {
@@ -53,6 +59,9 @@ func WebauthnBeginRegistration(c *gin.Context) {
 		return
 	}
 	sess.Set("webauthn_registration_session", string(sessionData))
+	if req.Alias != "" {
+		sess.Set("webauthn_alias", req.Alias)
+	}
 	sess.Save()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -114,7 +123,13 @@ func WebauthnFinishRegistration(c *gin.Context) {
 	}
 
 	// 保存凭据到数据库
-	err = model.SaveWebAuthnCredential(userId, credential)
+	alias := ""
+	if v := sess.Get("webauthn_alias"); v != nil {
+		if s, ok := v.(string); ok {
+			alias = s
+		}
+	}
+	err = model.SaveWebAuthnCredential(userId, credential, alias)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "保存凭据失败",
@@ -125,6 +140,7 @@ func WebauthnFinishRegistration(c *gin.Context) {
 
 	// 清除会话
 	sess.Delete("webauthn_registration_session")
+	sess.Delete("webauthn_alias")
 	sess.Save()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -292,6 +308,7 @@ func GetUserWebAuthnCredentials(c *gin.Context) {
 		result = append(result, gin.H{
 			"id":            cred.Id,
 			"credential_id": cred.CredentialId,
+			"alias":         cred.Alias,
 			"created_time":  cred.CreatedTime,
 		})
 	}
