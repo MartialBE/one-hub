@@ -24,13 +24,6 @@ func WebauthnBeginRegistration(c *gin.Context) {
 	}
 
 	userId := c.GetInt("id")
-	if userId == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "未授权",
-			"success": false,
-		})
-		return
-	}
 
 	user, err := model.GetUserById(userId, false)
 	if err != nil {
@@ -80,13 +73,6 @@ func WebauthnFinishRegistration(c *gin.Context) {
 	}
 
 	userId := c.GetInt("id")
-	if userId < 1 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "未授权",
-			"success": false,
-		})
-		return
-	}
 
 	user, err := model.GetUserById(userId, false)
 	if err != nil {
@@ -296,13 +282,6 @@ func WebauthnFinishLogin(c *gin.Context) {
 // 获取用户的WebAuthn凭据列表
 func GetUserWebAuthnCredentials(c *gin.Context) {
 	userId := c.GetInt("id")
-	if userId == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "未授权",
-			"success": false,
-		})
-		return
-	}
 
 	var credentials []model.WebAuthnCredential
 	model.DB.Where("user_id = ?", userId).Find(&credentials)
@@ -326,13 +305,6 @@ func GetUserWebAuthnCredentials(c *gin.Context) {
 // 删除WebAuthn凭据
 func DeleteWebAuthnCredential(c *gin.Context) {
 	userId := c.GetInt("id")
-	if userId == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "未授权",
-			"success": false,
-		})
-		return
-	}
 
 	credentialId := c.Param("id")
 	if credentialId == "" {
