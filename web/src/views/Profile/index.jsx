@@ -20,7 +20,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import { IconBrandWechat, IconBrandGithub, IconMail, IconBrandTelegram, IconBrandOauth } from '@tabler/icons-react';
 import Label from 'ui-component/Label';
 import { API } from 'utils/api';
-import { showError, showSuccess, onGitHubOAuthClicked, copy, trims, onLarkOAuthClicked } from 'utils/common';
+import { showError, showSuccess, onGitHubOAuthClicked, copy, trims, onLarkOAuthClicked, onWebAuthnRegister, getWebAuthnCredentials, deleteWebAuthnCredential } from 'utils/common';
 import * as Yup from 'yup';
 import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
@@ -45,6 +45,8 @@ export default function Profile() {
   const [turnstileToken, setTurnstileToken] = useState('');
   const [openWechat, setOpenWechat] = useState(false);
   const [openEmail, setOpenEmail] = useState(false);
+  const [webAuthnCredentials, setWebAuthnCredentials] = useState([]);
+  const [loadingWebAuthn, setLoadingWebAuthn] = useState(false);
   const status = useSelector((state) => state.siteInfo);
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -74,6 +76,30 @@ export default function Profile() {
     } catch (error) {
       return;
     }
+  };
+
+  const loadWebAuthnCredentials = async () => {
+    setLoadingWebAuthn(true);
+    try {
+      const credentials = await getWebAuthnCredentials();
+      setWebAuthnCredentials(credentials);
+    } catch (error) {
+      console.error('加载WebAuthn凭据失败:', error);
+    } finally {
+      setLoadingWebAuthn(false);
+    }
+  };
+
+  const handleWebAuthnRegister = async () => {
+    await onWebAuthnRegister(showError, showSuccess, () => {
+      loadWebAuthnCredentials();
+    });
+  };
+
+  const handleDeleteWebAuthnCredential = async (credentialId) => {
+    await deleteWebAuthnCredential(credentialId, showError, showSuccess, () => {
+      loadWebAuthnCredentials();
+    });
   };
 
   const bindWeChat = async (code) => {
@@ -132,6 +158,7 @@ export default function Profile() {
       }
     }
     loadUser().then();
+    loadWebAuthnCredentials().then();
   }, [status]);
 
   return (
@@ -298,6 +325,68 @@ export default function Profile() {
                         </Typography>
                       </Alert>
                     </Stack>
+                  </Grid>
+                )}
+              </Grid>
+            </SubCard>
+            <SubCard title="WebAuthn 凭据管理">
+              <Grid container spacing={2}>
+                <Grid xs={12}>
+                  <Alert severity="info">
+                    WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。
+                  </Alert>
+                </Grid>
+                <Grid xs={12}>
+                  <Button 
+                    variant="contained" 
+                    onClick={handleWebAuthnRegister}
+                    disabled={loadingWebAuthn}
+                  >
+                    注册 WebAuthn 凭据
+                  </Button>
+                </Grid>
+                {webAuthnCredentials.length > 0 && (
+                  <Grid xs={12}>
+                    <Typography variant="h4" sx={{ mb: 2 }}>
+                      已注册的凭据
+                    </Typography>
+                    {webAuthnCredentials.map((credential) => (
+                      <Card 
+                        key={credential.id} 
+                        sx={{ 
+                          mb: 2, 
+                          p: 2, 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center' 
+                        }}
+                      >
+                        <Stack>
+                          <Typography variant="body1">
+                            凭据 ID: {credential.credential_id.substring(0, 20)}...
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            注册时间: {new Date(credential.created_time * 1000).toLocaleString()}
+                          </Typography>
+                        </Stack>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteWebAuthnCredential(credential.id)}
+                          disabled={loadingWebAuthn}
+                        >
+                          删除
+                        </Button>
+                      </Card>
+                    ))}
+                  </Grid>
+                )}
+                {webAuthnCredentials.length === 0 && !loadingWebAuthn && (
+                  <Grid xs={12}>
+                    <Alert severity="info">
+                      您还没有注册任何 WebAuthn 凭据。点击上方按钮开始注册。
+                    </Alert>
                   </Grid>
                 )}
               </Grid>
