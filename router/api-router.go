@@ -53,8 +53,8 @@ func SetApiRouter(router *gin.Engine) {
 			webauthnGroup.POST("/registration/finish", middleware.UserAuth(), controller.WebauthnFinishRegistration)
 
 			// 登录相关
-			webauthnGroup.POST("/login/begin", controller.WebauthnBeginLogin)
-			webauthnGroup.POST("/login/finish", controller.WebauthnFinishLogin)
+			webauthnGroup.POST("/login/begin", middleware.CriticalRateLimit(), controller.WebauthnBeginLogin)
+			webauthnGroup.POST("/login/finish", middleware.CriticalRateLimit(), controller.WebauthnFinishLogin)
 
 			// 凭据管理
 			webauthnGroup.GET("/credentials", middleware.UserAuth(), controller.GetUserWebAuthnCredentials)
