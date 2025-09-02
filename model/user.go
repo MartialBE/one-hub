@@ -589,8 +589,6 @@ func (user *User) WebAuthnIcon() string {
 }
 
 func (user *User) WebAuthnCredentials() []webauthn.Credential {
-	// 这里需要从数据库获取用户的WebAuthn凭据
-	// 你需要创建一个WebAuthnCredential表来存储这些信息
 	credentials := GetUserWebAuthnCredentials(user.Id)
 	return credentials
 }
@@ -621,13 +619,6 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 
 	var webauthnCredentials []webauthn.Credential
 	for _, cred := range credentials {
-		// 需要将 base64 编码的字符串解码回字节数组
-    //credentialIdBytes, err := base64.StdEncoding.DecodeString(cred.CredentialId)
-    //if err != nil {
-    //	// 处理解码错误，可以记录日志或跳过该凭据
-    //	continue
-    //}
-
 		webauthnCredentials = append(webauthnCredentials, webauthn.Credential{
       ID: cred.CredentialId,
 			PublicKey:       cred.PublicKey,
@@ -649,7 +640,6 @@ func SaveWebAuthnCredential(userId int, credential *webauthn.Credential, alias s
 	if alias == "" {
     alias = time.Now().Format("20060102150405")
 	}
-  //credentialIdBase64 := base64.StdEncoding.EncodeToString(credential.ID)
 	webauthnCred := WebAuthnCredential{
 		UserId:          userId,
     CredentialId: credential.ID,
