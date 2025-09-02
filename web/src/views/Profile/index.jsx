@@ -422,7 +422,12 @@ export default function Profile() {
                               : new Date(credential.created_time * 1000).toLocaleString()}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            凭据 ID: {credential.credential_id}
+                            凭据 ID:{' '}
+                            <span title={credential.credential_id}>
+                              {credential.credential_id.length > 20
+                                ? credential.credential_id.substring(0, 20) + '...'
+                                : credential.credential_id}
+                            </span>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             注册时间: {new Date(credential.created_time * 1000).toLocaleString()}
