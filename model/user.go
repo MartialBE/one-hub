@@ -648,7 +648,7 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 // 保存WebAuthn凭据
 func SaveWebAuthnCredential(userId int, credential *webauthn.Credential, alias string) error {
 	if alias == "" {
-		alias = time.Now().Format("2006-01-02 15:04:05")
+    alias = time.Now().Format("20060102150405")
 	}
 	credentialIdBase64 := base64.StdEncoding.EncodeToString(credential.ID)
 	webauthnCred := WebAuthnCredential{
