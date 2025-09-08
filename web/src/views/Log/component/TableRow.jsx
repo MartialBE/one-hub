@@ -323,13 +323,13 @@ function calculateTokens(item) {
     { key: 'reasoning_tokens', label: 'logPage.reasoningTokens', rate: reasoning_tokens, labelParams: { ratio: reasoning_tokens } },
     {
       key: 'input_image_tokens',
-      label: 'log.inputImageTokens',
+      label: 'logPage.inputImageTokens',
       rate: input_image_tokens,
       labelParams: { ratio: input_image_tokens }
     },
     {
       key: 'output_image_tokens',
-      label: 'log.outputImageTokens',
+      label: 'logPage.outputImageTokens',
       rate: output_image_tokens,
       labelParams: { ratio: output_image_tokens }
     }

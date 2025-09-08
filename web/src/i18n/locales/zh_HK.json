@@ -734,7 +734,15 @@
     "usernameMinLength": "用戶名不能少於 3 個字符",
     "usernameRequired": "用戶名不能為空",
     "wechatBindSuccess": "微信帳戶綁定成功！",
-    "yourTokenIs": "你的訪問令牌是："
+    "yourTokenIs": "你的訪問令牌是：",
+    "registerWebauthn": "註冊 WebAuthn 憑證",
+    "webauthnManagement": "WebAuthn 憑證管理",
+    "webauthnDescription": "WebAuthn 提供無密碼身份驗證，您可以使用指紋、Face ID 或安全密鑰等生物識別方式進行登入。",
+    "registeredCredentials": "已註冊憑證",
+    "alias": "別名:",
+    "credentialId": "憑證 ID:",
+    "registerTime": "註冊時間:",
+    "delete": "刪除"
   },
   "redemption": "兌換",
   "redemptionPage": {
