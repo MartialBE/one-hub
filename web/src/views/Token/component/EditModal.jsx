@@ -21,7 +21,8 @@ import {
   FormHelperText,
   Select,
   MenuItem,
-  Typography
+  Typography,
+  Grid
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -283,26 +284,62 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
               )}
 
               <Divider sx={{ margin: '16px 0px' }} />
-
-              <FormControl fullWidth>
-                <InputLabel>{t('token_index.userGroup')}</InputLabel>
-                <Select
-                  label={t('token_index.userGroup')}
-                  name="group"
-                  value={values.group || '-1'}
-                  onChange={(e) => {
-                    const value = e.target.value === '-1' ? '' : e.target.value;
-                    setFieldValue('group', value);
-                  }}
-                >
-                  <MenuItem value="-1">跟随用户分组</MenuItem>
-                  {userGroupOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Typography variant="h4">{t('token_index.selectGroup')}</Typography>
+              <Typography variant="caption">{t('token_index.selectGroupInfo')}</Typography>
+              <Grid container spacing={2} mt={2}>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>{t('token_index.userGroup')}</InputLabel>
+                    <Select
+                      label={t('token_index.userGroup')}
+                      name="group"
+                      value={values.group || '-1'}
+                      onChange={(e) => {
+                        const value = e.target.value === '-1' ? '' : e.target.value;
+                        setFieldValue('group', value);
+                        // 如果备份分组选择了和主分组相同的值，则重置备份分组
+                        if (values.backup_group === value && value !== '') {
+                          setFieldValue('backup_group', '');
+                        }
+                      }}
+                      variant={'outlined'}
+                    >
+                      <MenuItem value="-1">跟随用户分组</MenuItem>
+                      {userGroupOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>{t('token_index.userBackupGroup')}</InputLabel>
+                    <Select
+                      label={t('token_index.userBackupGroup')}
+                      name="backup_group"
+                      value={values.backup_group || '-1'}
+                      onChange={(e) => {
+                        const value = e.target.value === '-1' ? '' : e.target.value;
+                        setFieldValue('backup_group', value);
+                      }}
+                      variant={'outlined'}
+                    >
+                      <MenuItem value="-1">无备份分组</MenuItem>
+                      {userGroupOptions.map((option) => (
+                        <MenuItem 
+                          key={option.value} 
+                          value={option.value}
+                          disabled={values.group === option.value && values.group !== ''}
+                        >
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
               <DialogActions>
                 <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">

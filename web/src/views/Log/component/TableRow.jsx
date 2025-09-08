@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useMemo, useState } from 'react';
+import { ArrowForward } from '@mui/icons-material';
 
 import Badge from '@mui/material/Badge';
 
@@ -111,12 +112,26 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
 
         {columnVisibility.group && (
           <TableCell sx={{ p: '10px 8px' }}>
-            {item?.metadata?.group_name ? (
-              <Label color="default" variant="soft">
-                {userGroup[item.metadata.group_name]?.name || '跟随用户'}
-              </Label>
+            {item?.metadata?.is_backup_group ? (
+              // 显示分组重定向：原始分组 → 备份分组
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Label color="default" variant="soft">
+                  {userGroup[item.metadata.group_name]?.name || '跟随用户'}
+                </Label>
+                <ArrowForward sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Label color="warning" variant="soft">
+                  {userGroup[item.metadata.backup_group_name]?.name || '备份分组'}
+                </Label>
+              </Stack>
             ) : (
-              ''
+              // 正常显示分组
+              item?.metadata?.group_name || item?.metadata?.backup_group_name ? (
+                <Label color="default" variant="soft">
+                  {userGroup[item.metadata.group_name || item.metadata.backup_group_name]?.name || '跟随用户'}
+                </Label>
+              ) : (
+                ''
+              )
             )}
           </TableCell>
         )}
@@ -168,7 +183,13 @@ export default function LogTableRow({ item, userIsAdmin, userGroup, columnVisibi
         <TableRow>
           <TableCell colSpan={colCount} sx={{ p: 0, border: 0, bgcolor: 'transparent' }}>
             <Collapse in={open} timeout="auto" unmountOnExit>
-              <QuotaWithDetailContent item={item} t={t} totalInputTokens={totalInputTokens} totalOutputTokens={totalOutputTokens} />
+              <QuotaWithDetailContent
+                item={item}
+                userGroup={userGroup}
+                t={t}
+                totalInputTokens={totalInputTokens}
+                totalOutputTokens={totalOutputTokens}
+              />
             </Collapse>
           </TableCell>
         </TableRow>
