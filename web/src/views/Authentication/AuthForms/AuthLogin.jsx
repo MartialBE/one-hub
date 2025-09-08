@@ -302,12 +302,14 @@ const LoginForm = ({ ...others }) => {
                 <Button
                   disableElevation
                   fullWidth
-                  onClick={() => onWebAuthnClicked(
-                    values.username,
-                    (msg) => setErrors({ submit: msg }),
-                    (msg) => setStatus({ success: true, message: msg }),
-                    () => {}
-                  )}
+                  onClick={() =>
+                    onWebAuthnClicked(
+                      values.username,
+                      (msg) => setErrors({ submit: msg }),
+                      (msg) => setStatus({ success: true, message: msg }),
+                      () => {}
+                    )
+                  }
                   size="large"
                   variant="outlined"
                   sx={{

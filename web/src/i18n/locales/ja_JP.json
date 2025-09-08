@@ -733,7 +733,15 @@
     "usernameMinLength": "ユーザー名は3文字以上でなければなりません",
     "usernameRequired": "ユーザー名は空にできません",
     "wechatBindSuccess": "WeChatアカウントのバインドに成功しました！",
-    "yourTokenIs": "あなたのアクセストークンは次の通りです："
+    "yourTokenIs": "あなたのアクセストークンは次の通りです：",
+    "registerWebauthn": "WebAuthn認証を登録",
+    "webauthnManagement": "WebAuthn資格情報の管理",
+    "webauthnDescription": "WebAuthnはパスワードレス認証を提供し、指紋認証、Face ID、セキュリティキーなどの生体認証を使用してログインできます。",
+    "registeredCredentials": "登録済み認証情報",
+    "alias": "エイリアス:",
+    "credentialId": "認証情報ID:",
+    "registerTime": "登録日時:",
+    "delete": "削除"
   },
   "redemption": "引き換え",
   "redemptionPage": {

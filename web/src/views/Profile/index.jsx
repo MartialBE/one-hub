@@ -388,20 +388,20 @@ export default function Profile() {
                 )}
               </Grid>
             </SubCard>
-            <SubCard title="WebAuthn 凭据管理">
+            <SubCard title={t('profilePage.webauthnManagement')}>
               <Grid container spacing={2}>
                 <Grid xs={12}>
-                  <Alert severity="info">WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。</Alert>
+                  <Alert severity="info">{t('profilePage.webauthnDescription')}</Alert>
                 </Grid>
                 <Grid xs={12}>
                   <Button variant="contained" onClick={handleWebAuthnRegister} disabled={loadingWebAuthn}>
-                    注册 WebAuthn 凭据
+                    {t('profilePage.registerWebauthn')}
                   </Button>
                 </Grid>
                 {webAuthnCredentials.length > 0 && (
                   <Grid xs={12}>
                     <Typography variant="h4" sx={{ mb: 2 }}>
-                      已注册的凭据
+                      {t('profilePage.registeredCredentials')}
                     </Typography>
                     {webAuthnCredentials.map((credential) => (
                       <Card
@@ -416,13 +416,13 @@ export default function Profile() {
                       >
                         <Stack>
                           <Typography variant="body1">
-                            别名:{' '}
+                            {t('profilePage.alias')}:{' '}
                             {credential.alias && credential.alias.trim() !== ''
                               ? credential.alias
                               : new Date(credential.created_time * 1000).toLocaleString()}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            凭据 ID:{' '}
+                            {t('profilePage.credentialId')}:{' '}
                             <span title={credential.credential_id}>
                               {credential.credential_id.length > 20
                                 ? credential.credential_id.substring(0, 20) + '...'
@@ -430,7 +430,7 @@ export default function Profile() {
                             </span>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            注册时间: {new Date(credential.created_time * 1000).toLocaleString()}
+                            {t('profilePage.registerTime')}: {new Date(credential.created_time * 1000).toLocaleString()}
                           </Typography>
                         </Stack>
                         <Button
@@ -440,7 +440,7 @@ export default function Profile() {
                           onClick={() => handleDeleteWebAuthnCredential(credential.id)}
                           disabled={loadingWebAuthn}
                         >
-                          删除
+                          {t('profilePage.delete')}
                         </Button>
                       </Card>
                     ))}
@@ -448,7 +448,7 @@ export default function Profile() {
                 )}
                 {webAuthnCredentials.length === 0 && !loadingWebAuthn && (
                   <Grid xs={12}>
-                    <Alert severity="info">您还没有注册任何 WebAuthn 凭据。点击上方按钮开始注册。</Alert>
+                    <Alert severity="info">{t('profilePage.noWebauthnCredentials')}</Alert>
                   </Grid>
                 )}
               </Grid>
