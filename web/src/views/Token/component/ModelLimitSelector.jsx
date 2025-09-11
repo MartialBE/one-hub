@@ -9,7 +9,6 @@ const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { values, setFieldValue } = useFormikContext();
-  console.log('Component re-rendered. Formik values:', values); // 添加这行日志
   const sortedModelOptions = useMemo(() => {
     return [...modelOptions].sort((a, b) => a.owned_by.localeCompare(b.owned_by));
   }, [modelOptions]);
@@ -18,10 +17,6 @@ const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
     const selectedIds = new Set(values.setting?.limits?.models || []);
     return modelOptions.filter((option) => selectedIds.has(option.id));
   }, [values.setting?.limits?.models, modelOptions]);
-
-  useEffect(() => {
-    console.log('modelOptions prop has changed');
-  }, [modelOptions]);
 
   return (
     <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
