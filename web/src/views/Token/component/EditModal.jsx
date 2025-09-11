@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik } from 'formik'; // 1. 导入 useFormikContext
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
+import  ModelLimitSelector from './ModelLimitSelector';
 import {
   Dialog,
   DialogTitle,
@@ -22,11 +23,7 @@ import {
   Select,
   MenuItem,
   Typography,
-  Grid,
-  Chip,
-  Autocomplete,
-  TextField,
-  Paper
+  Grid
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -70,7 +67,7 @@ const originInputs = {
     },
     limits: {
       enabled: false,
-      models: [] // 初始化为数组
+      models: []
     }
   }
 };
@@ -81,7 +78,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const [inputs, setInputs] = useState(originInputs);
   const [modelOptions, setModelOptions] = useState([]);
   const [ownedByIcons, setOwnedByIcons] = useState({});
-
   const fetchOwnedByIcons = async () => {
     try {
       const res = await API.get('/api/model_ownedby/');
@@ -157,16 +153,9 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
       const { success, message, data } = res.data;
       if (success) {
         data.is_edit = true;
-        // 确保 setting.limits.models 始终是一个数组
-        if (!data.setting) {
-          data.setting = originInputs.setting;
-        }
-        if (!data.setting.limits) {
-          data.setting.limits = originInputs.setting.limits;
-        }
-        if (!data.setting.limits.models) {
-          data.setting.limits.models = [];
-        }
+        if (!data.setting) data.setting = originInputs.setting;
+        if (!data.setting.limits) data.setting.limits = originInputs.setting.limits;
+        if (!data.setting.limits.models) data.setting.limits.models = [];
         setInputs(data);
       } else {
         showError(message);
@@ -410,8 +399,9 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                     <Switch
                       checked={values?.setting?.limits?.enabled === true}
                       onClick={() => {
-                        setFieldValue('setting.limits.enabled', !values.setting?.limits?.enabled);
-                        if (values.setting?.limits?.enabled) {
+                        const newEnabledState = !values.setting?.limits?.enabled;
+                        setFieldValue('setting.limits.enabled', newEnabledState);
+                        if (!newEnabledState) {
                           setFieldValue('setting.limits.models', []);
                         }
                       }}
@@ -420,96 +410,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   label={t('token_index.limits_switch')}
                 />
               </FormControl>
-
-              {/*下拉框多选模型*/}
-              {values?.setting?.limits?.enabled && (
-                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                  <Autocomplete
-                    multiple
-                    disablePortal
-                    disableListWrap
-                    freeSolo
-                    options={modelOptions}
-                    value={
-                      values.setting?.limits?.models?.map((id) => modelOptions.find((option) => option.id === id)).filter(Boolean) || []
-                    }
-                    onChange={(event, newValue) => {
-                      const modelIds = newValue.map((option) => option.id);
-                      setFieldValue('setting.limits.models', modelIds);
-                    }}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    getOptionLabel={(option) => option.name}
-                    ListboxProps={{
-                      style: {
-                        maxHeight: '300px' // 将最大高度应用到内部列表上
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t('token_index.limit_models')}
-                        placeholder={values.setting?.limits?.models?.length > 0 ? '' : t('token_index.limit_models_info')}
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <li {...props} key={option.id}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
-                          <img
-                            src={getModelIcon(option.owned_by)}
-                            alt={option.owned_by}
-                            style={{ width: 20, height: 20, borderRadius: '4px' }}
-                            onError={(e) => {
-                              e.target.src = '/src/assets/images/icons/unknown_type.svg';
-                            }}
-                          />
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <span style={{ fontWeight: 500 }}>{option.name}</span>
-                            <span style={{ fontSize: '0.75rem', color: theme.palette.text.secondary }}>
-                              {option.owned_by} | {option.groups.join(', ')}
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option.id}
-                          label={option.name}
-                          {...getTagProps({ index })}
-                          size="small"
-                          variant="outlined"
-                          color="primary"
-                          sx={{
-                            margin: 1,
-                            color: theme.palette.primary.main,
-                            '& .MuiChip-deleteIcon': {
-                              color: theme.palette.primary.main,
-                              transition: 'color 0.2s ease-in-out'
-                            },
-                            // 鼠标悬停在删除图标上时的状态
-                            '& .MuiChip-deleteIcon:hover': {
-                              color: theme.palette.primary.main
-                            }
-                          }}
-                        />
-                      ))
-                    }
-                    PaperComponent={(props) => (
-                      <Paper
-                        {...props}
-                        style={{
-                          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    )}
-                    disableCloseOnSelect
-                  />
-                  <FormHelperText>{t('token_index.limit_models_info')}</FormHelperText>
-                </FormControl>
-              )}
-
+              {values?.setting?.limits?.enabled && <ModelLimitSelector modelOptions={modelOptions} getModelIcon={getModelIcon} />}
               <DialogActions>
                 <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
