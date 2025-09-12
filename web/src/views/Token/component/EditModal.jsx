@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik } from 'formik'; // 1. 导入 useFormikContext
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
+import  ModelLimitSelector from './ModelLimitSelector';
 import {
   Dialog,
   DialogTitle,
@@ -21,7 +22,8 @@ import {
   FormHelperText,
   Select,
   MenuItem,
-  Typography
+  Typography,
+  Grid
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -55,13 +57,17 @@ const originInputs = {
   name: '',
   remain_quota: 0,
   expired_time: -1,
-  unlimited_quota: false,
+  unlimited_quota: true,
   group: '',
-
+  backup_group: '',
   setting: {
     heartbeat: {
       enabled: false,
       timeout_seconds: 30
+    },
+    limits: {
+      enabled: false,
+      models: []
     }
   }
 };
@@ -70,14 +76,52 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
+  const [modelOptions, setModelOptions] = useState([]);
+  const [ownedByIcons, setOwnedByIcons] = useState({});
+  const fetchOwnedByIcons = async () => {
+    try {
+      const res = await API.get('/api/model_ownedby/');
+      const { success, data } = res.data;
+      if (success) {
+        const iconMap = {};
+        data.forEach((provider) => {
+          iconMap[provider.name] = provider.icon || '/src/assets/images/icons/unknown_type.svg';
+        });
+        setOwnedByIcons(iconMap);
+      }
+    } catch (error) {
+      console.error('获取模型提供商图标失败:', error);
+    }
+  };
+
+  const fetchModelOptions = async () => {
+    try {
+      const res = await API.get('/api/available_model');
+      const { success, data } = res.data;
+      if (success) {
+        const models = Object.keys(data).map((modelId) => ({
+          id: modelId,
+          name: modelId,
+          owned_by: data[modelId].owned_by,
+          groups: data[modelId].groups,
+          price: data[modelId].price
+        }));
+        setModelOptions(models);
+      }
+    } catch (error) {
+      console.error('获取模型列表失败:', error);
+    }
+  };
+
+  const getModelIcon = (ownedBy) => {
+    return ownedByIcons[ownedBy] || '/src/assets/images/icons/unknown_type.svg';
+  };
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
-
     values.remain_quota = parseInt(values.remain_quota);
     values.setting.heartbeat.timeout_seconds = parseInt(values.setting.heartbeat.timeout_seconds);
     let res;
-
     try {
       if (values.is_edit) {
         res = await API.put(`/api/token/`, { ...values, id: parseInt(tokenId) });
@@ -109,6 +153,9 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
       const { success, message, data } = res.data;
       if (success) {
         data.is_edit = true;
+        if (!data.setting) data.setting = originInputs.setting;
+        if (!data.setting.limits) data.setting.limits = originInputs.setting.limits;
+        if (!data.setting.limits.models) data.setting.limits.models = [];
         setInputs(data);
       } else {
         showError(message);
@@ -117,6 +164,13 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
       return;
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      fetchOwnedByIcons();
+      fetchModelOptions();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (tokenId) {
@@ -134,7 +188,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
       </DialogTitle>
       <Divider />
       <DialogContent>
-        <Alert severity="info">{t('token_index.quotaNote')}</Alert>
         <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
           {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldError, setFieldValue, isSubmitting }) => (
             <form noValidate onSubmit={handleSubmit}>
@@ -157,6 +210,21 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   </FormHelperText>
                 )}
               </FormControl>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={values.expired_time === -1}
+                    onClick={() => {
+                      if (values.expired_time === -1) {
+                        setFieldValue('expired_time', Math.floor(Date.now() / 1000));
+                      } else {
+                        setFieldValue('expired_time', -1);
+                      }
+                    }}
+                  />
+                }
+                label={t('token_index.neverExpires')}
+              />
               {values.expired_time !== -1 && (
                 <FormControl fullWidth error={Boolean(touched.expired_time && errors.expired_time)} sx={{ ...theme.typography.otherInput }}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
@@ -188,22 +256,19 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   )}
                 </FormControl>
               )}
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={values.expired_time === -1}
-                    onClick={() => {
-                      if (values.expired_time === -1) {
-                        setFieldValue('expired_time', Math.floor(Date.now() / 1000));
-                      } else {
-                        setFieldValue('expired_time', -1);
-                      }
-                    }}
-                  />
-                }
-                label={t('token_index.neverExpires')}
-              />
-
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values.unlimited_quota === true}
+                      onClick={() => {
+                        setFieldValue('unlimited_quota', !values.unlimited_quota);
+                      }}
+                    />
+                  }
+                  label={t('token_index.unlimitedQuota')}
+                />
+              </FormControl>
               <FormControl fullWidth error={Boolean(touched.remain_quota && errors.remain_quota)} sx={{ ...theme.typography.otherInput }}>
                 <InputLabel htmlFor="channel-remain_quota-label">{t('token_index.quota')}</InputLabel>
                 <OutlinedInput
@@ -225,20 +290,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                   </FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={values.unlimited_quota === true}
-                      onClick={() => {
-                        setFieldValue('unlimited_quota', !values.unlimited_quota);
-                      }}
-                    />
-                  }
-                  label={t('token_index.unlimitedQuota')}
-                />
-              </FormControl>
-
+              <Alert severity="info">{t('token_index.quotaNote')}</Alert>
               <Divider sx={{ margin: '16px 0px' }} />
               <Typography variant="h4">{t('token_index.heartbeat')}</Typography>
               <Typography variant="caption">{t('token_index.heartbeatTip')}</Typography>
@@ -283,26 +335,82 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
               )}
 
               <Divider sx={{ margin: '16px 0px' }} />
+              <Typography variant="h4">{t('token_index.selectGroup')}</Typography>
+              <Typography variant="caption">{t('token_index.selectGroupInfo')}</Typography>
+              <Grid container spacing={2} mt={2}>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>{t('token_index.userGroup')}</InputLabel>
+                    <Select
+                      label={t('token_index.userGroup')}
+                      name="group"
+                      value={values.group || '-1'}
+                      onChange={(e) => {
+                        const value = e.target.value === '-1' ? '' : e.target.value;
+                        setFieldValue('group', value);
+                        if (values.backup_group === value && value !== '') {
+                          setFieldValue('backup_group', '');
+                        }
+                      }}
+                      variant={'outlined'}
+                    >
+                      <MenuItem value="-1">跟随用户分组</MenuItem>
+                      {userGroupOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>{t('token_index.userBackupGroup')}</InputLabel>
+                    <Select
+                      label={t('token_index.userBackupGroup')}
+                      name="backup_group"
+                      value={values.backup_group || '-1'}
+                      onChange={(e) => {
+                        const value = e.target.value === '-1' ? '' : e.target.value;
+                        setFieldValue('backup_group', value);
+                      }}
+                      variant={'outlined'}
+                    >
+                      <MenuItem value="-1">无备用分组</MenuItem>
+                      {userGroupOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value} disabled={values.group === option.value && values.group !== ''}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
 
+              {/*令牌限制设置*/}
+              <Divider sx={{ margin: '16px 0px' }} />
+              <Typography variant="h4">{t('token_index.limits')}</Typography>
+              <Typography variant="caption">{t('token_index.limits_info')}</Typography>
+
+              {/*是否开启限制*/}
               <FormControl fullWidth>
-                <InputLabel>{t('token_index.userGroup')}</InputLabel>
-                <Select
-                  label={t('token_index.userGroup')}
-                  name="group"
-                  value={values.group || '-1'}
-                  onChange={(e) => {
-                    const value = e.target.value === '-1' ? '' : e.target.value;
-                    setFieldValue('group', value);
-                  }}
-                >
-                  <MenuItem value="-1">跟随用户分组</MenuItem>
-                  {userGroupOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values?.setting?.limits?.enabled === true}
+                      onClick={() => {
+                        const newEnabledState = !values.setting?.limits?.enabled;
+                        setFieldValue('setting.limits.enabled', newEnabledState);
+                        if (!newEnabledState) {
+                          setFieldValue('setting.limits.models', []);
+                        }
+                      }}
+                    />
+                  }
+                  label={t('token_index.limits_switch')}
+                />
               </FormControl>
+              {values?.setting?.limits?.enabled && <ModelLimitSelector modelOptions={modelOptions} getModelIcon={getModelIcon} />}
               <DialogActions>
                 <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">

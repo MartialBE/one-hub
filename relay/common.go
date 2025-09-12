@@ -58,7 +58,52 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 	return relay
 }
 
+func CheckLimitModel(c *gin.Context, modelName string) (error error) {
+	// 判断modelName是否在token的setting.limits.models[]范围内
+
+	// 从context中获取token设置
+	tokenSetting, exists := c.Get("token_setting")
+	if !exists {
+		// 如果没有token设置，则不进行限制
+		return nil
+	}
+
+	// 类型断言为TokenSetting指针
+	setting, ok := tokenSetting.(*model.TokenSetting)
+	if !ok || setting == nil {
+		// 类型断言失败或为空，不进行限制
+		return nil
+	}
+
+	// 检查是否启用了模型限制
+	if !setting.Limits.Enabled {
+		// 未启用模型限制，允许所有模型
+		return nil
+	}
+
+	// 检查模型列表是否为空
+	if len(setting.Limits.Models) == 0 {
+		// 模型列表为空，不允许任何模型
+		return errors.New("当前令牌未配置可用模型")
+	}
+
+	// 检查modelName是否在允许的模型列表中
+	for _, allowedModel := range setting.Limits.Models {
+		if allowedModel == modelName {
+			// 找到匹配的模型，允许使用
+			return nil
+		}
+	}
+
+	// modelName不在允许的模型列表中
+	return fmt.Errorf("当前令牌不支持模型: %s", modelName)
+}
+
 func GetProvider(c *gin.Context, modelName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
+	err := CheckLimitModel(c, modelName)
+	if err != nil {
+		return nil, "", err
+	}
 	channel, fail := fetchChannel(c, modelName)
 	if fail != nil {
 		return
@@ -114,8 +159,79 @@ func fetchChannelById(channelId int) (*model.Channel, error) {
 	return channel, nil
 }
 
+// GroupManager 统一管理分组逻辑
+type GroupManager struct {
+	primaryGroup string
+	backupGroup  string
+	context      *gin.Context
+}
+
+// NewGroupManager 创建分组管理器
+func NewGroupManager(c *gin.Context) *GroupManager {
+	return &GroupManager{
+		primaryGroup: c.GetString("token_group"),
+		backupGroup:  c.GetString("token_backup_group"),
+		context:      c,
+	}
+}
+
+// TryWithGroups 尝试使用主分组和备用分组
+func (gm *GroupManager) TryWithGroups(modelName string, filters []model.ChannelsFilterFunc, operation func(group string) (*model.Channel, error)) (*model.Channel, error) {
+	// 首先尝试主分组
+	if gm.primaryGroup != "" {
+		channel, err := gm.tryGroup(gm.primaryGroup, modelName, filters, operation)
+		if err == nil {
+			return channel, nil
+		}
+		logger.LogError(gm.context.Request.Context(), fmt.Sprintf("主分组 %s 失败: %v", gm.primaryGroup, err))
+	}
+
+	// 如果主分组失败，尝试备用分组
+	if gm.backupGroup != "" && gm.backupGroup != gm.primaryGroup {
+		logger.LogInfo(gm.context.Request.Context(), fmt.Sprintf("尝试使用备用分组: %s", gm.backupGroup))
+		channel, err := gm.tryGroup(gm.backupGroup, modelName, filters, operation)
+		if err == nil {
+			// 更新上下文中的分组信息
+			gm.context.Set("is_backupGroup", true)
+			if err := gm.setGroupRatio(gm.backupGroup); err != nil {
+				return nil, fmt.Errorf("设置备用分组倍率失败: %v", err)
+			}
+			return channel, nil
+		}
+		logger.LogError(gm.context.Request.Context(), fmt.Sprintf("备用分组 %s 也失败: %v", gm.backupGroup, err))
+		return nil, gm.createGroupError(gm.backupGroup, modelName, channel)
+	}
+	return nil, gm.createGroupError(gm.primaryGroup, modelName, nil)
+}
+
+// tryGroup 尝试使用指定分组
+func (gm *GroupManager) tryGroup(group string, modelName string, filters []model.ChannelsFilterFunc, operation func(group string) (*model.Channel, error)) (*model.Channel, error) {
+	if group == "" {
+		return nil, errors.New("分组为空")
+	}
+	return operation(group)
+}
+
+// setGroupRatio 设置分组比例
+func (gm *GroupManager) setGroupRatio(group string) error {
+	groupRatio := model.GlobalUserGroupRatio.GetBySymbol(group)
+	if groupRatio == nil {
+		return fmt.Errorf("分组 %s 不存在", group)
+	}
+	gm.context.Set("group_ratio", groupRatio.Ratio)
+	return nil
+}
+
+// createGroupError 创建统一的分组错误信息
+func (gm *GroupManager) createGroupError(group string, modelName string, channel *model.Channel) error {
+	if channel != nil {
+		logger.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
+		return errors.New("数据库一致性已被破坏，请联系管理员")
+	}
+	return fmt.Errorf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
+}
+
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
-	group := c.GetString("token_group")
 	skipOnlyChat := c.GetBool("skip_only_chat")
 	isStream := c.GetBool("is_stream")
 
@@ -139,17 +255,12 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		filters = append(filters, model.FilterDisabledStream(modelName))
 	}
 
-	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
-	if err != nil {
-		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
-		if channel != nil {
-			logger.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
-			message = "数据库一致性已被破坏，请联系管理员"
-		}
-		return nil, errors.New(message)
-	}
+	// 使用统一的分组管理器
+	groupManager := NewGroupManager(c)
+	return groupManager.TryWithGroups(modelName, filters, func(group string) (*model.Channel, error) {
+		return model.ChannelGroup.Next(group, modelName, filters...)
+	})
 
-	return channel, nil
 }
 
 func responseJsonClient(c *gin.Context, data interface{}) *types.OpenAIErrorWithStatusCode {

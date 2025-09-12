@@ -194,10 +194,11 @@ func GetDefaultModelOwnedBy() []*ModelOwnedBy {
 		{Id: config.ChannelTypeIdeogram, Name: "Ideogram", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ideogram.svg"},
 		{Id: config.ChannelTypeSiliconflow, Name: "Siliconflow", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/siliconcloud-color.svg"},
 		{Id: config.ChannelTypeFlux, Name: "Flux", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/flux.svg"},
-		{Id: config.ChannelTypeJina, Name: "Jina", Icon: ""},
+		{Id: config.ChannelTypeJina, Name: "Jina", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/jina.svg"},
 		{Id: config.ChannelTypeRerank, Name: "Rerank", Icon: ""},
 		{Id: config.ChannelTypeRecraft, Name: "RecraftAI", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/recraft.svg"},
 		{Id: config.ChannelTypeKling, Name: "Kling", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/kling-color.svg"},
 		{Id: config.ChannelTypeOpenRouter, Name: "OpenRouter", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openrouter.svg"},
+		{Id: config.ChannelTypeXAI, Name: "xAI", Icon: "https://registry.npmmirror.com/@lobehub/icons-static-webp/1.24.0/files/light/xai.webp"},
 	}
 }

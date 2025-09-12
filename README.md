@@ -77,6 +77,7 @@ _本项目是基于[one-api](https://github.com/songquanpeng/one-api)二次开�
 - 支持用户月度账单生成(通过环境变量或者配置文件开启)
 - 支持多策略(`覆盖更新`,`只更新现有价格`,`只新增价格`)模型价格自动更新(通过环境变量或者配置文件开启）
 - 支持`Gemini`、`Claude`格式API请求（详见[文档](https://one-hub-doc.vercel.app/)）
+- 支持`Webauthn`登录（前往`个人设置`页面注册Webauthn登陆凭证即可）
 
 ## 当前支持的供应商
 

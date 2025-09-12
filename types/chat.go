@@ -57,6 +57,7 @@ type ChatCompletionMessage struct {
 	Audio            any                              `json:"audio,omitempty"`
 	Annotations      any                              `json:"annotations,omitempty"`
 	Image            []MultimediaData                 `json:"image,omitempty"`
+	Images           []ChatMessagePart                `json:"images,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -396,6 +397,7 @@ type ChatCompletionStreamChoiceDelta struct {
 	ReasoningContent string                           `json:"reasoning_content,omitempty"`
 	Reasoning        string                           `json:"reasoning,omitempty"`
 	Image            []MultimediaData                 `json:"image,omitempty"`
+	Images           []ChatMessagePart                `json:"images,omitempty"`
 }
 
 func (m *ChatCompletionStreamChoiceDelta) ToolToFuncCalls() {

@@ -1,16 +1,18 @@
 package model
 
 import (
-	"errors"
-	"fmt"
-	"one-api/common"
-	"one-api/common/config"
-	"one-api/common/logger"
-	"one-api/common/redis"
-	"one-api/common/utils"
-	"strings"
+  "errors"
+  "fmt"
+  "one-api/common"
+  "one-api/common/config"
+  "one-api/common/logger"
+  "one-api/common/redis"
+  "one-api/common/utils"
+  "strings"
+  "time"
 
-	"gorm.io/gorm"
+  "github.com/go-webauthn/webauthn/webauthn"
+  "gorm.io/gorm"
 )
 
 // User if you add sensitive fields, don't forget to clean them in setupLogin function.
@@ -564,4 +566,90 @@ func ChangeUserQuota(id int, quota int, isRecharge bool) (err error) {
 	}
 
 	return nil
+}
+
+// WebAuthn 相关方法，实现 webauthn.User 接口
+func (user *User) WebAuthnID() []byte {
+	return []byte(fmt.Sprintf("%d", user.Id))
+}
+
+func (user *User) WebAuthnName() string {
+	return user.Username
+}
+
+func (user *User) WebAuthnDisplayName() string {
+	if user.DisplayName != "" {
+		return user.DisplayName
+	}
+	return user.Username
+}
+
+func (user *User) WebAuthnIcon() string {
+	return user.AvatarUrl
+}
+
+func (user *User) WebAuthnCredentials() []webauthn.Credential {
+	credentials := GetUserWebAuthnCredentials(user.Id)
+	return credentials
+}
+
+// WebAuthnCredential 表示WebAuthn凭据
+type WebAuthnCredential struct {
+	Id              int    `json:"id" gorm:"primaryKey"`
+	UserId          int    `json:"user_id" gorm:"index"`
+  CredentialId []byte `json:"credential_id" gorm:"unique;size:255"`
+	PublicKey       []byte `json:"public_key"`
+	AttestationType string `json:"attestation_type"`
+	Alias           string `json:"alias" gorm:"type:varchar(255);default:''"`
+	// Persist essential authenticator state and flags used during login validation
+	BackupEligible bool                   `json:"backup_eligible" gorm:"column:backup_eligible;default:false"`
+	BackupState    bool                   `json:"backup_state" gorm:"column:backup_state;default:false"`
+	Authenticator  webauthn.Authenticator `json:"authenticator" gorm:"embedded"`
+	CreatedTime    int64                  `json:"created_time"`
+}
+
+func (WebAuthnCredential) TableName() string {
+	return "webauthn_credentials"
+}
+
+// 获取用户的WebAuthn凭据
+func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
+	var credentials []WebAuthnCredential
+	DB.Where("user_id = ?", userId).Find(&credentials)
+
+	var webauthnCredentials []webauthn.Credential
+	for _, cred := range credentials {
+		webauthnCredentials = append(webauthnCredentials, webauthn.Credential{
+      ID: cred.CredentialId,
+			PublicKey:       cred.PublicKey,
+			AttestationType: cred.AttestationType,
+			Authenticator:   cred.Authenticator,
+			Flags: webauthn.CredentialFlags{
+				UserPresent:    false, // will be updated by library during validation
+				UserVerified:   false, // will be updated by library during validation
+				BackupEligible: cred.BackupEligible,
+				BackupState:    cred.BackupState,
+			},
+		})
+	}
+	return webauthnCredentials
+}
+
+// 保存WebAuthn凭据
+func SaveWebAuthnCredential(userId int, credential *webauthn.Credential, alias string) error {
+	if alias == "" {
+    alias = time.Now().Format("20060102150405")
+	}
+	webauthnCred := WebAuthnCredential{
+		UserId:          userId,
+    CredentialId: credential.ID,
+		PublicKey:       credential.PublicKey,
+		AttestationType: credential.AttestationType,
+		Alias:           alias,
+		BackupEligible:  credential.Flags.BackupEligible,
+		BackupState:     credential.Flags.BackupState,
+		Authenticator:   credential.Authenticator,
+		CreatedTime:     time.Now().Unix(),
+	}
+	return DB.Create(&webauthnCred).Error
 }

@@ -16,6 +16,7 @@ import (
 	"one-api/common/search"
 	"one-api/common/storage"
 	"one-api/common/telegram"
+	"one-api/common/webauthn"
 	"one-api/controller"
 	"one-api/cron"
 	"one-api/middleware"
@@ -63,6 +64,8 @@ func main() {
 	model.InitOptionMap()
 	// Initialize oidc
 	oidc.InitOIDCConfig()
+	// Initialize wenauthn
+	webauthn.InitWebAuthn()
 	model.NewPricing()
 	model.HandleOldTokenMaxId()
 

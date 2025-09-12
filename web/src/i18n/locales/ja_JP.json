@@ -733,7 +733,15 @@
     "usernameMinLength": "ユーザー名は3文字以上でなければなりません",
     "usernameRequired": "ユーザー名は空にできません",
     "wechatBindSuccess": "WeChatアカウントのバインドに成功しました！",
-    "yourTokenIs": "あなたのアクセストークンは次の通りです："
+    "yourTokenIs": "あなたのアクセストークンは次の通りです：",
+    "registerWebauthn": "WebAuthn認証を登録",
+    "webauthnManagement": "WebAuthn資格情報の管理",
+    "webauthnDescription": "WebAuthnはパスワードレス認証を提供し、指紋認証、Face ID、セキュリティキーなどの生体認証を使用してログインできます。",
+    "registeredCredentials": "登録済み認証情報",
+    "alias": "エイリアス:",
+    "credentialId": "認証情報ID:",
+    "registerTime": "登録日時:",
+    "delete": "削除"
   },
   "redemption": "引き換え",
   "redemptionPage": {
@@ -1189,13 +1197,21 @@
     "unlimited": "制限なし",
     "unlimitedQuota": "無制限のクォータ",
     "usedQuota": "使用済みクォータ",
+    "selectGroup": "グループを選択",
+    "selectGroupInfo": "使用したいチャネルグループを選択してください。チャネルグループが利用できない場合はバックアップチャネルが使用されます",
     "userGroup": "グループ",
+    "userBackupGroup": "バックアップグループ",
     "apiRate": "",
     "apiRateTip": "",
     "heartbeat": "心拍設定（実験的）",
     "heartbeatTip": "心拍設定とは、リクエスト時に長時間データが返ってこない場合、クライアントがタイムアウト機構によって接続を切断する可能性があることを指します。TCP接続がタイムアウトによって中断されないようにするため、心拍設定を有効にすることができます。設定した開始時間を超えて応答がない場合、5秒ごとにハートビートリクエスト（ストリームでないリクエストは空行、ストリームの場合は::PING）を送信し、接続を維持します。ご注意：中継プログラムを使用している場合は、この設定を有効にしないでください。予期しない問題が発生する可能性があります。",
     "heartbeatTimeout": "ハートビート開始時間(単位：秒)",
-    "heartbeatTimeoutHelperText": "最小値は30秒、最大値は90秒です"
+    "heartbeatTimeoutHelperText": "最小値は30秒、最大値は90秒です",
+    "limits": "制限",
+    "limits_info": "設定後、トークンに制限をかけることができます",
+    "limits_switch": "制限を有効にする",
+    "limit_models": "モデルの制限",
+    "limit_models_info": "このトークンが使用できるモデルを選択します。選択しない場合は、すべてのモデルが許可されます"
   },
   "topup": "トップアップ",
   "topupCard": {

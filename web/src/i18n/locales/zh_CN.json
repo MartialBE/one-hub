@@ -284,13 +284,21 @@
     "quota": "额度",
     "unlimitedQuota": "无限额度",
     "enableCache": "是否开启缓存(开启后，将会缓存聊天记录，以减少消费)",
+    "selectGroup": "选择分组",
+    "selectGroupInfo": "在这里选择你想要使用的渠道分组，当渠道分组不可用时，将会使用备用渠道",
     "userGroup": "分组",
+    "userBackupGroup": "备用分组",
     "cancel": "取消",
     "submit": "提交",
     "heartbeat": "心跳设置(实验性)",
     "heartbeatTip": "心跳设置是指当在请求时，如果长时间没有返回数据，您的客户端可能会因为超时机制而断开连接。为了保持TCP连接不会因超时中断，您可以开启心跳设置，当请求超出您设置的开始时间，且无响应时，我们将会每隔5秒发送一次心跳请求(非流式请求返回空行，流式返回::PING)，以保持连接。注意：如果您在使用中转程序时，请不要开启该设置，可能会出现不可预知的问题。",
     "heartbeatTimeout": "心跳开始时间(单位：秒)",
-    "heartbeatTimeoutHelperText": "最小值为30秒，最大值为90秒"
+    "heartbeatTimeoutHelperText": "最小值为30秒，最大值为90秒",
+    "limits": "令牌限制",
+    "limits_info": "设置后，可以对令牌进行限制",
+    "limits_switch": "启用限制",
+    "limit_models": "模型限制",
+    "limit_models_info": "选择允许此令牌使用的模型，未选择则表示允许所有模型"
   },
   "invoice_index": {
     "invoice": "月度账单",
@@ -560,7 +568,15 @@
     "lark": "飞书",
     "tokenNotice": "注意，此处生成的令牌用于系统管理，而非用于请求 OpenAI 相关的服务，请知悉。",
     "yourTokenIs": "你的访问令牌是:",
-    "keepSafe": "请妥善保管。如有泄漏，请立即重置。"
+    "keepSafe": "请妥善保管。如有泄漏，请立即重置。",
+    "registerWebauthn": "注册WebAuthn凭证",
+    "webauthnManagement":"WebAuthn 凭据管理",
+    "webauthnDescription": "WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。",
+    "registeredCredentials": "已注册凭证",
+    "alias": "别名:",
+    "credentialId": "凭据 ID:",
+    "registerTime": "注册时间:",
+    "delete": "删除"
   },
   "pricingPage": {
     "title": "模型价格",

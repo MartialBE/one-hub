@@ -13,14 +13,30 @@ import {
   Chip,
   Typography,
   SvgIcon,
-  useMediaQuery
+  useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import SubCard from 'ui-component/cards/SubCard';
 import { IconBrandWechat, IconBrandGithub, IconMail, IconBrandTelegram, IconBrandOauth } from '@tabler/icons-react';
 import Label from 'ui-component/Label';
 import { API } from 'utils/api';
-import { showError, showSuccess, onGitHubOAuthClicked, copy, trims, onLarkOAuthClicked } from 'utils/common';
+import {
+  showError,
+  showSuccess,
+  onGitHubOAuthClicked,
+  copy,
+  trims,
+  onLarkOAuthClicked,
+  onWebAuthnRegister,
+  getWebAuthnCredentials,
+  deleteWebAuthnCredential
+} from 'utils/common';
 import * as Yup from 'yup';
 import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
@@ -45,6 +61,10 @@ export default function Profile() {
   const [turnstileToken, setTurnstileToken] = useState('');
   const [openWechat, setOpenWechat] = useState(false);
   const [openEmail, setOpenEmail] = useState(false);
+  const [webAuthnCredentials, setWebAuthnCredentials] = useState([]);
+  const [loadingWebAuthn, setLoadingWebAuthn] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [credentialToDelete, setCredentialToDelete] = useState(null);
   const status = useSelector((state) => state.siteInfo);
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -74,6 +94,71 @@ export default function Profile() {
     } catch (error) {
       return;
     }
+  };
+
+  const loadWebAuthnCredentials = async () => {
+    setLoadingWebAuthn(true);
+    try {
+      const credentials = await getWebAuthnCredentials();
+      setWebAuthnCredentials(credentials);
+    } catch (error) {
+      console.error('加载WebAuthn凭据失败:', error);
+    } finally {
+      setLoadingWebAuthn(false);
+    }
+  };
+
+  // WebAuthn 注册 - 别名对话框逻辑
+  const [openAliasDialog, setOpenAliasDialog] = useState(false);
+  const [aliasInput, setAliasInput] = useState('');
+  const [aliasSubmitting, setAliasSubmitting] = useState(false);
+
+  const handleWebAuthnRegister = async () => {
+    setAliasInput('');
+    setOpenAliasDialog(true);
+  };
+
+  const closeAliasDialog = () => {
+    if (!aliasSubmitting) setOpenAliasDialog(false);
+  };
+
+  const confirmAliasAndRegister = async () => {
+    try {
+      setAliasSubmitting(true);
+      await onWebAuthnRegister(
+        showError,
+        showSuccess,
+        () => {
+          loadWebAuthnCredentials();
+        },
+        aliasInput.trim()
+      );
+      setOpenAliasDialog(false);
+    } catch (e) {
+      // 错误已在 onWebAuthnRegister 内部处理
+    } finally {
+      setAliasSubmitting(false);
+    }
+  };
+
+  const handleDeleteWebAuthnCredential = (credentialId) => {
+    setCredentialToDelete(credentialId);
+    setConfirmDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (credentialToDelete) {
+      await deleteWebAuthnCredential(credentialToDelete, showError, showSuccess, () => {
+        loadWebAuthnCredentials();
+      });
+    }
+    setConfirmDeleteOpen(false);
+    setCredentialToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setConfirmDeleteOpen(false);
+    setCredentialToDelete(null);
   };
 
   const bindWeChat = async (code) => {
@@ -132,6 +217,7 @@ export default function Profile() {
       }
     }
     loadUser().then();
+    loadWebAuthnCredentials().then();
   }, [status]);
 
   return (
@@ -302,6 +388,71 @@ export default function Profile() {
                 )}
               </Grid>
             </SubCard>
+            <SubCard title={t('profilePage.webauthnManagement')}>
+              <Grid container spacing={2}>
+                <Grid xs={12}>
+                  <Alert severity="info">{t('profilePage.webauthnDescription')}</Alert>
+                </Grid>
+                <Grid xs={12}>
+                  <Button variant="contained" onClick={handleWebAuthnRegister} disabled={loadingWebAuthn}>
+                    {t('profilePage.registerWebauthn')}
+                  </Button>
+                </Grid>
+                {webAuthnCredentials.length > 0 && (
+                  <Grid xs={12}>
+                    <Typography variant="h4" sx={{ mb: 2 }}>
+                      {t('profilePage.registeredCredentials')}
+                    </Typography>
+                    {webAuthnCredentials.map((credential) => (
+                      <Card
+                        key={credential.id}
+                        sx={{
+                          mb: 2,
+                          p: 2,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <Stack>
+                          <Typography variant="body1">
+                            {t('profilePage.alias')}:{' '}
+                            {credential.alias && credential.alias.trim() !== ''
+                              ? credential.alias
+                              : new Date(credential.created_time * 1000).toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('profilePage.credentialId')}:{' '}
+                            <span title={credential.credential_id}>
+                              {credential.credential_id.length > 20
+                                ? credential.credential_id.substring(0, 20) + '...'
+                                : credential.credential_id}
+                            </span>
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('profilePage.registerTime')}: {new Date(credential.created_time * 1000).toLocaleString()}
+                          </Typography>
+                        </Stack>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteWebAuthnCredential(credential.id)}
+                          disabled={loadingWebAuthn}
+                        >
+                          {t('profilePage.delete')}
+                        </Button>
+                      </Card>
+                    ))}
+                  </Grid>
+                )}
+                {webAuthnCredentials.length === 0 && !loadingWebAuthn && (
+                  <Grid xs={12}>
+                    <Alert severity="info">{t('profilePage.noWebauthnCredentials')}</Alert>
+                  </Grid>
+                )}
+              </Grid>
+            </SubCard>
             <SubCard title={t('profilePage.other')}>
               <Grid container spacing={2}>
                 <Grid xs={12}>
@@ -334,6 +485,65 @@ export default function Profile() {
           setOpenEmail(false);
         }}
       />
+      {/* 别名输入对话框 */}
+      <Dialog
+        open={openAliasDialog}
+        onClose={closeAliasDialog}
+        aria-labelledby="alias-dialog-title"
+        aria-describedby="alias-dialog-description"
+      >
+        <DialogTitle id="alias-dialog-title">设置凭据别名</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alias-dialog-description">
+            为新的 WebAuthn 凭据设置一个易于识别的别名（可选）。不设置将使用当前时间作为默认别名。
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="alias"
+            label="别名（可选）"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={aliasInput}
+            onChange={(e) => setAliasInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                confirmAliasAndRegister();
+              }
+            }}
+            disabled={aliasSubmitting || loadingWebAuthn}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeAliasDialog} color="primary" disabled={aliasSubmitting}>
+            取消
+          </Button>
+          <Button onClick={confirmAliasAndRegister} color="primary" variant="contained" disabled={aliasSubmitting || loadingWebAuthn}>
+            确认
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={confirmDeleteOpen}
+        onClose={cancelDelete}
+        aria-labelledby="confirm-delete-dialog-title"
+        aria-describedby="confirm-delete-dialog-description"
+      >
+        <DialogTitle id="confirm-delete-dialog-title">确认删除</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-delete-dialog-description">您确定要删除这个 WebAuthn 凭据吗？此操作无法撤销。</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} color="primary">
+            取消
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            删除
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

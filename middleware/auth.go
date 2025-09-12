@@ -134,6 +134,7 @@ func tokenAuth(c *gin.Context, key string) {
 	c.Set("token_id", token.Id)
 	c.Set("token_name", token.Name)
 	c.Set("token_group", token.Group)
+	c.Set("token_backup_group", token.BackupGroup)
 	c.Set("token_setting", utils.GetPointer(token.Setting.Data()))
 	if len(parts) > 1 {
 		if model.IsAdmin(token.UserId) {

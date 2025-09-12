@@ -745,7 +745,15 @@
     "usernameMinLength": "Username must be at least 3 characters long",
     "usernameRequired": "Username cannot be empty",
     "wechatBindSuccess": "WeChat account successfully bound!",
-    "yourTokenIs": "Your access token is:"
+    "yourTokenIs": "Your access token is:",
+    "registerWebauthn": "Register WebAuthn Credential",
+    "webauthnManagement": "WebAuthn Credential Management",
+    "webauthnDescription": "WebAuthn provides passwordless authentication, allowing you to log in using biometric methods like fingerprints, Face ID, or security keys.",
+    "registeredCredentials": "Registered Credentials",
+    "alias": "Alias:",
+    "credentialId": "Credential ID:",
+    "registerTime": "Register Time:",
+    "delete": "Delete"
   },
   "redemption": "Redemption",
   "redemptionPage": {
@@ -1200,13 +1208,21 @@
     "unlimited": "Unlimited",
     "unlimitedQuota": "Unlimited Quota",
     "usedQuota": "Used Quota",
-    "userGroup": "group",
+    "selectGroup": "Select group",
+    "selectGroupInfo": "Select the channel group you want to use here. When the channel group is unavailable, backup channels will be used",
+    "userGroup": "Group",
+    "userBackupGroup": "Backup group",
     "apiRate": "",
     "apiRateTip": "",
     "heartbeat": "Heartbeat setting (Experimental)",
     "heartbeatTip": "Heartbeat setting means that when you make a stream request, if there is no response for a long time, your client may disconnect due to the timeout mechanism. To prevent this, you can enable the heartbeat setting. When the request exceeds the start time you set and there is no response, we will send a heartbeat request every 5 seconds to keep the connection. Note: If you are using a relay program, please do not enable this setting, it may cause unexpected issues.",
     "heartbeatTimeout": "Heartbeat start time (unit: seconds)",
-    "heartbeatTimeoutHelperText": "Minimum value: 30 seconds, maximum value: 90 seconds"
+    "heartbeatTimeoutHelperText": "Minimum value: 30 seconds, maximum value: 90 seconds",
+    "limits": "Limits",
+    "limits_info": "After setting, you can impose restrictions on the token.",
+    "limits_switch": "Enable Limits",
+    "limit_models": "Model Limits",
+    "limit_models_info": "Select the models that this token is allowed to use. If no models are selected, all models are permitted."
   },
   "topup": "Top-up",
   "topupCard": {

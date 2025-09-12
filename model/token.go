@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"one-api/common"
 	"one-api/common/config"
 	"one-api/common/database"
@@ -11,6 +10,8 @@ import (
 	"one-api/common/redis"
 	"one-api/common/stmp"
 	"one-api/common/utils"
+
+	"gorm.io/gorm"
 )
 
 var (
@@ -35,6 +36,7 @@ type Token struct {
 	UnlimitedQuota bool           `json:"unlimited_quota" gorm:"default:false"`
 	UsedQuota      int            `json:"used_quota" gorm:"default:0"` // used quota
 	Group          string         `json:"group" gorm:"default:''"`
+	BackupGroup    string         `json:"backup_group" gorm:"default:''"`
 	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
 
 	Setting database.JSONType[TokenSetting] `json:"setting" form:"setting" gorm:"type:json"`
@@ -62,12 +64,18 @@ func (token *Token) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 type TokenSetting struct {
-	Heartbeat HeartbeatSetting `json:"heartbeat,omitempty"`
+	Heartbeat HeartbeatSetting  `json:"heartbeat,omitempty"`
+	Limits    LimitModelSetting `json:"limits,omitempty"`
 }
 
 type HeartbeatSetting struct {
 	Enabled        bool `json:"enabled"`
 	TimeoutSeconds int  `json:"timeout_seconds"`
+}
+
+type LimitModelSetting struct {
+	Enabled bool     `json:"enabled"`
+	Models  []string `json:"models"`
 }
 
 func GetUserTokensList(userId int, params *GenericParams) (*DataResult[Token], error) {
@@ -214,7 +222,7 @@ func (token *Token) Insert() error {
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
 func (token *Token) Update() error {
-	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "group", "setting").Updates(token).Error
+	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "group", "backup_group", "setting").Updates(token).Error
 	// 防止Redis缓存不生效，直接删除
 	if err == nil && config.RedisEnabled {
 		redis.RedisDel(fmt.Sprintf(UserTokensKey, token.Key))
