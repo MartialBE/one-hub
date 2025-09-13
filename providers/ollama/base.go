@@ -33,7 +33,7 @@ func getOllamaConfig() base.ProviderConfig {
 	return base.ProviderConfig{
 		BaseURL:         "",
 		ChatCompletions: "/api/chat",
-		Embeddings:      "/api/embeddings",
+		Embeddings:      "/api/embed",
 	}
 }
 
