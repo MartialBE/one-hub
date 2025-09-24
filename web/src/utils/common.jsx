@@ -693,11 +693,11 @@ export function getChatLinks(filterShow = false) {
 }
 
 export function replaceChatPlaceholders(text, key, server) {
-  // 使用正则表达式匹配 base64(...) 模式
-  const base64Pattern = /base64\(([^)]+)\)/g;
+  // 使用正则表达式匹配 base64<[...]> 模式
+  const base64Pattern = /base64<\[([^\]]+)\]>/g;
   return text
     .replace(base64Pattern, (match, content) => {
-      // 先对括号内的内容进行占位符替换
+      // 先对方括号内的内容进行占位符替换
       const replacedContent = content.replace('{key}', key).replace('{server}', server);
       // 然后进行base64编码
       try {
@@ -710,6 +710,7 @@ export function replaceChatPlaceholders(text, key, server) {
     .replace('{key}', key)
     .replace('{server}', server);
 }
+
 
 export function ValueFormatter(value, onlyUsd = false, unitMillion = false) {
   if (value == null) {
