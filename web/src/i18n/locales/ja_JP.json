@@ -798,7 +798,7 @@
   "setting_index": {
     "operationSettings": {
       "chatLinkSettings": {
-        "info": "チャットリンクを構成します。この設定は、トークン内のチャットやホームページのPlaygroundのチャットで有効です。 <br />リンクでは、&#123;key&#125;がユーザーのトークンを、&#123;server&#125;がサーバーアドレスを置き換えることができます。例えば：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />構成されていない場合、次の4つのリンクがデフォルトで構成されます：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />並べ替えルール：値が大きいほど順位が高く、同じ値の場合は構成順に並べられます",
+        "info": "チャット リンクを設定します。この設定はトークンのチャットと、ホームページの Playground のチャットに適用されます。<br />リンク内で &#123;key&#125; をユーザーのトークンに、&#123;server&#125; をサーバーアドレスに置き換えることができます。base64<[xxxxxx]> で base64 エンコードを行うことができます。例：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />設定しない場合、デフォルトで以下の4つのリンクが設定されます:<br />ChatGPT Next：{'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy：{'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 问天：{'ama://set-api-key?server={server}&key={key}'}<br />opencat：{'opencat://team/join?domain={server}&token={key}'}<br />並び順：値が大きいほど上位に表示され、値が同じ場合は設定順に表示されます。",
         "save": "チャットリンク設定を保存",
         "title": "チャットリンク設定"
       },

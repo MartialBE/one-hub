@@ -799,7 +799,7 @@
   "setting_index": {
     "operationSettings": {
       "chatLinkSettings": {
-        "info": "配置聊天鏈接，該配置在令牌中的聊天生效以及首頁的 Playground 中的聊天生效. <br />鏈接中可以使&#123;key&#125;替換用戶的令牌，&#123;server&#125;替換伺服器地址。例如：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />如果未配置，會默認配置以下4個鏈接：<br />ChatGPT Next ： {'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy ： {'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 問天 ： {'ama://set-api-key?server={server}&key={key}'}<br />opencat ： {'opencat://team/join?domain={server}&token={key}'}<br />排序規則：值越大越靠前，值相同則按照配置順序",
+        "info": "配置聊天鏈接，該配置在令牌中的聊天生效以及首頁的Playground中的聊天生效。<br />鏈接中可以使&#123;key&#125;替換用戶的令牌，&#123;server&#125;替換伺服器地址，base64<[xxxxxx]>進行base64編碼。例如：{'https://chat.oneapi.pro/#/?settings={\"key\":\"sk-{key}\",\"url\":\"{server}\"}'}<br />如果未配置，會默認配置以下4個鏈接：<br />ChatGPT Next：{'https://chat.oneapi.pro/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />chatgpt-web-midjourney-proxy：{'https://vercel.ddaiai.com/#/?settings={\"key\":\"{key}\",\"url\":\"{server}\"}'}<br />AMA 問天：{'ama://set-api-key?server={server}&key={key}'}<br />opencat：{'opencat://team/join?domain={server}&token={key}'}<br />排序規則：值越大越靠前，值相同則按照配置順序",
         "save": "保存聊天鏈接設置",
         "title": "聊天鏈接設置"
       },

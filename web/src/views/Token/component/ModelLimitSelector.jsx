@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import { useFormikContext } from 'formik';
-import { useEffect, useMemo } from 'react';
 import { Autocomplete, Box, Chip, FormControl, FormHelperText, Grid, Paper, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
+import { useMemo } from 'react';
 
 const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
   const { t } = useTranslation();
