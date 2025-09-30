@@ -48,6 +48,7 @@ func GetModelName(modelName string) string {
 		"us.claude-sonnet-4-20250514":   "us.anthropic.claude-sonnet-4-20250514-v1:0",
 		"us.claude-opus-4-20250514":     "us.anthropic.claude-opus-4-20250514-v1:0",
 		"us.claude-opus-4-1-20250805":   "us.anthropic.claude-opus-4-1-20250805-v1:0",
+		"us.claude-sonnet-4-5-20250929": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
 
 		"eu.claude-3-sonnet-20240229":   "eu.anthropic.claude-3-sonnet-20240229-v1:0",
 		"eu.claude-3-5-sonnet-20240620": "eu.anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -55,6 +56,8 @@ func GetModelName(modelName string) string {
 		"eu.claude-3-7-sonnet-20250219": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
 		"eu.claude-sonnet-4-20250514":   "eu.anthropic.claude-sonnet-4-20250514-v1:0",
 		"eu.claude-opus-4-20250514":     "eu.anthropic.claude-opus-4-20250514-v1:0",
+		"eu.claude-opus-4-1-20250805":   "eu.anthropic.claude-opus-4-1-20250805-v1:0",
+		"eu.claude-sonnet-4-5-20250929": "eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
 
 		"apac.claude-3-sonnet-20240229":   "apac.anthropic.claude-3-sonnet-20240229-v1:0",
 		"apac.claude-3-5-sonnet-20240620": "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -62,6 +65,8 @@ func GetModelName(modelName string) string {
 		"apac.claude-3-7-sonnet-20250219": "apac.anthropic.claude-3-7-sonnet-20250219-v1:0",
 		"apac.claude-sonnet-4-20250514":   "apac.anthropic.claude-sonnet-4-20250514-v1:0",
 		"apac.claude-opus-4-20250514":     "apac.anthropic.claude-opus-4-20250514-v1:0",
+		"apac.claude-opus-4-1-20250805":   "apac.anthropic.claude-opus-4-1-20250805-v1:0",
+		"apac.claude-sonnet-4-5-20250929": "apac.anthropic.claude-sonnet-4-5-20250929-v1:0",
 
 		//base model id
 		"claude-3-7-sonnet-20250219": "anthropic.claude-3-7-sonnet-20250219-v1:0",
@@ -77,6 +82,7 @@ func GetModelName(modelName string) string {
 		"claude-sonnet-4-20250514":   "anthropic.claude-sonnet-4-20250514-v1:0",
 		"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
 		"claude-opus-4-1-20250805":   "anthropic.claude-opus-4-1-20250805-v1:0",
+		"claude-sonnet-4-5-20250929": "anthropic.claude-sonnet-4-5-20250929-v1:0",
 	}
 
 	if value, exists := bedrockMap[modelName]; exists {
