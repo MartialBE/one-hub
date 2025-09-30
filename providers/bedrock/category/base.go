@@ -9,6 +9,28 @@ import (
 	"strings"
 )
 
+// 基础模型映射关系
+var bedrockMap = map[string]string{
+	//base model id
+	"claude-3-7-sonnet-20250219": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+	"claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+	"claude-3-5-sonnet-20241022": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+	"claude-3-opus-20240229":     "anthropic.claude-3-opus-20240229-v1:0",
+	"claude-3-sonnet-20240229":   "anthropic.claude-3-sonnet-20240229-v1:0",
+	"claude-3-haiku-20240307":    "anthropic.claude-3-haiku-20240307-v1:0",
+	"claude-3-5-haiku-20241022":  "anthropic.claude-3-5-haiku-20241022-v1:0",
+	"claude-2.1":                 "anthropic.claude-v2:1",
+	"claude-2.0":                 "anthropic.claude-v2",
+	"claude-instant-1.2":         "anthropic.claude-instant-v1",
+	"claude-sonnet-4-20250514":   "anthropic.claude-sonnet-4-20250514-v1:0",
+	"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
+	"claude-opus-4-1-20250805":   "anthropic.claude-opus-4-1-20250805-v1:0",
+	"claude-sonnet-4-5-20250929": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+}
+
+// 支持的区域前缀
+var regionPrefixes = []string{"global.", "us.", "eu.", "apac."}
+
 var CategoryMap = map[string]Category{}
 
 type Category struct {
@@ -36,51 +58,24 @@ func GetCategory(modelName string) (*Category, error) {
 }
 
 func GetModelName(modelName string) string {
-	bedrockMap := map[string]string{
-		//cross-region model id
-		"us.claude-3-sonnet-20240229":   "us.anthropic.claude-3-sonnet-20240229-v1:0",
-		"us.claude-3-opus-20240229":     "us.anthropic.claude-3-opus-20240229-v1:0",
-		"us.claude-3-haiku-20240307":    "us.anthropic.claude-3-haiku-20240307-v1:0",
-		"us.claude-3-5-sonnet-20240620": "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
-		"us.claude-3-5-sonnet-20241022": "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-		"us.claude-3-5-haiku-20241022":  "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-		"us.claude-3-7-sonnet-20250219": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-		"us.claude-sonnet-4-20250514":   "us.anthropic.claude-sonnet-4-20250514-v1:0",
-		"us.claude-opus-4-20250514":     "us.anthropic.claude-opus-4-20250514-v1:0",
-		"us.claude-opus-4-1-20250805":   "us.anthropic.claude-opus-4-1-20250805-v1:0",
-
-		"eu.claude-3-sonnet-20240229":   "eu.anthropic.claude-3-sonnet-20240229-v1:0",
-		"eu.claude-3-5-sonnet-20240620": "eu.anthropic.claude-3-5-sonnet-20240620-v1:0",
-		"eu.claude-3-haiku-20240307":    "eu.anthropic.claude-3-haiku-20240307-v1:0",
-		"eu.claude-3-7-sonnet-20250219": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
-		"eu.claude-sonnet-4-20250514":   "eu.anthropic.claude-sonnet-4-20250514-v1:0",
-		"eu.claude-opus-4-20250514":     "eu.anthropic.claude-opus-4-20250514-v1:0",
-
-		"apac.claude-3-sonnet-20240229":   "apac.anthropic.claude-3-sonnet-20240229-v1:0",
-		"apac.claude-3-5-sonnet-20240620": "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
-		"apac.claude-3-haiku-20240307":    "apac.anthropic.claude-3-haiku-20240307-v1:0",
-		"apac.claude-3-7-sonnet-20250219": "apac.anthropic.claude-3-7-sonnet-20250219-v1:0",
-		"apac.claude-sonnet-4-20250514":   "apac.anthropic.claude-sonnet-4-20250514-v1:0",
-		"apac.claude-opus-4-20250514":     "apac.anthropic.claude-opus-4-20250514-v1:0",
-
-		//base model id
-		"claude-3-7-sonnet-20250219": "anthropic.claude-3-7-sonnet-20250219-v1:0",
-		"claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0",
-		"claude-3-5-sonnet-20241022": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-		"claude-3-opus-20240229":     "anthropic.claude-3-opus-20240229-v1:0",
-		"claude-3-sonnet-20240229":   "anthropic.claude-3-sonnet-20240229-v1:0",
-		"claude-3-haiku-20240307":    "anthropic.claude-3-haiku-20240307-v1:0",
-		"claude-3-5-haiku-20241022":  "anthropic.claude-3-5-haiku-20241022-v1:0",
-		"claude-2.1":                 "anthropic.claude-v2:1",
-		"claude-2.0":                 "anthropic.claude-v2",
-		"claude-instant-1.2":         "anthropic.claude-instant-v1",
-		"claude-sonnet-4-20250514":   "anthropic.claude-sonnet-4-20250514-v1:0",
-		"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
-		"claude-opus-4-1-20250805":   "anthropic.claude-opus-4-1-20250805-v1:0",
+	// 提取区域前缀
+	regionPrefix := ""
+	for _, region := range regionPrefixes {
+		if strings.HasPrefix(modelName, region) {
+			regionPrefix = region
+			modelName = modelName[len(region):]
+			break
+		}
 	}
 
-	if value, exists := bedrockMap[modelName]; exists {
-		modelName = value
+	// 查找基础模型映射
+	if mappedName, exists := bedrockMap[modelName]; exists {
+		modelName = mappedName
+	}
+
+	// 如果有区域前缀，添加回去
+	if regionPrefix != "" {
+		modelName = regionPrefix + modelName
 	}
 
 	return modelName
