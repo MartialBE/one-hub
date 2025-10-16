@@ -1,9 +1,7 @@
 module one-api
 
 // +heroku goVersion go1.18
-go 1.24
-
-toolchain go1.24.2
+go 1.25
 
 require (
 	cloud.google.com/go/iam v1.5.2
