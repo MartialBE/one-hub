@@ -3,8 +3,6 @@ module one-api
 // +heroku goVersion go1.18
 go 1.25
 
-toolchain go1.25.0
-
 require (
 	cloud.google.com/go/iam v1.5.2
 	github.com/ThinkInAIXYZ/go-mcp v0.2.15
