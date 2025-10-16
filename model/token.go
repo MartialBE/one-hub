@@ -64,8 +64,8 @@ func (token *Token) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 type TokenSetting struct {
-	Heartbeat HeartbeatSetting  `json:"heartbeat,omitempty"`
-	Limits    LimitModelSetting `json:"limits,omitempty"`
+	Heartbeat HeartbeatSetting `json:"heartbeat,omitempty"`
+	Limits    LimitsConfig     `json:"limits,omitempty"`
 }
 
 type HeartbeatSetting struct {
@@ -73,9 +73,19 @@ type HeartbeatSetting struct {
 	TimeoutSeconds int  `json:"timeout_seconds"`
 }
 
+type LimitsConfig struct {
+	LimitModelSetting LimitModelSetting `json:"limit_model_setting,omitempty"`
+	LimitsIPSetting   LimitsIPSetting   `json:"limits_ip_setting,omitempty"`
+}
+
 type LimitModelSetting struct {
 	Enabled bool     `json:"enabled"`
 	Models  []string `json:"models"`
+}
+
+type LimitsIPSetting struct {
+	Enabled   bool     `json:"enabled"`
+	Whitelist []string `json:"whitelist"`
 }
 
 func GetUserTokensList(userId int, params *GenericParams) (*DataResult[Token], error) {

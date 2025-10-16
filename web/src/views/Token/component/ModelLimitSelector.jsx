@@ -14,9 +14,9 @@ const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
   }, [modelOptions]);
 
   const selectedValue = useMemo(() => {
-    const selectedIds = new Set(values.setting?.limits?.models || []);
+    const selectedIds = new Set(values.setting?.limits?.limit_model_setting?.models || []);
     return modelOptions.filter((option) => selectedIds.has(option.id));
-  }, [values.setting?.limits?.models, modelOptions]);
+  }, [values.setting?.limits?.limit_model_setting?.models, modelOptions]);
 
   return (
     <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
@@ -28,7 +28,7 @@ const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
         value={selectedValue}
         onChange={(event, newValue) => {
           const modelIds = newValue.map((option) => option.id);
-          setFieldValue('setting.limits.models', modelIds);
+          setFieldValue('setting.limits.limit_model_setting.models', modelIds);
         }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={(option) => option.name || ''}
@@ -41,7 +41,7 @@ const ModelLimitSelector = ({ modelOptions, getModelIcon }) => {
           <TextField
             {...params}
             label={t('token_index.limit_models')}
-            placeholder={values.setting?.limits?.models?.length > 0 ? '' : t('token_index.limit_models_info')}
+            placeholder={values.setting?.limits?.limit_model_setting?.models?.length > 0 ? '' : t('token_index.limit_models_info')}
           />
         )}
         renderOption={(props, option) => (

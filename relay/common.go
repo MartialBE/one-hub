@@ -59,7 +59,7 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 }
 
 func CheckLimitModel(c *gin.Context, modelName string) (error error) {
-	// 判断modelName是否在token的setting.limits.models[]范围内
+	// 判断modelName是否在token的setting.limits.LimitModelSetting.models[]范围内
 
 	// 从context中获取token设置
 	tokenSetting, exists := c.Get("token_setting")
@@ -76,19 +76,19 @@ func CheckLimitModel(c *gin.Context, modelName string) (error error) {
 	}
 
 	// 检查是否启用了模型限制
-	if !setting.Limits.Enabled {
+	if !setting.Limits.LimitModelSetting.Enabled {
 		// 未启用模型限制，允许所有模型
 		return nil
 	}
 
 	// 检查模型列表是否为空
-	if len(setting.Limits.Models) == 0 {
+	if len(setting.Limits.LimitModelSetting.Models) == 0 {
 		// 模型列表为空，不允许任何模型
 		return errors.New("当前令牌未配置可用模型")
 	}
 
 	// 检查modelName是否在允许的模型列表中
-	for _, allowedModel := range setting.Limits.Models {
+	for _, allowedModel := range setting.Limits.LimitModelSetting.Models {
 		if allowedModel == modelName {
 			// 找到匹配的模型，允许使用
 			return nil
@@ -99,8 +99,53 @@ func CheckLimitModel(c *gin.Context, modelName string) (error error) {
 	return fmt.Errorf("当前令牌不支持模型: %s", modelName)
 }
 
+// 检测是否IP白名单
+func CheckLimitIP(c *gin.Context) (error error) {
+	// 从context中获取token设置
+	tokenSetting, exists := c.Get("token_setting")
+	if !exists {
+		// 如果没有token设置，则不进行限制
+		return nil
+	}
+	// 类型断言为TokenSetting指针
+	setting, ok := tokenSetting.(*model.TokenSetting)
+	if !ok || setting == nil {
+		// 类型断言失败或为空，不进行限制
+		return nil
+	}
+	// 判断是否启用了ip限制
+	if !setting.Limits.LimitsIPSetting.Enabled {
+		return nil
+	}
+	// 未设置白名单
+	if len(setting.Limits.LimitsIPSetting.Whitelist) == 0 {
+		return nil
+	}
+
+	ip := c.ClientIP()
+	//判断ip是否在允许范围内
+	for _, allowedIP := range setting.Limits.LimitsIPSetting.Whitelist {
+		// 直接IP匹配
+		if allowedIP == ip {
+			return nil
+		}
+		// CIDR格式匹配
+		if strings.Contains(allowedIP, "/") {
+			if utils.IsIpInCidr(ip, allowedIP) {
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("当前IP: %s 不在白名单内", ip)
+}
+
 func GetProvider(c *gin.Context, modelName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
-	err := CheckLimitModel(c, modelName)
+	err := CheckLimitIP(c)
+	if err != nil {
+		return nil, "", err
+	}
+	err = CheckLimitModel(c, modelName)
 	if err != nil {
 		return nil, "", err
 	}
