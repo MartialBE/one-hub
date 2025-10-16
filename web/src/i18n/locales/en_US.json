@@ -1220,9 +1220,14 @@
     "heartbeatTimeoutHelperText": "Minimum value: 30 seconds, maximum value: 90 seconds",
     "limits": "Limits",
     "limits_info": "After setting, you can impose restrictions on the token.",
-    "limits_switch": "Enable Limits",
+    "limits_models_switch": "Enable Models Limits",
     "limit_models": "Model Limits",
-    "limit_models_info": "Select the models that this token is allowed to use. If no models are selected, all models are permitted."
+    "limit_models_info": "Select the models that this token is allowed to use. If no models are selected, all models are permitted.",
+    "limits_ip_whitelist": "IP Whitelist",
+    "limits_ip_whitelist_info": "Restrict token access to specific IP addresses or ranges",
+    "limits_ip_whitelist_switch": "Enable IP Whitelist",
+    "limits_ip_whitelist_input": "IP Addresses",
+    "limits_ip_whitelist_helper": "Enter one IP address or CIDR range per line (e.g., 192.168.1.1 or 10.0.0.0/8)"
   },
   "topup": "Top-up",
   "topupCard": {
@@ -1288,6 +1293,8 @@
     "cancelAdmin": "Cancel administrator",
     "createUser": "Create User",
     "creationTime": "Creation Time",
+    "lastLoginTime": "Last Login Time",
+    "lastLoginIP": "Last Login IP",
     "del": "delete users",
     "delTip": "Whether to delete the user",
     "displayName": "Display Name",

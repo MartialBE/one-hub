@@ -397,3 +397,16 @@ func GetLocalTimezone() string {
 
 	return "Asia/Shanghai"
 }
+
+// IsIpInCidr 判断IP是否在CIDR范围内
+func IsIpInCidr(ip string, cidr string) bool {
+	_, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return false
+	}
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	return ipNet.Contains(parsedIP)
+}

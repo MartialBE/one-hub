@@ -145,6 +145,8 @@ export default function UsersTableRow({ item, manageUser, handleOpenModal, setMo
           </Stack>
         </TableCell>
         <TableCell>{item.created_time === 0 ? t('common.unknown') : timestamp2string(item.created_time)}</TableCell>
+        <TableCell>{item.last_login_time === 0 ? t('common.unknown') : timestamp2string(item.last_login_time)}</TableCell>
+        <TableCell>{item.last_login_ip === '' || item.last_login_time === undefined ? t('common.unknown') : item.last_login_ip}</TableCell>
         <TableCell>
           {' '}
           <TableSwitch id={`switch-${item.id}`} checked={statusSwitch === 1} onChange={handleStatus} />

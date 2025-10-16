@@ -4,7 +4,7 @@ import { Formik } from 'formik'; // 1. 导入 useFormikContext
 import { useTheme } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import  ModelLimitSelector from './ModelLimitSelector';
+import ModelLimitSelector from './ModelLimitSelector';
 import {
   Dialog,
   DialogTitle,
@@ -23,7 +23,8 @@ import {
   Select,
   MenuItem,
   Typography,
-  Grid
+  Grid,
+  TextField
 } from '@mui/material';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -48,6 +49,12 @@ const validationSchema = Yup.object().shape({
         then: () => Yup.number().min(30, '时间 必须大于等于30秒').max(90, '时间 必须小于等于90秒').required('时间 不能为空'),
         otherwise: () => Yup.number()
       })
+    }),
+    limits: Yup.object().shape({
+      limits_ip_setting: Yup.object().shape({
+        enabled: Yup.boolean(),
+        whitelist: Yup.array().of(Yup.string())
+      })
     })
   })
 });
@@ -66,8 +73,14 @@ const originInputs = {
       timeout_seconds: 30
     },
     limits: {
-      enabled: false,
-      models: []
+      limit_model_setting: {
+        enabled: false,
+        models: []
+      },
+      limits_ip_setting: {
+        enabled: false,
+        whitelist: []
+      }
     }
   }
 };
@@ -121,6 +134,11 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
     setSubmitting(true);
     values.remain_quota = parseInt(values.remain_quota);
     values.setting.heartbeat.timeout_seconds = parseInt(values.setting.heartbeat.timeout_seconds);
+
+    // 过滤掉空的 IP 行
+    if (values.setting?.limits?.limits_ip_setting?.whitelist) {
+      values.setting.limits.limits_ip_setting.whitelist = values.setting.limits.limits_ip_setting.whitelist.filter(ip => ip.trim() !== '');
+    }
     let res;
     try {
       if (values.is_edit) {
@@ -155,7 +173,11 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
         data.is_edit = true;
         if (!data.setting) data.setting = originInputs.setting;
         if (!data.setting.limits) data.setting.limits = originInputs.setting.limits;
-        if (!data.setting.limits.models) data.setting.limits.models = [];
+        if (!data.setting.limits.limit_model_setting)
+          data.setting.limits.limit_model_setting = originInputs.setting.limits.limit_model_setting;
+        if (!data.setting.limits.limits_ip_setting) data.setting.limits.limits_ip_setting = originInputs.setting.limits.limits_ip_setting;
+        if (!data.setting.limits.limit_model_setting.models) data.setting.limits.limit_model_setting.models = [];
+        if (!data.setting.limits.limits_ip_setting.whitelist) data.setting.limits.limits_ip_setting.whitelist = [];
         setInputs(data);
       } else {
         showError(message);
@@ -397,20 +419,63 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={values?.setting?.limits?.enabled === true}
+                      checked={values?.setting?.limits?.limit_model_setting?.enabled === true}
                       onClick={() => {
-                        const newEnabledState = !values.setting?.limits?.enabled;
-                        setFieldValue('setting.limits.enabled', newEnabledState);
+                        const newEnabledState = !values.setting?.limits?.limit_model_setting?.enabled;
+                        setFieldValue('setting.limits.limit_model_setting.enabled', newEnabledState);
                         if (!newEnabledState) {
-                          setFieldValue('setting.limits.models', []);
+                          setFieldValue('setting.limits.limit_model_setting.models', []);
                         }
                       }}
                     />
                   }
-                  label={t('token_index.limits_switch')}
+                  label={t('token_index.limits_models_switch')}
                 />
               </FormControl>
-              {values?.setting?.limits?.enabled && <ModelLimitSelector modelOptions={modelOptions} getModelIcon={getModelIcon} />}
+              {values?.setting?.limits?.limit_model_setting?.enabled && (
+                <ModelLimitSelector modelOptions={modelOptions} getModelIcon={getModelIcon} />
+              )}
+
+
+              {/* IP 白名单限制 */}
+              <Divider sx={{ margin: '16px 0px' }} />
+              <Typography variant="caption">{t('token_index.limits_ip_whitelist_info')}</Typography>
+
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values?.setting?.limits?.limits_ip_setting?.enabled === true}
+                      onClick={() => {
+                        const newEnabledState = !values.setting?.limits?.limits_ip_setting?.enabled;
+                        setFieldValue('setting.limits.limits_ip_setting.enabled', newEnabledState);
+                        if (!newEnabledState) {
+                          setFieldValue('setting.limits.limits_ip_setting.whitelist', []);
+                        }
+                      }}
+                    />
+                  }
+                  label={t('token_index.limits_ip_whitelist_switch')}
+                />
+              </FormControl>
+
+              {values?.setting?.limits?.limits_ip_setting?.enabled && (
+                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
+                  <TextField
+                    label={t('token_index.limits_ip_whitelist_input')}
+                    multiline
+                    rows={6}
+                    value={values?.setting?.limits?.limits_ip_setting?.whitelist?.join('\n') || ''}
+                    onChange={(e) => {
+                      const lines = e.target.value.split('\n');
+                      setFieldValue('setting.limits.limits_ip_setting.whitelist', lines);
+                    }}
+                    placeholder="192.168.1.1&#10;10.0.0.0/8&#10;172.16.0.0/12"
+                    helperText={t('token_index.limits_ip_whitelist_helper')}
+                  />
+                </FormControl>
+              )}
+
               <DialogActions>
                 <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
                 <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">

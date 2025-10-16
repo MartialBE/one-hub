@@ -310,6 +310,139 @@ func addExtraRatios() *gormigrate.Migration {
 		},
 	}
 }
+
+func migrateTokenLimitsStructure() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202510160002",
+		Migrate: func(tx *gorm.DB) error {
+			// 直接查询原始JSON字符串，避免GORM自动转换
+			type TokenRaw struct {
+				Id      int    `gorm:"column:id"`
+				Name    string `gorm:"column:name"`
+				Setting string `gorm:"column:setting;type:json"`
+			}
+
+			var tokens []TokenRaw
+			err := tx.Table("tokens").Select("id, name, setting").Find(&tokens).Error
+			if err != nil {
+				logger.SysLog("查询token列表失败: " + err.Error())
+				return err
+			}
+
+			// 遍历每个 token，转换 limits 结构
+			for _, token := range tokens {
+				// 解析为 map 以便灵活处理
+				var settingMap map[string]interface{}
+				err = json.Unmarshal([]byte(token.Setting), &settingMap)
+				if err != nil || settingMap == nil {
+					// 如果解析失败或为空，跳过
+					continue
+				}
+
+				// 检查是否有 limits 字段
+				limitsRaw, exists := settingMap["limits"]
+				if !exists || limitsRaw == nil {
+					continue
+				}
+
+				// 将 limits 转换为 map
+				limitsMap, ok := limitsRaw.(map[string]interface{})
+				if !ok {
+					continue
+				}
+
+				// 检查是否已经是新结构（包含 limit_model_setting）
+				if _, hasNew := limitsMap["limit_model_setting"]; hasNew {
+					// 已经是新结构，跳过
+					continue
+				}
+
+				// 检查是否是旧结构（包含 enabled 或 models 字段，说明是直接在 limits 下的旧结构）
+				_, hasEnabled := limitsMap["enabled"]
+				_, hasModels := limitsMap["models"]
+				if !hasEnabled && !hasModels {
+					// 既没有 enabled 也没有 models，说明不是旧结构，跳过
+					continue
+				}
+
+				// 转换为新结构：将旧的 limits 内容移到 limit_model_setting 下
+				newLimits := map[string]interface{}{
+					"limit_model_setting": limitsMap,
+					"limits_ip_setting":   LimitsIPSetting{},
+				}
+
+				// 更新 settingMap
+				settingMap["limits"] = newLimits
+
+				// 序列化回 JSON
+				newSettingBytes, err := json.Marshal(settingMap)
+				if err != nil {
+					logger.SysLog("token setting序列化失败: " + err.Error())
+					continue
+				}
+
+				// 更新数据库
+				err = tx.Model(&Token{}).Where("id = ?", token.Id).Update("setting", datatypes.JSON(newSettingBytes)).Error
+				if err != nil {
+					logger.SysLog("更新token setting失败: " + err.Error())
+					continue
+				}
+			}
+
+			logger.SysLog("Token表setting字段limits结构升级完成")
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			// 回滚：将新结构转回旧结构
+			var tokens []Token
+			err := tx.Find(&tokens).Error
+			if err != nil {
+				return err
+			}
+
+			for _, token := range tokens {
+				settingBytes, err := token.Setting.MarshalJSON()
+				if err != nil {
+					continue
+				}
+
+				var settingMap map[string]interface{}
+				err = json.Unmarshal(settingBytes, &settingMap)
+				if err != nil || settingMap == nil {
+					continue
+				}
+
+				limitsRaw, exists := settingMap["limits"]
+				if !exists || limitsRaw == nil {
+					continue
+				}
+
+				limitsMap, ok := limitsRaw.(map[string]interface{})
+				if !ok {
+					continue
+				}
+
+				// 检查是否有 limit_model_setting
+				modelSettingRaw, hasModelSetting := limitsMap["limit_model_setting"]
+				if !hasModelSetting {
+					continue
+				}
+
+				// 将 limit_model_setting 的内容提升到 limits 层级
+				settingMap["limits"] = modelSettingRaw
+
+				newSettingBytes, err := json.Marshal(settingMap)
+				if err != nil {
+					continue
+				}
+
+				tx.Model(&Token{}).Where("id = ?", token.Id).Update("setting", datatypes.JSON(newSettingBytes))
+			}
+
+			return nil
+		},
+	}
+}
 func migrationAfter(db *gorm.DB) error {
 	// 从库不执行
 	if !config.IsMasterNode {
@@ -322,6 +455,7 @@ func migrationAfter(db *gorm.DB) error {
 		initUserGroup(),
 		addOldTokenMaxId(),
 		addExtraRatios(),
+		migrateTokenLimitsStructure(),
 	})
 	return m.Migrate()
 }

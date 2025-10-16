@@ -1209,9 +1209,14 @@
     "heartbeatTimeoutHelperText": "最小値は30秒、最大値は90秒です",
     "limits": "制限",
     "limits_info": "設定後、トークンに制限をかけることができます",
-    "limits_switch": "制限を有効にする",
+    "limits_models_switch": "モデル制限を有効にする",
     "limit_models": "モデルの制限",
-    "limit_models_info": "このトークンが使用できるモデルを選択します。選択しない場合は、すべてのモデルが許可されます"
+    "limit_models_info": "このトークンが使用できるモデルを選択します。選択しない場合は、すべてのモデルが許可されます",
+    "limits_ip_whitelist": "IPホワイトリスト",
+    "limits_ip_whitelist_info": "トークンアクセスを特定のIPアドレスまたは範囲に制限します",
+    "limits_ip_whitelist_switch": "IPホワイトリストを有効にする",
+    "limits_ip_whitelist_input": "IPアドレス",
+    "limits_ip_whitelist_helper": "1行に1つのIPアドレスまたはCIDR範囲を入力してください（例：192.168.1.1または10.0.0.0/8）"
   },
   "topup": "トップアップ",
   "topupCard": {
@@ -1277,6 +1282,8 @@
     "cancelAdmin": "管理者のキャンセル",
     "createUser": "ユーザーを作成",
     "creationTime": "作成時間",
+    "lastLoginTime": "最終ログイン時間",
+    "lastLoginIP": "最終ログインIP",
     "del": "ユーザーを削除する",
     "delTip": "ユーザーを削除するかどうか",
     "displayName": "表示名",
