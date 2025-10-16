@@ -1288,6 +1288,8 @@
     "cancelAdmin": "Cancel administrator",
     "createUser": "Create User",
     "creationTime": "Creation Time",
+    "lastLoginTime": "Last Login Time",
+    "lastLoginIP": "Last Login IP",
     "del": "delete users",
     "delTip": "Whether to delete the user",
     "displayName": "Display Name",

@@ -1278,6 +1278,8 @@
     "cancelAdmin": "取消管理員",
     "createUser": "新建用戶",
     "creationTime": "創建時間",
+    "lastLoginTime": "最後登入時間",
+    "lastLoginIP": "最後登入IP",
     "del": "刪除用戶",
     "delTip": "是否刪除用戶",
     "displayName": "顯示名稱",

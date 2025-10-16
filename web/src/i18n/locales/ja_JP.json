@@ -1277,6 +1277,8 @@
     "cancelAdmin": "管理者のキャンセル",
     "createUser": "ユーザーを作成",
     "creationTime": "作成時間",
+    "lastLoginTime": "最終ログイン時間",
+    "lastLoginIP": "最終ログインIP",
     "del": "ユーザーを削除する",
     "delTip": "ユーザーを削除するかどうか",
     "displayName": "表示名",

@@ -520,6 +520,8 @@
     "userRole": "用户角色",
     "bind": "绑定",
     "creationTime": "创建时间",
+    "lastLoginTime": "最后登录时间",
+    "lastLoginIP": "最后登录IP",
     "status": "状态",
     "action": "操作",
     "useQuota": "请求次数",
