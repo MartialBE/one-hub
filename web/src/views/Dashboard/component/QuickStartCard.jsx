@@ -57,7 +57,7 @@ const QuickStartCard = () => {
             {t('dashboard_index.quickStartTip')}
           </Typography>
 
-          <Stack spacing={2}>
+          <Stack direction="row" flexWrap="wrap" sx={{ gap: 2 }}>
             {chatLinks.map(
               (option, index) =>
                 option.url.startsWith('http') && (
@@ -71,10 +71,10 @@ const QuickStartCard = () => {
                       color: 'white',
                       '&:hover': {
                         backgroundColor: theme.palette.primary.dark,
-                        boxShadow: '0 0 10px 0 rgba(11, 108, 235, 0.5)'
+                        boxShadow: '0 0 3px 0 rgba(11, 108, 235, 0.5)'
                       },
                       textTransform: 'none',
-                      boxShadow: '0 0 15px 0 rgba(11, 108, 235, 0.5)'
+                      boxShadow: '0 0 3px 0 rgba(11, 108, 235, 0.5)'
                     }}
                   >
                     {option.name}
@@ -83,7 +83,7 @@ const QuickStartCard = () => {
             )}
           </Stack>
           <Divider />
-          <Stack spacing={2} direction="row" flexWrap="wrap" sx={{ gap: 2 }}>
+          <Stack direction="row" flexWrap="wrap" sx={{ gap: 2 }}>
             {chatLinks.map(
               (option, index) =>
                 !option.url.startsWith('http') && (
@@ -97,10 +97,10 @@ const QuickStartCard = () => {
                       color: 'white',
                       '&:hover': {
                         backgroundColor: '#00838F',
-                        boxShadow: '0 0 10px 0 #00838F'
+                        boxShadow: '0 0 3px 0 #00838F'
                       },
                       textTransform: 'none',
-                      boxShadow: '0 0 10px 0 #00838F'
+                      boxShadow: '0 0 3px 0 #00838F'
                     }}
                   >
                     {option.name}

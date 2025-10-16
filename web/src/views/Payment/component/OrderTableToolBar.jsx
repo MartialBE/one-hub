@@ -108,7 +108,7 @@ export default function OrderTableToolBar({ filterName, handleFilterName }) {
             />
           </LocalizationProvider>
         </FormControl>
-        <FormControl sx={{ minWidth: '22%' }}>
+        <FormControl sx={{ minWidth: '15%' }}>
           <InputLabel htmlFor="channel-status-label">{t('orderlogPage.statusLabel')}</InputLabel>
           <Select
             id="channel-type-label"

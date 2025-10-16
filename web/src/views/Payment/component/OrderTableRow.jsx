@@ -24,7 +24,7 @@ export default function OrderTableRow({ item }) {
   return (
     <>
       <TableRow tabIndex={item.id}>
-        <TableCell>{timestamp2string(item.created_at)}</TableCell>
+        <TableCell style={{ minWidth: '180px' }}>{timestamp2string(item.created_at)}</TableCell>
         <TableCell>{item.gateway_id}</TableCell>
         <TableCell>{item.user_id}</TableCell>
         <TableCell>{item.trade_no}</TableCell>
