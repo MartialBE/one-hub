@@ -18,6 +18,7 @@ import { API } from 'utils/api';
 import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { Icon } from '@iconify/react';
 import dayjs from 'dayjs';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 export default function Order() {
   const { t } = useTranslation();
@@ -143,33 +144,35 @@ export default function Order() {
           </Container>
         </Toolbar>
         {searching && <LinearProgress />}
-        <TableContainer sx={{ overflow: 'unset' }}>
-          <Table sx={{ minWidth: 800 }}>
-            <KeywordTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleSort}
-              headLabel={[
-                { id: 'created_at', label: t('orderlogPage.tableHeaders.created_at'), disableSort: false },
-                { id: 'gateway_id', label: t('orderlogPage.tableHeaders.gateway_id'), disableSort: false },
-                { id: 'user_id', label: t('orderlogPage.tableHeaders.user_id'), disableSort: false },
-                { id: 'trade_no', label: t('orderlogPage.tableHeaders.trade_no'), disableSort: true },
-                { id: 'gateway_no', label: t('orderlogPage.tableHeaders.gateway_no'), disableSort: true },
-                { id: 'amount', label: t('orderlogPage.tableHeaders.amount'), disableSort: true },
-                { id: 'fee', label: t('orderlogPage.tableHeaders.fee'), disableSort: true },
-                { id: 'discount', label: t('orderlogPage.tableHeaders.discount'), disableSort: true },
-                { id: 'order_amount', label: t('orderlogPage.tableHeaders.order_amount'), disableSort: true },
-                { id: 'quota', label: t('orderlogPage.tableHeaders.quota'), disableSort: true },
-                { id: 'status', label: t('orderlogPage.tableHeaders.status'), disableSort: false }
-              ]}
-            />
-            <TableBody>
-              {orderList.map((row, index) => (
-                <LogTableRow item={row} key={`${row.id}_${index}`} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <PerfectScrollbar component="div">
+          <TableContainer sx={{ overflow: 'unset' }}>
+            <Table sx={{ minWidth: 800 }}>
+              <KeywordTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleSort}
+                headLabel={[
+                  { id: 'created_at', label: t('orderlogPage.tableHeaders.created_at'), disableSort: false },
+                  { id: 'gateway_id', label: t('orderlogPage.tableHeaders.gateway_id'), disableSort: false },
+                  { id: 'user_id', label: t('orderlogPage.tableHeaders.user_id'), disableSort: false },
+                  { id: 'trade_no', label: t('orderlogPage.tableHeaders.trade_no'), disableSort: true },
+                  { id: 'gateway_no', label: t('orderlogPage.tableHeaders.gateway_no'), disableSort: true },
+                  { id: 'amount', label: t('orderlogPage.tableHeaders.amount'), disableSort: true },
+                  { id: 'fee', label: t('orderlogPage.tableHeaders.fee'), disableSort: true },
+                  { id: 'discount', label: t('orderlogPage.tableHeaders.discount'), disableSort: true },
+                  { id: 'order_amount', label: t('orderlogPage.tableHeaders.order_amount'), disableSort: true },
+                  { id: 'quota', label: t('orderlogPage.tableHeaders.quota'), disableSort: true },
+                  { id: 'status', label: t('orderlogPage.tableHeaders.status'), disableSort: false }
+                ]}
+              />
+              <TableBody>
+                {orderList.map((row, index) => (
+                  <LogTableRow item={row} key={`${row.id}_${index}`} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </PerfectScrollbar>
         <TablePagination
           page={page}
           component="div"

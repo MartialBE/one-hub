@@ -1210,9 +1210,14 @@
     "heartbeatTimeoutHelperText": "最小值為30秒，最大值為90秒",
     "limits": "權杖限制",
     "limits_info": "設定後，可以對權杖進行限制",
-    "limits_switch": "啟用限制",
+    "limits_models_switch": "啟用模型限制",
     "limit_models": "模型限制",
-    "limit_models_info": "選擇允許此權杖使用的模型，未選擇則表示允許所有模型"
+    "limit_models_info": "選擇允許此權杖使用的模型，未選擇則表示允許所有模型",
+    "limits_ip_whitelist": "IP白名單",
+    "limits_ip_whitelist_info": "限制權杖只能從特定IP位址或範圍存取",
+    "limits_ip_whitelist_switch": "啟用IP白名單",
+    "limits_ip_whitelist_input": "IP位址",
+    "limits_ip_whitelist_helper": "每行輸入一個IP位址或CIDR範圍（如：192.168.1.1 或 10.0.0.0/8）"
   },
   "topup": "儲值",
   "topupCard": {
@@ -1278,6 +1283,8 @@
     "cancelAdmin": "取消管理員",
     "createUser": "新建用戶",
     "creationTime": "創建時間",
+    "lastLoginTime": "最後登入時間",
+    "lastLoginIP": "最後登入IP",
     "del": "刪除用戶",
     "delTip": "是否刪除用戶",
     "displayName": "顯示名稱",

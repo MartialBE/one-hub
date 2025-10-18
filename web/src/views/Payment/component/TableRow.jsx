@@ -69,8 +69,8 @@ export default function PaymentTableRow({ item, managePayment, handleOpenModal, 
       <TableRow tabIndex={item.id}>
         <TableCell>{item.id}</TableCell>
         <TableCell>{item.uuid}</TableCell>
-        <TableCell>{item.name}</TableCell>
-        <TableCell>{PaymentType?.[item.type] || t('common.unknown')}</TableCell>
+        <TableCell style={{ minWidth: '100px' }}>{item.name}</TableCell>
+        <TableCell style={{ minWidth: '80px' }}>{PaymentType?.[item.type] || t('common.unknown')}</TableCell>
         <TableCell>
           <img src={item.icon} alt="icon" style={{ width: '24px', height: '24px' }} />
         </TableCell>

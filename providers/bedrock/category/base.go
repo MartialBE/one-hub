@@ -26,6 +26,7 @@ var bedrockMap = map[string]string{
 	"claude-opus-4-20250514":     "anthropic.claude-opus-4-20250514-v1:0",
 	"claude-opus-4-1-20250805":   "anthropic.claude-opus-4-1-20250805-v1:0",
 	"claude-sonnet-4-5-20250929": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+	"claude-haiku-4-5-20251001":  "anthropic.claude-haiku-4-5-20251001-v1:0",
 }
 
 // 支持的区域前缀

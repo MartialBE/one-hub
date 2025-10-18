@@ -296,9 +296,14 @@
     "heartbeatTimeoutHelperText": "最小值为30秒，最大值为90秒",
     "limits": "令牌限制",
     "limits_info": "设置后，可以对令牌进行限制",
-    "limits_switch": "启用限制",
+    "limits_models_switch": "启用模型限制",
     "limit_models": "模型限制",
-    "limit_models_info": "选择允许此令牌使用的模型，未选择则表示允许所有模型"
+    "limit_models_info": "选择允许此令牌使用的模型，未选择则表示允许所有模型",
+    "limits_ip_whitelist": "IP白名单",
+    "limits_ip_whitelist_info": "限制令牌只能从特定IP地址或范围访问",
+    "limits_ip_whitelist_switch": "启用IP白名单",
+    "limits_ip_whitelist_input": "IP地址",
+    "limits_ip_whitelist_helper": "每行输入一个IP地址或CIDR范围（如：192.168.1.1 或 10.0.0.0/8）"
   },
   "invoice_index": {
     "invoice": "月度账单",
@@ -520,6 +525,8 @@
     "userRole": "用户角色",
     "bind": "绑定",
     "creationTime": "创建时间",
+    "lastLoginTime": "最后登录时间",
+    "lastLoginIP": "最后登录IP",
     "status": "状态",
     "action": "操作",
     "useQuota": "请求次数",

@@ -58,8 +58,8 @@ func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 	return relay
 }
 
-func CheckLimitModel(c *gin.Context, modelName string) (error error) {
-	// 判断modelName是否在token的setting.limits.models[]范围内
+func checkLimitModel(c *gin.Context, modelName string) (error error) {
+	// 判断modelName是否在token的setting.limits.LimitModelSetting.models[]范围内
 
 	// 从context中获取token设置
 	tokenSetting, exists := c.Get("token_setting")
@@ -76,33 +76,36 @@ func CheckLimitModel(c *gin.Context, modelName string) (error error) {
 	}
 
 	// 检查是否启用了模型限制
-	if !setting.Limits.Enabled {
+	if !setting.Limits.LimitModelSetting.Enabled {
 		// 未启用模型限制，允许所有模型
 		return nil
 	}
 
 	// 检查模型列表是否为空
-	if len(setting.Limits.Models) == 0 {
-		// 模型列表为空，不允许任何模型
-		return errors.New("当前令牌未配置可用模型")
+	if len(setting.Limits.LimitModelSetting.Models) == 0 {
+		// Empty model list means no models are allowed
+		return errors.New("No available models configured for current token")
 	}
 
-	// 检查modelName是否在允许的模型列表中
-	for _, allowedModel := range setting.Limits.Models {
+	// Check if modelName is in the allowed models list
+	for _, allowedModel := range setting.Limits.LimitModelSetting.Models {
 		if allowedModel == modelName {
-			// 找到匹配的模型，允许使用
+			// Found matching model, allow usage
 			return nil
 		}
 	}
 
-	// modelName不在允许的模型列表中
-	return fmt.Errorf("当前令牌不支持模型: %s", modelName)
+	// modelName is not in the allowed models list
+	return fmt.Errorf("Model %s is not supported for current token", modelName)
 }
 
 func GetProvider(c *gin.Context, modelName string) (provider providersBase.ProviderInterface, newModelName string, fail error) {
-	err := CheckLimitModel(c, modelName)
-	if err != nil {
-		return nil, "", err
+	// 检查模型限制
+	if modelName != "" {
+		if err := checkLimitModel(c, modelName); err != nil {
+			c.AbortWithStatus(http.StatusNotFound)
+			return nil, "", err
+		}
 	}
 	channel, fail := fetchChannel(c, modelName)
 	if fail != nil {

@@ -80,6 +80,7 @@ func setupLogin(user *model.User, c *gin.Context) {
 		return
 	}
 	user.LastLoginTime = time.Now().Unix()
+  user.LastLoginIp = c.ClientIP()
 
 	user.Update(false)
 
