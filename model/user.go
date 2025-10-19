@@ -1,18 +1,18 @@
 package model
 
 import (
-  "errors"
-  "fmt"
-  "one-api/common"
-  "one-api/common/config"
-  "one-api/common/logger"
-  "one-api/common/redis"
-  "one-api/common/utils"
-  "strings"
-  "time"
+	"errors"
+	"fmt"
+	"one-api/common"
+	"one-api/common/config"
+	"one-api/common/logger"
+	"one-api/common/redis"
+	"one-api/common/utils"
+	"strings"
+	"time"
 
-  "github.com/go-webauthn/webauthn/webauthn"
-  "gorm.io/gorm"
+	"github.com/go-webauthn/webauthn/webauthn"
+	"gorm.io/gorm"
 )
 
 // User if you add sensitive fields, don't forget to clean them in setupLogin function.
@@ -44,7 +44,7 @@ type User struct {
 	AffHistoryQuota  int            `json:"aff_history_quota" gorm:"type:int;default:0;column:aff_history"`
 	InviterId        int            `json:"inviter_id" gorm:"type:int;column:inviter_id;index"`
 	LastLoginTime    int64          `json:"last_login_time" gorm:"bigint;default:0"`
-  LastLoginIp string `json:"last_login_ip" gorm:"type:varchar(128);default:''"`
+	LastLoginIp      string         `json:"last_login_ip" gorm:"type:varchar(128);default:''"`
 	CreatedTime      int64          `json:"created_time" gorm:"bigint"`
 	DeletedAt        gorm.DeletedAt `json:"-" gorm:"index"`
 }
@@ -58,11 +58,13 @@ func GetMaxUserId() int {
 }
 
 var allowedUserOrderFields = map[string]bool{
-	"id":           true,
-	"username":     true,
-	"role":         true,
-	"status":       true,
-	"created_time": true,
+	"id":              true,
+	"username":        true,
+	"role":            true,
+	"status":          true,
+	"created_time":    true,
+	"last_login_time": true,
+	"last_login_ip":   true,
 }
 
 func GetUsersList(params *GenericParams) (*DataResult[User], error) {
@@ -598,7 +600,7 @@ func (user *User) WebAuthnCredentials() []webauthn.Credential {
 type WebAuthnCredential struct {
 	Id              int    `json:"id" gorm:"primaryKey"`
 	UserId          int    `json:"user_id" gorm:"index"`
-  CredentialId []byte `json:"credential_id" gorm:"unique;size:255"`
+	CredentialId    []byte `json:"credential_id" gorm:"unique;size:255"`
 	PublicKey       []byte `json:"public_key"`
 	AttestationType string `json:"attestation_type"`
 	Alias           string `json:"alias" gorm:"type:varchar(255);default:''"`
@@ -621,7 +623,7 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 	var webauthnCredentials []webauthn.Credential
 	for _, cred := range credentials {
 		webauthnCredentials = append(webauthnCredentials, webauthn.Credential{
-      ID: cred.CredentialId,
+			ID:              cred.CredentialId,
 			PublicKey:       cred.PublicKey,
 			AttestationType: cred.AttestationType,
 			Authenticator:   cred.Authenticator,
@@ -639,11 +641,11 @@ func GetUserWebAuthnCredentials(userId int) []webauthn.Credential {
 // 保存WebAuthn凭据
 func SaveWebAuthnCredential(userId int, credential *webauthn.Credential, alias string) error {
 	if alias == "" {
-    alias = time.Now().Format("20060102150405")
+		alias = time.Now().Format("20060102150405")
 	}
 	webauthnCred := WebAuthnCredential{
 		UserId:          userId,
-    CredentialId: credential.ID,
+		CredentialId:    credential.ID,
 		PublicKey:       credential.PublicKey,
 		AttestationType: credential.AttestationType,
 		Alias:           alias,
