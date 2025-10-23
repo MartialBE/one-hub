@@ -38,11 +38,16 @@ type Message struct {
 }
 
 type EmbeddingRequest struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
+	Model string `json:"model"`
+	Input any    `json:"input"`
 }
 
 type EmbeddingResponse struct {
 	OllamaError
-	Embedding []float64 `json:"embedding,omitempty"`
+	Model           string       `json:"model,omitempty"`
+	Embeddings      [][]float64  `json:"embeddings,omitempty"`
+	Embedding       []float64    `json:"embedding,omitempty"`
+	TotalDuration   int64        `json:"total_duration,omitempty"`
+	LoadDuration    int64        `json:"load_duration,omitempty"`
+	PromptEvalCount int          `json:"prompt_eval_count,omitempty"`
 }
