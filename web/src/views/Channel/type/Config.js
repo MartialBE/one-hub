@@ -326,7 +326,7 @@ const typeConfig = {
       test_model: 'claude-3-haiku-20240307'
     },
     prompt: {
-      key: '按照如下格式输入：Region|AccessKeyID|SecretAccessKey|SessionToken 其中SessionToken可不填空'
+      key: '老版本Bedrock按照如下格式输入：Region|AccessKeyID|SecretAccessKey|SessionToken 其中SessionToken可不填空,新版本Bedrock按照如下格式输入：Region|Token(其中Token不能为空，Token前往新版本Bedrock控制台创建API密钥)'
     },
     modelGroup: 'Anthropic'
   },

@@ -43,6 +43,7 @@ type BedrockProvider struct {
 	AccessKeyID     string
 	SecretAccessKey string
 	SessionToken    string
+	APIToken        string
 	Category        *category.Category
 }
 
@@ -84,6 +85,9 @@ func (p *BedrockProvider) GetFullRequestURL(requestURL string, modelName string)
 func (p *BedrockProvider) GetRequestHeaders() (headers map[string]string) {
 	headers = make(map[string]string)
 	p.CommonRequestHeaders(headers)
+	if p.APIToken != "" {
+		headers["Authorization"] = "Bearer " + p.APIToken
+	}
 	headers["Accept"] = "*/*"
 
 	return headers
@@ -91,11 +95,14 @@ func (p *BedrockProvider) GetRequestHeaders() (headers map[string]string) {
 
 func getKeyConfig(bedrock *BedrockProvider) {
 	keys := strings.Split(bedrock.Channel.Key, "|")
-	if len(keys) < 3 {
+	if len(keys) < 2 {
 		return
 	}
-
 	bedrock.Region = keys[0]
+	if len(keys) == 2 {
+		bedrock.APIToken = keys[1]
+		return
+	}
 	bedrock.AccessKeyID = keys[1]
 	bedrock.SecretAccessKey = keys[2]
 	if len(keys) == 4 && keys[3] != "" {
@@ -114,6 +121,9 @@ func (p *BedrockProvider) Sign(req *http.Request) error {
 			return errors.New("error getting request body: " + err.Error())
 		}
 		req.Body = io.NopCloser(bytes.NewReader(body))
+	}
+	if p.APIToken != "" {
+		return nil
 	}
 	sig, err := sigv4.New(sigv4.WithCredential(p.AccessKeyID, p.SecretAccessKey, p.SessionToken), sigv4.WithRegionService(p.Region, awsService))
 	if err != nil {
