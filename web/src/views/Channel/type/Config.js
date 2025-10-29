@@ -418,12 +418,26 @@ const typeConfig = {
     modelGroup: 'Coze'
   },
   39: {
+    inputLabel: {
+      provider_models_list: '从Ollama获取模型'
+    },
     input: {
-      models: ['phi3', 'llama3']
+      base_url: 'https://ollama.com',
+      models: [
+        'glm-4.6',
+        'kimi-k2:1t',
+        'qwen3-coder:480b',
+        'deepseek-v3.1:671b',
+        'gpt-oss:120b',
+        'gpt-oss:20b',
+        'qwen3-vl:235b',
+        'minimax-m2'
+      ]
     },
     prompt: {
-      base_url: '请输入你部署的Ollama地址，例如：http://127.0.0.1:11434，如果你使用了cloudflare Zero Trust，可以在下方插件填入授权信息',
-      key: '请随意填写'
+      base_url:
+        '请输入你部署的Ollama地址或者Ollama Cloud地址，例如：http://127.0.0.1:11434或者https://ollama.com，如果你使用了cloudflare Zero Trust，可以在下方Header配置填入授权信息',
+      key: '本地部署可以随便填，Ollama Cloud请填写API KEY，获取地址https://ollama.com/settings/keys'
     }
   },
   40: {
