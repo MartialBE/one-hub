@@ -58,6 +58,7 @@ type ChatCompletionMessage struct {
 	Annotations      any                              `json:"annotations,omitempty"`
 	Image            []MultimediaData                 `json:"image,omitempty"`
 	Images           []ChatMessagePart                `json:"images,omitempty"`
+	CacheControl     any                              `json:"cache_control,omitempty"`
 }
 
 func (m ChatCompletionMessage) StringContent() string {
@@ -179,6 +180,7 @@ type FormatJsonSchema struct {
 type ChatCompletionRequest struct {
 	Model               string                        `json:"model" binding:"required"`
 	Messages            []ChatCompletionMessage       `json:"messages" binding:"required"`
+	System              any                           `json:"system,omitempty"`
 	MaxTokens           int                           `json:"max_tokens,omitempty"`
 	MaxCompletionTokens int                           `json:"max_completion_tokens,omitempty"`
 	Temperature         *float64                      `json:"temperature,omitempty"`
