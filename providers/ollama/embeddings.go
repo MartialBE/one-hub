@@ -22,8 +22,8 @@ func (p *OllamaProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*typ
 	headers := p.GetRequestHeaders()
 
 	ollamaRequest := &EmbeddingRequest{
-		Model:  request.Model,
-		Prompt: request.ParseInputString(),
+		Model: request.Model,
+		Input: request.Input,
 	}
 
 	// 创建请求
@@ -50,18 +50,32 @@ func (p *OllamaProvider) CreateEmbeddings(request *types.EmbeddingRequest) (*typ
 		}
 	}
 
-	response := &types.EmbeddingResponse{
-		Object: "list",
-		Model:  request.Model,
-		Data: []types.Embedding{{
+	// 构造 OpenAI 兼容响应
+	openaiData := make([]types.Embedding, 0)
+	if len(ollamaResponse.Embeddings) > 0 {
+		for i, v := range ollamaResponse.Embeddings {
+			openaiData = append(openaiData, types.Embedding{
+				Object:    "embedding",
+				Index:     i,
+				Embedding: v,
+			})
+		}
+	} else if len(ollamaResponse.Embedding) > 0 {
+		openaiData = append(openaiData, types.Embedding{
 			Object:    "embedding",
 			Index:     0,
 			Embedding: ollamaResponse.Embedding,
-		}},
+		})
+	}
+
+	response := &types.EmbeddingResponse{
+		Object: "list",
+		Model:  request.Model,
+		Data:   openaiData,
 		Usage: &types.Usage{
-			TotalTokens:      0,
+			PromptTokens:     ollamaResponse.PromptEvalCount,
 			CompletionTokens: 0,
-			PromptTokens:     0,
+			TotalTokens:      ollamaResponse.PromptEvalCount,
 		},
 	}
 

@@ -186,7 +186,7 @@ export const CHANNEL_OPTIONS = {
     text: 'Ollama',
     value: 39,
     color: 'orange',
-    url: ''
+    url: 'https://ollama.com'
   },
   40: {
     key: 40,
