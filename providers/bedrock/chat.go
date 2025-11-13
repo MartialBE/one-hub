@@ -1,6 +1,7 @@
 package bedrock
 
 import (
+	"encoding/json"
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
@@ -73,11 +74,43 @@ func (p *BedrockProvider) getChatRequest(request *types.ChatCompletionRequest) (
 		return nil, errWithCode
 	}
 
-	// 创建请求
-	req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(bedrockRequest), p.Requester.WithHeader(headers))
+	// 处理额外参数
+	customParams, err := p.CustomParameterHandler()
 	if err != nil {
-		return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		return nil, common.ErrorWrapper(err, "custom_parameter_error", http.StatusInternalServerError)
 	}
+
+	// 如果有额外参数，将其合并到请求体中
+	var req *http.Request
+	if customParams != nil {
+		// 将请求体转换为map，以便添加额外参数
+		var requestMap map[string]interface{}
+		requestBytes, err := json.Marshal(bedrockRequest)
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "marshal_request_failed", http.StatusInternalServerError)
+		}
+
+		err = json.Unmarshal(requestBytes, &requestMap)
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "unmarshal_request_failed", http.StatusInternalServerError)
+		}
+
+		// 合并自定义参数
+		requestMap = p.mergeCustomParams(requestMap, customParams)
+
+		// 使用修改后的请求体创建请求
+		req, err = p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(requestMap), p.Requester.WithHeader(headers))
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		}
+	} else {
+		// 如果没有额外参数，使用原始请求体创建请求
+		req, err = p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(bedrockRequest), p.Requester.WithHeader(headers))
+		if err != nil {
+			return nil, common.ErrorWrapper(err, "new_request_failed", http.StatusInternalServerError)
+		}
+	}
+
 	p.Sign(req)
 
 	return req, nil
