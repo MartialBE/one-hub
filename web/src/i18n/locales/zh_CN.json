@@ -24,6 +24,7 @@
   "channel": "渠道",
   "token": "令牌",
   "invoice": "月度账单",
+  "multi-user-stats": "多用户令牌统计",
   "midjourney": "Midjourney",
   "log": "日志",
   "redemption": "兑换",
@@ -577,7 +578,7 @@
     "yourTokenIs": "你的访问令牌是:",
     "keepSafe": "请妥善保管。如有泄漏，请立即重置。",
     "registerWebauthn": "注册WebAuthn凭证",
-    "webauthnManagement":"WebAuthn 凭据管理",
+    "webauthnManagement": "WebAuthn 凭据管理",
     "webauthnDescription": "WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。",
     "registeredCredentials": "已注册凭证",
     "alias": "别名:",
@@ -971,7 +972,6 @@
         "usernameClaimsPlaceholder": "请输入用户名声明(例如username)",
         "saveButton": "保存OIDC设置"
       },
-
       "configureTurnstile": {
         "title": "配置 Turnstile",
         "subTitle": "用以支持用户校验，",
@@ -1051,11 +1051,9 @@
     "githubError": "操作失败，重定向至登录界面中...",
     "githubCountError": "出现错误，第 {{count}} 次重试中...",
     "githubLogin": "GitHub 登录",
-
     "oidcError": "操作失败，重定向至登录界面中...",
     "oidcCountError": "出现错误，第 {{count}} 次重试中...",
     "oidcLogin": "OIDC 登录",
-
     "larkLogin": "飞书 登录",
     "passwordRest": "密码重置确认",
     "useGithubLogin": "使用 Github 登录",
