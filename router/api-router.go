@@ -212,7 +212,12 @@ func SetApiRouter(router *gin.Engine) {
 			analyticsRoute.GET("/statistics", controller.GetStatisticsDetail)
 			analyticsRoute.GET("/period", controller.GetStatisticsByPeriod)
 		}
-
+		multiUserStatsRoute := apiRouter.Group("/multi_user_stats")
+		multiUserStatsRoute.Use(middleware.AdminAuth())
+		{
+			multiUserStatsRoute.GET("/", controller.GetMultiUserStatistics)
+			multiUserStatsRoute.GET("/export", controller.ExportMultiUserStatisticsCSV)
+		}
 		pricesRoute := apiRouter.Group("/prices")
 		pricesRoute.Use(middleware.AdminAuth())
 		{
