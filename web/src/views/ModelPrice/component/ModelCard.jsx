@@ -6,12 +6,12 @@ import { Icon } from '@iconify/react';
 import Label from 'ui-component/Label';
 import { MODALITY_OPTIONS } from 'constants/Modality';
 import { copy } from 'utils/common';
-
+import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 
-export default function ModelCard({ model, provider, modelInfo, price, group, ownedbyIcon, unit, onViewDetail }) {
+export default function ModelCard({ model, provider, modelInfo, price, group, ownedbyIcon, type, formatPrice, onViewDetail }) {
   const theme = useTheme();
-
+  const { t } = useTranslation();
   // 解析输入输出模态
   const getModalities = (modalitiesStr) => {
     try {
@@ -33,14 +33,6 @@ export default function ModelCard({ model, provider, modelInfo, price, group, ow
   const inputModalities = modelInfo ? getModalities(modelInfo.input_modalities) : [];
   const outputModalities = modelInfo ? getModalities(modelInfo.output_modalities) : [];
   const tags = modelInfo ? getTags(modelInfo.tags) : [];
-
-  // 格式化价格
-  const formatPrice = (value) => {
-    if (typeof value === 'number') {
-      return value.toFixed(6);
-    }
-    return value;
-  };
 
   const isPriceAvailable = typeof price.input === 'number' && typeof price.output === 'number';
 
@@ -196,15 +188,46 @@ export default function ModelCard({ model, provider, modelInfo, price, group, ow
                 标签
               </Typography>
               <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                {tags.slice(0, 3).map((tag, index) => (
-                  <Chip key={index} label={tag} size="small" sx={{ height: 20, fontSize: '0.7rem', borderRadius: '4px' }} />
+                {tags.map((tag, index) => (
+                  <Label
+                    key={index}
+                    variant="soft"
+                    color={tag === 'Hot' ? 'error' : 'primary'}
+                    sx={{
+                      fontSize: '0.7rem',
+                      py: 0.25,
+                      px: 0.75,
+                      borderRadius: '4px',
+                      display: 'inline-flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {tag === 'Hot' && <Icon icon="ic:round-local-fire-department" width={14} height={14} style={{ marginRight: 4 }} />}
+                    {tag}
+                  </Label>
                 ))}
-                {tags.length > 3 && (
-                  <Chip label={`+${tags.length - 3}`} size="small" sx={{ height: 20, fontSize: '0.7rem', borderRadius: '4px' }} />
-                )}
               </Stack>
             </Box>
           )}
+          {/* 标签 */}
+
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+              计费方式
+            </Typography>
+            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+              {type === 'tokens' && (
+                <Label color="success" variant="soft" sx={{ fontWeight: 600 }}>
+                  {t('modelpricePage.tokens')}
+                </Label>
+              )}
+              {type === 'times' && (
+                <Label color="warning" variant="soft" sx={{ fontWeight: 600 }}>
+                  {t('modelpricePage.times')}
+                </Label>
+              )}
+            </Stack>
+          </Box>
         </Stack>
 
         {/* 价格信息 */}
@@ -218,7 +241,7 @@ export default function ModelCard({ model, provider, modelInfo, price, group, ow
                   输入价格
                 </Typography>
                 <Label color="success" variant="outlined" sx={{ fontSize: '0.75rem', py: 0.25, px: 0.75, fontWeight: 600 }}>
-                  ${formatPrice(price.input)} / 1{unit}
+                  {formatPrice(price.input, type)}
                 </Label>
               </Stack>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -226,7 +249,7 @@ export default function ModelCard({ model, provider, modelInfo, price, group, ow
                   输出价格
                 </Typography>
                 <Label color="warning" variant="outlined" sx={{ fontSize: '0.75rem', py: 0.25, px: 0.75, fontWeight: 600 }}>
-                  ${formatPrice(price.output)} / 1{unit}
+                  {formatPrice(price.output, type)}
                 </Label>
               </Stack>
             </Stack>
@@ -301,5 +324,7 @@ ModelCard.propTypes = {
   group: PropTypes.object,
   ownedbyIcon: PropTypes.string,
   unit: PropTypes.string,
+  type: PropTypes.string,
+  formatPrice: PropTypes.func,
   onViewDetail: PropTypes.func
 };

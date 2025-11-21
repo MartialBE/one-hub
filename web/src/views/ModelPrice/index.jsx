@@ -123,6 +123,22 @@ export default function ModelPrice() {
     )
   ];
 
+  // 格式化价格
+  const formatPrice = (value, type) => {
+    if (typeof value === 'number') {
+      let nowUnit = '';
+      let isM = unit === 'M';
+      if (type === 'times') {
+        isM = false;
+      }
+      if (type === 'tokens') {
+        nowUnit = `/ 1${unit}`;
+      }
+      return ValueFormatter(value, true, isM) + nowUnit;
+    }
+    return value;
+  };
+
   // 过滤模型
   const filteredModels = Object.entries(availableModels)
     .filter(([modelName, model]) => {
@@ -179,22 +195,22 @@ export default function ModelPrice() {
     .map(([modelName, model]) => {
       const group = userGroupMap[selectedGroup];
       const hasAccess = model.groups.includes(selectedGroup);
-
       const price = hasAccess
         ? {
-          input: group.ratio * model.price.input,
-          output: group.ratio * model.price.output
-        }
+            input: group.ratio * model.price.input,
+            output: group.ratio * model.price.output
+          }
         : { input: t('modelpricePage.noneGroup'), output: t('modelpricePage.noneGroup') };
 
-      // 计算所有用户组的价格
+      // 计算所有用户组的价格F
       const allGroupPrices = Object.entries(userGroupMap).map(([key, grp]) => {
         const hasGroupAccess = model.groups.includes(key);
         return {
           groupName: grp.name,
           groupKey: key,
-          input: hasGroupAccess ? (grp.ratio * model.price.input).toFixed(6) : '不可用',
-          output: hasGroupAccess ? (grp.ratio * model.price.output).toFixed(6) : '不可用',
+          input: hasGroupAccess ? grp.ratio * model.price.input : 0,
+          output: hasGroupAccess ? grp.ratio * model.price.output : 0,
+          type: model.price.type,
           extraRatios:
             model.price.extra_ratios && hasGroupAccess
               ? Object.fromEntries(Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)]))
@@ -407,8 +423,9 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                        }`,
+                      border: `1px solid ${
+                        isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                      }`,
                       boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                     }}
                   >
@@ -493,12 +510,13 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.default, 0.5)
                         : theme.palette.background.default,
-                  border: `1px solid ${selectedModality === 'all'
+                  border: `1px solid ${
+                    selectedModality === 'all'
                       ? theme.palette.primary.main
                       : theme.palette.mode === 'dark'
                         ? alpha('#fff', 0.08)
                         : alpha('#000', 0.05)
-                    }`,
+                  }`,
                   boxShadow: selectedModality === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                 }}
               >
@@ -546,12 +564,13 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${isSelected
+                      border: `1px solid ${
+                        isSelected
                           ? theme.palette[option.color]?.main || theme.palette.primary.main
                           : theme.palette.mode === 'dark'
                             ? alpha('#fff', 0.08)
                             : alpha('#000', 0.05)
-                        }`,
+                      }`,
                       boxShadow: isSelected
                         ? `0 2px 8px ${alpha(theme.palette[option.color]?.main || theme.palette.primary.main, 0.2)}`
                         : 'none'
@@ -615,12 +634,13 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                    border: `1px solid ${selectedTag === 'all'
+                    border: `1px solid ${
+                      selectedTag === 'all'
                         ? theme.palette.primary.main
                         : theme.palette.mode === 'dark'
                           ? alpha('#fff', 0.08)
                           : alpha('#000', 0.05)
-                      }`,
+                    }`,
                     boxShadow: selectedTag === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                   }}
                 >
@@ -668,8 +688,9 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                          }`,
+                        border: `1px solid ${
+                          isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                        }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.info.main, 0.2)}` : 'none'
                       }}
                     >
@@ -746,12 +767,13 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.paper, 0.6)
                         : alpha(theme.palette.background.paper, 1),
-                    border: `1px solid ${onlyShowAvailable
+                    border: `1px solid ${
+                      onlyShowAvailable
                         ? theme.palette.primary.main
                         : theme.palette.mode === 'dark'
                           ? alpha('#fff', 0.1)
                           : alpha('#000', 0.08)
-                      }`,
+                    }`,
                     borderRadius: '20px',
                     boxShadow: onlyShowAvailable
                       ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`
@@ -840,12 +862,13 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${isSelected
+                        border: `1px solid ${
+                          isSelected
                             ? theme.palette.primary.main
                             : theme.palette.mode === 'dark'
                               ? alpha('#fff', 0.08)
                               : alpha('#000', 0.05)
-                          }`,
+                        }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                       }}
                     >
@@ -931,6 +954,8 @@ export default function ModelPrice() {
                   group={model.group}
                   ownedbyIcon={getIconByName(model.provider)}
                   unit={unit}
+                  type={model.type}
+                  formatPrice={formatPrice}
                   onViewDetail={() => handleViewDetail(model)}
                 />
               </Grid>
@@ -967,6 +992,8 @@ export default function ModelPrice() {
         priceData={selectedModelDetail?.priceData}
         ownedbyIcon={selectedModelDetail ? getIconByName(selectedModelDetail.provider) : null}
         userGroupMap={userGroupMap}
+        formatPrice={formatPrice}
+        unit={unit}
       />
     </Stack>
   );

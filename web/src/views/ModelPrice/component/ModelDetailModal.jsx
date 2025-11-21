@@ -25,15 +25,12 @@ import { MODALITY_OPTIONS } from 'constants/Modality';
 import { copy } from 'utils/common';
 import { useTranslation } from 'react-i18next';
 
-
 // ----------------------------------------------------------------------
 
-export default function ModelDetailModal({ open, onClose, model, provider, modelInfo, priceData, ownedbyIcon, userGroupMap }) {
+export default function ModelDetailModal({ open, onClose, model, provider, modelInfo, priceData, ownedbyIcon, formatPrice, unit }) {
   const theme = useTheme();
   const { t } = useTranslation();
-
   if (!model) return null;
-
   // 解析模态和标签
   const getModalities = (modalitiesStr) => {
     try {
@@ -102,14 +99,26 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               </Stack>
             </Box>
           </Stack>
-          <Stack direction="row" spacing={1}>
-            {priceData?.price?.type === 'tokens' && <Chip label={t('modelpricePage.tokens')} size="small" color="success" sx={{ fontWeight: 600 }} />}
-            {tags.includes('Hot') && <Chip label="Hot" size="small" color="error" sx={{ fontWeight: 600 }} />}
-            <IconButton onClick={onClose} sx={{ ml: 1 }}>
-              <Icon icon="eva:close-outline" width={24} height={24} />
-            </IconButton>
+          <Stack direction="row" spacing={1} sx={{ mr: 4 }}>
+            {tags.includes('Hot') && (
+              <Label color="error" variant="filled" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Icon icon="mdi:fire" width={16} height={16} />
+                Hot
+              </Label>
+            )}
           </Stack>
         </Box>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 12,
+            top: 12,
+            color: 'text.secondary'
+          }}
+        >
+          <Icon icon="eva:close-outline" width={24} height={24} />
+        </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ pt: 0 }}>
@@ -146,7 +155,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             </Stack>
 
             {/* 上下文长度 */}
-            {modelInfo?.context_length && (
+            {modelInfo?.context_length > 0 && (
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:file-text-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
@@ -159,7 +168,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             )}
 
             {/* 最大Tokens */}
-            {modelInfo?.max_tokens && (
+            {modelInfo?.max_tokens > 0 && (
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:maximize-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
@@ -227,7 +236,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
         {/* 价格明细 */}
         <Box sx={{ mb: 2 }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-            <Icon icon="eva:pricetags-outline" width={20} height={20} />
+            <Icon icon="mdi:attach-money" width={20} height={20} />
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
               {t('modelpricePage.priceDetails')}
             </Typography>
@@ -254,25 +263,27 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
                 </TableRow>
               </TableHead>
               <TableBody>
-                {priceData?.allGroupPrices?.map((groupPrice, index) => (
-                  <TableRow key={index} hover>
-                    <TableCell>
-                      <Label color="primary" variant="soft">
-                        {groupPrice.groupName}
-                      </Label>
-                    </TableCell>
-                    <TableCell>
-                      <Label color="success" variant="outlined">
-                        ${groupPrice.input}
-                      </Label>
-                    </TableCell>
-                    <TableCell>
-                      <Label color="warning" variant="outlined">
-                        ${groupPrice.output}
-                      </Label>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {priceData?.allGroupPrices?.map((groupPrice, index) => {
+                  return (
+                    <TableRow key={index} hover>
+                      <TableCell>
+                        <Label color="primary" variant="soft">
+                          {groupPrice.groupName}
+                        </Label>
+                      </TableCell>
+                      <TableCell>
+                        <Label color="success" variant="outlined">
+                          {formatPrice(groupPrice.input, groupPrice?.type)}
+                        </Label>
+                      </TableCell>
+                      <TableCell>
+                        <Label color="warning" variant="outlined">
+                          {formatPrice(groupPrice.output, groupPrice?.type)}
+                        </Label>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -314,5 +325,7 @@ ModelDetailModal.propTypes = {
   modelInfo: PropTypes.object,
   priceData: PropTypes.object,
   ownedbyIcon: PropTypes.string,
-  userGroupMap: PropTypes.object
+  userGroupMap: PropTypes.object,
+  formatPrice: PropTypes.func,
+  unit: PropTypes.string
 };
