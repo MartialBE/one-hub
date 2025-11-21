@@ -13,6 +13,7 @@ import ModelInfoTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import { API } from 'utils/api';
 import EditModal from './component/EditModal';
+import ImportModal from './component/ImportModal';
 import { Icon } from '@iconify/react';
 
 // ----------------------------------------------------------------------
@@ -22,6 +23,7 @@ export default function ModelInfo() {
 
   const [openModal, setOpenModal] = useState(false);
   const [editId, setEditId] = useState(0);
+  const [openImportModal, setOpenImportModal] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -129,14 +131,24 @@ export default function ModelInfo() {
           </Typography>
         </Stack>
 
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Icon icon="solar:add-circle-line-duotone" />}
-          onClick={() => handleOpenModal(0)}
-        >
-          新建模型信息
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<Icon icon="solar:upload-bold-duotone" />}
+            onClick={() => setOpenImportModal(true)}
+          >
+            批量导入
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Icon icon="solar:add-circle-line-duotone" />}
+            onClick={() => handleOpenModal(0)}
+          >
+            新建模型信息
+          </Button>
+        </Stack>
       </Stack>
       <Card>
         <Toolbar
@@ -201,6 +213,17 @@ export default function ModelInfo() {
         onCancel={handleCloseModal}
         onOk={handleOkModal}
         editId={editId}
+        existingModels={modelInfos.map((info) => info.model)}
+      />
+      <ImportModal
+        open={openImportModal}
+        onCancel={() => setOpenImportModal(false)}
+        onOk={(status) => {
+          if (status === true) {
+            setOpenImportModal(false);
+            handleRefresh();
+          }
+        }}
         existingModels={modelInfos.map((info) => info.model)}
       />
     </>

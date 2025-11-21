@@ -263,10 +263,11 @@ const EditModal = ({ open, editId, onCancel, onOk, existingModels = [] }) => {
                                             renderTags={(value, getTagProps) =>
                                                 value.map((option, index) => {
                                                     const color = MODALITY_OPTIONS[option]?.color || 'default';
+                                                    const { key, ...tagProps } = getTagProps({ index });
                                                     return (
-                                                        // eslint-disable-next-line react/jsx-key
                                                         <Chip
-                                                            {...getTagProps({ index })}
+                                                            key={key}
+                                                            {...tagProps}
                                                             label={MODALITY_OPTIONS[option]?.text || option}
                                                             size="small"
                                                             sx={{
@@ -307,8 +308,9 @@ const EditModal = ({ open, editId, onCancel, onOk, existingModels = [] }) => {
                                             )}
                                             renderOption={(props, option) => {
                                                 const color = MODALITY_OPTIONS[option]?.color || 'default';
+                                                const { key, ...otherProps } = props;
                                                 return (
-                                                    <li {...props}>
+                                                    <li key={key} {...otherProps}>
                                                         <Chip
                                                             label={MODALITY_OPTIONS[option]?.text || option}
                                                             size="small"
@@ -345,10 +347,11 @@ const EditModal = ({ open, editId, onCancel, onOk, existingModels = [] }) => {
                                             renderTags={(value, getTagProps) =>
                                                 value.map((option, index) => {
                                                     const color = MODALITY_OPTIONS[option]?.color || 'default';
+                                                    const { key, ...tagProps } = getTagProps({ index });
                                                     return (
-                                                        // eslint-disable-next-line react/jsx-key
                                                         <Chip
-                                                            {...getTagProps({ index })}
+                                                            key={key}
+                                                            {...tagProps}
                                                             label={MODALITY_OPTIONS[option]?.text || option}
                                                             size="small"
                                                             sx={{
@@ -389,8 +392,9 @@ const EditModal = ({ open, editId, onCancel, onOk, existingModels = [] }) => {
                                             )}
                                             renderOption={(props, option) => {
                                                 const color = MODALITY_OPTIONS[option]?.color || 'default';
+                                                const { key, ...otherProps } = props;
                                                 return (
-                                                    <li {...props}>
+                                                    <li key={key} {...otherProps}>
                                                         <Chip
                                                             label={MODALITY_OPTIONS[option]?.text || option}
                                                             size="small"
@@ -425,24 +429,27 @@ const EditModal = ({ open, editId, onCancel, onOk, existingModels = [] }) => {
                                                 setFieldValue('tags', JSON.stringify(value));
                                             }}
                                             renderTags={(value, getTagProps) =>
-                                                value.map((option, index) => (
-                                                    // eslint-disable-next-line react/jsx-key
-                                                    <Chip
-                                                        variant="outlined"
-                                                        label={option}
-                                                        {...getTagProps({ index })}
-                                                        sx={{
-                                                            borderRadius: '4px',
-                                                            height: '24px',
-                                                            '& .MuiChip-deleteIcon': {
-                                                                color: theme.palette.grey[500],
-                                                                '&:hover': {
-                                                                    color: theme.palette.grey[700]
+                                                value.map((option, index) => {
+                                                    const { key, ...tagProps } = getTagProps({ index });
+                                                    return (
+                                                        <Chip
+                                                            key={key}
+                                                            variant="outlined"
+                                                            label={option}
+                                                            {...tagProps}
+                                                            sx={{
+                                                                borderRadius: '4px',
+                                                                height: '24px',
+                                                                '& .MuiChip-deleteIcon': {
+                                                                    color: theme.palette.grey[500],
+                                                                    '&:hover': {
+                                                                        color: theme.palette.grey[700]
+                                                                    }
                                                                 }
-                                                            }
-                                                        }}
-                                                    />
-                                                ))
+                                                            }}
+                                                        />
+                                                    );
+                                                })
                                             }
                                             renderInput={(params) => (
                                                 <TextField
