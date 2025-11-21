@@ -39,7 +39,7 @@ export const ExtraRatiosSelector = ({ value = {}, onChange }) => {
 
   // 更新扩展倍率的值
   const handleChangeRatioValue = (key, newValue) => {
-    onChange({ ...value, [key]: Number(newValue) });
+    onChange({ ...value, [key]: newValue });
   };
 
   // 获取配置项的名称
@@ -173,7 +173,7 @@ export const ExtraRatiosSelector = ({ value = {}, onChange }) => {
                     //     {handleStartAdornment()}
                     //   </InputAdornment>
                     // }
-                    onChange={(e) => handleChangeRatioValue(config.key, parseFloat(e.target.value) || 0)}
+                    onChange={(e) => handleChangeRatioValue(config.key, e.target.value)}
                     sx={{
                       height: 36,
                       '& .MuiOutlinedInput-input': {

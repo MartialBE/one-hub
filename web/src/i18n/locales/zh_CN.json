@@ -577,7 +577,7 @@
     "yourTokenIs": "你的访问令牌是:",
     "keepSafe": "请妥善保管。如有泄漏，请立即重置。",
     "registerWebauthn": "注册WebAuthn凭证",
-    "webauthnManagement":"WebAuthn 凭据管理",
+    "webauthnManagement": "WebAuthn 凭据管理",
     "webauthnDescription": "WebAuthn 提供无密码身份验证，您可以使用指纹、Face ID 或安全密钥等生物识别方式进行登录。",
     "registeredCredentials": "已注册凭证",
     "alias": "别名:",
@@ -616,7 +616,7 @@
     "input": "输入",
     "output": "输出",
     "rate": "倍率",
-    "search": "搜索",
+    "search": "搜索模型名称或描述",
     "tokens": "按量付费",
     "times": "按次付费",
     "all": "全部",
@@ -636,7 +636,21 @@
     "input_image_tokens": "输入图片倍率",
     "output_image_tokens": "输出图片倍率",
     "showAll": "显示所有",
-    "onlyAvailable": "只显示可用"
+    "onlyAvailable": "只显示可用",
+    "modelPricing": "模型定价",
+    "unit": "单位",
+    "modalityType": "模态类型",
+    "allModality": "全部",
+    "tags": "标签",
+    "allTags": "全部",
+    "modelInfo": "模型信息",
+    "contextLength": "上下文长度",
+    "maxTokens": "最大tokens",
+    "inputModality": "输入模态",
+    "outputModality": "输出模态",
+    "priceDetails": "价格明细",
+    "priceNote": "不同分组,对应的价格也随之不同,渠道组需要在令牌管理中切换。",
+    "otherInfo": "其他信息"
   },
   "paymentPage": {
     "orderList": "订单列表",
@@ -971,7 +985,6 @@
         "usernameClaimsPlaceholder": "请输入用户名声明(例如username)",
         "saveButton": "保存OIDC设置"
       },
-
       "configureTurnstile": {
         "title": "配置 Turnstile",
         "subTitle": "用以支持用户校验，",
@@ -1051,11 +1064,9 @@
     "githubError": "操作失败，重定向至登录界面中...",
     "githubCountError": "出现错误，第 {{count}} 次重试中...",
     "githubLogin": "GitHub 登录",
-
     "oidcError": "操作失败，重定向至登录界面中...",
     "oidcCountError": "出现错误，第 {{count}} 次重试中...",
     "oidcLogin": "OIDC 登录",
-
     "larkLogin": "飞书 登录",
     "passwordRest": "密码重置确认",
     "useGithubLogin": "使用 Github 登录",
