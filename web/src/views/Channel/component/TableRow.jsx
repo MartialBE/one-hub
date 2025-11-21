@@ -217,10 +217,10 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
           prev.map((c) =>
             c.id === channel.id
               ? {
-                  ...c,
-                  test_time: Date.now() / 1000,
-                  response_time: time * 1000
-                }
+                ...c,
+                test_time: Date.now() / 1000,
+                response_time: time * 1000
+              }
               : c
           )
         );
@@ -1315,10 +1315,10 @@ export default function ChannelTableRow({ item, manageChannel, onRefresh, groupO
                         prev.map((c) =>
                           c.id === currentTestingChannel.id
                             ? {
-                                ...c,
-                                test_time: Date.now() / 1000,
-                                response_time: time * 1000
-                              }
+                              ...c,
+                              test_time: Date.now() / 1000,
+                              response_time: time * 1000
+                            }
                             : c
                         )
                       );

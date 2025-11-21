@@ -128,6 +128,16 @@ func SetApiRouter(router *gin.Engine) {
 			modelOwnedByRoute.DELETE("/:id", controller.DeleteModelOwnedBy)
 		}
 
+		modelInfoRoute := apiRouter.Group("/model_info")
+		modelInfoRoute.GET("/", controller.GetAllModelInfo)
+		modelInfoRoute.Use(middleware.AdminAuth())
+		{
+			modelInfoRoute.GET("/:id", controller.GetModelInfo)
+			modelInfoRoute.POST("/", controller.CreateModelInfo)
+			modelInfoRoute.PUT("/", controller.UpdateModelInfo)
+			modelInfoRoute.DELETE("/:id", controller.DeleteModelInfo)
+		}
+
 		userGroup := apiRouter.Group("/user_group")
 		userGroup.Use(middleware.AdminAuth())
 		{
