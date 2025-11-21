@@ -137,7 +137,7 @@ const EditModal = ({
         return 0;
       }
       if (unitType === 'rate') {
-        return price;
+        return Number(price);
       }
 
       let priceValue = new Decimal(price);
@@ -186,7 +186,7 @@ const EditModal = ({
           break;
         case 'USD':
         case 'RMB':
-          endAdornment = value === 0 ? 'Free' : calculateRate(value) + ' Rate';
+          endAdornment = Number(value) === 0 ? 'Free' : calculateRate(value) + ' Rate';
           break;
       }
 
@@ -209,6 +209,15 @@ const EditModal = ({
   // 表单提交处理
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
+
+    // Ensure extra_ratios values are numbers
+    if (values.extra_ratios) {
+      const processedRatios = {};
+      Object.keys(values.extra_ratios).forEach((key) => {
+        processedRatios[key] = Number(values.extra_ratios[key]);
+      });
+      values.extra_ratios = processedRatios;
+    }
 
     // 单一模式处理
     if (singleMode) {
@@ -282,7 +291,7 @@ const EditModal = ({
 
     let finalValue;
     if (name === 'input' || name === 'output') {
-      finalValue = value === '' ? 0 : Number(value);
+      finalValue = value;
     } else {
       finalValue = name === 'locked' ? checked : value;
     }
@@ -643,8 +652,8 @@ const EditModal = ({
             onClick={() =>
               submit(inputs, {
                 setErrors,
-                setStatus: () => {},
-                setSubmitting: () => {}
+                setStatus: () => { },
+                setSubmitting: () => { }
               })
             }
             variant="contained"
