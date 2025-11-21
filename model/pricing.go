@@ -77,6 +77,22 @@ func (p *Pricing) Init() error {
 		return nil
 	}
 
+	modelInfos, err := GetAllModelInfo()
+	if err == nil {
+		modelInfoMap := make(map[string]*ModelInfoResponse)
+		for _, info := range modelInfos {
+			modelInfoMap[info.Model] = info.ToResponse()
+		}
+
+		for _, price := range prices {
+			if info, ok := modelInfoMap[price.Model]; ok {
+				price.ModelInfo = info
+			}
+		}
+	} else {
+		logger.SysError("Failed to fetch model infos: " + err.Error())
+	}
+
 	newPrices := make(map[string]*Price)
 	newMatch := make(map[string]bool)
 

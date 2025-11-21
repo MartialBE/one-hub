@@ -62,6 +62,7 @@ type Price struct {
 	Locked      bool    `json:"locked" gorm:"default:false"` // 如果模型为locked 则覆盖模式不会更新locked的模型价格
 
 	ExtraRatios *datatypes.JSONType[map[string]float64] `json:"extra_ratios,omitempty" gorm:"type:json"`
+	ModelInfo   *ModelInfoResponse                      `json:"model_info,omitempty" gorm:"-"`
 }
 
 func GetAllPrices() ([]*Price, error) {

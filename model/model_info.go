@@ -2,6 +2,7 @@ package model
 
 import (
 	"one-api/common/logger"
+	"one-api/common/utils"
 )
 
 type ModelInfo struct {
@@ -17,6 +18,48 @@ type ModelInfo struct {
 	SupportUrl       string `json:"support_url" gorm:"type:text"`
 	CreatedAt        int64  `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt        int64  `json:"updated_at" gorm:"autoUpdateTime"`
+}
+
+type ModelInfoResponse struct {
+	Model            string   `json:"model"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	ContextLength    int      `json:"context_length"`
+	MaxTokens        int      `json:"max_tokens"`
+	InputModalities  []string `json:"input_modalities"`
+	OutputModalities []string `json:"output_modalities"`
+	Tags             []string `json:"tags"`
+	SupportUrl       []string `json:"support_url"`
+	CreatedAt        int64    `json:"created_at"`
+	UpdatedAt        int64    `json:"updated_at"`
+}
+
+func (m *ModelInfo) ToResponse() *ModelInfoResponse {
+	res := &ModelInfoResponse{
+		Model:         m.Model,
+		Name:          m.Name,
+		Description:   m.Description,
+		ContextLength: m.ContextLength,
+		MaxTokens:     m.MaxTokens,
+		CreatedAt:     m.CreatedAt,
+		UpdatedAt:     m.UpdatedAt,
+	}
+
+	res.InputModalities, _ = utils.UnmarshalString[[]string](m.InputModalities)
+	res.OutputModalities, _ = utils.UnmarshalString[[]string](m.OutputModalities)
+	res.Tags, _ = utils.UnmarshalString[[]string](m.Tags)
+
+	var err error
+	res.SupportUrl, err = utils.UnmarshalString[[]string](m.SupportUrl)
+	if err != nil {
+		if m.SupportUrl != "" {
+			res.SupportUrl = []string{m.SupportUrl}
+		} else {
+			res.SupportUrl = []string{}
+		}
+	}
+
+	return res
 }
 
 func (m *ModelInfo) TableName() string {
