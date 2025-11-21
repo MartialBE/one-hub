@@ -23,11 +23,14 @@ import { Icon } from '@iconify/react';
 import Label from 'ui-component/Label';
 import { MODALITY_OPTIONS } from 'constants/Modality';
 import { copy } from 'utils/common';
+import { useTranslation } from 'react-i18next';
+
 
 // ----------------------------------------------------------------------
 
 export default function ModelDetailModal({ open, onClose, model, provider, modelInfo, priceData, ownedbyIcon, userGroupMap }) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   if (!model) return null;
 
@@ -100,7 +103,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             </Box>
           </Stack>
           <Stack direction="row" spacing={1}>
-            {priceData?.price?.type === 'tokens' && <Chip label="按Token收费" size="small" color="success" sx={{ fontWeight: 600 }} />}
+            {priceData?.price?.type === 'tokens' && <Chip label={t('modelpricePage.tokens')} size="small" color="success" sx={{ fontWeight: 600 }} />}
             {tags.includes('Hot') && <Chip label="Hot" size="small" color="error" sx={{ fontWeight: 600 }} />}
             <IconButton onClick={onClose} sx={{ ml: 1 }}>
               <Icon icon="eva:close-outline" width={24} height={24} />
@@ -126,7 +129,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Icon icon="eva:info-outline" width={20} height={20} />
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              模型信息
+              {t('modelpricePage.modelInfo')}
             </Typography>
           </Stack>
 
@@ -135,10 +138,10 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             <Stack direction="row" alignItems="center" spacing={2}>
               <Icon icon="eva:cube-outline" width={18} height={18} color={theme.palette.text.secondary} />
               <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                类型:
+                {t('modelpricePage.type')}:
               </Typography>
               <Label color="primary" variant="soft">
-                {priceData?.price?.type === 'tokens' ? '按Token收费' : '按次数收费'}
+                {priceData?.price?.type === 'tokens' ? t('modelpricePage.tokens') : t('modelpricePage.times')}
               </Label>
             </Stack>
 
@@ -147,7 +150,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:file-text-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                  上下文长度:
+                  {t('modelpricePage.contextLength')}:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   {modelInfo.context_length.toLocaleString()}
@@ -160,7 +163,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:maximize-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                  最大tokens:
+                  {t('modelpricePage.maxTokens')}:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   {modelInfo.max_tokens.toLocaleString()}
@@ -173,7 +176,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:arrow-down-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                  输入模态:
+                  {t('modelpricePage.inputModality')}:
                 </Typography>
                 <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
                   {inputModalities.map((modality, index) => (
@@ -190,7 +193,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:arrow-up-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                  输出模态:
+                  {t('modelpricePage.outputModality')}:
                 </Typography>
                 <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
                   {outputModalities.map((modality, index) => (
@@ -207,7 +210,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Icon icon="eva:pricetags-outline" width={18} height={18} color={theme.palette.text.secondary} />
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                  标签:
+                  {t('modelpricePage.tags')}:
                 </Typography>
                 <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
                   {tags.map((tag, index) => (
@@ -226,38 +229,13 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Icon icon="eva:pricetags-outline" width={20} height={20} />
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              价格明细
+              {t('modelpricePage.priceDetails')}
             </Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-            不同分组,主要是根据对应的渠道来源不同,对应的价格也随之不同,渠道组需要在令牌管理中切换。
+            {t('modelpricePage.priceNote')}
           </Typography>
-
-          {/* 等级标签 */}
-          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              等级:
-            </Typography>
-            {Object.entries(userGroupMap || {}).map(([key, group]) => {
-              let tierLabel = 'Free';
-              if (group.ratio > 0) {
-                if (group.ratio < 1) tierLabel = `Tier 1`;
-                else if (group.ratio < 2) tierLabel = `Tier 2`;
-                else tierLabel = `Tier 3`;
-              }
-              const discount = group.ratio > 1 ? ` ${((group.ratio - 1) * 10).toFixed(0)} 折` : '';
-              return (
-                <Chip
-                  key={key}
-                  label={`${tierLabel}${discount}`}
-                  size="small"
-                  color={group.ratio === 0 ? 'default' : group.ratio > 1 ? 'warning' : 'success'}
-                  sx={{ fontWeight: 500 }}
-                />
-              );
-            })}
-          </Stack>
 
           {/* 价格表格 */}
           <TableContainer
@@ -270,10 +248,9 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ backgroundColor: theme.palette.mode === 'dark' ? alpha('#fff', 0.05) : alpha('#000', 0.02) }}>
-                  <TableCell sx={{ fontWeight: 600 }}>渠道组</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>输入</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>输出</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>其他价格</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('modelpricePage.group')}</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('modelpricePage.input')}</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{t('modelpricePage.output')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -294,21 +271,6 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
                         ${groupPrice.output}
                       </Label>
                     </TableCell>
-                    <TableCell>
-                      {groupPrice.extraRatios ? (
-                        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                          {Object.entries(groupPrice.extraRatios).map(([key, value]) => (
-                            <Label key={key} variant="outlined" color="info" sx={{ fontSize: '0.7rem' }}>
-                              {key}: ${value}
-                            </Label>
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          缓存
-                        </Typography>
-                      )}
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -322,14 +284,14 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
               <Icon icon="eva:bar-chart-outline" width={20} height={20} />
               <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                其他信息
+                {t('modelpricePage.otherInfo')}
               </Typography>
             </Stack>
             <Stack spacing={1}>
               {Object.entries(priceData.price.extra_ratios).map(([key, value]) => (
                 <Stack key={key} direction="row" alignItems="center" spacing={2}>
                   <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                    {key}:
+                    {t(`modelpricePage.${key}`)}:
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {value}

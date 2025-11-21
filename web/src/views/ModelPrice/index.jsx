@@ -111,13 +111,17 @@ export default function ModelPrice() {
   }, [fetchAvailableModels, fetchModelInfo, fetchUserGroupMap]);
 
   // 提取所有唯一标签
-  const allTags = [...new Set(Object.values(modelInfoMap).flatMap((info) => {
-    try {
-      return JSON.parse(info.tags || '[]');
-    } catch (e) {
-      return [];
-    }
-  }))];
+  const allTags = [
+    ...new Set(
+      Object.values(modelInfoMap).flatMap((info) => {
+        try {
+          return JSON.parse(info.tags || '[]');
+        } catch (e) {
+          return [];
+        }
+      })
+    )
+  ];
 
   // 过滤模型
   const filteredModels = Object.entries(availableModels)
@@ -191,11 +195,10 @@ export default function ModelPrice() {
           groupKey: key,
           input: hasGroupAccess ? (grp.ratio * model.price.input).toFixed(6) : '不可用',
           output: hasGroupAccess ? (grp.ratio * model.price.output).toFixed(6) : '不可用',
-          extraRatios: model.price.extra_ratios && hasGroupAccess
-            ? Object.fromEntries(
-              Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)])
-            )
-            : null
+          extraRatios:
+            model.price.extra_ratios && hasGroupAccess
+              ? Object.fromEntries(Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)]))
+              : null
         };
       });
 
@@ -277,7 +280,7 @@ export default function ModelPrice() {
           </Typography>
         </Fade>
         <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
-          模型定价
+          {t('modelpricePage.modelPricing')}
         </Typography>
       </Box>
 
@@ -328,7 +331,7 @@ export default function ModelPrice() {
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
-              Unit:
+              {t('modelpricePage.unit')}:
             </Typography>
             <ToggleButtonGroup
               value={unit}
@@ -464,7 +467,7 @@ export default function ModelPrice() {
             }}
           >
             <Icon icon="eva:layers-outline" width={18} height={18} />
-            模态类型
+            {t('modelpricePage.modalityType')}
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             <ButtonBase
@@ -490,7 +493,11 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.default, 0.5)
                         : theme.palette.background.default,
-                  border: `1px solid ${selectedModality === 'all' ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                  border: `1px solid ${selectedModality === 'all'
+                      ? theme.palette.primary.main
+                      : theme.palette.mode === 'dark'
+                        ? alpha('#fff', 0.08)
+                        : alpha('#000', 0.05)
                     }`,
                   boxShadow: selectedModality === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                 }}
@@ -509,7 +516,7 @@ export default function ModelPrice() {
                     fontSize: '0.8125rem'
                   }}
                 >
-                  全部
+                  {t('modelpricePage.allModality')}
                 </Typography>
               </Box>
             </ButtonBase>
@@ -540,12 +547,14 @@ export default function ModelPrice() {
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
                       border: `1px solid ${isSelected
-                        ? theme.palette[option.color]?.main || theme.palette.primary.main
-                        : theme.palette.mode === 'dark'
-                          ? alpha('#fff', 0.08)
-                          : alpha('#000', 0.05)
+                          ? theme.palette[option.color]?.main || theme.palette.primary.main
+                          : theme.palette.mode === 'dark'
+                            ? alpha('#fff', 0.08)
+                            : alpha('#000', 0.05)
                         }`,
-                      boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette[option.color]?.main || theme.palette.primary.main, 0.2)}` : 'none'
+                      boxShadow: isSelected
+                        ? `0 2px 8px ${alpha(theme.palette[option.color]?.main || theme.palette.primary.main, 0.2)}`
+                        : 'none'
                     }}
                   >
                     <Typography
@@ -580,7 +589,7 @@ export default function ModelPrice() {
               }}
             >
               <Icon icon="eva:pricetags-outline" width={18} height={18} />
-              标签
+              {t('modelpricePage.tags')}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               <ButtonBase
@@ -606,7 +615,11 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                    border: `1px solid ${selectedTag === 'all' ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                    border: `1px solid ${selectedTag === 'all'
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.08)
+                          : alpha('#000', 0.05)
                       }`,
                     boxShadow: selectedTag === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                   }}
@@ -625,7 +638,7 @@ export default function ModelPrice() {
                       fontSize: '0.8125rem'
                     }}
                   >
-                    全部
+                    {t('modelpricePage.allTags')}
                   </Typography>
                 </Box>
               </ButtonBase>
@@ -734,10 +747,10 @@ export default function ModelPrice() {
                         ? alpha(theme.palette.background.paper, 0.6)
                         : alpha(theme.palette.background.paper, 1),
                     border: `1px solid ${onlyShowAvailable
-                      ? theme.palette.primary.main
-                      : theme.palette.mode === 'dark'
-                        ? alpha('#fff', 0.1)
-                        : alpha('#000', 0.08)
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.1)
+                          : alpha('#000', 0.08)
                       }`,
                     borderRadius: '20px',
                     boxShadow: onlyShowAvailable
@@ -828,10 +841,10 @@ export default function ModelPrice() {
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
                         border: `1px solid ${isSelected
-                          ? theme.palette.primary.main
-                          : theme.palette.mode === 'dark'
-                            ? alpha('#fff', 0.08)
-                            : alpha('#000', 0.05)
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === 'dark'
+                              ? alpha('#fff', 0.08)
+                              : alpha('#000', 0.05)
                           }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                       }}
