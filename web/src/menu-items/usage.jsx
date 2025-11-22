@@ -29,6 +29,14 @@ const usage = {
       breadcrumbs: false
     },
     {
+      id: 'multi-user-stats',
+      title: '多用户令牌统计',
+      type: 'item',
+      url: '/panel/multi-user-stats',
+      icon: icons.IconList,
+      breadcrumbs: false
+    },
+    {
       id: 'midjourney',
       title: 'Midjourney',
       type: 'item',
