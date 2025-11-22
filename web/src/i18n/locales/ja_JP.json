@@ -784,7 +784,11 @@
     "unbound": "未連携",
     "bind": "連携",
     "unbind": "解除",
-    "change": "変更"
+    "change": "変更",
+    "unbindSuccess": "解除成功",
+    "unbindConfirm": "解除確認",
+    "unbindWarning": "本当に解除しますか？解除後はこの方法でログインできなくなります。",
+    "cancel": "キャンセル"
   },
   "redemption": "引き換え",
   "redemptionPage": {

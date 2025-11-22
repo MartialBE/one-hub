@@ -598,7 +598,11 @@
     "unbound": "未绑定",
     "bind": "绑定",
     "unbind": "解绑",
-    "change": "更换"
+    "change": "更换",
+    "unbindSuccess": "解绑成功",
+    "unbindConfirm": "确认解绑",
+    "unbindWarning": "您确定要解除绑定吗？解绑后您将无法使用该方式登录。",
+    "cancel": "取消"
   },
   "pricingPage": {
     "title": "模型价格",

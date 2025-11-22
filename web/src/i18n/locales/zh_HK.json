@@ -785,7 +785,11 @@
     "unbound": "未綁定",
     "bind": "綁定",
     "unbind": "解綁",
-    "change": "更換"
+    "change": "更換",
+    "unbindSuccess": "解綁成功",
+    "unbindConfirm": "確認解綁",
+    "unbindWarning": "您確定要解除綁定嗎？解綁後您將無法使用該方式登錄。",
+    "cancel": "取消"
   },
   "redemption": "兌換",
   "redemptionPage": {

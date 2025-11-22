@@ -101,6 +101,8 @@ export default function Profile() {
   const [loadingWebAuthn, setLoadingWebAuthn] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [credentialToDelete, setCredentialToDelete] = useState(null);
+  const [openUnbindDialog, setOpenUnbindDialog] = useState(false);
+  const [unbindType, setUnbindType] = useState('');
   const [userGroupMap, setUserGroupMap] = useState({});
   const status = useSelector((state) => state.siteInfo);
   const account = useSelector((state) => state.account);
@@ -243,6 +245,28 @@ export default function Profile() {
     } catch (err) {
       // 请求失败，设置错误信息
       return { success: false, message: '' };
+    }
+  };
+
+  const handleUnbind = (type) => {
+    setUnbindType(type);
+    setOpenUnbindDialog(true);
+  };
+
+  const confirmUnbind = async () => {
+    try {
+      const res = await API.post(`/api/user/unbind`, { type: unbindType });
+      const { success, message } = res.data;
+      if (success) {
+        showSuccess(t('profilePage.unbindSuccess'));
+        await loadUser();
+      } else {
+        showError(message);
+      }
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setOpenUnbindDialog(false);
     }
   };
 
@@ -448,7 +472,11 @@ export default function Profile() {
                     secondary={inputs.wechat_id ? `${t('profilePage.bound')}: ${inputs.wechat_id}` : t('profilePage.unbound')}
                   />
                   <ListItemSecondaryAction>
-                    {!inputs.wechat_id && (
+                    {inputs.wechat_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('wechat')}>
+                        {t('profilePage.unbind')}
+                      </Button>
+                    ) : (
                       <Button variant="outlined" onClick={handleWechatOpen}>
                         {t('profilePage.bind')}
                       </Button>
@@ -468,7 +496,11 @@ export default function Profile() {
                     secondary={inputs.github_id ? `${t('profilePage.bound')}: ${inputs.github_id}` : t('profilePage.unbound')}
                   />
                   <ListItemSecondaryAction>
-                    {!inputs.github_id && (
+                    {inputs.github_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('github')}>
+                        {t('profilePage.unbind')}
+                      </Button>
+                    ) : (
                       <Button variant="outlined" onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}>
                         {t('profilePage.bind')}
                       </Button>
@@ -486,7 +518,11 @@ export default function Profile() {
                     secondary={inputs.lark_id ? `${t('profilePage.bound')}: ${inputs.lark_id}` : t('profilePage.unbound')}
                   />
                   <ListItemSecondaryAction>
-                    {!inputs.lark_id && (
+                    {inputs.lark_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('lark')}>
+                        {t('profilePage.unbind')}
+                      </Button>
+                    ) : (
                       <Button variant="outlined" onClick={() => onLarkOAuthClicked(status.lark_client_id)}>
                         {t('profilePage.bind')}
                       </Button>
@@ -506,7 +542,11 @@ export default function Profile() {
                     secondary={inputs.oidc_id ? `${t('profilePage.bound')}: ${inputs.oidc_id}` : t('profilePage.unbound')}
                   />
                   <ListItemSecondaryAction>
-                    {/* OIDC binding logic can be added here if needed */}
+                    {inputs.oidc_id && (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('oidc')}>
+                        {t('profilePage.unbind')}
+                      </Button>
+                    )}
                   </ListItemSecondaryAction>
                 </ListItem>
               )}
@@ -704,6 +744,27 @@ export default function Profile() {
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
             删除
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openUnbindDialog}
+        onClose={() => setOpenUnbindDialog(false)}
+        aria-labelledby="unbind-dialog-title"
+        aria-describedby="unbind-dialog-description"
+      >
+        <DialogTitle id="unbind-dialog-title">{t('profilePage.unbindConfirm')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="unbind-dialog-description">
+            {t('profilePage.unbindWarning')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenUnbindDialog(false)} color="primary">
+            {t('profilePage.cancel')}
+          </Button>
+          <Button onClick={confirmUnbind} color="error" variant="contained">
+            {t('profilePage.unbind')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -796,7 +796,11 @@
     "unbound": "Unbound",
     "bind": "Bind",
     "unbind": "Unbind",
-    "change": "Change"
+    "change": "Change",
+    "unbindSuccess": "Unbind successful",
+    "unbindConfirm": "Confirm Unbind",
+    "unbindWarning": "Are you sure you want to unbind? You will not be able to log in using this method after unbinding.",
+    "cancel": "Cancel"
   },
   "redemption": "Redemption",
   "redemptionPage": {
