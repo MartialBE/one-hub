@@ -93,7 +93,7 @@ export default function ModelDetailModal({ open, onClose, model, provider, model
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                   {model}
                 </Typography>
-                <IconButton size="small" onClick={() => copy(model, '模型标识')} sx={{ p: 0.5 }}>
+                <IconButton size="small" onClick={() => copy(model, t('modelpricePage.modelId'))} sx={{ p: 0.5 }}>
                   <Icon icon="eva:copy-outline" width={16} height={16} />
                 </IconButton>
               </Stack>
