@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
@@ -14,7 +14,8 @@ import {
   Avatar,
   ButtonBase,
   Tooltip,
-  Grid
+  Grid,
+  Pagination
 } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { API } from 'utils/api';
@@ -43,6 +44,8 @@ export default function ModelPrice() {
   const [selectedTag, setSelectedTag] = useState('all');
   const [unit, setUnit] = useState('K');
   const [onlyShowAvailable, setOnlyShowAvailable] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 24;
 
   // 详情对话框状态
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -140,102 +143,120 @@ export default function ModelPrice() {
   };
 
   // 过滤模型
-  const filteredModels = Object.entries(availableModels)
-    .filter(([modelName, model]) => {
-      // 供应商筛选
-      if (selectedOwnedBy !== 'all' && model.owned_by !== selectedOwnedBy) return false;
+  const filteredModels = useMemo(() => {
+    return Object.entries(availableModels)
+      .filter(([modelName, model]) => {
+        // 供应商筛选
+        if (selectedOwnedBy !== 'all' && model.owned_by !== selectedOwnedBy) return false;
 
-      // 仅显示可用
-      if (onlyShowAvailable && !model.groups.includes(selectedGroup)) return false;
+        // 仅显示可用
+        if (onlyShowAvailable && !model.groups.includes(selectedGroup)) return false;
 
-      // 搜索
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const modelInfo = modelInfoMap[modelName];
-        const matchModel = modelName.toLowerCase().includes(query);
-        const matchDescription = modelInfo?.description?.toLowerCase().includes(query);
-        if (!matchModel && !matchDescription) return false;
-      }
+        // 搜索
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          const modelInfo = modelInfoMap[modelName];
+          const matchModel = modelName.toLowerCase().includes(query);
+          const matchDescription = modelInfo?.description?.toLowerCase().includes(query);
+          if (!matchModel && !matchDescription) return false;
+        }
 
-      // 模态筛选
-      if (selectedModality !== 'all') {
-        const modelInfo = modelInfoMap[modelName];
-        if (modelInfo) {
-          try {
-            const inputModalities = JSON.parse(modelInfo.input_modalities || '[]');
-            const outputModalities = JSON.parse(modelInfo.output_modalities || '[]');
-            if (!inputModalities.includes(selectedModality) && !outputModalities.includes(selectedModality)) {
+        // 模态筛选
+        if (selectedModality !== 'all') {
+          const modelInfo = modelInfoMap[modelName];
+          if (modelInfo) {
+            try {
+              const inputModalities = JSON.parse(modelInfo.input_modalities || '[]');
+              const outputModalities = JSON.parse(modelInfo.output_modalities || '[]');
+              if (!inputModalities.includes(selectedModality) && !outputModalities.includes(selectedModality)) {
+                return false;
+              }
+            } catch (e) {
               return false;
             }
-          } catch (e) {
+          } else {
             return false;
           }
-        } else {
-          return false;
         }
-      }
 
-      // 标签筛选
-      if (selectedTag !== 'all') {
-        const modelInfo = modelInfoMap[modelName];
-        if (modelInfo) {
-          try {
-            const tags = JSON.parse(modelInfo.tags || '[]');
-            if (!tags.includes(selectedTag)) return false;
-          } catch (e) {
+        // 标签筛选
+        if (selectedTag !== 'all') {
+          const modelInfo = modelInfoMap[modelName];
+          if (modelInfo) {
+            try {
+              const tags = JSON.parse(modelInfo.tags || '[]');
+              if (!tags.includes(selectedTag)) return false;
+            } catch (e) {
+              return false;
+            }
+          } else {
             return false;
           }
-        } else {
-          return false;
         }
-      }
 
-      return true;
-    })
-    .map(([modelName, model]) => {
-      const group = userGroupMap[selectedGroup];
-      const hasAccess = model.groups.includes(selectedGroup);
-      const price = hasAccess
-        ? {
-          input: group.ratio * model.price.input,
-          output: group.ratio * model.price.output
-        }
-        : { input: t('modelpricePage.noneGroup'), output: t('modelpricePage.noneGroup') };
+        return true;
+      })
+      .map(([modelName, model]) => {
+        const group = userGroupMap[selectedGroup];
+        const hasAccess = model.groups.includes(selectedGroup);
+        const price = hasAccess
+          ? {
+            input: group.ratio * model.price.input,
+            output: group.ratio * model.price.output
+          }
+          : { input: t('modelpricePage.noneGroup'), output: t('modelpricePage.noneGroup') };
 
-      // 计算所有用户组的价格F
-      const allGroupPrices = Object.entries(userGroupMap).map(([key, grp]) => {
-        const hasGroupAccess = model.groups.includes(key);
+        // 计算所有用户组的价格F
+        const allGroupPrices = Object.entries(userGroupMap).map(([key, grp]) => {
+          const hasGroupAccess = model.groups.includes(key);
+          return {
+            groupName: grp.name,
+            groupKey: key,
+            input: hasGroupAccess ? grp.ratio * model.price.input : 0,
+            output: hasGroupAccess ? grp.ratio * model.price.output : 0,
+            type: model.price.type,
+            extraRatios:
+              model.price.extra_ratios && hasGroupAccess
+                ? Object.fromEntries(Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)]))
+                : null
+          };
+        });
+
         return {
-          groupName: grp.name,
-          groupKey: key,
-          input: hasGroupAccess ? grp.ratio * model.price.input : 0,
-          output: hasGroupAccess ? grp.ratio * model.price.output : 0,
+          model: modelName,
+          provider: model.owned_by,
+          modelInfo: modelInfoMap[modelName],
+          price,
+          group: hasAccess ? group : null,
           type: model.price.type,
-          extraRatios:
-            model.price.extra_ratios && hasGroupAccess
-              ? Object.fromEntries(Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)]))
-              : null
+          priceData: {
+            price: model.price,
+            allGroupPrices
+          }
         };
+      })
+      .sort((a, b) => {
+        const ownerA = ownedby?.find((item) => item.name === a.provider);
+        const ownerB = ownedby?.find((item) => item.name === b.provider);
+        return (ownerA?.id || 0) - (ownerB?.id || 0);
       });
+  }, [availableModels, selectedOwnedBy, onlyShowAvailable, selectedGroup, searchQuery, modelInfoMap, selectedModality, selectedTag, userGroupMap, ownedby, t, unit]);
 
-      return {
-        model: modelName,
-        provider: model.owned_by,
-        modelInfo: modelInfoMap[modelName],
-        price,
-        group: hasAccess ? group : null,
-        type: model.price.type,
-        priceData: {
-          price: model.price,
-          allGroupPrices
-        }
-      };
-    })
-    .sort((a, b) => {
-      const ownerA = ownedby?.find((item) => item.name === a.provider);
-      const ownerB = ownedby?.find((item) => item.name === b.provider);
-      return (ownerA?.id || 0) - (ownerB?.id || 0);
-    });
+  // 分页处理
+  const paginatedModels = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredModels.slice(startIndex, startIndex + pageSize);
+  }, [filteredModels, page, pageSize]);
+
+  // 重置页码
+  useEffect(() => {
+    setPage(1);
+  }, [selectedOwnedBy, selectedGroup, searchQuery, selectedModality, selectedTag, onlyShowAvailable]);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleOwnedByChange = (newValue) => {
     setSelectedOwnedBy(newValue);
@@ -948,24 +969,35 @@ export default function ModelPrice() {
           共 {filteredModels.length} 个模型
         </Typography>
         {filteredModels.length > 0 ? (
-          <Grid container spacing={3}>
-            {filteredModels.map((model) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={model.model}>
-                <ModelCard
-                  model={model.model}
-                  provider={model.provider}
-                  modelInfo={model.modelInfo}
-                  price={model.price}
-                  group={model.group}
-                  ownedbyIcon={getIconByName(model.provider)}
-                  unit={unit}
-                  type={model.type}
-                  formatPrice={formatPrice}
-                  onViewDetail={() => handleViewDetail(model)}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container spacing={3}>
+              {paginatedModels.map((model) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={model.model}>
+                  <ModelCard
+                    model={model.model}
+                    provider={model.provider}
+                    modelInfo={model.modelInfo}
+                    price={model.price}
+                    group={model.group}
+                    ownedbyIcon={getIconByName(model.provider)}
+                    unit={unit}
+                    type={model.type}
+                    formatPrice={formatPrice}
+                    onViewDetail={() => handleViewDetail(model)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Pagination
+                count={Math.ceil(filteredModels.length / pageSize)}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                size={isMobile ? 'small' : 'medium'}
+              />
+            </Box>
+          </>
         ) : (
           <Card
             sx={{
