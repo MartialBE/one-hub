@@ -30,13 +30,14 @@ import {
 } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { API } from 'utils/api';
-import { showError, ValueFormatter } from 'utils/common';
+import { showError, ValueFormatter, copy, showSuccess } from 'utils/common';
 import { useTheme } from '@mui/material/styles';
 import CustomToggleButtonGroup from 'ui-component/ToggleButton';
 import { alpha } from '@mui/material/styles';
 import ModelCard from './component/ModelCard';
 import ModelDetailModal from './component/ModelDetailModal';
 import { MODALITY_OPTIONS } from 'constants/Modality';
+import Label from 'ui-component/Label';
 
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
@@ -229,6 +230,7 @@ export default function ModelPrice() {
             input: hasGroupAccess ? grp.ratio * model.price.input : 0,
             output: hasGroupAccess ? grp.ratio * model.price.output : 0,
             type: model.price.type,
+            ratio: grp.ratio,
             extraRatios:
               model.price.extra_ratios && hasGroupAccess
                 ? Object.fromEntries(Object.entries(model.price.extra_ratios).map(([k, v]) => [k, (grp.ratio * v).toFixed(6)]))
@@ -320,6 +322,15 @@ export default function ModelPrice() {
     return owner?.icon;
   };
 
+  const getTags = (tagsJson) => {
+    if (!tagsJson) return [];
+    try {
+      return JSON.parse(tagsJson);
+    } catch (e) {
+      return [];
+    }
+  };
+
   const clearSearch = () => {
     setSearchQuery('');
   };
@@ -374,7 +385,7 @@ export default function ModelPrice() {
                   backgroundColor: alpha(theme.palette.primary.main, 0.1),
                   color: theme.palette.primary.main,
                   '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.2)
                   }
                 }
               }
@@ -513,8 +524,9 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                        }`,
+                      border: `1px solid ${
+                        isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                      }`,
                       boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                     }}
                   >
@@ -599,12 +611,13 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.default, 0.5)
                         : theme.palette.background.default,
-                  border: `1px solid ${selectedModality === 'all'
-                    ? theme.palette.primary.main
-                    : theme.palette.mode === 'dark'
-                      ? alpha('#fff', 0.08)
-                      : alpha('#000', 0.05)
-                    }`,
+                  border: `1px solid ${
+                    selectedModality === 'all'
+                      ? theme.palette.primary.main
+                      : theme.palette.mode === 'dark'
+                        ? alpha('#fff', 0.08)
+                        : alpha('#000', 0.05)
+                  }`,
                   boxShadow: selectedModality === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                 }}
               >
@@ -652,12 +665,13 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${isSelected
-                        ? theme.palette[option.color]?.main || theme.palette.primary.main
-                        : theme.palette.mode === 'dark'
-                          ? alpha('#fff', 0.08)
-                          : alpha('#000', 0.05)
-                        }`,
+                      border: `1px solid ${
+                        isSelected
+                          ? theme.palette[option.color]?.main || theme.palette.primary.main
+                          : theme.palette.mode === 'dark'
+                            ? alpha('#fff', 0.08)
+                            : alpha('#000', 0.05)
+                      }`,
                       boxShadow: isSelected
                         ? `0 2px 8px ${alpha(theme.palette[option.color]?.main || theme.palette.primary.main, 0.2)}`
                         : 'none'
@@ -721,12 +735,13 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                    border: `1px solid ${selectedTag === 'all'
-                      ? theme.palette.primary.main
-                      : theme.palette.mode === 'dark'
-                        ? alpha('#fff', 0.08)
-                        : alpha('#000', 0.05)
-                      }`,
+                    border: `1px solid ${
+                      selectedTag === 'all'
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.08)
+                          : alpha('#000', 0.05)
+                    }`,
                     boxShadow: selectedTag === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                   }}
                 >
@@ -774,8 +789,9 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                          }`,
+                        border: `1px solid ${
+                          isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                        }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.info.main, 0.2)}` : 'none'
                       }}
                     >
@@ -852,12 +868,13 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.paper, 0.6)
                         : alpha(theme.palette.background.paper, 1),
-                    border: `1px solid ${onlyShowAvailable
-                      ? theme.palette.primary.main
-                      : theme.palette.mode === 'dark'
-                        ? alpha('#fff', 0.1)
-                        : alpha('#000', 0.08)
-                      }`,
+                    border: `1px solid ${
+                      onlyShowAvailable
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.1)
+                          : alpha('#000', 0.08)
+                    }`,
                     borderRadius: '20px',
                     boxShadow: onlyShowAvailable
                       ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`
@@ -946,12 +963,13 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${isSelected
-                          ? theme.palette.primary.main
-                          : theme.palette.mode === 'dark'
-                            ? alpha('#fff', 0.08)
-                            : alpha('#000', 0.05)
-                          }`,
+                        border: `1px solid ${
+                          isSelected
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === 'dark'
+                              ? alpha('#fff', 0.08)
+                              : alpha('#000', 0.05)
+                        }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                       }}
                     >
@@ -1054,8 +1072,8 @@ export default function ModelPrice() {
                       <TableCell>{t('modelpricePage.modelName')}</TableCell>
                       <TableCell align="center">{t('modelpricePage.type')}</TableCell>
                       <TableCell align="center">{t('modelpricePage.provider')}</TableCell>
-                      <TableCell align="center">{t('modelpricePage.inputPrice')}</TableCell>
-                      <TableCell align="center">{t('modelpricePage.outputPrice')}</TableCell>
+                      <TableCell align="left">{t('modelpricePage.inputPrice')}</TableCell>
+                      <TableCell align="left">{t('modelpricePage.outputPrice')}</TableCell>
                       <TableCell align="center">{t('common.action')}</TableCell>
                     </TableRow>
                   </TableHead>
@@ -1063,23 +1081,36 @@ export default function ModelPrice() {
                     {paginatedModels.map((model) => (
                       <TableRow key={model.model} hover>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Avatar
-                              src={getIconByName(model.provider)}
-                              alt={model.provider}
-                              sx={{
-                                width: 24,
-                                height: 24,
-                                backgroundColor: '#fff',
-                                '& .MuiAvatar-img': {
-                                  objectFit: 'contain',
-                                  padding: '2px'
-                                }
-                              }}
-                            />
-                            <Typography variant="body2" fontWeight="bold">
-                              {model.model}
-                            </Typography>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1rem' }}>
+                                {model.model}
+                              </Typography>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  copy(model.model, t('modelpricePage.modelName'));
+                                }}
+                                sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                              >
+                                <Icon icon="eva:copy-outline" width={16} height={16} />
+                              </IconButton>
+                              {getTags(model.modelInfo?.tags).some((t) => t.toLowerCase() === 'hot') && (
+                                <Label variant="soft" color="error" startIcon={<Icon icon="mdi:fire" />} sx={{ ml: 0.5 }}>
+                                  HOT
+                                </Label>
+                              )}
+                            </Box>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                              {getTags(model.modelInfo?.tags).map(
+                                (tag) =>
+                                  tag.toLowerCase() !== 'hot' && (
+                                    <Label key={tag} variant="soft" color="default">
+                                      {tag}
+                                    </Label>
+                                  )
+                              )}
+                            </Box>
                           </Box>
                         </TableCell>
                         <TableCell align="center">
@@ -1114,34 +1145,58 @@ export default function ModelPrice() {
                                 }
                               }}
                             />
-                            {model.provider}
+                            <Typography variant="body2">{model.provider}</Typography>
                           </Box>
                         </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" color="text.secondary">
-                            {model.type === 'tokens' ? (
-                              <>
-                                {formatPrice(model.price.input, 'tokens')}
-                              </>
-                            ) : (
-                              <>
-                                {formatPrice(model.price.input, 'times')} / {t('modelpricePage.timeUnit')}
-                              </>
-                            )}
-                          </Typography>
+                        <TableCell align="left">
+                          <Stack spacing={0.5}>
+                            {model.priceData.allGroupPrices.map((groupPrice) => (
+                              <Box key={groupPrice.groupKey} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ minWidth: 40 }}>
+                                  {groupPrice.groupName}:
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color='success.main'
+                                  fontWeight="bold"
+                                >
+                                  {groupPrice.input > 0
+                                    ? formatPrice(groupPrice.input, model.type === 'tokens' ? 'tokens' : 'times')
+                                    : t('modelpricePage.free')}
+                                </Typography>
+                                {groupPrice.input > 0 && (
+                                  <Typography variant="caption" color="success.main">
+                                    (x{groupPrice.ratio})
+                                  </Typography>
+                                )}
+                              </Box>
+                            ))}
+                          </Stack>
                         </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" color="text.secondary">
-                            {model.type === 'tokens' ? (
-                              <>
-                                {formatPrice(model.price.output, 'tokens')}
-                              </>
-                            ) : (
-                              <>
-                                {formatPrice(model.price.output, 'times')} / {t('modelpricePage.timeUnit')}
-                              </>
-                            )}
-                          </Typography>
+                        <TableCell align="left">
+                          <Stack spacing={0.5}>
+                            {model.priceData.allGroupPrices.map((groupPrice) => (
+                              <Box key={groupPrice.groupKey} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ minWidth: 40 }}>
+                                  {groupPrice.groupName}:
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color= 'success.main'
+                                  fontWeight="bold"
+                                >
+                                  {groupPrice.output > 0
+                                    ? formatPrice(groupPrice.output, model.type === 'tokens' ? 'tokens' : 'times')
+                                    : t('modelpricePage.free')}
+                                </Typography>
+                                {groupPrice.output > 0 && (
+                                  <Typography variant="caption" color="success.main">
+                                    (x{groupPrice.ratio})
+                                  </Typography>
+                                )}
+                              </Box>
+                            ))}
+                          </Stack>
                         </TableCell>
                         <TableCell align="center">
                           <IconButton onClick={() => handleViewDetail(model)} size="small">
