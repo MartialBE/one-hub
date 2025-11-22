@@ -70,8 +70,8 @@ const ImportModal = ({ open, onCancel, onOk, existingModels = [] }) => {
             description: modelInfo.description || '',
             context_length: modelInfo.context_length || 0, // 默认值
             max_tokens: modelInfo.max_tokens || 0,
-            input_modalities: JSON.stringify(modelInfo.input_modalities || ['text']),
-            output_modalities: JSON.stringify(modelInfo.output_modalities || ['text']),
+            input_modalities: JSON.stringify(modelInfo.input_modalities || []),
+            output_modalities: JSON.stringify(modelInfo.output_modalities || []),
             tags: JSON.stringify(modelInfo.tags || []),
             isConflict: existingModels.includes(modelInfo.model || item.model)
           };
