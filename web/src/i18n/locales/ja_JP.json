@@ -769,7 +769,8 @@
     "alias": "エイリアス:",
     "credentialId": "認証情報ID:",
     "registerTime": "登録日時:",
-    "delete": "削除"
+    "delete": "削除",
+    "noWebauthnCredentials": "WebAuthn 資格情報が見つかりません"
   },
   "redemption": "引き換え",
   "redemptionPage": {

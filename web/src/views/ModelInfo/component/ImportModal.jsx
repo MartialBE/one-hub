@@ -484,7 +484,7 @@ const ImportModal = ({ open, onCancel, onOk, existingModels = [] }) => {
           <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
             <Icon icon="solar:cloud-download-linear" width={48} style={{ opacity: 0.5 }} />
             <Typography variant="body2" sx={{ mt: 1 }}>
-              输入 JSON URL 并点击"获取数据"开始
+              输入JSON URL并点击&quot;获取数据&quot;开始
             </Typography>
           </Box>
         )}

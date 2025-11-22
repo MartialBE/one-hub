@@ -583,7 +583,8 @@
     "alias": "别名:",
     "credentialId": "凭据 ID:",
     "registerTime": "注册时间:",
-    "delete": "删除"
+    "delete": "删除",
+    "noWebauthnCredentials": "未找到 WebAuthn 凭据"
   },
   "pricingPage": {
     "title": "模型价格",

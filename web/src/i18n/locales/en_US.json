@@ -781,7 +781,8 @@
     "alias": "Alias:",
     "credentialId": "Credential ID:",
     "registerTime": "Register Time:",
-    "delete": "Delete"
+    "delete": "Delete",
+    "noWebauthnCredentials": "No WebAuthn credentials found"
   },
   "redemption": "Redemption",
   "redemptionPage": {

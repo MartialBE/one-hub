@@ -770,7 +770,8 @@
     "alias": "別名:",
     "credentialId": "憑證 ID:",
     "registerTime": "註冊時間:",
-    "delete": "刪除"
+    "delete": "刪除",
+    "noWebauthnCredentials": "未找到 WebAuthn 憑證"
   },
   "redemption": "兌換",
   "redemptionPage": {
