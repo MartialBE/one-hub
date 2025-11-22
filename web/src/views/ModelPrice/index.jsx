@@ -197,9 +197,9 @@ export default function ModelPrice() {
       const hasAccess = model.groups.includes(selectedGroup);
       const price = hasAccess
         ? {
-            input: group.ratio * model.price.input,
-            output: group.ratio * model.price.output
-          }
+          input: group.ratio * model.price.input,
+          output: group.ratio * model.price.output
+        }
         : { input: t('modelpricePage.noneGroup'), output: t('modelpricePage.noneGroup') };
 
       // 计算所有用户组的价格F
@@ -230,6 +230,11 @@ export default function ModelPrice() {
           allGroupPrices
         }
       };
+    })
+    .sort((a, b) => {
+      const ownerA = ownedby?.find((item) => item.name === a.provider);
+      const ownerB = ownedby?.find((item) => item.name === b.provider);
+      return (ownerA?.id || 0) - (ownerB?.id || 0);
     });
 
   const handleOwnedByChange = (newValue) => {
@@ -254,7 +259,14 @@ export default function ModelPrice() {
     setOnlyShowAvailable((prev) => !prev);
   };
 
-  const uniqueOwnedBy = ['all', ...new Set(Object.values(availableModels).map((model) => model.owned_by))];
+  const uniqueOwnedBy = [
+    'all',
+    ...[...new Set(Object.values(availableModels).map((model) => model.owned_by))].sort((a, b) => {
+      const ownerA = ownedby?.find((item) => item.name === a);
+      const ownerB = ownedby?.find((item) => item.name === b);
+      return (ownerA?.id || 0) - (ownerB?.id || 0);
+    })
+  ];
 
   const getIconByName = (name) => {
     if (name === 'all') return null;
@@ -423,9 +435,8 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${
-                        isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                      }`,
+                      border: `1px solid ${isSelected ? theme.palette.primary.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                        }`,
                       boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                     }}
                   >
@@ -510,13 +521,12 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.default, 0.5)
                         : theme.palette.background.default,
-                  border: `1px solid ${
-                    selectedModality === 'all'
-                      ? theme.palette.primary.main
-                      : theme.palette.mode === 'dark'
-                        ? alpha('#fff', 0.08)
-                        : alpha('#000', 0.05)
-                  }`,
+                  border: `1px solid ${selectedModality === 'all'
+                    ? theme.palette.primary.main
+                    : theme.palette.mode === 'dark'
+                      ? alpha('#fff', 0.08)
+                      : alpha('#000', 0.05)
+                    }`,
                   boxShadow: selectedModality === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                 }}
               >
@@ -564,13 +574,12 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                      border: `1px solid ${
-                        isSelected
-                          ? theme.palette[option.color]?.main || theme.palette.primary.main
-                          : theme.palette.mode === 'dark'
-                            ? alpha('#fff', 0.08)
-                            : alpha('#000', 0.05)
-                      }`,
+                      border: `1px solid ${isSelected
+                        ? theme.palette[option.color]?.main || theme.palette.primary.main
+                        : theme.palette.mode === 'dark'
+                          ? alpha('#fff', 0.08)
+                          : alpha('#000', 0.05)
+                        }`,
                       boxShadow: isSelected
                         ? `0 2px 8px ${alpha(theme.palette[option.color]?.main || theme.palette.primary.main, 0.2)}`
                         : 'none'
@@ -634,13 +643,12 @@ export default function ModelPrice() {
                         : theme.palette.mode === 'dark'
                           ? alpha(theme.palette.background.default, 0.5)
                           : theme.palette.background.default,
-                    border: `1px solid ${
-                      selectedTag === 'all'
-                        ? theme.palette.primary.main
-                        : theme.palette.mode === 'dark'
-                          ? alpha('#fff', 0.08)
-                          : alpha('#000', 0.05)
-                    }`,
+                    border: `1px solid ${selectedTag === 'all'
+                      ? theme.palette.primary.main
+                      : theme.palette.mode === 'dark'
+                        ? alpha('#fff', 0.08)
+                        : alpha('#000', 0.05)
+                      }`,
                     boxShadow: selectedTag === 'all' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                   }}
                 >
@@ -662,7 +670,7 @@ export default function ModelPrice() {
                   </Typography>
                 </Box>
               </ButtonBase>
-              {allTags.slice(0, 10).map((tag) => {
+              {allTags.map((tag) => {
                 const isSelected = selectedTag === tag;
                 return (
                   <ButtonBase
@@ -688,9 +696,8 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${
-                          isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
-                        }`,
+                        border: `1px solid ${isSelected ? theme.palette.info.main : theme.palette.mode === 'dark' ? alpha('#fff', 0.08) : alpha('#000', 0.05)
+                          }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.info.main, 0.2)}` : 'none'
                       }}
                     >
@@ -767,13 +774,12 @@ export default function ModelPrice() {
                       : theme.palette.mode === 'dark'
                         ? alpha(theme.palette.background.paper, 0.6)
                         : alpha(theme.palette.background.paper, 1),
-                    border: `1px solid ${
-                      onlyShowAvailable
-                        ? theme.palette.primary.main
-                        : theme.palette.mode === 'dark'
-                          ? alpha('#fff', 0.1)
-                          : alpha('#000', 0.08)
-                    }`,
+                    border: `1px solid ${onlyShowAvailable
+                      ? theme.palette.primary.main
+                      : theme.palette.mode === 'dark'
+                        ? alpha('#fff', 0.1)
+                        : alpha('#000', 0.08)
+                      }`,
                     borderRadius: '20px',
                     boxShadow: onlyShowAvailable
                       ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`
@@ -862,13 +868,12 @@ export default function ModelPrice() {
                           : theme.palette.mode === 'dark'
                             ? alpha(theme.palette.background.default, 0.5)
                             : theme.palette.background.default,
-                        border: `1px solid ${
-                          isSelected
-                            ? theme.palette.primary.main
-                            : theme.palette.mode === 'dark'
-                              ? alpha('#fff', 0.08)
-                              : alpha('#000', 0.05)
-                        }`,
+                        border: `1px solid ${isSelected
+                          ? theme.palette.primary.main
+                          : theme.palette.mode === 'dark'
+                            ? alpha('#fff', 0.08)
+                            : alpha('#000', 0.05)
+                          }`,
                         boxShadow: isSelected ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
                       }}
                     >

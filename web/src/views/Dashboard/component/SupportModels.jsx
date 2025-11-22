@@ -32,7 +32,11 @@ const SupportModels = () => {
       Object.values(modelGroup).forEach((models) => models.sort());
 
       const sortedModelGroup = Object.keys(modelGroup)
-        .sort()
+        .sort((a, b) => {
+          const ownerA = ownedby?.find((item) => item.name === a);
+          const ownerB = ownedby?.find((item) => item.name === b);
+          return (ownerA?.id || 0) - (ownerB?.id || 0);
+        })
         .reduce((acc, key) => {
           acc[key] = modelGroup[key];
           return acc;
