@@ -133,10 +133,11 @@ export async function onOIDCAuthClicked(openInNewTab = false) {
   }
 }
 export async function onWebAuthnClicked(username, showError, showSuccess, navigateToStatus) {
-  if (!username || username.trim() === '') {
-    showError('请先输入用户名');
-    return;
-  }
+  // Remove username check to support discoverable login
+  // if (!username || username.trim() === '') {
+  //   showError('请先输入用户名');
+  //   return;
+  // }
 
   try {
     // 检查浏览器是否支持WebAuthn
@@ -197,7 +198,7 @@ export async function onWebAuthnClicked(username, showError, showSuccess, naviga
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username: username.trim() })
+      body: JSON.stringify({ username: username ? username.trim() : '' })
     });
 
     const beginData = await beginResponse.json();

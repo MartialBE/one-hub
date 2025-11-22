@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"one-api/common/webauthn"
 	"one-api/model"
@@ -162,7 +163,7 @@ func WebauthnBeginLogin(c *gin.Context) {
 
 	// 从请求中获取用户名
 	type LoginRequest struct {
-		Username string `json:"username" binding:"required"`
+		Username string `json:"username"`
 	}
 
 	var req LoginRequest
@@ -174,30 +175,48 @@ func WebauthnBeginLogin(c *gin.Context) {
 		return
 	}
 
-	var user = model.User{
-		Username: req.Username,
-	}
-	// 根据用户名获取用户
-	err = user.FillUserByUsername()
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "登陆失败",
-			"success": false,
-		})
-		return
-	}
+	var options interface{}
+	var session *wauth.SessionData
 
-	options, session, err := webauthnInstance.BeginLogin(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "无法开始登录: " + err.Error(),
-			"success": false,
-		})
-		return
+	sess := sessions.Default(c)
+
+	if req.Username == "" {
+		// 无用户名登录 (Discoverable Login)
+		options, session, err = webauthnInstance.BeginDiscoverableLogin()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "无法开始无用户名登录: " + err.Error(),
+				"success": false,
+			})
+			return
+		}
+		sess.Delete("webauthn_user_id")
+	} else {
+		var user = model.User{
+			Username: req.Username,
+		}
+		// 根据用户名获取用户
+		err = user.FillUserByUsername()
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "登陆失败",
+				"success": false,
+			})
+			return
+		}
+
+		options, session, err = webauthnInstance.BeginLogin(&user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "无法开始登录: " + err.Error(),
+				"success": false,
+			})
+			return
+		}
+		sess.Set("webauthn_user_id", strconv.Itoa(user.Id))
 	}
 
 	// 将session存储到用户会话中
-	sess := sessions.Default(c)
 	sessionData, err := json.Marshal(session)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -207,7 +226,6 @@ func WebauthnBeginLogin(c *gin.Context) {
 		return
 	}
 	sess.Set("webauthn_login_session", string(sessionData))
-	sess.Set("webauthn_user_id", strconv.Itoa(user.Id))
 	sess.Save()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -232,27 +250,9 @@ func WebauthnFinishLogin(c *gin.Context) {
 	sessionDataStr := sess.Get("webauthn_login_session")
 	userIdStr := sess.Get("webauthn_user_id")
 
-	if sessionDataStr == nil || userIdStr == nil {
+	if sessionDataStr == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "会话已过期",
-			"success": false,
-		})
-		return
-	}
-
-	userId, err := strconv.Atoi(userIdStr.(string))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "登陆失败",
-			"success": false,
-		})
-		return
-	}
-
-	user, err := model.GetUserById(userId, false)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "登陆失败",
 			"success": false,
 		})
 		return
@@ -268,13 +268,84 @@ func WebauthnFinishLogin(c *gin.Context) {
 		return
 	}
 
-	_, err = webauthnInstance.FinishLogin(user, sessionData, c.Request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "登录验证失败: " + err.Error(),
-			"success": false,
-		})
-		return
+	var user *model.User
+
+	if userIdStr != nil {
+		// 有用户名的登录
+		userId, err := strconv.Atoi(userIdStr.(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "登陆失败",
+				"success": false,
+			})
+			return
+		}
+
+		user, err = model.GetUserById(userId, false)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "登陆失败",
+				"success": false,
+			})
+			return
+		}
+
+		_, err = webauthnInstance.FinishLogin(user, sessionData, c.Request)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "登录验证失败: " + err.Error(),
+				"success": false,
+			})
+			return
+		}
+	} else {
+		// 无用户名登录 (Discoverable Login)
+		var foundUser wauth.User
+		_, err := webauthnInstance.FinishDiscoverableLogin(func(rawID, userHandle []byte) (wauth.User, error) {
+			if len(userHandle) > 0 {
+				userId, err := strconv.Atoi(string(userHandle))
+				if err == nil {
+					u, err := model.GetUserById(userId, false)
+					if err == nil {
+						foundUser = u
+						return u, nil
+					}
+				}
+			}
+			// Fallback to lookup by credential ID
+			u, err := model.GetUserByWebAuthnCredentialId(rawID)
+			if err == nil {
+				foundUser = u
+				return u, nil
+			}
+			return nil, errors.New("user not found")
+		}, sessionData, c.Request)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "登录验证失败: " + err.Error(),
+				"success": false,
+			})
+			return
+		}
+
+		if foundUser == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "无法找到对应的用户",
+				"success": false,
+			})
+			return
+		}
+
+		var ok bool
+		user, ok = foundUser.(*model.User)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "用户类型断言失败",
+				"success": false,
+			})
+			return
+		}
 	}
 
 	// 检查用户状态

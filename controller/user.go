@@ -80,7 +80,7 @@ func setupLogin(user *model.User, c *gin.Context) {
 		return
 	}
 	user.LastLoginTime = time.Now().Unix()
-  user.LastLoginIp = c.ClientIP()
+	user.LastLoginIp = c.ClientIP()
 
 	user.Update(false)
 
@@ -804,6 +804,61 @@ func ChangeUserQuota(c *gin.Context) {
 
 	model.RecordQuotaLog(userId, model.LogTypeManage, req.Quota, c.ClientIP(), remark)
 
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+}
+
+type UnbindRequest struct {
+	Type string `json:"type"`
+}
+
+func Unbind(c *gin.Context) {
+	var req UnbindRequest
+	err := json.NewDecoder(c.Request.Body).Decode(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "无效的参数",
+		})
+		return
+	}
+	id := c.GetInt("id")
+	user, err := model.GetUserById(id, false)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	updates := make(map[string]interface{})
+	switch req.Type {
+	case "github":
+		updates["github_id"] = ""
+		updates["github_id_new"] = nil
+	case "wechat":
+		updates["wechat_id"] = ""
+	case "lark":
+		updates["lark_id"] = ""
+	case "oidc":
+		updates["oidc_id"] = ""
+	default:
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "未知的绑定类型",
+		})
+		return
+	}
+	err = model.DB.Model(user).Updates(updates).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
