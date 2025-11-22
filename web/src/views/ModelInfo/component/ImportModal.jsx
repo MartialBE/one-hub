@@ -117,7 +117,8 @@ const ImportModal = ({ open, onCancel, onOk, existingModels = [] }) => {
 
       try {
         // 准备提交的数据（移除 isConflict 标记）
-        const { isConflict, ...submitData } = item;
+        const submitData = { ...item };
+        delete submitData.isConflict;
 
         if (item.isConflict && conflictStrategy === 'overwrite') {
           // 查找现有记录的 ID（需要从 existingModels 获取完整信息）
