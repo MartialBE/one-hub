@@ -54,7 +54,7 @@ const MainRoutes = {
       element: <InvoiceDetail />
     },
     {
-      path: 'multi-user-stats',
+      path: 'multi_user_stats',
       element: <MultiUserStats />
     },
     {

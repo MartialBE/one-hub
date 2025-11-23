@@ -40,7 +40,7 @@ export default function MultiUserStats() {
 
         setSearching(true);
         try {
-            const res = await API.get('/api/multi_user_stats/', {
+            const res = await API.get('/api/analytics/multi_user_stats', {
                 params: {
                     usernames: usernames.trim(),
                     start_time: startDate.format('YYYY-MM-DD'),
@@ -74,7 +74,7 @@ export default function MultiUserStats() {
 
         setSearching(true);
         try {
-            const res = await API.get('/api/multi_user_stats/export', {
+            const res = await API.get('/api/analytics/multi_user_stats/export', {
                 params: {
                     usernames: usernames.trim(),
                     start_time: startDate.format('YYYY-MM-DD'),
