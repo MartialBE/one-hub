@@ -327,7 +327,7 @@ export default function Profile() {
     <>
       <MainCard>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={value} onChange={handleChange} aria-label="profile tabs">
+          <Tabs value={value} onChange={handleChange} aria-label="profile tabs" variant="scrollable" scrollButtons="auto">
             <Tab icon={<IconSettings />} iconPosition="start" label={t('profilePage.general')} {...a11yProps(0)} />
             <Tab icon={<IconLink />} iconPosition="start" label={t('profilePage.binding')} {...a11yProps(1)} />
             <Tab icon={<IconShieldLock />} iconPosition="start" label={t('profilePage.webauthn')} {...a11yProps(2)} />
@@ -618,13 +618,13 @@ export default function Profile() {
                     >
                       <Stack>
                         <Typography variant="body1">
-                          {t('profilePage.alias')}:{' '}
+                          {t('profilePage.alias')}{' '}
                           {credential.alias && credential.alias.trim() !== ''
                             ? credential.alias
                             : new Date(credential.created_time * 1000).toLocaleString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {t('profilePage.credentialId')}:{' '}
+                          {t('profilePage.credentialId')}{' '}
                           <span title={credential.credential_id}>
                             {credential.credential_id.length > 20
                               ? credential.credential_id.substring(0, 20) + '...'
@@ -632,7 +632,7 @@ export default function Profile() {
                           </span>
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {t('profilePage.registerTime')}: {new Date(credential.created_time * 1000).toLocaleString()}
+                          {t('profilePage.registerTime')} {new Date(credential.created_time * 1000).toLocaleString()}
                         </Typography>
                       </Stack>
                       <Button
