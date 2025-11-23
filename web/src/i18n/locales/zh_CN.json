@@ -24,6 +24,7 @@
   "channel": "渠道",
   "token": "令牌",
   "invoice": "月度账单",
+  "multi_user_stats": "多用户令牌统计",
   "midjourney": "Midjourney",
   "log": "日志",
   "redemption": "兑换",
