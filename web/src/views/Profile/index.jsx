@@ -25,7 +25,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   ListItemAvatar
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
@@ -444,19 +443,40 @@ export default function Profile() {
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary="Email"
+                  primary={
+                    matchDownSM ? (
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">Email</Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => {
+                            setOpenEmail(true);
+                          }}
+                        >
+                          {inputs.email ? t('profilePage.change') : t('profilePage.bind')}
+                        </Button>
+                      </Box>
+                    ) : (
+                      'Email'
+                    )
+                  }
                   secondary={inputs.email ? `${t('profilePage.bound')}: ${inputs.email}` : t('profilePage.unbound')}
+                  secondaryTypographyProps={matchDownSM ? {} : { noWrap: true }}
+                  sx={matchDownSM ? {} : { minWidth: 0, mr: 2 }}
                 />
-                <ListItemSecondaryAction>
+                {!matchDownSM && (
                   <Button
+                    size="small"
                     variant="outlined"
                     onClick={() => {
                       setOpenEmail(true);
                     }}
+                    sx={{ ml: 2 }}
                   >
                     {inputs.email ? t('profilePage.change') : t('profilePage.bind')}
                   </Button>
-                </ListItemSecondaryAction>
+                )}
               </ListItem>
               {status.wechat_login && (
                 <ListItem divider>
@@ -466,20 +486,38 @@ export default function Profile() {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary="WeChat"
+                    primary={
+                      matchDownSM ? (
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">WeChat</Typography>
+                          {inputs.wechat_id ? (
+                            <Button size="small" variant="outlined" color="error" onClick={() => handleUnbind('wechat')}>
+                              {t('profilePage.unbind')}
+                            </Button>
+                          ) : (
+                            <Button size="small" variant="outlined" onClick={handleWechatOpen}>
+                              {t('profilePage.bind')}
+                            </Button>
+                          )}
+                        </Box>
+                      ) : (
+                        'WeChat'
+                      )
+                    }
                     secondary={inputs.wechat_id ? `${t('profilePage.bound')}: ${inputs.wechat_id}` : t('profilePage.unbound')}
+                    secondaryTypographyProps={matchDownSM ? {} : { noWrap: true }}
+                    sx={matchDownSM ? {} : { minWidth: 0, mr: 2 }}
                   />
-                  <ListItemSecondaryAction>
-                    {inputs.wechat_id ? (
-                      <Button variant="outlined" color="error" onClick={() => handleUnbind('wechat')}>
+                  {!matchDownSM &&
+                    (inputs.wechat_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('wechat')} sx={{ ml: 2 }}>
                         {t('profilePage.unbind')}
                       </Button>
                     ) : (
-                      <Button variant="outlined" onClick={handleWechatOpen}>
+                      <Button variant="outlined" onClick={handleWechatOpen} sx={{ ml: 2 }}>
                         {t('profilePage.bind')}
                       </Button>
-                    )}
-                  </ListItemSecondaryAction>
+                    ))}
                 </ListItem>
               )}
               {status.github_oauth && (
@@ -490,20 +528,46 @@ export default function Profile() {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary="GitHub"
+                    primary={
+                      matchDownSM ? (
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">GitHub</Typography>
+                          {inputs.github_id ? (
+                            <Button size="small" variant="outlined" color="error" onClick={() => handleUnbind('github')}>
+                              {t('profilePage.unbind')}
+                            </Button>
+                          ) : (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}
+                            >
+                              {t('profilePage.bind')}
+                            </Button>
+                          )}
+                        </Box>
+                      ) : (
+                        'GitHub'
+                      )
+                    }
                     secondary={inputs.github_id ? `${t('profilePage.bound')}: ${inputs.github_id}` : t('profilePage.unbound')}
+                    secondaryTypographyProps={matchDownSM ? {} : { noWrap: true }}
+                    sx={matchDownSM ? {} : { minWidth: 0, mr: 2 }}
                   />
-                  <ListItemSecondaryAction>
-                    {inputs.github_id ? (
-                      <Button variant="outlined" color="error" onClick={() => handleUnbind('github')}>
+                  {!matchDownSM &&
+                    (inputs.github_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('github')} sx={{ ml: 2 }}>
                         {t('profilePage.unbind')}
                       </Button>
                     ) : (
-                      <Button variant="outlined" onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => onGitHubOAuthClicked(status.github_client_id, true)}
+                        sx={{ ml: 2 }}
+                      >
                         {t('profilePage.bind')}
                       </Button>
-                    )}
-                  </ListItemSecondaryAction>
+                    ))}
                 </ListItem>
               )}
               {status.lark_client_id && (
@@ -512,20 +576,38 @@ export default function Profile() {
                     <Avatar src={LarkIcon} sx={{ bgcolor: 'transparent' }} />
                   </ListItemAvatar>
                   <ListItemText
-                    primary="Lark"
+                    primary={
+                      matchDownSM ? (
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">Lark</Typography>
+                          {inputs.lark_id ? (
+                            <Button size="small" variant="outlined" color="error" onClick={() => handleUnbind('lark')}>
+                              {t('profilePage.unbind')}
+                            </Button>
+                          ) : (
+                            <Button size="small" variant="outlined" onClick={() => onLarkOAuthClicked(status.lark_client_id)}>
+                              {t('profilePage.bind')}
+                            </Button>
+                          )}
+                        </Box>
+                      ) : (
+                        'Lark'
+                      )
+                    }
                     secondary={inputs.lark_id ? `${t('profilePage.bound')}: ${inputs.lark_id}` : t('profilePage.unbound')}
+                    secondaryTypographyProps={matchDownSM ? {} : { noWrap: true }}
+                    sx={matchDownSM ? {} : { minWidth: 0, mr: 2 }}
                   />
-                  <ListItemSecondaryAction>
-                    {inputs.lark_id ? (
-                      <Button variant="outlined" color="error" onClick={() => handleUnbind('lark')}>
+                  {!matchDownSM &&
+                    (inputs.lark_id ? (
+                      <Button variant="outlined" color="error" onClick={() => handleUnbind('lark')} sx={{ ml: 2 }}>
                         {t('profilePage.unbind')}
                       </Button>
                     ) : (
-                      <Button variant="outlined" onClick={() => onLarkOAuthClicked(status.lark_client_id)}>
+                      <Button variant="outlined" onClick={() => onLarkOAuthClicked(status.lark_client_id)} sx={{ ml: 2 }}>
                         {t('profilePage.bind')}
                       </Button>
-                    )}
-                  </ListItemSecondaryAction>
+                    ))}
                 </ListItem>
               )}
               {status.oidc_auth && (
@@ -536,16 +618,29 @@ export default function Profile() {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary="OIDC"
+                    primary={
+                      matchDownSM ? (
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">OIDC</Typography>
+                          {inputs.oidc_id && (
+                            <Button size="small" variant="outlined" color="error" onClick={() => handleUnbind('oidc')}>
+                              {t('profilePage.unbind')}
+                            </Button>
+                          )}
+                        </Box>
+                      ) : (
+                        'OIDC'
+                      )
+                    }
                     secondary={inputs.oidc_id ? `${t('profilePage.bound')}: ${inputs.oidc_id}` : t('profilePage.unbound')}
+                    secondaryTypographyProps={matchDownSM ? {} : { noWrap: true }}
+                    sx={matchDownSM ? {} : { minWidth: 0, mr: 2 }}
                   />
-                  <ListItemSecondaryAction>
-                    {inputs.oidc_id && (
-                      <Button variant="outlined" color="error" onClick={() => handleUnbind('oidc')}>
-                        {t('profilePage.unbind')}
-                      </Button>
-                    )}
-                  </ListItemSecondaryAction>
+                  {!matchDownSM && inputs.oidc_id && (
+                    <Button variant="outlined" color="error" onClick={() => handleUnbind('oidc')} sx={{ ml: 2 }}>
+                      {t('profilePage.unbind')}
+                    </Button>
+                  )}
                 </ListItem>
               )}
             </List>
