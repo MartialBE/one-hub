@@ -49,7 +49,6 @@ import * as Yup from 'yup';
 import WechatModal from 'views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
 import EmailModal from './component/EmailModal';
-import Turnstile from 'react-turnstile';
 import LarkIcon from 'assets/images/icons/lark.svg';
 import { useTheme } from '@mui/material/styles';
 
@@ -94,7 +93,6 @@ export default function Profile() {
   const [inputs, setInputs] = useState([]);
   const [turnstileEnabled, setTurnstileEnabled] = useState(false);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
   const [openWechat, setOpenWechat] = useState(false);
   const [openEmail, setOpenEmail] = useState(false);
   const [webAuthnCredentials, setWebAuthnCredentials] = useState([]);
@@ -577,16 +575,6 @@ export default function Profile() {
                 </Alert>
               </Stack>
             )}
-            {turnstileEnabled && (
-              <Box sx={{ mt: 2 }}>
-                <Turnstile
-                  sitekey={turnstileSiteKey}
-                  onVerify={(token) => {
-                    setTurnstileToken(token);
-                  }}
-                />
-              </Box>
-            )}
           </SubCard>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
@@ -682,7 +670,7 @@ export default function Profile() {
       <WechatModal open={openWechat} handleClose={handleWechatClose} wechatLogin={bindWeChat} qrCode={status.wechat_qrcode} />
       <EmailModal
         open={openEmail}
-        turnstileToken={turnstileToken}
+        turnstileSiteKey={turnstileSiteKey}
         turnstileEnabled={turnstileEnabled}
         handleClose={() => {
           setOpenEmail(false);

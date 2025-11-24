@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
@@ -20,18 +20,21 @@ import { useTheme } from '@mui/material/styles';
 import * as Yup from 'yup';
 import useRegister from 'hooks/useRegister';
 import { API } from 'utils/api';
+import Turnstile from 'react-turnstile';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('请输入正确的邮箱地址').required('邮箱不能为空'),
   email_verification_code: Yup.string().required('验证码不能为空')
 });
 
-const EmailModal = ({ open, handleClose, turnstileToken, turnstileEnabled }) => {
+const EmailModal = ({ open, handleClose, turnstileSiteKey, turnstileEnabled }) => {
   const theme = useTheme();
   const [countdown, setCountdown] = useState(30);
   const [disableButton, setDisableButton] = useState(false);
   const { sendVerificationCode } = useRegister();
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef();
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setLoading(true);
@@ -80,6 +83,10 @@ const EmailModal = ({ open, handleClose, turnstileToken, turnstileEnabled }) => 
     setLoading(true);
     const { success, message } = await sendVerificationCode(email, turnstileToken);
     setLoading(false);
+    if (turnstileEnabled && turnstileRef.current) {
+      turnstileRef.current.reset();
+      setTurnstileToken('');
+    }
     if (!success) {
       setDisableButton(false);
       showError(message);
@@ -153,6 +160,15 @@ const EmailModal = ({ open, handleClose, turnstileToken, turnstileEnabled }) => 
                     </FormHelperText>
                   )}
                 </FormControl>
+                {turnstileEnabled && (
+                  <Turnstile
+                    sitekey={turnstileSiteKey}
+                    ref={turnstileRef}
+                    onVerify={(token) => {
+                      setTurnstileToken(token);
+                    }}
+                  />
+                )}
                 <DialogActions>
                   <Button onClick={handleClose}>取消</Button>
                   <Button disableElevation disabled={loading} type="submit" variant="contained" color="primary">
@@ -173,6 +189,6 @@ export default EmailModal;
 EmailModal.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
-  turnstileToken: PropTypes.string,
+  turnstileSiteKey: PropTypes.string,
   turnstileEnabled: PropTypes.bool
 };
