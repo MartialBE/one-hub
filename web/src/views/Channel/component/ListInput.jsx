@@ -6,6 +6,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { Box, List, Button, ListItem, TextField, IconButton, ListItemSecondaryAction } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import Editor from '@monaco-editor/react';
 
 import { Icon } from '@iconify/react';
 import { showError } from 'utils/common';
@@ -13,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 
 const ListInput = ({ listValue, onChange, disabled, error, label }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -113,19 +116,43 @@ const ListInput = ({ listValue, onChange, disabled, error, label }) => {
       <Dialog open={openJsonDialog} onClose={handleCloseJsonDialog} fullWidth maxWidth="md">
         <DialogTitle>{t('channel_edit.mapAddByJson', { name: label?.name || '项目' })}</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="json-input"
-            label={t('channel_edit.mapJsonInput')}
-            type="text"
-            fullWidth
-            multiline
-            rows={6}
-            value={jsonInput}
-            onChange={handleJsonInputChange}
-            helperText={t('channel_edit.listJsonHelperText')}
-          />
+          <Box
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              overflow: 'hidden',
+              marginTop: 1,
+              resize: 'vertical',
+              height: '400px',
+              minHeight: '200px',
+              '&:hover': {
+                borderColor: 'primary.main'
+              },
+              '&:focus-within': {
+                borderColor: 'primary.main',
+                borderWidth: 1
+              }
+            }}
+          >
+            <Editor
+              height="100%"
+              language="json"
+              theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'light'}
+              value={jsonInput}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                fontSize: 14,
+                lineNumbers: 'on',
+                folding: true,
+                formatOnPaste: true,
+                formatOnType: true
+              }}
+              onChange={(value) => setJsonInput(value)}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseJsonDialog}>{t('common.cancel')}</Button>
