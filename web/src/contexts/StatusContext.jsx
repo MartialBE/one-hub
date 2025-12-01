@@ -15,6 +15,7 @@ const StatusProvider = ({ children }) => {
 
   const loadStatus = useCallback(async () => {
     let system_name = '';
+    let analytics_code = '';
     try {
       const res = await API.get('/api/status');
       const { success, data } = res.data;
@@ -41,6 +42,9 @@ const StatusProvider = ({ children }) => {
         if (data.system_name) {
           system_name = data.system_name;
         }
+        if (data.analytics_code) {
+          analytics_code = data.analytics_code;
+        }
       } else {
         const backupSiteInfo = localStorage.getItem('siteInfo');
         if (backupSiteInfo) {
@@ -60,6 +64,19 @@ const StatusProvider = ({ children }) => {
 
     if (system_name) {
       document.title = system_name;
+    }
+
+    if (analytics_code) {
+      // Check if the script is already injected
+      if (!document.getElementById('analytics-code')) {
+        const range = document.createRange();
+        const fragment = range.createContextualFragment(analytics_code);
+        // Add an ID to the first child to prevent duplicate injection
+        if (fragment.firstElementChild) {
+          fragment.firstElementChild.id = 'analytics-code';
+          document.head.appendChild(fragment);
+        }
+      }
     }
     // eslint-disable-next-line
   }, [dispatch]);
