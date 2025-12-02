@@ -32,7 +32,7 @@ jobs:
           git describe --tags > VERSION
       - uses: actions/setup-node@v3
         with:
-          node-version: 22.4.1
+          node-version: 22.20.0
       - name: Cache Node modules
         uses: actions/cache@v3
         with:

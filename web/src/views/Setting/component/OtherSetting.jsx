@@ -30,7 +30,8 @@ const OtherSetting = () => {
     About: '',
     SystemName: '',
     Logo: '',
-    HomePageContent: ''
+    HomePageContent: '',
+    AnalyticsCode: ''
   });
   let [loading, setLoading] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -109,6 +110,10 @@ const OtherSetting = () => {
 
   const submitAbout = async () => {
     await updateOption('About', inputs.About);
+  };
+
+  const submitAnalyticsCode = async () => {
+    await updateOption('AnalyticsCode', inputs.AnalyticsCode);
   };
 
   const submitOption = async (key) => {
@@ -294,6 +299,26 @@ const OtherSetting = () => {
             <Grid xs={12}>
               <Button variant="contained" onClick={submitFooter}>
                 {t('setting_index.otherSettings.customSettings.setFooter')}
+              </Button>
+            </Grid>
+            <Grid xs={12}>
+              <FormControl fullWidth>
+                <TextField
+                  multiline
+                  maxRows={15}
+                  id="AnalyticsCode"
+                  label="统计代码"
+                  value={inputs.AnalyticsCode}
+                  name="AnalyticsCode"
+                  onChange={handleInputChange}
+                  minRows={10}
+                  placeholder="在此输入统计代码，例如 Google Analytics 或 Umami"
+                />
+              </FormControl>
+            </Grid>
+            <Grid xs={12}>
+              <Button variant="contained" onClick={submitAnalyticsCode}>
+                保存统计代码
               </Button>
             </Grid>
           </Grid>
