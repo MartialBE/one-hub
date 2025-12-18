@@ -333,8 +333,9 @@ type GeminiChatGenerationConfig struct {
 }
 
 type ThinkingConfig struct {
-	ThinkingBudget  *int `json:"thinkingBudget"`
-	IncludeThoughts bool `json:"includeThoughts,omitempty"`
+	ThinkingBudget  *int   `json:"thinkingBudget,omitempty"`
+	ThinkingLevel   string `json:"thinkingLevel,omitempty"`
+	IncludeThoughts bool   `json:"includeThoughts,omitempty"`
 }
 
 type GeminiError struct {
