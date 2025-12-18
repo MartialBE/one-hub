@@ -172,8 +172,29 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 	}
 
 	if request.Reasoning != nil {
-		geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
-			ThinkingBudget: &request.Reasoning.MaxTokens,
+		thinkingConfig := &ThinkingConfig{}
+		
+		// Only set ThinkingBudget when MaxTokens > 0
+		if request.Reasoning.MaxTokens > 0 {
+			thinkingConfig.ThinkingBudget = &request.Reasoning.MaxTokens
+		}
+		
+		// Convert effort to thinkingLevel
+		if request.Reasoning.Effort != "" {
+			effortToLevelMap := map[string]string{
+				"minimal": "MINIMAL",
+				"low":     "LOW",
+				"medium":  "MEDIUM",
+				"high":    "HIGH",
+			}
+			if level, ok := effortToLevelMap[request.Reasoning.Effort]; ok {
+				thinkingConfig.ThinkingLevel = level
+			}
+		}
+		
+		// Only set ThinkingConfig if at least one parameter is set
+		if thinkingConfig.ThinkingBudget != nil || thinkingConfig.ThinkingLevel != "" {
+			geminiRequest.GenerationConfig.ThinkingConfig = thinkingConfig
 		}
 	}
 
