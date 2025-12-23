@@ -177,6 +177,10 @@ type FormatJsonSchema struct {
 	Strict      any    `json:"strict,omitempty"`
 }
 
+type Thinking struct {
+    Type string `json:"type"`
+}
+
 type ChatCompletionRequest struct {
 	Model               string                        `json:"model" binding:"required"`
 	Messages            []ChatCompletionMessage       `json:"messages" binding:"required"`
@@ -188,7 +192,7 @@ type ChatCompletionRequest struct {
 	TopK                *float64                      `json:"top_k,omitempty"`
 	N                   *int                          `json:"n,omitempty"`
 	Stream              bool                          `json:"stream,omitempty"`
-	StreamOptions       *StreamOptions                `json:"stream_options,omitempty"`
+	StreamOptions       *StreamOptions                `json:"stream_options,omitempty"`  
 	Stop                any                           `json:"stop,omitempty"`
 	PresencePenalty     *float64                      `json:"presence_penalty,omitempty"`
 	ResponseFormat      *ChatCompletionResponseFormat `json:"response_format,omitempty"`
@@ -216,6 +220,8 @@ type ChatCompletionRequest struct {
 	EnableThinking *bool `json:"enable_thinking,omitempty"` // qwen3 思考开关
 	ThinkingBudget *int  `json:"thinking_budget,omitempty"` // qwen3 思考长度，只有enable_thinking开启才生效
 	EnableSearch   *bool `json:"enable_search,omitempty"`   // qwen 搜索开关
+  
+  Thinking *Thinking `json:"thinking,omitempty"` // 火山引擎 思考开关
 
 	OneOtherArg string `json:"-"`
 }
