@@ -56,6 +56,7 @@ func GinzapWithConfig() gin.HandlerFunc {
 			zap.Int("token_id", c.GetInt("token_id")),
 			zap.String("token_name", c.GetString("token_name")),
 			zap.Int("channel_id", c.GetInt("channel_id")),
+			zap.Any("user_id", c.Request.Header.Get("x-user-id")),
 		}
 
 		if len(c.Errors) > 0 {
