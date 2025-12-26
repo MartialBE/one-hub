@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"sync"
@@ -21,6 +22,9 @@ const (
 var batchUpdateStores []map[int]int
 var batchUpdateLocks []sync.Mutex
 
+var batchLogStore []*Log
+var batchLogLock sync.Mutex
+
 func init() {
 	for i := 0; i < BatchUpdateTypeCount; i++ {
 		batchUpdateStores = append(batchUpdateStores, make(map[int]int))
@@ -33,8 +37,32 @@ func InitBatchUpdater() {
 		for {
 			time.Sleep(time.Duration(config.BatchUpdateInterval) * time.Second)
 			batchUpdate()
+			flushBatchLogs()
 		}
 	}()
+}
+
+func AddLogToBatch(log *Log) {
+	batchLogLock.Lock()
+	defer batchLogLock.Unlock()
+	batchLogStore = append(batchLogStore, log)
+}
+
+func flushBatchLogs() {
+	batchLogLock.Lock()
+	logs := batchLogStore
+	batchLogStore = nil
+	batchLogLock.Unlock()
+
+	if len(logs) == 0 {
+		return
+	}
+
+	logger.SysLog(fmt.Sprintf("batch inserting %d logs", len(logs)))
+	err := BatchInsert(DB, logs)
+	if err != nil {
+		logger.SysError("failed to batch insert logs: " + err.Error())
+	}
 }
 
 func addNewRecord(type_ int, id int, value int) {

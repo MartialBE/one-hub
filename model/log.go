@@ -121,9 +121,13 @@ func RecordConsumeLog(
 		log.Metadata = datatypes.NewJSONType(metadata)
 	}
 
-	err := DB.Create(log).Error
-	if err != nil {
-		logger.LogError(ctx, "failed to record log: "+err.Error())
+	if config.BatchUpdateEnabled {
+		AddLogToBatch(log)
+	} else {
+		err := DB.Create(log).Error
+		if err != nil {
+			logger.LogError(ctx, "failed to record log: "+err.Error())
+		}
 	}
 }
 
