@@ -197,9 +197,8 @@ func GetTokenById(id int) (*Token, error) {
 	if id == 0 {
 		return nil, errors.New("id 为空！")
 	}
-	token := Token{Id: id}
-	var err error = nil
-	err = DB.First(&token, "id = ?", id).Error
+	var token Token
+	err := DB.First(&token, "id = ?", id).Error
 	return &token, err
 }
 
@@ -319,7 +318,7 @@ func PreConsumeTokenQuota(tokenId int, quota int) (err error) {
 	if quota < 0 {
 		return errors.New("quota 不能为负数！")
 	}
-	token, err := GetTokenById(tokenId)
+	token, err := CacheGetTokenById(tokenId)
 	if err != nil {
 		return err
 	}
@@ -377,7 +376,7 @@ func PostConsumeTokenQuota(tokenId int, quota int) (err error) {
 	if quota == 0 {
 		return nil
 	}
-	token, err := GetTokenById(tokenId)
+	token, err := CacheGetTokenById(tokenId)
 	if err != nil {
 		return err
 	}
