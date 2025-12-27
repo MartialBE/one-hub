@@ -30,7 +30,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { renderQuotaWithPrompt, showSuccess, showError } from 'utils/common';
+import { renderQuotaWithPrompt, showSuccess, showError, useIsAdmin } from 'utils/common';
 import { API } from 'utils/api';
 import { useTranslation } from 'react-i18next';
 import 'dayjs/locale/zh-cn';
@@ -81,13 +81,15 @@ const originInputs = {
         enabled: false,
         whitelist: []
       }
-    }
+    },
+    billing_tag: ''
   }
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const userIsAdmin = useIsAdmin();
   const [inputs, setInputs] = useState(originInputs);
   const [modelOptions, setModelOptions] = useState([]);
   const [ownedByIcons, setOwnedByIcons] = useState({});
@@ -178,6 +180,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
         if (!data.setting.limits.limits_ip_setting) data.setting.limits.limits_ip_setting = originInputs.setting.limits.limits_ip_setting;
         if (!data.setting.limits.limit_model_setting.models) data.setting.limits.limit_model_setting.models = [];
         if (!data.setting.limits.limits_ip_setting.whitelist) data.setting.limits.limits_ip_setting.whitelist = [];
+        if (!data.setting.billing_tag) data.setting.billing_tag = '';
         setInputs(data);
       } else {
         showError(message);
@@ -474,6 +477,35 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
                     helperText={t('token_index.limits_ip_whitelist_helper')}
                   />
                 </FormControl>
+              )}
+
+              {/* 费用标签 - 仅管理员可见 */}
+              {userIsAdmin && (
+                <>
+                  <Divider sx={{ margin: '16px 0px' }} />
+                  <Typography variant="h4" color="primary">{t('token_index.billingTag')}</Typography>
+                  <Typography variant="caption">{t('token_index.billingTagInfo')}</Typography>
+                  <FormControl fullWidth sx={{ mt: 2 }}>
+                    <InputLabel>{t('token_index.billingTagLabel')}</InputLabel>
+                    <Select
+                      label={t('token_index.billingTagLabel')}
+                      name="setting.billing_tag"
+                      value={values?.setting?.billing_tag || ''}
+                      onChange={(e) => {
+                        setFieldValue('setting.billing_tag', e.target.value);
+                      }}
+                      variant={'outlined'}
+                    >
+                      <MenuItem value="">{t('token_index.billingTagNone')}</MenuItem>
+                      {userGroupOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <FormHelperText>{t('token_index.billingTagHelper')}</FormHelperText>
+                  </FormControl>
+                </>
               )}
 
               <DialogActions>

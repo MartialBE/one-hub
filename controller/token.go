@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"one-api/common"
 	"one-api/common/config"
+	"one-api/common/database"
 	"one-api/common/utils"
 	"one-api/model"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 )
 
 func GetUserTokensList(c *gin.Context) {
@@ -92,6 +94,8 @@ func GetPlaygroundToken(c *gin.Context) {
 
 func AddToken(c *gin.Context) {
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
+	isAdmin := userRole >= config.RoleAdminUser
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
 	if err != nil {
@@ -131,7 +135,7 @@ func AddToken(c *gin.Context) {
 	}
 
 	setting := token.Setting.Data()
-	err = validateTokenSetting(&setting)
+	err = validateTokenSetting(&setting, isAdmin)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
@@ -183,6 +187,8 @@ func DeleteToken(c *gin.Context) {
 
 func UpdateToken(c *gin.Context) {
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
+	isAdmin := userRole >= config.RoleAdminUser
 	statusOnly := c.Query("status_only")
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
@@ -202,7 +208,7 @@ func UpdateToken(c *gin.Context) {
 	}
 
 	setting := token.Setting.Data()
-	err = validateTokenSetting(&setting)
+	err = validateTokenSetting(&setting, isAdmin)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
@@ -264,6 +270,14 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.UnlimitedQuota = token.UnlimitedQuota
 		cleanToken.Group = token.Group
 		cleanToken.BackupGroup = token.BackupGroup
+
+		// 非管理员用户需要保留原有的 BillingTag
+		if !isAdmin {
+			tokenSetting := token.Setting.Data()
+			originalSetting := cleanToken.Setting.Data()
+			tokenSetting.BillingTag = originalSetting.BillingTag
+			token.Setting = database.JSONType[model.TokenSetting]{JSONType: datatypes.NewJSONType(tokenSetting)}
+		}
 		cleanToken.Setting = token.Setting
 	}
 	err = cleanToken.Update()
@@ -299,7 +313,7 @@ func validateTokenGroup(tokenGroup string, userId int) error {
 	return nil
 }
 
-func validateTokenSetting(setting *model.TokenSetting) error {
+func validateTokenSetting(setting *model.TokenSetting, isAdmin bool) error {
 	if setting == nil {
 		return nil
 	}
@@ -307,6 +321,18 @@ func validateTokenSetting(setting *model.TokenSetting) error {
 	if setting.Heartbeat.Enabled {
 		if setting.Heartbeat.TimeoutSeconds < 30 || setting.Heartbeat.TimeoutSeconds > 90 {
 			return errors.New("heartbeat timeout seconds must be between 30 and 90")
+		}
+	}
+
+	// BillingTag 验证：只有管理员可以设置，且必须是有效的分组
+	if setting.BillingTag != "" {
+		if !isAdmin {
+			return errors.New("只有管理员可以设置费用标签")
+		}
+		// 验证费用标签是否是有效的分组
+		groupRatio := model.GlobalUserGroupRatio.GetBySymbol(setting.BillingTag)
+		if groupRatio == nil {
+			return errors.New("无效的费用标签分组")
 		}
 	}
 

@@ -1265,7 +1265,12 @@
     "limits_ip_whitelist_info": "限制權杖只能從特定IP位址或範圍存取",
     "limits_ip_whitelist_switch": "啟用IP白名單",
     "limits_ip_whitelist_input": "IP位址",
-    "limits_ip_whitelist_helper": "每行輸入一個IP位址或CIDR範圍（如：192.168.1.1 或 10.0.0.0/8）"
+    "limits_ip_whitelist_helper": "每行輸入一個IP位址或CIDR範圍（如：192.168.1.1 或 10.0.0.0/8）",
+    "billingTag": "費用標籤",
+    "billingTagInfo": "用於按照分組統計費用，僅管理員可設置",
+    "billingTagLabel": "費用標籤",
+    "billingTagNone": "不設置",
+    "billingTagHelper": "選擇一個分組作為費用標籤，用於按分組統計該令牌的費用"
   },
   "topup": "儲值",
   "topupCard": {
