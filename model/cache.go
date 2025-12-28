@@ -15,7 +15,6 @@ var (
 	TokenCacheSeconds           = 0
 	UserGroupCacheKey           = "user_group:%d"
 	UserTokensKey               = "token:%s"
-	TokenIdCacheKey             = "token_id:%d"
 	UsernameCacheKey            = "user_name:%d"
 	UserQuotaCacheKey           = "user_quota:%d"
 	UserEnabledCacheKey         = "user_enabled:%d"
