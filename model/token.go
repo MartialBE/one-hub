@@ -318,7 +318,7 @@ func PreConsumeTokenQuota(tokenId int, quota int) (err error) {
 	if quota < 0 {
 		return errors.New("quota 不能为负数！")
 	}
-	token, err := CacheGetTokenById(tokenId)
+	token, err := GetTokenById(tokenId)
 	if err != nil {
 		return err
 	}
@@ -376,7 +376,7 @@ func PostConsumeTokenQuota(tokenId int, quota int) (err error) {
 	if quota == 0 {
 		return nil
 	}
-	token, err := CacheGetTokenById(tokenId)
+	token, err := PostConsumeCacheGetTokenById(tokenId)
 	if err != nil {
 		return err
 	}

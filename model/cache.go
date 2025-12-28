@@ -41,7 +41,8 @@ func CacheGetTokenByKey(key string) (*Token, error) {
 	return token, err
 }
 
-func CacheGetTokenById(id int) (*Token, error) {
+func PostConsumeCacheGetTokenById(id int) (*Token, error) {
+
 	if !config.RedisEnabled {
 		return GetTokenById(id)
 	}
