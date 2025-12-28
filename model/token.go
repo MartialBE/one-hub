@@ -197,9 +197,8 @@ func GetTokenById(id int) (*Token, error) {
 	if id == 0 {
 		return nil, errors.New("id 为空！")
 	}
-	token := Token{Id: id}
-	var err error = nil
-	err = DB.First(&token, "id = ?", id).Error
+	var token Token
+	err := DB.First(&token, "id = ?", id).Error
 	return &token, err
 }
 
@@ -373,23 +372,20 @@ func sendQuotaWarningEmail(userId int, userQuota int, noMoreQuota bool) {
 	}
 }
 
-func PostConsumeTokenQuota(tokenId int, quota int) (err error) {
+// PostConsumeTokenQuotaWithInfo 消费 token 配额，直接使用传入的 userId 和 unlimitedQuota，避免数据库查询
+func PostConsumeTokenQuotaWithInfo(tokenId int, userId int, unlimitedQuota bool, quota int) (err error) {
 	if quota == 0 {
 		return nil
 	}
-	token, err := GetTokenById(tokenId)
-	if err != nil {
-		return err
-	}
 	if quota > 0 {
-		err = DecreaseUserQuota(token.UserId, quota)
+		err = DecreaseUserQuota(userId, quota)
 	} else {
-		err = IncreaseUserQuota(token.UserId, -quota)
+		err = IncreaseUserQuota(userId, -quota)
 	}
 	if err != nil {
 		return err
 	}
-	if !token.UnlimitedQuota {
+	if !unlimitedQuota {
 		if quota > 0 {
 			err = DecreaseTokenQuota(tokenId, quota)
 		} else {

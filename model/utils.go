@@ -114,9 +114,43 @@ func BatchInsert[T any](db *gorm.DB, data []T) error {
 		if end > len(data) {
 			end = len(data)
 		}
-		if err := db.Create(data[i:end]).Error; err != nil {
-			return err
+		if err := batchInsertWithRetry(db, data[i:end]); err != nil {
+			logger.SysError(fmt.Sprintf("batch insert failed after retry, lost %d records: %s", end-i, err.Error()))
 		}
 	}
 	return nil
+}
+
+// batchInsertWithRetry 使用二分法进行容错插入
+// 当批量插入失败时，将数据二分后分别尝试插入，递归直到单条记录
+func batchInsertWithRetry[T any](db *gorm.DB, data []T) error {
+	if len(data) == 0 {
+		return nil
+	}
+
+	// 尝试批量插入
+	err := db.Create(data).Error
+	if err == nil {
+		return nil
+	}
+
+	// 如果只有一条记录且失败，记录错误并跳过这条记录
+	if len(data) == 1 {
+		logger.SysError(fmt.Sprintf("failed to insert single record: %s", err.Error()))
+		return err
+	}
+
+	// 二分继续尝试
+	mid := len(data) / 2
+	logger.SysLog(fmt.Sprintf("batch insert failed, splitting %d records into two halves", len(data)))
+
+	// 分别插入两半，即使一半失败也继续插入另一半
+	err1 := batchInsertWithRetry(db, data[:mid])
+	err2 := batchInsertWithRetry(db, data[mid:])
+
+	// 返回第一个错误（如果有的话）
+	if err1 != nil {
+		return err1
+	}
+	return err2
 }
