@@ -15,7 +15,6 @@ var (
 	TokenCacheSeconds           = 0
 	UserGroupCacheKey           = "user_group:%d"
 	UserTokensKey               = "token:%s"
-	TokenIdCacheKey             = "token_id:%d"
 	UsernameCacheKey            = "user_name:%d"
 	UserQuotaCacheKey           = "user_quota:%d"
 	UserEnabledCacheKey         = "user_enabled:%d"
@@ -35,22 +34,6 @@ func CacheGetTokenByKey(key string) (*Token, error) {
 		time.Duration(TokenCacheSeconds)*time.Second,
 		func() (*Token, error) {
 			return GetTokenByKey(key)
-		},
-		cache.CacheTimeout)
-
-	return token, err
-}
-
-func CacheGetTokenById(id int) (*Token, error) {
-	if !config.RedisEnabled {
-		return GetTokenById(id)
-	}
-
-	token, err := cache.GetOrSetCache(
-		fmt.Sprintf(TokenIdCacheKey, id),
-		time.Duration(TokenCacheSeconds)*time.Second,
-		func() (*Token, error) {
-			return GetTokenById(id)
 		},
 		cache.CacheTimeout)
 
