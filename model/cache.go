@@ -41,23 +41,6 @@ func CacheGetTokenByKey(key string) (*Token, error) {
 	return token, err
 }
 
-func PostConsumeCacheGetTokenById(id int) (*Token, error) {
-
-	if !config.RedisEnabled {
-		return GetTokenById(id)
-	}
-
-	token, err := cache.GetOrSetCache(
-		fmt.Sprintf(TokenIdCacheKey, id),
-		time.Duration(TokenCacheSeconds)*time.Second,
-		func() (*Token, error) {
-			return GetTokenById(id)
-		},
-		cache.CacheTimeout)
-
-	return token, err
-}
-
 func CacheGetUserGroup(id int) (group string, err error) {
 	if !config.RedisEnabled {
 		return GetUserGroup(id)
