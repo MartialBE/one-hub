@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"one-api/common/config"
 	"strconv"
 	"time"
 
@@ -40,7 +41,7 @@ func init() {
 			Name: "provider_requests_total",
 			Help: "Total number of provider requests.",
 		},
-		[]string{"channel_type", "channel_id", "model", "type"},
+		[]string{"channel_type_id", "channel_type", "channel_id", "channel_name", "model", "type"},
 	)
 
 	// 3. 监控 panic
@@ -83,11 +84,17 @@ func RecordProvider(c *gin.Context, statusCode int) {
 
 	channelType := c.GetInt("channel_type")
 	channelId := c.GetInt("channel_id")
+	channelName := c.GetString("channel_name")
+
+	// 将 channel type ID 转换为名称
+	channelTypeName := config.GetChannelTypeName(channelType)
 
 	go SafelyRecordMetric(func() {
 		providerCounter.WithLabelValues(
 			strconv.Itoa(channelType),
+			channelTypeName,
 			strconv.Itoa(channelId),
+			channelName,
 			model,
 			strconv.Itoa(statusCode),
 		).Inc()
