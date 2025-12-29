@@ -304,7 +304,11 @@
     "limits_ip_whitelist_info": "限制令牌只能从特定IP地址或范围访问",
     "limits_ip_whitelist_switch": "启用IP白名单",
     "limits_ip_whitelist_input": "IP地址",
-    "limits_ip_whitelist_helper": "每行输入一个IP地址或CIDR范围（如：192.168.1.1 或 10.0.0.0/8）"
+    "limits_ip_whitelist_helper": "每行输入一个IP地址或CIDR范围（如：192.168.1.1 或 10.0.0.0/8）",
+    "billingTag": "费用标签",
+    "billingTagInfo": "不参与实际运算，仅是一个标签便于按照分组统计费用，仅管理员可见并设置",
+    "billingTagLabel": "费用标签",
+    "billingTagHelper": "选择一个分组作为费用标签，用于按分组统计该令牌的费用"
   },
   "invoice_index": {
     "invoice": "月度账单",

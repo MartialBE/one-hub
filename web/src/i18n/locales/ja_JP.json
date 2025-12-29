@@ -1263,7 +1263,11 @@
     "limits_ip_whitelist_info": "トークンアクセスを特定のIPアドレスまたは範囲に制限します",
     "limits_ip_whitelist_switch": "IPホワイトリストを有効にする",
     "limits_ip_whitelist_input": "IPアドレス",
-    "limits_ip_whitelist_helper": "1行に1つのIPアドレスまたはCIDR範囲を入力してください（例：192.168.1.1または10.0.0.0/8）"
+    "limits_ip_whitelist_helper": "1行に1つのIPアドレスまたはCIDR範囲を入力してください（例：192.168.1.1または10.0.0.0/8）",
+    "billingTag": "課金タグ",
+    "billingTagInfo": "グループ別の課金統計に使用します。管理者のみ設定可能",
+    "billingTagLabel": "課金タグ",
+    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください"
   },
   "topup": "トップアップ",
   "topupCard": {
