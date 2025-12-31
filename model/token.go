@@ -318,6 +318,17 @@ func (token *Token) Update() error {
 	return err
 }
 
+// UpdateByAdmin 管理员更新token，支持更新user_id字段
+func (token *Token) UpdateByAdmin() error {
+	err := DB.Model(token).Select("user_id", "name", "status", "expired_time", "remain_quota", "unlimited_quota", "group", "backup_group", "setting").Updates(token).Error
+	// 防止Redis缓存不生效，直接删除
+	if err == nil && config.RedisEnabled {
+		redis.RedisDel(fmt.Sprintf(UserTokensKey, token.Key))
+	}
+
+	return err
+}
+
 func (token *Token) SelectUpdate() error {
 	// This can update zero values
 	return DB.Model(token).Select("accessed_time", "status").Updates(token).Error

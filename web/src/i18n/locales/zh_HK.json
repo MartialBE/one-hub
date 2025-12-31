@@ -1277,7 +1277,10 @@
     "tokenId": "令牌ID",
     "tokenIdPlaceholder": "輸入令牌ID",
     "clearSearch": "清除",
-    "owner": "所屬"
+    "owner": "所屬",
+    "adminEditWarning": "您正在以管理員身份編輯此權杖，可以修改權杖所屬用戶",
+    "transferToUser": "所屬用戶ID",
+    "transferToUserHelper": "修改用戶ID可轉移此權杖的所有權"
   },
   "topup": "儲值",
   "topupCard": {

@@ -1286,7 +1286,10 @@
     "tokenId": "Token ID",
     "tokenIdPlaceholder": "Enter token ID",
     "clearSearch": "Clear",
-    "owner": "Owner"
+    "owner": "Owner",
+    "adminEditWarning": "You are editing this token as an administrator, you can change the token owner",
+    "transferToUser": "Owner User ID",
+    "transferToUserHelper": "Change user ID to transfer token ownership"
   },
   "topup": "Top-up",
   "topupCard": {

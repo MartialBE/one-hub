@@ -1275,7 +1275,10 @@
     "tokenId": "トークンID",
     "tokenIdPlaceholder": "トークンIDを入力",
     "clearSearch": "クリア",
-    "owner": "所有者"
+    "owner": "所有者",
+    "adminEditWarning": "管理者としてこのトークンを編集しています。トークンの所有者を変更できます",
+    "transferToUser": "所有者ユーザーID",
+    "transferToUserHelper": "ユーザーIDを変更してトークンの所有権を転送します"
   },
   "topup": "トップアップ",
   "topupCard": {

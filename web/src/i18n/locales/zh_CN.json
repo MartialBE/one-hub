@@ -316,7 +316,10 @@
     "tokenId": "令牌ID",
     "tokenIdPlaceholder": "输入令牌ID",
     "clearSearch": "清除",
-    "owner": "所属"
+    "owner": "所属",
+    "adminEditWarning": "您正在以管理员身份编辑此令牌，可以修改令牌所属用户",
+    "transferToUser": "所属用户ID",
+    "transferToUserHelper": "修改用户ID可转移此令牌的所有权"
   },
   "invoice_index": {
     "invoice": "月度账单",

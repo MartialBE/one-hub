@@ -198,6 +198,7 @@ func SetApiRouter(router *gin.Engine) {
 		tokenAdminRoute.Use(middleware.AdminAuth())
 		{
 			tokenAdminRoute.GET("/admin/search", controller.GetTokensListByAdmin)
+			tokenAdminRoute.PUT("/admin", controller.UpdateTokenByAdmin)
 		}
 		redemptionRoute := apiRouter.Group("/redemption")
 		redemptionRoute.Use(middleware.AdminAuth())

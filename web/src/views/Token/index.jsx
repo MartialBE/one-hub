@@ -413,6 +413,7 @@ export default function Token() {
         onOk={handleOkModal}
         tokenId={editTokenId}
         userGroupOptions={userGroupOptions}
+        adminMode={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
       />
     </>
   );
