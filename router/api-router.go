@@ -194,6 +194,11 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.PUT("/", controller.UpdateToken)
 			tokenRoute.DELETE("/:id", controller.DeleteToken)
 		}
+		tokenAdminRoute := apiRouter.Group("/token")
+		tokenAdminRoute.Use(middleware.AdminAuth())
+		{
+			tokenAdminRoute.GET("/admin/search", controller.GetTokensListByAdmin)
+		}
 		redemptionRoute := apiRouter.Group("/redemption")
 		redemptionRoute.Use(middleware.AdminAuth())
 		{

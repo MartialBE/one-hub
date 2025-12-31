@@ -100,6 +100,36 @@ func GetUserTokensList(userId int, params *GenericParams) (*DataResult[Token], e
 	return PaginateAndOrder(db, &params.PaginationParams, &tokens, allowedTokenOrderFields)
 }
 
+// AdminSearchTokensParams 管理员搜索令牌的参数
+type AdminSearchTokensParams struct {
+	GenericParams
+	UserId  int `form:"user_id"`
+	TokenId int `form:"token_id"`
+}
+
+// GetTokensListByAdmin 管理员查询令牌列表（可按用户ID或令牌ID查询）
+func GetTokensListByAdmin(params *AdminSearchTokensParams) (*DataResult[Token], error) {
+	var tokens []*Token
+	db := DB.Model(&Token{})
+
+	// 按用户ID筛选
+	if params.UserId > 0 {
+		db = db.Where("user_id = ?", params.UserId)
+	}
+
+	// 按令牌ID筛选
+	if params.TokenId > 0 {
+		db = db.Where("id = ?", params.TokenId)
+	}
+
+	// 按关键词搜索名称
+	if params.Keyword != "" {
+		db = db.Where("name LIKE ?", params.Keyword+"%")
+	}
+
+	return PaginateAndOrder(db, &params.PaginationParams, &tokens, allowedTokenOrderFields)
+}
+
 func GetTokenModel(key string) (token *Token, err error) {
 	if key == "" {
 		return nil, ErrTokenInvalid

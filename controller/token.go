@@ -43,6 +43,27 @@ func GetUserTokensList(c *gin.Context) {
 	})
 }
 
+// GetTokensListByAdmin 管理员查询令牌列表（可按用户ID或令牌ID查询）
+func GetTokensListByAdmin(c *gin.Context) {
+	var params model.AdminSearchTokensParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	tokens, err := model.GetTokensListByAdmin(&params)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    tokens,
+	})
+}
+
 func GetToken(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	userId := c.GetInt("id")

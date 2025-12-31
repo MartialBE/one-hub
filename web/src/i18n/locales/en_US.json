@@ -1278,7 +1278,14 @@
     "billingTag": "Billing Tag",
     "billingTagInfo": "Used for billing statistics by group, only admins can set this",
     "billingTagLabel": "Billing Tag",
-    "billingTagHelper": "Select a group as billing tag for tracking token costs by group"
+    "billingTagHelper": "Select a group as billing tag for tracking token costs by group",
+    "adminSearch": "Admin Search",
+    "adminSearchDesc": "Search all users' tokens by User ID or Token ID",
+    "userId": "User ID",
+    "userIdPlaceholder": "Enter user ID",
+    "tokenId": "Token ID",
+    "tokenIdPlaceholder": "Enter token ID",
+    "clearSearch": "Clear"
   },
   "topup": "Top-up",
   "topupCard": {
