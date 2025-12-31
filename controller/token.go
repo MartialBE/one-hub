@@ -27,8 +27,8 @@ func GetUserTokensList(c *gin.Context) {
 		return
 	}
 
-	// 对于非管理员，隐藏 BillingTag 字段
-	if userRole < config.RoleAdminUser {
+	// 对于非可信用户，隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
 		for _, token := range *tokens.Data {
 			setting := token.Setting.Data()
 			setting.BillingTag = nil
@@ -63,8 +63,8 @@ func GetToken(c *gin.Context) {
 		return
 	}
 
-	// 对于非管理员，隐藏 BillingTag 字段
-	if userRole < config.RoleAdminUser {
+	// 对于非可信用户，隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
 		setting := token.Setting.Data()
 		setting.BillingTag = nil
 		token.Setting.Set(setting)
@@ -158,8 +158,8 @@ func AddToken(c *gin.Context) {
 		return
 	}
 
-	// 非管理员不能设置 BillingTag
-	if userRole < config.RoleAdminUser {
+	// 非可信用户不能设置 BillingTag
+	if userRole < config.RoleReliableUser {
 		setting.BillingTag = nil
 	}
 
@@ -292,13 +292,13 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.Group = token.Group
 		cleanToken.BackupGroup = token.BackupGroup
 
-		// 处理 BillingTag: 非管理员保持原值不变
+		// 处理 BillingTag: 非可信用户保持原值不变
 		oldSetting := cleanToken.Setting.Data()
-		if userRole < config.RoleAdminUser {
-			// 非管理员：保持原来的 BillingTag，忽略前端传入的值
+		if userRole < config.RoleReliableUser {
+			// 非可信用户：保持原来的 BillingTag，忽略前端传入的值
 			newSetting.BillingTag = oldSetting.BillingTag
 		}
-		// 管理员：直接使用前端传入的值（包括空值，用于清除 BillingTag）
+		// 可信用户：直接使用前端传入的值（包括空值，用于清除 BillingTag）
 
 		cleanToken.Setting.Set(newSetting)
 	}
@@ -311,8 +311,8 @@ func UpdateToken(c *gin.Context) {
 		return
 	}
 
-	// 对于非管理员，返回数据时隐藏 BillingTag 字段
-	if userRole < config.RoleAdminUser {
+	// 对于非可信用户，返回数据时隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
 		responseSetting := cleanToken.Setting.Data()
 		responseSetting.BillingTag = nil
 		cleanToken.Setting.Set(responseSetting)

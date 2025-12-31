@@ -30,7 +30,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { renderQuotaWithPrompt, showSuccess, showError, useIsAdmin } from 'utils/common';
+import { renderQuotaWithPrompt, showSuccess, showError, useIsReliable } from 'utils/common';
 import { API } from 'utils/api';
 import { useTranslation } from 'react-i18next';
 import 'dayjs/locale/zh-cn';
@@ -88,7 +88,7 @@ const originInputs = {
 const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const userIsAdmin = useIsAdmin();
+  const userIsAdmin = useIsReliable();
   const [inputs, setInputs] = useState(originInputs);
   const [modelOptions, setModelOptions] = useState([]);
   const [ownedByIcons, setOwnedByIcons] = useState({});

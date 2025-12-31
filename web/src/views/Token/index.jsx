@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { showError, showSuccess, trims, copy, useIsAdmin } from 'utils/common';
+import { showError, showSuccess, trims, copy, useIsReliable } from 'utils/common';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -41,7 +41,7 @@ export default function Token() {
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
   const { userGroup } = useSelector((state) => state.account);
-  const userIsAdmin = useIsAdmin();
+  const userIsAdmin = useIsReliable();
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
