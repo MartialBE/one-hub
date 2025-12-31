@@ -66,7 +66,7 @@ func (token *Token) AfterCreate(tx *gorm.DB) (err error) {
 type TokenSetting struct {
 	Heartbeat  HeartbeatSetting `json:"heartbeat,omitempty"`
 	Limits     LimitsConfig     `json:"limits,omitempty"`
-	BillingTag *string          `json:"billing_tag,omitempty"` // 费用标签，用于按分组统计费用，仅管理员可见
+	BillingTag *string          `json:"billing_tag,omitempty"` // 费用标签，用于按分组统计费用，仅可信内部员工和管理员可见
 }
 
 type HeartbeatSetting struct {

@@ -41,7 +41,7 @@ export default function Token() {
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
   const { userGroup } = useSelector((state) => state.account);
-  const userIsAdmin = useIsReliable();
+  const userIsReliable = useIsReliable();
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -247,7 +247,7 @@ export default function Token() {
                 headLabel={[
                   { id: 'name', label: t('token_index.name'), disableSort: false },
                   { id: 'group', label: t('token_index.userGroup'), disableSort: false },
-                  { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsAdmin },
+                  { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
                   { id: 'status', label: t('token_index.status'), disableSort: false },
                   { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
                   { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
@@ -265,7 +265,7 @@ export default function Token() {
                     handleOpenModal={handleOpenModal}
                     setModalTokenId={setEditTokenId}
                     userGroup={userGroup}
-                    userIsAdmin={userIsAdmin}
+                    userIsReliable={userIsReliable}
                   />
                 ))}
               </TableBody>

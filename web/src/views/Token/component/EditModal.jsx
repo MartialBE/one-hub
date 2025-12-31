@@ -88,7 +88,7 @@ const originInputs = {
 const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const userIsAdmin = useIsReliable();
+  const userIsReliable = useIsReliable();
   const [inputs, setInputs] = useState(originInputs);
   const [modelOptions, setModelOptions] = useState([]);
   const [ownedByIcons, setOwnedByIcons] = useState({});
@@ -478,7 +478,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userGroupOptions }) => {
               )}
 
               {/* 费用标签 - 仅管理员可见 */}
-              {userIsAdmin && (
+              {userIsReliable && (
                 <>
                   <Divider sx={{ margin: '16px 0px' }} />
                   <Typography variant="h4" color="primary">{t('token_index.billingTag')}</Typography>
