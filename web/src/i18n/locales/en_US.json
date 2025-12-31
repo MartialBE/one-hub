@@ -1285,7 +1285,8 @@
     "userIdPlaceholder": "Enter user ID",
     "tokenId": "Token ID",
     "tokenIdPlaceholder": "Enter token ID",
-    "clearSearch": "Clear"
+    "clearSearch": "Clear",
+    "owner": "Owner"
   },
   "topup": "Top-up",
   "topupCard": {

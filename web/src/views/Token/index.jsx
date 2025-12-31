@@ -366,6 +366,7 @@ export default function Token() {
                 orderBy={orderBy}
                 onRequestSort={handleSort}
                 headLabel={[
+                  { id: 'owner', label: t('token_index.owner'), disableSort: true, hide: !(adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)) },
                   { id: 'name', label: t('token_index.name'), disableSort: false },
                   { id: 'group', label: t('token_index.userGroup'), disableSort: false },
                   { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
@@ -387,6 +388,7 @@ export default function Token() {
                     setModalTokenId={setEditTokenId}
                     userGroup={userGroup}
                     userIsReliable={userIsReliable}
+                    showOwner={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
                   />
                 ))}
               </TableBody>

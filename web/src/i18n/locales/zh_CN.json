@@ -315,7 +315,8 @@
     "userIdPlaceholder": "输入用户ID",
     "tokenId": "令牌ID",
     "tokenIdPlaceholder": "输入令牌ID",
-    "clearSearch": "清除"
+    "clearSearch": "清除",
+    "owner": "所属"
   },
   "invoice_index": {
     "invoice": "月度账单",

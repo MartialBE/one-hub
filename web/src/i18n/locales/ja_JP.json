@@ -1267,7 +1267,15 @@
     "billingTag": "課金タグ",
     "billingTagInfo": "グループ別の課金統計に使用します。管理者のみ設定可能",
     "billingTagLabel": "課金タグ",
-    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください"
+    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください",
+    "adminSearch": "管理者検索",
+    "adminSearchDesc": "ユーザーIDまたはトークンIDですべてのユーザーのトークンを検索",
+    "userId": "ユーザーID",
+    "userIdPlaceholder": "ユーザーIDを入力",
+    "tokenId": "トークンID",
+    "tokenIdPlaceholder": "トークンIDを入力",
+    "clearSearch": "クリア",
+    "owner": "所有者"
   },
   "topup": "トップアップ",
   "topupCard": {

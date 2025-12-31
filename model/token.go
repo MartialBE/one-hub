@@ -107,8 +107,14 @@ type AdminSearchTokensParams struct {
 	TokenId int `form:"token_id"`
 }
 
+// TokenWithOwner 包含令牌信息和所属用户信息
+type TokenWithOwner struct {
+	Token
+	OwnerName string `json:"owner_name"` // 用户名称（优先显示 display_name，其次 username）
+}
+
 // GetTokensListByAdmin 管理员查询令牌列表（可按用户ID或令牌ID查询）
-func GetTokensListByAdmin(params *AdminSearchTokensParams) (*DataResult[Token], error) {
+func GetTokensListByAdmin(params *AdminSearchTokensParams) (*DataResult[TokenWithOwner], error) {
 	var tokens []*Token
 	db := DB.Model(&Token{})
 
@@ -127,7 +133,48 @@ func GetTokensListByAdmin(params *AdminSearchTokensParams) (*DataResult[Token], 
 		db = db.Where("name LIKE ?", params.Keyword+"%")
 	}
 
-	return PaginateAndOrder(db, &params.PaginationParams, &tokens, allowedTokenOrderFields)
+	result, err := PaginateAndOrder(db, &params.PaginationParams, &tokens, allowedTokenOrderFields)
+	if err != nil {
+		return nil, err
+	}
+
+	// 收集所有用户ID
+	userIds := make([]int, 0)
+	userIdMap := make(map[int]bool)
+	for _, token := range *result.Data {
+		if !userIdMap[token.UserId] {
+			userIds = append(userIds, token.UserId)
+			userIdMap[token.UserId] = true
+		}
+	}
+
+	// 批量查询用户信息
+	userNameMap := make(map[int]string)
+	if len(userIds) > 0 {
+		var users []User
+		DB.Select("id, username, display_name").Where("id IN ?", userIds).Find(&users)
+		for _, user := range users {
+			name := user.DisplayName
+			if name == "" {
+				name = user.Username
+			}
+			userNameMap[user.Id] = name
+		}
+	}
+
+	// 构建带用户信息的结果
+	tokensWithOwner := make([]*TokenWithOwner, len(*result.Data))
+	for i, token := range *result.Data {
+		tokensWithOwner[i] = &TokenWithOwner{
+			Token:     *token,
+			OwnerName: userNameMap[token.UserId],
+		}
+	}
+
+	return &DataResult[TokenWithOwner]{
+		Data:       &tokensWithOwner,
+		TotalCount: result.TotalCount,
+	}, nil
 }
 
 func GetTokenModel(key string) (token *Token, err error) {

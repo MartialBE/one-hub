@@ -57,7 +57,7 @@ function statusInfo(t, status) {
   }
 }
 
-export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId, userGroup, userIsReliable }) {
+export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId, userGroup, userIsReliable, showOwner }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [menuItems, setMenuItems] = useState(null);
@@ -174,6 +174,13 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
   return (
     <>
       <TableRow tabIndex={item.id}>
+        {showOwner && (
+          <TableCell>
+            <Tooltip title={`ID: ${item.user_id}`} placement="top">
+              <span>{item.user_id} - {item.owner_name || '-'}</span>
+            </Tooltip>
+          </TableCell>
+        )}
         <TableCell>{item.name}</TableCell>
         <TableCell>
           <Label color={userGroup[item.group]?.color}>{userGroup[item.group]?.name || '跟随用户'}</Label>
@@ -275,5 +282,6 @@ TokensTableRow.propTypes = {
   handleOpenModal: PropTypes.func,
   setModalTokenId: PropTypes.func,
   userGroup: PropTypes.object,
-  userIsReliable: PropTypes.bool
+  userIsReliable: PropTypes.bool,
+  showOwner: PropTypes.bool
 };
