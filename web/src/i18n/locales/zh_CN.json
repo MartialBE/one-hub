@@ -319,7 +319,8 @@
     "owner": "所属",
     "adminEditWarning": "您正在以管理员身份编辑此令牌，可以修改令牌所属用户",
     "transferToUser": "所属用户ID",
-    "transferToUserHelper": "修改用户ID可转移此令牌的所有权"
+    "transferToUserHelper": "修改用户ID可转移此令牌的所有权",
+    "accessedTime": "最近使用"
   },
   "invoice_index": {
     "invoice": "月度账单",

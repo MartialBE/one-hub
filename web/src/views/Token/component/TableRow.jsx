@@ -57,7 +57,7 @@ function statusInfo(t, status) {
   }
 }
 
-export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId, userGroup, userIsReliable, showOwner }) {
+export default function TokensTableRow({ item, manageToken, handleOpenModal, setModalTokenId, userGroup, userIsReliable, isAdminSearch }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [menuItems, setMenuItems] = useState(null);
@@ -174,7 +174,7 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
   return (
     <>
       <TableRow tabIndex={item.id}>
-        {showOwner && (
+        {isAdminSearch && (
           <TableCell>
             <Tooltip title={`ID: ${item.user_id}`} placement="top">
               <span>{item.user_id} - {item.owner_name || '-'}</span>
@@ -208,18 +208,52 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
           </Tooltip>
         </TableCell>
 
-        <TableCell>{renderQuota(item.used_quota)}</TableCell>
+        {isAdminSearch ? (
+          // 管理员搜索模式：合并额度显示
+          <TableCell>
+            <Stack direction="column" spacing={0.5}>
+              <span>{renderQuota(item.used_quota)}</span>
+              <span style={{ color: 'text.secondary' }}>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 2)}</span>
+            </Stack>
+          </TableCell>
+        ) : (
+          // 普通模式：分开显示
+          <>
+            <TableCell>{renderQuota(item.used_quota)}</TableCell>
+            <TableCell>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 2)}</TableCell>
+          </>
+        )}
 
-        <TableCell>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 2)}</TableCell>
+        {isAdminSearch ? (
+          // 管理员搜索模式：合并时间显示
+          <TableCell>
+            <Stack direction="column" spacing={0.5}>
+              <span>{timestamp2string(item.created_time)}</span>
+              <span style={{ color: 'text.secondary' }}>{item.expired_time === -1 ? t('token_index.neverExpires') : timestamp2string(item.expired_time)}</span>
+            </Stack>
+          </TableCell>
+        ) : (
+          // 普通模式：分开显示
+          <>
+            <TableCell>{timestamp2string(item.created_time)}</TableCell>
+            <TableCell>{item.expired_time === -1 ? t('token_index.neverExpires') : timestamp2string(item.expired_time)}</TableCell>
+          </>
+        )}
 
-        <TableCell>{timestamp2string(item.created_time)}</TableCell>
-
-        <TableCell>{item.expired_time === -1 ? t('token_index.neverExpires') : timestamp2string(item.expired_time)}</TableCell>
+        {/* 管理员搜索模式：最近使用日期 */}
+        {isAdminSearch && (
+          <TableCell>
+            {item.accessed_time ? timestamp2string(item.accessed_time) : '-'}
+          </TableCell>
+        )}
 
         <TableCell>
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
-            <ButtonGroup size="small" aria-label="split button">
+            {isAdminSearch ? (
+              // 管理员搜索模式：只保留简单的复制按钮
               <Button
+                size="small"
+                variant="outlined"
                 color="primary"
                 onClick={() => {
                   copy(`sk-${item.key}`, t('token_index.token'));
@@ -227,18 +261,32 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
               >
                 {isMobile ? <Icon icon="mdi:content-copy" /> : t('token_index.copy')}
               </Button>
-              <Button size="small" onClick={(e) => handleOpenMenu(e, 'copy')}>
-                <IconCaretDownFilled size={'16px'} />
-              </Button>
-            </ButtonGroup>
-            <ButtonGroup size="small" onClick={(e) => handleOpenMenu(e, 'link')} aria-label="split button">
-              <Button size="small" color="primary">
-                {isMobile ? <Icon icon="mdi:chat" /> : t('token_index.chat')}
-              </Button>
-              <Button size="small">
-                <IconCaretDownFilled size={'16px'} />
-              </Button>
-            </ButtonGroup>
+            ) : (
+              // 普通模式：完整的操作按钮
+              <>
+                <ButtonGroup size="small" aria-label="split button">
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      copy(`sk-${item.key}`, t('token_index.token'));
+                    }}
+                  >
+                    {isMobile ? <Icon icon="mdi:content-copy" /> : t('token_index.copy')}
+                  </Button>
+                  <Button size="small" onClick={(e) => handleOpenMenu(e, 'copy')}>
+                    <IconCaretDownFilled size={'16px'} />
+                  </Button>
+                </ButtonGroup>
+                <ButtonGroup size="small" onClick={(e) => handleOpenMenu(e, 'link')} aria-label="split button">
+                  <Button size="small" color="primary">
+                    {isMobile ? <Icon icon="mdi:chat" /> : t('token_index.chat')}
+                  </Button>
+                  <Button size="small">
+                    <IconCaretDownFilled size={'16px'} />
+                  </Button>
+                </ButtonGroup>
+              </>
+            )}
             <IconButton onClick={(e) => handleOpenMenu(e, 'action')} sx={{ color: 'rgb(99, 115, 129)' }}>
               <Icon icon="solar:menu-dots-circle-bold-duotone" width={20} />
             </IconButton>
@@ -283,5 +331,5 @@ TokensTableRow.propTypes = {
   setModalTokenId: PropTypes.func,
   userGroup: PropTypes.object,
   userIsReliable: PropTypes.bool,
-  showOwner: PropTypes.bool
+  isAdminSearch: PropTypes.bool
 };

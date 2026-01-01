@@ -365,18 +365,36 @@ export default function Token() {
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'owner', label: t('token_index.owner'), disableSort: true, hide: !(adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)) },
-                  { id: 'name', label: t('token_index.name'), disableSort: false },
-                  { id: 'group', label: t('token_index.userGroup'), disableSort: false },
-                  { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
-                  { id: 'status', label: t('token_index.status'), disableSort: false },
-                  { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
-                  { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
-                  { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
-                  { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
-                  { id: 'action', label: t('token_index.actions'), disableSort: true }
-                ].filter(col => !col.hide)}
+                headLabel={(() => {
+                  const isAdminSearch = adminSearchEnabled && (adminSearchUserId || adminSearchTokenId);
+                  if (isAdminSearch) {
+                    // 管理员搜索模式：合并额度列、合并时间列、新增最近使用
+                    return [
+                      { id: 'owner', label: t('token_index.owner'), disableSort: true },
+                      { id: 'name', label: t('token_index.name'), disableSort: false },
+                      { id: 'group', label: t('token_index.userGroup'), disableSort: false },
+                      { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
+                      { id: 'status', label: t('token_index.status'), disableSort: false },
+                      { id: 'quota', label: t('token_index.usedQuota') + ' / ' + t('token_index.remainingQuota'), disableSort: true },
+                      { id: 'time', label: t('token_index.createdTime') + ' / ' + t('token_index.expiryTime'), disableSort: true },
+                      { id: 'accessed_time', label: t('token_index.accessedTime'), disableSort: false },
+                      { id: 'action', label: t('token_index.actions'), disableSort: true }
+                    ].filter(col => !col.hide);
+                  } else {
+                    // 普通模式
+                    return [
+                      { id: 'name', label: t('token_index.name'), disableSort: false },
+                      { id: 'group', label: t('token_index.userGroup'), disableSort: false },
+                      { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
+                      { id: 'status', label: t('token_index.status'), disableSort: false },
+                      { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
+                      { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
+                      { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
+                      { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
+                      { id: 'action', label: t('token_index.actions'), disableSort: true }
+                    ].filter(col => !col.hide);
+                  }
+                })()}
               />
               <TableBody>
                 {tokens.map((row) => (
@@ -388,7 +406,7 @@ export default function Token() {
                     setModalTokenId={setEditTokenId}
                     userGroup={userGroup}
                     userIsReliable={userIsReliable}
-                    showOwner={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
+                    isAdminSearch={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
                   />
                 ))}
               </TableBody>

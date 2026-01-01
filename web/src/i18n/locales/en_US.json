@@ -1289,7 +1289,8 @@
     "owner": "Owner",
     "adminEditWarning": "You are editing this token as an administrator, you can change the token owner",
     "transferToUser": "Owner User ID",
-    "transferToUserHelper": "Change user ID to transfer token ownership"
+    "transferToUserHelper": "Change user ID to transfer token ownership",
+    "accessedTime": "Last Used"
   },
   "topup": "Top-up",
   "topupCard": {
