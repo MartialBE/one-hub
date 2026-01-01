@@ -372,7 +372,7 @@ export default function Token() {
                     return [
                       { id: 'owner', label: t('token_index.owner'), disableSort: true },
                       { id: 'name', label: t('token_index.name'), disableSort: false },
-                      { id: 'group', label: t('token_index.userGroup'), disableSort: false },
+                      { id: 'group', label: t('token_index.userGroup') + ' / ' + t('token_index.userBackupGroup'), disableSort: false },
                       { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
                       { id: 'status', label: t('token_index.status'), disableSort: false },
                       { id: 'quota', label: t('token_index.usedQuota') + ' / ' + t('token_index.remainingQuota'), disableSort: true },

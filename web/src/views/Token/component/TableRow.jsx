@@ -183,7 +183,16 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
         )}
         <TableCell>{item.name}</TableCell>
         <TableCell>
-          <Label color={userGroup[item.group]?.color}>{userGroup[item.group]?.name || '跟随用户'}</Label>
+          {isAdminSearch ? (
+            // 管理员搜索模式：分组/备用分组两行显示
+            <Stack direction="column" spacing={0.5}>
+              <Label color={userGroup[item.group]?.color}>{userGroup[item.group]?.name || '跟随用户'}</Label>
+              <Label color={userGroup[item.backup_group]?.color}>{userGroup[item.backup_group]?.name || '-'}</Label>
+            </Stack>
+          ) : (
+            // 普通模式：只显示分组
+            <Label color={userGroup[item.group]?.color}>{userGroup[item.group]?.name || '跟随用户'}</Label>
+          )}
         </TableCell>
         {userIsReliable && (
           <TableCell>
