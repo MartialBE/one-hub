@@ -487,7 +487,7 @@ export function useIsAdmin() {
 export function useIsReliable() {
   const { user } = useSelector((state) => state.account);
   if (!user) return false;
-  return user.role >= 5;
+  return user.role >= 3;
 }
 
 export function timestamp2string(timestamp) {

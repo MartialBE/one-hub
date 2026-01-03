@@ -217,7 +217,7 @@ var ClaudeAPIEnabled = true
 const (
 	RoleGuestUser     = 0
 	RoleCommonUser    = 1
-	RoleReliableUser  = 5   // 可信的内部员工
+	RoleReliableUser  = 3   // 可信的内部员工
 	RoleAdminUser     = 10
 	RoleRootUser      = 100
 )
