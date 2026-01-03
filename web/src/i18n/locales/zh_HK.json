@@ -1265,7 +1265,11 @@
     "limits_ip_whitelist_info": "限制權杖只能從特定IP位址或範圍存取",
     "limits_ip_whitelist_switch": "啟用IP白名單",
     "limits_ip_whitelist_input": "IP位址",
-    "limits_ip_whitelist_helper": "每行輸入一個IP位址或CIDR範圍（如：192.168.1.1 或 10.0.0.0/8）"
+    "limits_ip_whitelist_helper": "每行輸入一個IP位址或CIDR範圍（如：192.168.1.1 或 10.0.0.0/8）",
+    "billingTag": "費用標籤",
+    "billingTagInfo": "用於按照分組統計費用，僅管理員可設定",
+    "billingTagLabel": "費用標籤",
+    "billingTagHelper": "選擇一個分組作為費用標籤，用於按分組統計該權杖的費用"
   },
   "topup": "儲值",
   "topupCard": {
@@ -1327,6 +1331,8 @@
     "adminUserRole": "管理員",
     "bind": "綁定",
     "cUserRole": "普通用戶",
+    "reliableUserRole": "可信內部員工",
+    "setReliable": "設為可信內部員工",
     "cancel": "取消",
     "cancelAdmin": "取消管理員",
     "createUser": "新建用戶",
@@ -1348,6 +1354,7 @@
     "refresh": "刷新",
     "saveSuccess": "保存成功！",
     "searchPlaceholder": "搜索用戶的ID、用戶名、分組、顯示名稱，以及電子郵件地址...",
+    "setCommonUser": "設為普通用戶",
     "setAdmin": "設為管理員",
     "statistics": "統計信息",
     "status": "狀態",

@@ -1263,7 +1263,11 @@
     "limits_ip_whitelist_info": "トークンアクセスを特定のIPアドレスまたは範囲に制限します",
     "limits_ip_whitelist_switch": "IPホワイトリストを有効にする",
     "limits_ip_whitelist_input": "IPアドレス",
-    "limits_ip_whitelist_helper": "1行に1つのIPアドレスまたはCIDR範囲を入力してください（例：192.168.1.1または10.0.0.0/8）"
+    "limits_ip_whitelist_helper": "1行に1つのIPアドレスまたはCIDR範囲を入力してください（例：192.168.1.1または10.0.0.0/8）",
+    "billingTag": "課金タグ",
+    "billingTagInfo": "グループ別の課金統計に使用します。管理者のみ設定可能",
+    "billingTagLabel": "課金タグ",
+    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください"
   },
   "topup": "トップアップ",
   "topupCard": {
@@ -1325,6 +1329,8 @@
     "adminUserRole": "管理者",
     "bind": "バインド",
     "cUserRole": "一般ユーザー",
+    "reliableUserRole": "信頼できる内部スタッフ",
+    "setReliable": "信頼できるスタッフに設定",
     "cancel": "キャンセル",
     "cancelAdmin": "管理者のキャンセル",
     "createUser": "ユーザーを作成",
@@ -1346,6 +1352,7 @@
     "refresh": "リフレッシュ",
     "saveSuccess": "保存しました！",
     "searchPlaceholder": "ユーザーのID、ユーザー名、グループ、表示名、またはメールアドレスを検索...",
+    "setCommonUser": "一般ユーザーに設定",
     "setAdmin": "管理者として設定する",
     "statistics": "統計情報",
     "status": "状態",

@@ -1274,7 +1274,11 @@
     "limits_ip_whitelist_info": "Restrict token access to specific IP addresses or ranges",
     "limits_ip_whitelist_switch": "Enable IP Whitelist",
     "limits_ip_whitelist_input": "IP Addresses",
-    "limits_ip_whitelist_helper": "Enter one IP address or CIDR range per line (e.g., 192.168.1.1 or 10.0.0.0/8)"
+    "limits_ip_whitelist_helper": "Enter one IP address or CIDR range per line (e.g., 192.168.1.1 or 10.0.0.0/8)",
+    "billingTag": "Billing Tag",
+    "billingTagInfo": "Used for billing statistics by group, only admins can set this",
+    "billingTagLabel": "Billing Tag",
+    "billingTagHelper": "Select a group as billing tag for tracking token costs by group"
   },
   "topup": "Top-up",
   "topupCard": {
@@ -1336,6 +1340,8 @@
     "adminUserRole": "administrator",
     "bind": "Bind",
     "cUserRole": "general user",
+    "reliableUserRole": "reliable internal staff",
+    "setReliable": "Set as reliable staff",
     "cancel": "Cancel",
     "cancelAdmin": "Cancel administrator",
     "createUser": "Create User",
@@ -1357,6 +1363,7 @@
     "refresh": "Refresh",
     "saveSuccess": "Saved successfully!",
     "searchPlaceholder": "Search for user ID, username, group, display name, or email address...",
+    "setCommonUser": "Set as common user",
     "setAdmin": "Set as administrator",
     "statistics": "Statistics",
     "status": "Status",

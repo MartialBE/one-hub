@@ -22,3 +22,8 @@ func (j *JSONType[T]) UnmarshalMsgpack(data []byte) error {
 	j.JSONType = datatypes.NewJSONType(v)
 	return nil
 }
+
+// Set 设置 JSONType 的值
+func (j *JSONType[T]) Set(v T) {
+	j.JSONType = datatypes.NewJSONType(v)
+}
