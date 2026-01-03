@@ -112,7 +112,7 @@ func initTable() error {
 			source_ip         String,
 			metadata          String,
 
-			partition_date      String DEFAULT formatDate(toDateTime(created_at), '%Y-%m-%d')
+			partition_date      String DEFAULT formatDateTime(toDateTime(created_at), '%%Y-%%m-%%d')
 		) ENGINE = MergeTree()
 		ORDER BY (partition_date, created_at, user_id)
 		PARTITION BY partition_date
