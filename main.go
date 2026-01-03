@@ -7,6 +7,7 @@ import (
 	"one-api/cli"
 	"one-api/common"
 	"one-api/common/cache"
+	"one-api/common/clickhouse"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/notify"
@@ -59,6 +60,9 @@ func main() {
 	defer model.CloseDB()
 	// Initialize Redis
 	redis.InitRedisClient()
+	// Initialize ClickHouse
+	clickhouse.InitClickHouseClient()
+	defer clickhouse.CloseClickHouse()
 	cache.InitCacheManager()
 	// Initialize options
 	model.InitOptionMap()

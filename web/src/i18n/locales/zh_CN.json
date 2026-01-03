@@ -804,6 +804,8 @@
       "logSettings": {
         "title": "日志设置",
         "logConsume": "启用日志消费",
+        "logToMySQL": "写入 MySQL",
+        "logToClickHouse": "写入 ClickHouse",
         "logCleanupTime": {
           "label": "日志清理时间",
           "placeholder": "日志清理时间"

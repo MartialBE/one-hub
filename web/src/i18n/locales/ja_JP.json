@@ -887,6 +887,8 @@
           "placeholder": "ログクリーニング時間"
         },
         "logConsume": "ログ消費を有効にする",
+        "logToMySQL": "MySQLに書き込む",
+        "logToClickHouse": "ClickHouseに書き込む",
         "title": "ログ設定"
       },
       "monitoringSettings": {
