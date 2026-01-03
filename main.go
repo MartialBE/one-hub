@@ -55,14 +55,16 @@ func main() {
 		logger.FatalLog("failed to initialize user token: " + err.Error())
 	}
 
+	// Initialize ClickHouse first (must be before SetupDB for batch updater to start correctly)
+	clickhouse.InitClickHouseClient()
+	defer clickhouse.CloseClickHouse()
+
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
+
 	// Initialize Redis
 	redis.InitRedisClient()
-	// Initialize ClickHouse
-	clickhouse.InitClickHouseClient()
-	defer clickhouse.CloseClickHouse()
 	cache.InitCacheManager()
 	// Initialize options
 	model.InitOptionMap()

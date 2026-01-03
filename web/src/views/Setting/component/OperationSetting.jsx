@@ -12,7 +12,8 @@ import {
   Alert,
   Select,
   MenuItem,
-  Chip
+  Chip,
+  Typography
 } from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
@@ -589,10 +590,15 @@ const OperationSetting = () => {
                 label={t('setting_index.operationSettings.logSettings.logToMySQL')}
                 control={<Checkbox checked={inputs.LogToMySQLEnabled === 'true'} onChange={handleInputChange} name="LogToMySQLEnabled" />}
               />
-              <FormControlLabel
-                label={t('setting_index.operationSettings.logSettings.logToClickHouse')}
-                control={<Checkbox checked={inputs.LogToClickHouseEnabled === 'true'} onChange={handleInputChange} name="LogToClickHouseEnabled" />}
-              />
+              <Stack direction="column" sx={{ ml: 2 }}>
+                <FormControlLabel
+                  label={t('setting_index.operationSettings.logSettings.logToClickHouse')}
+                  control={<Checkbox checked={inputs.LogToClickHouseEnabled === 'true'} onChange={handleInputChange} name="LogToClickHouseEnabled" />}
+                />
+                <Typography variant="caption" sx={{ color: 'text.secondary', ml: 2 }}>
+                  需要传入 clickhouse 连接字符串才可用 (CLICKHOUSE_CONN_STRING)
+                </Typography>
+              </Stack>
             </Stack>
           )}
           <FormControl>

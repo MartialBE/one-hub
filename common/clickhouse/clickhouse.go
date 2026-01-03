@@ -33,17 +33,12 @@ type LogEntry struct {
 	Metadata         string // JSON 字符串
 }
 
-// InitClickHouseClient 初始化 ClickHouse 连接（参考 Redis 模式）
+// InitClickHouseClient 初始化 ClickHouse 连接
 func InitClickHouseClient() error {
 	connString := viper.GetString("clickhouse_conn_string")
 
 	if connString == "" {
 		logger.SysLog("CLICKHOUSE_CONN_STRING not set, ClickHouse is not enabled")
-		return nil
-	}
-
-	if !config.LogToClickHouseEnabled {
-		logger.SysLog("LOG_TO_CLICKHOUSE is false, ClickHouse logging is disabled")
 		return nil
 	}
 
@@ -96,7 +91,7 @@ func initTable() error {
 
 	ttlClause := ""
 	if config.ClickHouseLogTTLDays > 0 {
-		ttlClause = fmt.Sprintf("TTL created_time + INTERVAL %d DAY", config.ClickHouseLogTTLDays)
+		ttlClause = fmt.Sprintf("TTL parseDateTimeBestEffort(created_time) + INTERVAL %d DAY", config.ClickHouseLogTTLDays)
 	}
 
 	createTableSQL := fmt.Sprintf(`
@@ -117,10 +112,10 @@ func initTable() error {
 			source_ip         String,
 			metadata          String,
 
-			created_time      DateTime DEFAULT toDateTime(created_at)
+			created_time      String DEFAULT formatDate(toDateTime(created_at), '%Y-%m-%d')
 		) ENGINE = MergeTree()
-		ORDER BY (created_at, user_id, model_name)
-		PARTITION BY toYYYYMM(created_time)
+		ORDER BY (created_time, created_at, user_id)
+		PARTITION BY created_time
 		%s
 	`, ttlClause)
 

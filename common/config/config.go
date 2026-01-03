@@ -25,7 +25,6 @@ func InitConf() {
 
 	// ClickHouse 配置初始化
 	LogToMySQLEnabled = viper.GetBool("log_to_mysql")
-	LogToClickHouseEnabled = viper.GetBool("log_to_clickhouse")
 	ClickHouseLogTTLDays = viper.GetInt("clickhouse_log_ttl_days")
 }
 
@@ -60,6 +59,5 @@ func defaultConfig() {
 	// ClickHouse 配置默认值
 	viper.SetDefault("clickhouse_conn_string", "")
 	viper.SetDefault("log_to_mysql", true)
-	viper.SetDefault("log_to_clickhouse", false)
 	viper.SetDefault("clickhouse_log_ttl_days", 0)
 }

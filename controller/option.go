@@ -91,6 +91,14 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case "LogToClickHouseEnabled":
+		if option.Value == "true" && !config.ClickHouseEnabled {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "无法启用写入 ClickHouse，请先配置 CLICKHOUSE_CONN_STRING 环境变量！",
+			})
+			return
+		}
 	}
 	err = model.UpdateOption(option.Key, option.Value)
 	if err != nil {

@@ -49,6 +49,17 @@ func InitBatchUpdater() {
 	}()
 }
 
+// InitClickHouseBatchUpdater 初始化 ClickHouse 独立批量刷新器
+// 这个函数独立于 MySQL 的批量更新机制，确保 ClickHouse 日志即使没有启用 MySQL 批量更新也能正常刷新
+func InitClickHouseBatchUpdater(interval int) {
+	go func() {
+		for {
+			time.Sleep(time.Duration(interval) * time.Second)
+			flushBatchLogsClick()
+		}
+	}()
+}
+
 func AddLogToBatch(log *Log) {
 	batchLogLock.Lock()
 	defer batchLogLock.Unlock()
