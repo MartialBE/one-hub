@@ -91,7 +91,7 @@ func initTable() error {
 
 	ttlClause := ""
 	if config.ClickHouseLogTTLDays > 0 {
-		ttlClause = fmt.Sprintf("TTL parseDateTimeBestEffort(created_time) + INTERVAL %d DAY", config.ClickHouseLogTTLDays)
+		ttlClause = fmt.Sprintf("TTL parseDateTimeBestEffort(partition_date) + INTERVAL %d DAY", config.ClickHouseLogTTLDays)
 	}
 
 	createTableSQL := fmt.Sprintf(`
@@ -112,10 +112,10 @@ func initTable() error {
 			source_ip         String,
 			metadata          String,
 
-			created_time      String DEFAULT formatDate(toDateTime(created_at), '%Y-%m-%d')
+			partition_date      String DEFAULT formatDate(toDateTime(created_at), '%Y-%m-%d')
 		) ENGINE = MergeTree()
-		ORDER BY (created_time, created_at, user_id)
-		PARTITION BY created_time
+		ORDER BY (partition_date, created_at, user_id)
+		PARTITION BY partition_date
 		%s
 	`, ttlClause)
 
