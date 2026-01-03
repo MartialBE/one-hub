@@ -7,6 +7,7 @@ import (
 	"one-api/cli"
 	"one-api/common"
 	"one-api/common/cache"
+	"one-api/common/clickhouse"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/notify"
@@ -54,9 +55,14 @@ func main() {
 		logger.FatalLog("failed to initialize user token: " + err.Error())
 	}
 
+	// Initialize ClickHouse first (must be before SetupDB for batch updater to start correctly)
+	clickhouse.InitClickHouseClient()
+	defer clickhouse.CloseClickHouse()
+
 	// Initialize SQL Database
 	model.SetupDB()
 	defer model.CloseDB()
+
 	// Initialize Redis
 	redis.InitRedisClient()
 	cache.InitCacheManager()

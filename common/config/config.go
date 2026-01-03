@@ -22,6 +22,10 @@ func InitConf() {
 	UPTIMEKUMA_ENABLE = viper.GetBool("uptime_kuma.enable") != false
 	UPTIMEKUMA_DOMAIN = viper.GetString("uptime_kuma.domain")
 	UPTIMEKUMA_STATUS_PAGE_NAME = viper.GetString("uptime_kuma.status_page_name")
+
+	// ClickHouse 配置初始化
+	LogToMySQLEnabled = viper.GetBool("log_to_mysql")
+	ClickHouseLogTTLDays = viper.GetInt("clickhouse_log_ttl_days")
 }
 
 func setEnv() {
@@ -51,4 +55,9 @@ func defaultConfig() {
 	viper.SetDefault("uptime_kuma.enable", false)
 	viper.SetDefault("uptime_kuma.domain", "")
 	viper.SetDefault("uptime_kuma.status_page_name", "")
+
+	// ClickHouse 配置默认值
+	viper.SetDefault("clickhouse_conn_string", "")
+	viper.SetDefault("log_to_mysql", true)
+	viper.SetDefault("clickhouse_log_ttl_days", 0)
 }

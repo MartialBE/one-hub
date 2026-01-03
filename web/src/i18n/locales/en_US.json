@@ -899,6 +899,8 @@
           "placeholder": "Log Cleanup Time"
         },
         "logConsume": "Enable Log Consumption",
+        "logToMySQL": "Write to MySQL",
+        "logToClickHouse": "Write to ClickHouse",
         "title": "Log Settings"
       },
       "monitoringSettings": {

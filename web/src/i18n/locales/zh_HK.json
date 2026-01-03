@@ -889,6 +889,8 @@
           "placeholder": "日誌清理時間"
         },
         "logConsume": "啟用日誌消費",
+        "logToMySQL": "寫入 MySQL",
+        "logToClickHouse": "寫入 ClickHouse",
         "title": "日誌設置"
       },
       "monitoringSettings": {

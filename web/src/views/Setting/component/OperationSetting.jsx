@@ -12,7 +12,8 @@ import {
   Alert,
   Select,
   MenuItem,
-  Chip
+  Chip,
+  Typography
 } from '@mui/material';
 import { showSuccess, showError, verifyJSON } from 'utils/common';
 import { API } from 'utils/api';
@@ -45,6 +46,8 @@ const OperationSetting = () => {
     AutomaticEnableChannelEnabled: '',
     ChannelDisableThreshold: 0,
     LogConsumeEnabled: '',
+    LogToMySQLEnabled: '',
+    LogToClickHouseEnabled: '',
     DisplayInCurrencyEnabled: '',
     ApproximateTokenEnabled: '',
     RetryTimes: 0,
@@ -166,6 +169,7 @@ const OperationSetting = () => {
   const handleInputChange = async (event) => {
     let { name, value } = event.target;
 
+    // 处理复选框类型的配置项（以 Enabled 结尾）
     if (name.endsWith('Enabled')) {
       await updateOption(name, value);
       showSuccess('设置成功！');
@@ -580,6 +584,23 @@ const OperationSetting = () => {
             label={t('setting_index.operationSettings.logSettings.logConsume')}
             control={<Checkbox checked={inputs.LogConsumeEnabled === 'true'} onChange={handleInputChange} name="LogConsumeEnabled" />}
           />
+          {inputs.LogConsumeEnabled === 'true' && (
+            <Stack direction="row" spacing={2} sx={{ ml: 3 }}>
+              <FormControlLabel
+                label={t('setting_index.operationSettings.logSettings.logToMySQL')}
+                control={<Checkbox checked={inputs.LogToMySQLEnabled === 'true'} onChange={handleInputChange} name="LogToMySQLEnabled" />}
+              />
+              <Stack direction="column" sx={{ ml: 2 }}>
+                <FormControlLabel
+                  label={t('setting_index.operationSettings.logSettings.logToClickHouse')}
+                  control={<Checkbox checked={inputs.LogToClickHouseEnabled === 'true'} onChange={handleInputChange} name="LogToClickHouseEnabled" />}
+                />
+                <Typography variant="caption" sx={{ color: 'text.secondary', ml: 2 }}>
+                  需要传入 clickhouse 连接字符串才可用 (CLICKHOUSE_CONN_STRING)
+                </Typography>
+              </Stack>
+            </Stack>
+          )}
           <FormControl>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'zh-cn'}>
               <DateTimePicker

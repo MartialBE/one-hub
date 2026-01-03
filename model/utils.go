@@ -1,7 +1,9 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
+	"one-api/common/clickhouse"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"sync"
@@ -25,6 +27,10 @@ var batchUpdateLocks []sync.Mutex
 var batchLogStore []*Log
 var batchLogLock sync.Mutex
 
+// ClickHouse 专用缓存
+var batchLogStoreClick []*Log
+var batchLogLockClick sync.Mutex
+
 func init() {
 	for i := 0; i < BatchUpdateTypeCount; i++ {
 		batchUpdateStores = append(batchUpdateStores, make(map[int]int))
@@ -38,6 +44,18 @@ func InitBatchUpdater() {
 			time.Sleep(time.Duration(config.BatchUpdateInterval) * time.Second)
 			batchUpdate()
 			flushBatchLogs()
+			flushBatchLogsClick()
+		}
+	}()
+}
+
+// InitClickHouseBatchUpdater 初始化 ClickHouse 独立批量刷新器
+// 这个函数独立于 MySQL 的批量更新机制，确保 ClickHouse 日志即使没有启用 MySQL 批量更新也能正常刷新
+func InitClickHouseBatchUpdater(interval int) {
+	go func() {
+		for {
+			time.Sleep(time.Duration(interval) * time.Second)
+			flushBatchLogsClick()
 		}
 	}()
 }
@@ -62,6 +80,67 @@ func flushBatchLogs() {
 	err := BatchInsert(DB, logs)
 	if err != nil {
 		logger.SysError("failed to batch insert logs: " + err.Error())
+	}
+}
+
+// AddLogToBatchClick 添加日志到 ClickHouse 批量缓存（独立于 MySQL）
+func AddLogToBatchClick(log *Log) {
+	if !config.ClickHouseEnabled {
+		return
+	}
+	batchLogLockClick.Lock()
+	defer batchLogLockClick.Unlock()
+	batchLogStoreClick = append(batchLogStoreClick, log)
+}
+
+// flushBatchLogsClick 批量刷新日志到 ClickHouse
+func flushBatchLogsClick() {
+	if !config.ClickHouseEnabled {
+		return
+	}
+
+	batchLogLockClick.Lock()
+	logs := batchLogStoreClick
+	batchLogStoreClick = nil
+	batchLogLockClick.Unlock()
+
+	if len(logs) == 0 {
+		return
+	}
+
+	// 转换为 ClickHouse LogEntry
+	entries := make([]*clickhouse.LogEntry, 0, len(logs))
+	for _, log := range logs {
+		metadataStr := ""
+		if log.Metadata.Data() != nil {
+			if data, err := json.Marshal(log.Metadata.Data()); err == nil {
+				metadataStr = string(data)
+			}
+		}
+
+		entry := &clickhouse.LogEntry{
+			UserId:           int32(log.UserId),
+			CreatedAt:        log.CreatedAt,
+			Type:             int8(log.Type),
+			Content:          log.Content,
+			Username:         log.Username,
+			TokenName:        log.TokenName,
+			ModelName:        log.ModelName,
+			Quota:            int32(log.Quota),
+			PromptTokens:     int32(log.PromptTokens),
+			CompletionTokens: int32(log.CompletionTokens),
+			ChannelId:        int32(log.ChannelId),
+			RequestTime:      int32(log.RequestTime),
+			IsStream:         log.IsStream,
+			SourceIp:         log.SourceIp,
+			Metadata:         metadataStr,
+		}
+		entries = append(entries, entry)
+	}
+
+	logger.SysLog(fmt.Sprintf("batch inserting %d logs to ClickHouse", len(entries)))
+	if err := clickhouse.BatchInsert(entries); err != nil {
+		logger.SysError("failed to batch insert logs to ClickHouse: " + err.Error())
 	}
 }
 

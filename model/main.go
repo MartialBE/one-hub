@@ -30,11 +30,21 @@ func SetupDB() {
 	config.RootUserEmail = GetRootUserEmail()
 	NewModelOwnedBys()
 
+	// 启动 MySQL 批量更新（如果启用）
 	if viper.GetBool("batch_update_enabled") {
 		config.BatchUpdateEnabled = true
 		config.BatchUpdateInterval = utils.GetOrDefault("batch_update_interval", 5)
 		logger.SysLog("batch update enabled with interval " + strconv.Itoa(config.BatchUpdateInterval) + "s")
 		InitBatchUpdater()
+	}
+
+	// 启动 ClickHouse 批量刷新（独立于 MySQL 批量更新）
+	if config.ClickHouseEnabled {
+		batchInterval := config.BatchUpdateInterval
+		if batchInterval == 0 {
+			batchInterval = 5 // 默认 5 秒
+		}
+		InitClickHouseBatchUpdater(batchInterval)
 	}
 }
 

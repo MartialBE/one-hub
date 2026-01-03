@@ -121,12 +121,20 @@ func RecordConsumeLog(
 		log.Metadata = datatypes.NewJSONType(metadata)
 	}
 
-	if config.BatchUpdateEnabled {
-		AddLogToBatch(log)
-	} else {
-		err := DB.Create(log).Error
-		if err != nil {
-			logger.LogError(ctx, "failed to record log: "+err.Error())
+	// ClickHouse 只支持批量写入模式
+	if config.LogToClickHouseEnabled && config.ClickHouseEnabled {
+		AddLogToBatchClick(log)
+	}
+
+	// MySQL 支持批量和非批量模式
+	if config.LogToMySQLEnabled {
+		if config.BatchUpdateEnabled {
+			AddLogToBatch(log)
+		} else {
+			err := DB.Create(log).Error
+			if err != nil {
+				logger.LogError(ctx, "failed to record log to MySQL: "+err.Error())
+			}
 		}
 	}
 }
