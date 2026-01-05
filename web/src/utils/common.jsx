@@ -484,6 +484,12 @@ export function useIsAdmin() {
   return user.role >= 10;
 }
 
+export function useIsReliable() {
+  const { user } = useSelector((state) => state.account);
+  if (!user) return false;
+  return user.role >= 3;
+}
+
 export function timestamp2string(timestamp) {
   let date = new Date(timestamp * 1000);
   let year = date.getFullYear().toString();

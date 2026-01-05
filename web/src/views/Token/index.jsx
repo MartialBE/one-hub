@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { showError, showSuccess, trims, copy } from 'utils/common';
+import { showError, showSuccess, trims, copy, useIsReliable } from 'utils/common';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -41,6 +41,7 @@ export default function Token() {
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
   const { userGroup } = useSelector((state) => state.account);
+  const userIsReliable = useIsReliable();
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -246,13 +247,14 @@ export default function Token() {
                 headLabel={[
                   { id: 'name', label: t('token_index.name'), disableSort: false },
                   { id: 'group', label: t('token_index.userGroup'), disableSort: false },
+                  { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
                   { id: 'status', label: t('token_index.status'), disableSort: false },
                   { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
                   { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
                   { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
                   { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
                   { id: 'action', label: t('token_index.actions'), disableSort: true }
-                ]}
+                ].filter(col => !col.hide)}
               />
               <TableBody>
                 {tokens.map((row) => (
@@ -263,6 +265,7 @@ export default function Token() {
                     handleOpenModal={handleOpenModal}
                     setModalTokenId={setEditTokenId}
                     userGroup={userGroup}
+                    userIsReliable={userIsReliable}
                   />
                 ))}
               </TableBody>

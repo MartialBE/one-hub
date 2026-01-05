@@ -30,6 +30,7 @@ type Quota struct {
 	userId           int
 	channelId        int
 	tokenId          int
+	unlimitedQuota   bool
 	HandelStatus     bool
 
 	startTime         time.Time
@@ -41,13 +42,14 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) *Quota {
 	isBackupGroup := c.GetBool("is_backupGroup")
 
 	quota := &Quota{
-		modelName:     modelName,
-		promptTokens:  promptTokens,
-		userId:        c.GetInt("id"),
-		channelId:     c.GetInt("channel_id"),
-		tokenId:       c.GetInt("token_id"),
-		HandelStatus:  false,
-		isBackupGroup: isBackupGroup, // 记录是否使用备用分组
+		modelName:      modelName,
+		promptTokens:   promptTokens,
+		userId:         c.GetInt("id"),
+		channelId:      c.GetInt("channel_id"),
+		tokenId:        c.GetInt("token_id"),
+		unlimitedQuota: c.GetBool("token_unlimited_quota"),
+		HandelStatus:   false,
+		isBackupGroup:  isBackupGroup, // 记录是否使用备用分组
 	}
 
 	quota.price = *model.PricingInstance.GetPrice(quota.modelName)
@@ -145,7 +147,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 
 	if quota > 0 {
 		quotaDelta := quota - q.preConsumedQuota
-		err := model.PostConsumeTokenQuota(q.tokenId, quotaDelta)
+		err := model.PostConsumeTokenQuotaWithInfo(q.tokenId, q.userId, q.unlimitedQuota, quotaDelta)
 		if err != nil {
 			return errors.New("error consuming token remain quota: " + err.Error())
 		}
@@ -177,11 +179,10 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 }
 
 func (q *Quota) Undo(c *gin.Context) {
-	tokenId := c.GetInt("token_id")
 	if q.HandelStatus {
 		go func(ctx context.Context) {
 			// return pre-consumed quota
-			err := model.PostConsumeTokenQuota(tokenId, -q.preConsumedQuota)
+			err := model.PostConsumeTokenQuotaWithInfo(q.tokenId, q.userId, q.unlimitedQuota, -q.preConsumedQuota)
 			if err != nil {
 				logger.LogError(ctx, "error return pre-consumed quota: "+err.Error())
 			}
