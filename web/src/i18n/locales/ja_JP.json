@@ -538,6 +538,7 @@
     "modelName": "モデル名",
     "noneGroup": "現在のグループは利用できません",
     "outputMultiplier": "価格を出力します。",
+    "timesPrice": "1回あたりの価格",
     "search": "検索",
     "times": "回数制課金",
     "tokens": "量に応じて支払う",
