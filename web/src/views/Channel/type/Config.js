@@ -17,7 +17,8 @@ const defaultConfig = {
     only_chat: false,
     pre_cost: 1,
     disabled_stream: [],
-    compatible_response: false
+    compatible_response: false,
+    allow_extra_body: false
   },
   inputLabel: {
     name: '渠道名称',
@@ -37,7 +38,8 @@ const defaultConfig = {
     provider_models_list: '',
     pre_cost: '预计费选项',
     disabled_stream: '禁用流式的模型',
-    compatible_response: '兼容Response API'
+    compatible_response: '兼容Response API',
+    allow_extra_body: '允许额外字段透传'
   },
   prompt: {
     type: '请选择渠道类型',
@@ -61,7 +63,8 @@ const defaultConfig = {
     pre_cost:
       '这里选择预计费选项，用于预估费用，如果你觉得计算图片占用太多资源，可以选择关闭图片计费。但是请注意：有些渠道在stream下是不会返回tokens的，这会导致输入tokens计算错误。',
     disabled_stream: '这里填写禁用流式的模型，注意：如果填写了禁用流式的模型，那么这些模型在流式请求时会跳过该渠道',
-    compatible_response: '兼容Response API'
+    compatible_response: '兼容Response API',
+    allow_extra_body: '开启后，将会透传用户请求中的额外字段（如OpenAI SDK的extra_body参数），适用于需要传递自定义参数到上游API的场景'
   },
   modelGroup: 'OpenAI'
 };

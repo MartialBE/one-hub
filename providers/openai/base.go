@@ -246,6 +246,28 @@ func (p *OpenAIProvider) mergeCustomParams(requestMap map[string]interface{}, cu
 	return requestMap
 }
 
+// mergeExtraBodyFromRawRequest 从原始请求基础上合并处理后的请求字段
+// 以用户原始请求为基础，用处理后的字段覆盖，这样额外字段自然保留
+func (p *OpenAIProvider) mergeExtraBodyFromRawRequest(requestMap map[string]interface{}) map[string]interface{} {
+	rawBody, ok := p.GetRawBody()
+	if !ok || rawBody == nil {
+		return requestMap
+	}
+
+	var rawRequest map[string]interface{}
+	err := json.Unmarshal(rawBody, &rawRequest)
+	if err != nil {
+		return requestMap
+	}
+
+	// 以原始请求为基础，用处理后的请求字段覆盖
+	for key, value := range requestMap {
+		rawRequest[key] = value
+	}
+
+	return rawRequest
+}
+
 // 修改GetRequestTextBody函数中的对应部分
 func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, request any) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	url, errWithCode := p.GetSupportedAPIUri(relayMode)
@@ -263,8 +285,11 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "custom_parameter_error", http.StatusInternalServerError)
 	}
-	// 如果有额外参数，将其添加到请求体中
-	if customParams != nil {
+
+	// 检查是否需要合并额外字段（来自渠道配置的额外参数或用户请求中的extra_body）
+	needMerge := customParams != nil || p.Channel.AllowExtraBody
+
+	if needMerge {
 		// 将请求体转换为map，以便添加额外参数
 		var requestMap map[string]interface{}
 		requestBytes, err := json.Marshal(request)
@@ -277,8 +302,15 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 			return nil, common.ErrorWrapper(err, "unmarshal_request_failed", http.StatusInternalServerError)
 		}
 
+		// 如果允许额外字段透传，从原始请求中获取额外字段
+		if p.Channel.AllowExtraBody {
+			requestMap = p.mergeExtraBodyFromRawRequest(requestMap)
+		}
+
 		// 处理自定义额外参数
-		requestMap = p.mergeCustomParams(requestMap, customParams)
+		if customParams != nil {
+			requestMap = p.mergeCustomParams(requestMap, customParams)
+		}
 
 		// 使用修改后的请求体创建请求
 		req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(requestMap), p.Requester.WithHeader(headers))
