@@ -542,6 +542,7 @@
     "modelName": "模型名稱",
     "noneGroup": "當前分組不可用",
     "outputMultiplier": "輸出價格",
+    "timesPrice": "單次價格",
     "search": "搜尋",
     "times": "按次付費",
     "tokens": "按量付費",

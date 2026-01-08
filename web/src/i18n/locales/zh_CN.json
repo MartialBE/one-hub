@@ -644,6 +644,7 @@
     "outputPrice": "输出价格",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
+    "timesPrice": "单次价格",
     "input": "输入",
     "output": "输出",
     "rate": "倍率",
