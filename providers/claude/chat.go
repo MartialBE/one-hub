@@ -121,7 +121,6 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 	claudeRequest := ClaudeRequest{
 		Model:         request.Model,
 		Messages:      make([]Message, 0),
-		System:        "",
 		MaxTokens:     request.MaxTokens,
 		StopSequences: nil,
 		Temperature:   request.Temperature,
@@ -148,7 +147,12 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 
 	// 如果请求中已经有 system 字段（如数组格式带 cache_control），直接使用
 	if request.System != nil {
-		claudeRequest.System = request.System
+		// 检查是否为空字符串，避免传递空 system 字段
+		if str, ok := request.System.(string); ok && str == "" {
+			// 空字符串不设置，保持为 nil
+		} else {
+			claudeRequest.System = request.System
+		}
 	}
 
 	// 处理 messages
