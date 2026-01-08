@@ -19,8 +19,33 @@ func (f DeepseekProviderFactory) Create(channel *model.Channel) base.ProviderInt
 				Channel:   channel,
 				Requester: requester.NewHTTPRequester(*channel.Proxy, openai.RequestErrorHandle),
 			},
-			BalanceAction: false,
+			BalanceAction:     false,
+			RequestMapHandler: deepseekRequestMapHandler,
 		},
+	}
+}
+
+// deepseekRequestMapHandler 为 DeepSeek 渠道的 assistant 消息添加 reasoning_content 字段
+// DeepSeek API 要求 assistant 消息必须包含 reasoning_content 字段，即使为空字符串
+func deepseekRequestMapHandler(requestMap map[string]interface{}) {
+	messages, ok := requestMap["messages"].([]interface{})
+	if !ok {
+		return
+	}
+
+	for _, msg := range messages {
+		msgMap, ok := msg.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		role, _ := msgMap["role"].(string)
+		if role == "assistant" {
+			// 如果没有 reasoning_content 字段，添加空字符串
+			if _, exists := msgMap["reasoning_content"]; !exists {
+				msgMap["reasoning_content"] = ""
+			}
+		}
 	}
 }
 
