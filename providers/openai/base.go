@@ -18,6 +18,7 @@ type OpenAIProviderFactory struct{}
 
 type UsageHandler func(usage *types.Usage) (ForcedFormatting bool)
 type RequestHandleBefore func(request *types.ChatCompletionRequest) (errWithCode *types.OpenAIErrorWithStatusCode)
+type RequestMapHandler func(requestMap map[string]interface{})
 
 type OpenAIProvider struct {
 	base.BaseProvider
@@ -29,6 +30,7 @@ type OpenAIProvider struct {
 
 	UsageHandler        UsageHandler
 	RequestHandleBefore RequestHandleBefore
+	RequestMapHandler   RequestMapHandler
 }
 
 // 创建 OpenAIProvider
@@ -263,8 +265,12 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 	if err != nil {
 		return nil, common.ErrorWrapper(err, "custom_parameter_error", http.StatusInternalServerError)
 	}
-	// 如果有额外参数，将其添加到请求体中
-	if customParams != nil {
+
+	// 检查是否需要合并额外字段（来自渠道配置的额外参数或用户请求中的extra_body或自定义请求处理）
+	needMerge := customParams != nil || p.RequestMapHandler != nil
+
+	if needMerge {
+
 		// 将请求体转换为map，以便添加额外参数
 		var requestMap map[string]interface{}
 		requestBytes, err := json.Marshal(request)
@@ -279,6 +285,11 @@ func (p *OpenAIProvider) GetRequestTextBody(relayMode int, ModelName string, req
 
 		// 处理自定义额外参数
 		requestMap = p.mergeCustomParams(requestMap, customParams)
+
+		// 调用自定义请求Map处理钩子
+		if p.RequestMapHandler != nil {
+			p.RequestMapHandler(requestMap)
+		}
 
 		// 使用修改后的请求体创建请求
 		req, err := p.Requester.NewRequest(http.MethodPost, fullRequestURL, p.Requester.WithBody(requestMap), p.Requester.WithHeader(headers))
