@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"one-api/common"
+	"one-api/common/utils"
 	"strings"
 	"time"
 )
@@ -264,13 +265,19 @@ func UpdateStatistics(updateType StatisticsUpdateType) error {
 	sqlWhere := ""
 	sqlDate := ""
 	sqlSuffix := ""
+	// 获取时区偏移量，用于 SQL 日期计算
+	tzOffset := utils.GetTimezoneOffset()
+	tzOffsetSeconds := utils.GetTimezoneOffsetSeconds()
+
 	if common.UsingSQLite {
 		sqlPrefix = "INSERT OR REPLACE INTO"
-		sqlDate = "strftime('%Y-%m-%d', datetime(created_at, 'unixepoch', '+8 hours'))"
+		// SQLite: 使用秒数偏移量，支持任意时区
+		sqlDate = fmt.Sprintf("strftime('%%Y-%%m-%%d', datetime(created_at + %d, 'unixepoch'))", tzOffsetSeconds)
 		sqlSuffix = ""
 	} else if common.UsingPostgreSQL {
 		sqlPrefix = "INSERT INTO"
-		sqlDate = "DATE_TRUNC('day', TO_TIMESTAMP(created_at))::DATE"
+		// PostgreSQL: 使用 AT TIME ZONE 进行时区转换
+		sqlDate = fmt.Sprintf("DATE_TRUNC('day', TO_TIMESTAMP(created_at) AT TIME ZONE 'UTC' AT TIME ZONE INTERVAL '%s')::DATE", tzOffset)
 		sqlSuffix = `ON CONFLICT (date, user_id, channel_id, model_name) DO UPDATE SET
 		request_count = EXCLUDED.request_count,
 		quota = EXCLUDED.quota,
@@ -279,7 +286,8 @@ func UpdateStatistics(updateType StatisticsUpdateType) error {
 		request_time = EXCLUDED.request_time`
 	} else {
 		sqlPrefix = "INSERT INTO"
-		sqlDate = "DATE_FORMAT(FROM_UNIXTIME(created_at), '%Y-%m-%d')"
+		// MySQL: 使用 CONVERT_TZ 从 UTC 转换到目标时区
+		sqlDate = fmt.Sprintf("DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(created_at, '%%Y-%%m-%%d %%H:%%i:%%s'), INTERVAL %d SECOND), '%%Y-%%m-%%d')", tzOffsetSeconds)
 		sqlSuffix = `ON DUPLICATE KEY UPDATE
 		request_count = VALUES(request_count),
 		quota = VALUES(quota),

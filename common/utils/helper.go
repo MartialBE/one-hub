@@ -398,6 +398,38 @@ func GetLocalTimezone() string {
 	return "Asia/Shanghai"
 }
 
+// GetTimezoneOffset 返回时区偏移量字符串，格式如 "+08:00" 或 "-05:00"
+func GetTimezoneOffset() string {
+	loc, err := time.LoadLocation(GetLocalTimezone())
+	if err != nil {
+		// 如果加载失败，使用系统本地时区
+		loc = time.Local
+	}
+
+	_, offset := time.Now().In(loc).Zone()
+	hours := offset / 3600
+	minutes := (offset % 3600) / 60
+	if minutes < 0 {
+		minutes = -minutes
+	}
+
+	if hours >= 0 {
+		return fmt.Sprintf("+%02d:%02d", hours, minutes)
+	}
+	return fmt.Sprintf("%03d:%02d", hours, minutes)
+}
+
+// GetTimezoneOffsetSeconds 返回时区偏移的秒数
+func GetTimezoneOffsetSeconds() int {
+	loc, err := time.LoadLocation(GetLocalTimezone())
+	if err != nil {
+		loc = time.Local
+	}
+
+	_, offset := time.Now().In(loc).Zone()
+	return offset
+}
+
 // IsIpInCidr 判断IP是否在CIDR范围内
 func IsIpInCidr(ip string, cidr string) bool {
 	_, ipNet, err := net.ParseCIDR(cidr)
