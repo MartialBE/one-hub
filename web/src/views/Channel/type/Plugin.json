@@ -308,7 +308,7 @@
           "type": "string",
           "required": false
         },
-        "12": {
+        "16": {
           "name": "Responses地址",
           "description": "默认为： /v1/responses",
           "type": "string",
