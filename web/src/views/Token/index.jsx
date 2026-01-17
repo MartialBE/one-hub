@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { showError, showSuccess, trims, copy, useIsReliable } from 'utils/common';
+import { showError, showSuccess, trims, copy, useIsReliable, useIsAdmin } from 'utils/common';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,7 +11,7 @@ import Alert from '@mui/material/Alert';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 
-import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
+import { Button, Card, Box, Stack, Container, Typography, FormControl, InputLabel, OutlinedInput, InputAdornment, Collapse } from '@mui/material';
 import TokensTableRow from './component/TableRow';
 import KeywordTableHead from 'ui-component/TableHead';
 import TableToolBar from 'ui-component/TableToolBar';
@@ -22,9 +22,12 @@ import { useSelector } from 'react-redux';
 import { PAGE_SIZE_OPTIONS, getPageSize, savePageSize } from 'constants';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from 'contexts/UserContext';
+import { useTheme } from '@mui/material/styles';
 
 export default function Token() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const grey500 = theme.palette.grey[500];
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
@@ -42,6 +45,12 @@ export default function Token() {
   const siteInfo = useSelector((state) => state.siteInfo);
   const { userGroup } = useSelector((state) => state.account);
   const userIsReliable = useIsReliable();
+  const userIsAdmin = useIsAdmin();
+
+  // 管理员搜索相关状态
+  const [adminSearchEnabled, setAdminSearchEnabled] = useState(false);
+  const [adminSearchUserId, setAdminSearchUserId] = useState('');
+  const [adminSearchTokenId, setAdminSearchTokenId] = useState('');
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -76,14 +85,31 @@ export default function Token() {
       if (orderBy) {
         orderBy = order === 'desc' ? '-' + orderBy : orderBy;
       }
-      const res = await API.get(`/api/token/`, {
-        params: {
-          page: page + 1,
-          size: rowsPerPage,
-          keyword: keyword,
-          order: orderBy
-        }
-      });
+
+      let res;
+      // 如果启用了管理员搜索模式且有搜索条件
+      if (adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)) {
+        res = await API.get(`/api/token/admin/search`, {
+          params: {
+            page: page + 1,
+            size: rowsPerPage,
+            keyword: keyword,
+            order: orderBy,
+            user_id: adminSearchUserId ? parseInt(adminSearchUserId, 10) : undefined,
+            token_id: adminSearchTokenId ? parseInt(adminSearchTokenId, 10) : undefined
+          }
+        });
+      } else {
+        res = await API.get(`/api/token/`, {
+          params: {
+            page: page + 1,
+            size: rowsPerPage,
+            keyword: keyword,
+            order: orderBy
+          }
+        });
+      }
+
       const { success, message, data } = res.data;
       if (success) {
         setListCount(data.total_count);
@@ -106,7 +132,7 @@ export default function Token() {
 
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
-  }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
+  }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag, adminSearchEnabled, adminSearchUserId, adminSearchTokenId]);
 
   useEffect(() => {
     loadUserGroup();
@@ -215,6 +241,101 @@ export default function Token() {
           {t('token_index.replaceApiAddress2')}
         </Alert>
       </Stack>
+
+      {/* 管理员搜索面板 */}
+      {userIsAdmin && (
+        <Card sx={{ mb: 3 }}>
+          <Box
+            sx={{
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              borderBottom: adminSearchEnabled ? '1px solid' : 'none',
+              borderColor: 'divider',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+            onClick={() => setAdminSearchEnabled(!adminSearchEnabled)}
+          >
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Icon icon="solar:shield-keyhole-bold-duotone" width={24} color={theme.palette.warning.main} />
+              <Typography variant="subtitle1" fontWeight={600}>
+                {t('token_index.adminSearch')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('token_index.adminSearchDesc')}
+              </Typography>
+            </Stack>
+            <Icon
+              icon={adminSearchEnabled ? 'solar:alt-arrow-up-bold-duotone' : 'solar:alt-arrow-down-bold-duotone'}
+              width={20}
+              color={grey500}
+            />
+          </Box>
+          <Collapse in={adminSearchEnabled}>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={2}
+              sx={{ p: 2 }}
+            >
+              <FormControl sx={{ flex: 1 }}>
+                <InputLabel htmlFor="admin-search-user-id">{t('token_index.userId')}</InputLabel>
+                <OutlinedInput
+                  id="admin-search-user-id"
+                  type="number"
+                  value={adminSearchUserId}
+                  onChange={(e) => {
+                    setAdminSearchUserId(e.target.value);
+                    setPage(0);
+                  }}
+                  label={t('token_index.userId')}
+                  placeholder={t('token_index.userIdPlaceholder')}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Icon icon="solar:user-id-bold-duotone" width={20} color={grey500} />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <FormControl sx={{ flex: 1 }}>
+                <InputLabel htmlFor="admin-search-token-id">{t('token_index.tokenId')}</InputLabel>
+                <OutlinedInput
+                  id="admin-search-token-id"
+                  type="number"
+                  value={adminSearchTokenId}
+                  onChange={(e) => {
+                    setAdminSearchTokenId(e.target.value);
+                    setPage(0);
+                  }}
+                  label={t('token_index.tokenId')}
+                  placeholder={t('token_index.tokenIdPlaceholder')}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Icon icon="solar:key-bold-duotone" width={20} color={grey500} />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setAdminSearchUserId('');
+                  setAdminSearchTokenId('');
+                  setPage(0);
+                }}
+                startIcon={<Icon icon="solar:refresh-bold-duotone" width={18} />}
+              >
+                {t('token_index.clearSearch')}
+              </Button>
+            </Stack>
+          </Collapse>
+        </Card>
+      )}
+
       <Card>
         <Box component="form" onSubmit={searchTokens} noValidate>
           <TableToolBar placeholder={t('token_index.searchTokenName')} />
@@ -244,17 +365,36 @@ export default function Token() {
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'name', label: t('token_index.name'), disableSort: false },
-                  { id: 'group', label: t('token_index.userGroup'), disableSort: false },
-                  { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
-                  { id: 'status', label: t('token_index.status'), disableSort: false },
-                  { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
-                  { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
-                  { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
-                  { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
-                  { id: 'action', label: t('token_index.actions'), disableSort: true }
-                ].filter(col => !col.hide)}
+                headLabel={(() => {
+                  const isAdminSearch = adminSearchEnabled && (adminSearchUserId || adminSearchTokenId);
+                  if (isAdminSearch) {
+                    // 管理员搜索模式：合并额度列、合并时间列、新增最近使用
+                    return [
+                      { id: 'owner', label: t('token_index.owner'), disableSort: true },
+                      { id: 'name', label: t('token_index.name'), disableSort: false },
+                      { id: 'group', label: t('token_index.userGroup') + ' / ' + t('token_index.userBackupGroup'), disableSort: false },
+                      { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
+                      { id: 'status', label: t('token_index.status'), disableSort: false },
+                      { id: 'quota', label: t('token_index.usedQuota') + ' / ' + t('token_index.remainingQuota'), disableSort: true },
+                      { id: 'time', label: t('token_index.createdTime') + ' / ' + t('token_index.expiryTime'), disableSort: true },
+                      { id: 'accessed_time', label: t('token_index.accessedTime'), disableSort: false },
+                      { id: 'action', label: t('token_index.actions'), disableSort: true }
+                    ].filter(col => !col.hide);
+                  } else {
+                    // 普通模式
+                    return [
+                      { id: 'name', label: t('token_index.name'), disableSort: false },
+                      { id: 'group', label: t('token_index.userGroup'), disableSort: false },
+                      { id: 'billing_tag', label: t('token_index.billingTag'), disableSort: true, hide: !userIsReliable },
+                      { id: 'status', label: t('token_index.status'), disableSort: false },
+                      { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
+                      { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
+                      { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
+                      { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
+                      { id: 'action', label: t('token_index.actions'), disableSort: true }
+                    ].filter(col => !col.hide);
+                  }
+                })()}
               />
               <TableBody>
                 {tokens.map((row) => (
@@ -266,6 +406,7 @@ export default function Token() {
                     setModalTokenId={setEditTokenId}
                     userGroup={userGroup}
                     userIsReliable={userIsReliable}
+                    isAdminSearch={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
                   />
                 ))}
               </TableBody>
@@ -290,6 +431,7 @@ export default function Token() {
         onOk={handleOkModal}
         tokenId={editTokenId}
         userGroupOptions={userGroupOptions}
+        adminMode={adminSearchEnabled && (adminSearchUserId || adminSearchTokenId)}
       />
     </>
   );
