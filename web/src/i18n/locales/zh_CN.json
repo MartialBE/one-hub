@@ -308,7 +308,19 @@
     "billingTag": "费用标签",
     "billingTagInfo": "不参与实际运算，仅是一个标签，可用于按照分组统计费用（例如企业内部部门成本统计），仅可信用户和管理员可见并设置",
     "billingTagLabel": "费用标签",
-    "billingTagHelper": "选择一个分组作为费用标签，用于按分组统计该令牌的费用"
+    "billingTagHelper": "选择一个分组作为费用标签，用于按分组统计该令牌的费用",
+    "adminSearch": "管理员搜索",
+    "adminSearchDesc": "按用户ID或令牌ID搜索所有用户的令牌",
+    "userId": "用户ID",
+    "userIdPlaceholder": "输入用户ID",
+    "tokenId": "令牌ID",
+    "tokenIdPlaceholder": "输入令牌ID",
+    "clearSearch": "清除",
+    "owner": "所属",
+    "adminEditWarning": "您正在以管理员身份编辑此令牌，可以修改令牌所属用户",
+    "transferToUser": "所属用户ID",
+    "transferToUserHelper": "修改用户ID可转移此令牌的所有权",
+    "accessedTime": "最近使用"
   },
   "invoice_index": {
     "invoice": "月度账单",
@@ -644,6 +656,7 @@
     "outputPrice": "输出价格",
     "inputMultiplier": "输入价格",
     "outputMultiplier": "输出价格",
+    "timesPrice": "单次价格",
     "input": "输入",
     "output": "输出",
     "rate": "倍率",

@@ -542,6 +542,7 @@
     "modelName": "模型名稱",
     "noneGroup": "當前分組不可用",
     "outputMultiplier": "輸出價格",
+    "timesPrice": "單次價格",
     "search": "搜尋",
     "times": "按次付費",
     "tokens": "按量付費",
@@ -1269,7 +1270,19 @@
     "billingTag": "費用標籤",
     "billingTagInfo": "用於按照分組統計費用，僅管理員可設定",
     "billingTagLabel": "費用標籤",
-    "billingTagHelper": "選擇一個分組作為費用標籤，用於按分組統計該權杖的費用"
+    "billingTagHelper": "選擇一個分組作為費用標籤，用於按分組統計該權杖的費用",
+    "adminSearch": "管理員搜索",
+    "adminSearchDesc": "按用戶ID或令牌ID搜索所有用戶的令牌",
+    "userId": "用戶ID",
+    "userIdPlaceholder": "輸入用戶ID",
+    "tokenId": "令牌ID",
+    "tokenIdPlaceholder": "輸入令牌ID",
+    "clearSearch": "清除",
+    "owner": "所屬",
+    "adminEditWarning": "您正在以管理員身份編輯此權杖，可以修改權杖所屬用戶",
+    "transferToUser": "所屬用戶ID",
+    "transferToUserHelper": "修改用戶ID可轉移此權杖的所有權",
+    "accessedTime": "最近使用"
   },
   "topup": "儲值",
   "topupCard": {

@@ -538,6 +538,7 @@
     "modelName": "モデル名",
     "noneGroup": "現在のグループは利用できません",
     "outputMultiplier": "価格を出力します。",
+    "timesPrice": "1回あたりの価格",
     "search": "検索",
     "times": "回数制課金",
     "tokens": "量に応じて支払う",
@@ -1267,7 +1268,19 @@
     "billingTag": "課金タグ",
     "billingTagInfo": "グループ別の課金統計に使用します。管理者のみ設定可能",
     "billingTagLabel": "課金タグ",
-    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください"
+    "billingTagHelper": "このトークンのコストをグループ別に追跡するための課金タグとしてグループを選択してください",
+    "adminSearch": "管理者検索",
+    "adminSearchDesc": "ユーザーIDまたはトークンIDですべてのユーザーのトークンを検索",
+    "userId": "ユーザーID",
+    "userIdPlaceholder": "ユーザーIDを入力",
+    "tokenId": "トークンID",
+    "tokenIdPlaceholder": "トークンIDを入力",
+    "clearSearch": "クリア",
+    "owner": "所有者",
+    "adminEditWarning": "管理者としてこのトークンを編集しています。トークンの所有者を変更できます",
+    "transferToUser": "所有者ユーザーID",
+    "transferToUserHelper": "ユーザーIDを変更してトークンの所有権を転送します",
+    "accessedTime": "最終使用"
   },
   "topup": "トップアップ",
   "topupCard": {

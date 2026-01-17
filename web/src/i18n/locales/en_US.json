@@ -550,6 +550,7 @@
     "modelName": "Model Name",
     "noneGroup": "Current group unavailable",
     "outputMultiplier": "Output Price",
+    "timesPrice": "Price per Call",
     "search": "Search model name or description",
     "times": "Pay per call",
     "tokens": "Pay per token",
@@ -1278,7 +1279,19 @@
     "billingTag": "Billing Tag",
     "billingTagInfo": "Used for billing statistics by group, only admins can set this",
     "billingTagLabel": "Billing Tag",
-    "billingTagHelper": "Select a group as billing tag for tracking token costs by group"
+    "billingTagHelper": "Select a group as billing tag for tracking token costs by group",
+    "adminSearch": "Admin Search",
+    "adminSearchDesc": "Search all users' tokens by User ID or Token ID",
+    "userId": "User ID",
+    "userIdPlaceholder": "Enter user ID",
+    "tokenId": "Token ID",
+    "tokenIdPlaceholder": "Enter token ID",
+    "clearSearch": "Clear",
+    "owner": "Owner",
+    "adminEditWarning": "You are editing this token as an administrator, you can change the token owner",
+    "transferToUser": "Owner User ID",
+    "transferToUserHelper": "Change user ID to transfer token ownership",
+    "accessedTime": "Last Used"
   },
   "topup": "Top-up",
   "topupCard": {
