@@ -141,6 +141,11 @@ var EmailDomainWhitelist = []string{
 	"foxmail.com",
 }
 
+// 用户黑名单功能
+var BlockedUserIdsEnabled = false
+var BlockedUserIds = []string{}
+var BlockedModels = []string{}
+
 var MemoryCacheEnabled = false
 
 var LogConsumeEnabled = true
@@ -215,11 +220,11 @@ var GeminiAPIEnabled = true
 var ClaudeAPIEnabled = true
 
 const (
-	RoleGuestUser     = 0
-	RoleCommonUser    = 1
-	RoleReliableUser  = 3   // 可信的内部员工
-	RoleAdminUser     = 10
-	RoleRootUser      = 100
+	RoleGuestUser    = 0
+	RoleCommonUser   = 1
+	RoleReliableUser = 3 // 可信的内部员工
+	RoleAdminUser    = 10
+	RoleRootUser     = 100
 )
 
 var RateLimitKeyExpirationDuration = 20 * time.Minute

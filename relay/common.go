@@ -234,7 +234,56 @@ func (gm *GroupManager) createGroupError(group string, modelName string, channel
 	return fmt.Errorf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 }
 
+// checkBlockedUserId 检查用户ID是否在黑名单中
+func checkBlockedUserId(c *gin.Context, modelName string) error {
+	if !config.BlockedUserIdsEnabled {
+		return nil
+	}
+
+	userId := c.GetHeader("x-user-id")
+	if userId == "" {
+		return nil
+	}
+
+	// 检查用户ID是否在黑名单中
+	isBlockedUser := false
+	for _, blockedId := range config.BlockedUserIds {
+		if blockedId == userId {
+			isBlockedUser = true
+			break
+		}
+	}
+
+	if !isBlockedUser {
+		return nil
+	}
+
+	// 检查模型是否在被拦截的模型列表中
+	// 如果模型列表为空，则不拦截
+	if len(config.BlockedModels) == 0 {
+		return nil
+	}
+
+	// 检查当前模型是否在被拦截的模型列表中
+	for _, blockedModel := range config.BlockedModels {
+		if blockedModel == modelName {
+			group := c.GetString("token_group")
+			if group == "" {
+				group = "default"
+			}
+			return fmt.Errorf("CUSTOM:当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
+		}
+	}
+
+	return nil
+}
+
 func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, error) {
+	// 检查用户ID是否在黑名单中
+	if err := checkBlockedUserId(c, modelName); err != nil {
+		return nil, err
+	}
+
 	skipOnlyChat := c.GetBool("skip_only_chat")
 	isStream := c.GetBool("is_stream")
 

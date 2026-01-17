@@ -22,6 +22,9 @@ func InitConf() {
 	UPTIMEKUMA_ENABLE = viper.GetBool("uptime_kuma.enable") != false
 	UPTIMEKUMA_DOMAIN = viper.GetString("uptime_kuma.domain")
 	UPTIMEKUMA_STATUS_PAGE_NAME = viper.GetString("uptime_kuma.status_page_name")
+	BlockedUserIdsEnabled = viper.GetBool("blocked_user_ids.enabled")
+	BlockedUserIds = viper.GetStringSlice("blocked_user_ids.list")
+	BlockedModels = viper.GetStringSlice("blocked_user_ids.models")
 }
 
 func setEnv() {
@@ -51,4 +54,7 @@ func defaultConfig() {
 	viper.SetDefault("uptime_kuma.enable", false)
 	viper.SetDefault("uptime_kuma.domain", "")
 	viper.SetDefault("uptime_kuma.status_page_name", "")
+	viper.SetDefault("blocked_user_ids.enabled", false)
+	viper.SetDefault("blocked_user_ids.list", []string{})
+	viper.SetDefault("blocked_user_ids.models", []string{})
 }

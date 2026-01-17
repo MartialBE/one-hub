@@ -45,6 +45,12 @@ global:
   api_rate_limit: 180 # 全局 API 速率限制（除中继请求外），单 ip 三分钟内的最大请求数，默认为 180。
   web_rate_limit: 100 # 全局 Web 速率限制，单 ip 三分钟内的最大请求数，默认为 100。
 
+# 访问控制设置
+blocked_user_ids:
+  enabled: false # 是否启用用户黑名单功能，默认为 false
+  list: [] # 黑名单用户ID列表，从请求头 x-user-id 中获取，例如: ["user123", "user456"]
+  models: [] # 被拦截的模型列表，例如: ["gpt-5.1", "gpt-5.2"]。如果为空，则拦截黑名单用户的所有模型请求；如果不为空，则只拦截列表中指定的模型
+
 # 频道更新设置
 channel:
   update_frequency: 0 # 设置之后将定期更新渠道余额，单位为分钟，未设置则不进行更新。
