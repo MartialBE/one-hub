@@ -174,8 +174,8 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 	if request.Reasoning != nil {
 		thinkingConfig := &ThinkingConfig{}
 		
-		// Only set ThinkingBudget when MaxTokens > 0
-		if request.Reasoning.MaxTokens > 0 {
+		// Set ThinkingBudget when MaxTokens >= 0
+		if request.Reasoning.MaxTokens >= 0 {
 			thinkingConfig.ThinkingBudget = &request.Reasoning.MaxTokens
 		}
 		
