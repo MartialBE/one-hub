@@ -83,12 +83,21 @@ func ClaudeUsageToOpenaiUsage(cUsage *Usage, usage *types.Usage) bool {
 		return false
 	}
 
+	// 设置缓存信息到内部字段（用于内部统计）
 	usage.PromptTokensDetails.CachedWriteTokens = cUsage.CacheCreationInputTokens
 	usage.PromptTokensDetails.CachedReadTokens = cUsage.CacheReadInputTokens
+	usage.PromptTokensDetails.CachedTokens = cUsage.CacheReadInputTokens // cached_tokens 显示读取的缓存
 
-	usage.PromptTokens = cUsage.InputTokens + cUsage.CacheCreationInputTokens + cUsage.CacheReadInputTokens
+	// 设置缓存信息到顶层字段（用于 API 响应）
+	usage.CacheCreationInputTokens = cUsage.CacheCreationInputTokens
+	usage.CacheReadInputTokens = cUsage.CacheReadInputTokens
+
+	// 注意：根据 OpenAI 的格式，prompt_tokens 不包含缓存 tokens
+	// 缓存 tokens 单独在顶层字段中显示
+	usage.PromptTokens = cUsage.InputTokens
 	usage.CompletionTokens = cUsage.OutputTokens
-	usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	// total_tokens 包含所有 tokens（包括缓存）
+	usage.TotalTokens = cUsage.InputTokens + cUsage.OutputTokens + cUsage.CacheCreationInputTokens + cUsage.CacheReadInputTokens
 
 	return true
 }
