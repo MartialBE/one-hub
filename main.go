@@ -160,6 +160,7 @@ func SyncChannelCache(frequency int) {
 		time.Sleep(time.Duration(frequency) * time.Second)
 		logger.SysLog("syncing channels from database")
 		model.ChannelGroup.Load()
+		model.GlobalUserGroupRatio.Load()
 		model.PricingInstance.Init()
 		model.ModelOwnedBysInstance.Load()
 	}

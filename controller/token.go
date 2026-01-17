@@ -14,6 +14,7 @@ import (
 
 func GetUserTokensList(c *gin.Context) {
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
 	var params model.GenericParams
 	if err := c.ShouldBindQuery(&params); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
@@ -25,6 +26,37 @@ func GetUserTokensList(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
+
+	// 对于非可信用户，隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
+		for _, token := range *tokens.Data {
+			setting := token.Setting.Data()
+			setting.BillingTag = nil
+			token.Setting.Set(setting)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    tokens,
+	})
+}
+
+// GetTokensListByAdmin 管理员查询令牌列表（可按用户ID或令牌ID查询）
+func GetTokensListByAdmin(c *gin.Context) {
+	var params model.AdminSearchTokensParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	tokens, err := model.GetTokensListByAdmin(&params)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -35,6 +67,7 @@ func GetUserTokensList(c *gin.Context) {
 func GetToken(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -50,6 +83,14 @@ func GetToken(c *gin.Context) {
 		})
 		return
 	}
+
+	// 对于非可信用户，隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
+		setting := token.Setting.Data()
+		setting.BillingTag = nil
+		token.Setting.Set(setting)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -92,6 +133,7 @@ func GetPlaygroundToken(c *gin.Context) {
 
 func AddToken(c *gin.Context) {
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
 	if err != nil {
@@ -137,6 +179,11 @@ func AddToken(c *gin.Context) {
 		return
 	}
 
+	// 非可信用户不能设置 BillingTag
+	if userRole < config.RoleReliableUser {
+		setting.BillingTag = nil
+	}
+
 	cleanToken := model.Token{
 		UserId: userId,
 		Name:   token.Name,
@@ -148,8 +195,8 @@ func AddToken(c *gin.Context) {
 		UnlimitedQuota: token.UnlimitedQuota,
 		Group:          token.Group,
 		BackupGroup:    token.BackupGroup,
-		Setting:        token.Setting,
 	}
+	cleanToken.Setting.Set(setting)
 	err = cleanToken.Insert()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -183,6 +230,7 @@ func DeleteToken(c *gin.Context) {
 
 func UpdateToken(c *gin.Context) {
 	userId := c.GetInt("id")
+	userRole := c.GetInt("role")
 	statusOnly := c.Query("status_only")
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
@@ -201,8 +249,8 @@ func UpdateToken(c *gin.Context) {
 		return
 	}
 
-	setting := token.Setting.Data()
-	err = validateTokenSetting(&setting)
+	newSetting := token.Setting.Data()
+	err = validateTokenSetting(&newSetting)
 	if err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
@@ -264,7 +312,16 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.UnlimitedQuota = token.UnlimitedQuota
 		cleanToken.Group = token.Group
 		cleanToken.BackupGroup = token.BackupGroup
-		cleanToken.Setting = token.Setting
+
+		// 处理 BillingTag: 非可信用户保持原值不变
+		oldSetting := cleanToken.Setting.Data()
+		if userRole < config.RoleReliableUser {
+			// 非可信用户：保持原来的 BillingTag，忽略前端传入的值
+			newSetting.BillingTag = oldSetting.BillingTag
+		}
+		// 可信用户：直接使用前端传入的值（包括空值，用于清除 BillingTag）
+
+		cleanToken.Setting.Set(newSetting)
 	}
 	err = cleanToken.Update()
 	if err != nil {
@@ -274,11 +331,163 @@ func UpdateToken(c *gin.Context) {
 		})
 		return
 	}
+
+	// 对于非可信用户，返回数据时隐藏 BillingTag 字段
+	if userRole < config.RoleReliableUser {
+		responseSetting := cleanToken.Setting.Data()
+		responseSetting.BillingTag = nil
+		cleanToken.Setting.Set(responseSetting)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
 		"data":    cleanToken,
 	})
+}
+
+// UpdateTokenByAdmin 管理员更新任意token（支持转移用户）
+func UpdateTokenByAdmin(c *gin.Context) {
+	statusOnly := c.Query("status_only")
+	token := model.Token{}
+	err := c.ShouldBindJSON(&token)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	if len(token.Name) > 30 {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "令牌名称过长",
+		})
+		return
+	}
+
+	newSetting := token.Setting.Data()
+	err = validateTokenSetting(&newSetting)
+	if err != nil {
+		common.APIRespondWithError(c, http.StatusOK, err)
+		return
+	}
+
+	cleanToken, err := model.GetTokenById(token.Id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if token.Status == config.TokenStatusEnabled {
+		if cleanToken.Status == config.TokenStatusExpired && cleanToken.ExpiredTime <= utils.GetTimestamp() && cleanToken.ExpiredTime != -1 {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "令牌已过期，无法启用，请先修改令牌过期时间，或者设置为永不过期",
+			})
+			return
+		}
+		if cleanToken.Status == config.TokenStatusExhausted && cleanToken.RemainQuota <= 0 && !cleanToken.UnlimitedQuota {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "令牌可用额度已用尽，无法启用，请先修改令牌剩余额度，或者设置为无限额度",
+			})
+			return
+		}
+	}
+
+	// 验证目标用户是否存在（如果要转移token）
+	if token.UserId > 0 && token.UserId != cleanToken.UserId {
+		targetUser, err := model.GetUserById(token.UserId, false)
+		if err != nil || targetUser == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "目标用户不存在",
+			})
+			return
+		}
+	}
+
+	// 验证用户组（使用目标用户ID）
+	targetUserId := cleanToken.UserId
+	if token.UserId > 0 {
+		targetUserId = token.UserId
+	}
+
+	if cleanToken.Group != token.Group && token.Group != "" {
+		err = validateTokenGroupForUser(token.Group, targetUserId)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+	}
+	if cleanToken.BackupGroup != token.BackupGroup && token.BackupGroup != "" {
+		err = validateTokenGroupForUser(token.BackupGroup, targetUserId)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+	}
+
+	if statusOnly != "" {
+		cleanToken.Status = token.Status
+	} else {
+		cleanToken.Name = token.Name
+		cleanToken.ExpiredTime = token.ExpiredTime
+		cleanToken.RemainQuota = token.RemainQuota
+		cleanToken.UnlimitedQuota = token.UnlimitedQuota
+		cleanToken.Group = token.Group
+		cleanToken.BackupGroup = token.BackupGroup
+		cleanToken.Setting.Set(newSetting)
+
+		// 管理员可以转移token给其他用户
+		if token.UserId > 0 {
+			cleanToken.UserId = token.UserId
+		}
+	}
+
+	err = cleanToken.UpdateByAdmin()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    cleanToken,
+	})
+}
+
+// validateTokenGroupForUser 验证用户组是否对指定用户有效
+func validateTokenGroupForUser(tokenGroup string, userId int) error {
+	userGroup, _ := model.CacheGetUserGroup(userId)
+	if userGroup == "" {
+		return errors.New("获取用户组信息失败")
+	}
+
+	groupRatio := model.GlobalUserGroupRatio.GetBySymbol(tokenGroup)
+	if groupRatio == nil {
+		return errors.New("无效的用户组")
+	}
+
+	if !groupRatio.Public && userGroup != tokenGroup {
+		return errors.New("目标用户无权使用指定的分组")
+	}
+
+	return nil
 }
 
 func validateTokenGroup(tokenGroup string, userId int) error {
