@@ -448,19 +448,31 @@ func ConvertToChatOpenai(provider base.ProviderInterface, response *ClaudeRespon
 
 // 转换为OpenAI聊天流式请求体
 func (h *ClaudeStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan string, errChan chan error) {
-	// 如果rawLine 前缀不为data:，则直接返回
-	if !strings.HasPrefix(string(*rawLine), h.Prefix) {
+	rawStr := string(*rawLine)
+
+	// 跳过 event: 行（SSE 格式）
+	if strings.HasPrefix(rawStr, "event:") {
 		*rawLine = nil
 		return
 	}
 
-	if strings.HasPrefix(string(*rawLine), "data: ") {
-		// 去除前缀
-		*rawLine = (*rawLine)[6:]
+	// 跳过空行
+	if strings.TrimSpace(rawStr) == "" {
+		*rawLine = nil
+		return
 	}
 
+	// 如果不是 data: 开头，跳过
+	if !strings.HasPrefix(rawStr, "data:") {
+		*rawLine = nil
+		return
+	}
+
+	// 去除 "data: " 前缀
+	dataContent := strings.TrimSpace(rawStr[5:])
+
 	var claudeResponse ClaudeStreamResponse
-	err := json.Unmarshal(*rawLine, &claudeResponse)
+	err := json.Unmarshal([]byte(dataContent), &claudeResponse)
 	if err != nil {
 		errChan <- common.ErrorToOpenAIError(err)
 		return
