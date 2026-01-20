@@ -217,8 +217,10 @@ type ChatCompletionRequest struct {
 	ThinkingBudget *int  `json:"thinking_budget,omitempty"` // qwen3 思考长度，只有enable_thinking开启才生效
 	EnableSearch   *bool `json:"enable_search,omitempty"`   // qwen 搜索开关
 
-  Thinking *interface{} `json:"thinking,omitempty"` // thinking 思考开关，兼容火山引擎
-  
+	Thinking *interface{} `json:"thinking,omitempty"` // thinking 思考开关，兼容火山引擎
+
+	Metadata any `json:"metadata,omitempty"` // 元数据字段，用于传递额外信息（如 Claude 的 user_id）
+
 	OneOtherArg string `json:"-"`
 }
 

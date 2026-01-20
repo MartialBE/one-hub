@@ -31,7 +31,7 @@ type ClaudeProvider struct {
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
 		BaseURL:         "https://api.anthropic.com",
-		ChatCompletions: "/v1/messages",
+		ChatCompletions: "/v1/messages?beta=true",
 		ModelList:       "/v1/models",
 	}
 }
@@ -66,8 +66,31 @@ func errorHandle(claudeError *ClaudeError) *types.OpenAIError {
 // 获取请求头
 func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 	headers = make(map[string]string)
-	p.CommonRequestHeaders(headers)
 
+	// 设置默认请求头（优先级最低）
+	setDefaultHeaders(headers)
+
+	// 透传所有原始请求头（会覆盖默认值）
+	if p.Context != nil && p.Context.Request != nil {
+		for key, values := range p.Context.Request.Header {
+			if len(values) > 0 {
+				headers[key] = values[0]
+			}
+		}
+	}
+
+	// 应用自定义 header（如果有配置，会覆盖前面的值）
+	if p.Channel.ModelHeaders != nil {
+		var customHeaders map[string]string
+		err := json.Unmarshal([]byte(*p.Channel.ModelHeaders), &customHeaders)
+		if err == nil {
+			for key, value := range customHeaders {
+				headers[key] = value
+			}
+		}
+	}
+
+	// 强制设置认证头（最高优先级）
 	headers["x-api-key"] = p.Channel.Key
 	headers["Authorization"] = fmt.Sprintf("Bearer %s", p.Channel.Key)
 	anthropicVersion := p.Context.Request.Header.Get("anthropic-version")
@@ -77,6 +100,34 @@ func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 	headers["anthropic-version"] = anthropicVersion
 	headers["APP-Code"] = "HVNB1579"
 	return headers
+}
+
+// 设置默认请求头（模拟 Claude Code CLI 的请求头）
+func setDefaultHeaders(headers map[string]string) {
+	// 基础头
+	headers["Accept"] = "application/json"
+	headers["accept-language"] = "*"
+	headers["accept-encoding"] = "gzip, deflate"
+
+	// X-Stainless 系列默认值（Stainless SDK 标准头）
+	headers["X-Stainless-Retry-Count"] = "0"
+	headers["X-Stainless-Timeout"] = "600"
+	headers["X-Stainless-Lang"] = "js"
+	headers["X-Stainless-Package-Version"] = "0.70.0"
+	headers["X-Stainless-OS"] = "MacOS"
+	headers["X-Stainless-Arch"] = "arm64"
+	headers["X-Stainless-Runtime"] = "node"
+	headers["X-Stainless-Runtime-Version"] = "v22.19.0"
+
+	// anthropic 系列默认值
+	headers["anthropic-dangerous-direct-browser-access"] = "true"
+	headers["anthropic-version"] = "2023-06-01"
+	headers["anthropic-beta"] = "claude-code-20250219,interleaved-thinking-2025-05-14"
+
+	// 其他默认值
+	headers["x-app"] = "cli"
+	headers["User-Agent"] = "claude-cli/2.1.12 (external, cli)"
+	headers["sec-fetch-mode"] = "cors"
 }
 
 func (p *ClaudeProvider) GetFullRequestURL(requestURL string) string {

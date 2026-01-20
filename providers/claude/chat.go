@@ -200,6 +200,20 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		claudeRequest.MaxTokens = config.ClaudeSettingsInstance.GetDefaultMaxTokens(request.Model)
 	}
 
+	// 处理 metadata 字段
+	if request.Metadata != nil {
+		// 尝试将 metadata 转换为 ClaudeMetadata
+		if metadataMap, ok := request.Metadata.(map[string]any); ok {
+			claudeMetadata := &ClaudeMetadata{}
+			if userId, exists := metadataMap["user_id"]; exists {
+				if userIdStr, ok := userId.(string); ok {
+					claudeMetadata.UserId = userIdStr
+					claudeRequest.Metadata = claudeMetadata
+				}
+			}
+		}
+	}
+
 	// 如果是3-7 默认开启thinking
 	if request.OneOtherArg == "thinking" || request.Reasoning != nil {
 		var opErr *types.OpenAIErrorWithStatusCode
