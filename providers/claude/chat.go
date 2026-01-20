@@ -482,11 +482,20 @@ func (h *ClaudeStreamHandler) HandlerStream(rawLine *[]byte, dataChan chan strin
 	case "message_start":
 		h.convertToOpenaiStream(&claudeResponse, dataChan)
 		h.Usage.PromptTokens = claudeResponse.Message.Usage.InputTokens
+		// 设置缓存信息
+		h.Usage.PromptTokensDetails.CachedWriteTokens = claudeResponse.Message.Usage.CacheCreationInputTokens
+		h.Usage.PromptTokensDetails.CachedReadTokens = claudeResponse.Message.Usage.CacheReadInputTokens
+		h.Usage.PromptTokensDetails.CachedTokens = claudeResponse.Message.Usage.CacheReadInputTokens
+		h.Usage.CacheCreationInputTokens = claudeResponse.Message.Usage.CacheCreationInputTokens
+		h.Usage.CacheReadInputTokens = claudeResponse.Message.Usage.CacheReadInputTokens
 
 	case "message_delta":
 		h.convertToOpenaiStream(&claudeResponse, dataChan)
 		h.Usage.CompletionTokens = claudeResponse.Usage.OutputTokens
 		h.Usage.TotalTokens = h.Usage.PromptTokens + h.Usage.CompletionTokens
+
+		// 发送包含 usage 信息的 chunk（类似 OpenAI 的 stream_options.include_usage 行为）
+		h.sendUsageChunk(dataChan)
 
 	case "content_block_delta":
 		h.convertToOpenaiStream(&claudeResponse, dataChan)
@@ -566,12 +575,50 @@ func (h *ClaudeStreamHandler) convertToOpenaiStream(claudeResponse *ClaudeStream
 	if finishReason != "" {
 		choice.FinishReason = &finishReason
 	}
+
 	chatCompletion := types.ChatCompletionStreamResponse{
 		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
 		Object:  "chat.completion.chunk",
 		Created: utils.GetTimestamp(),
 		Model:   h.Request.Model,
 		Choices: []types.ChatCompletionStreamChoice{choice},
+	}
+
+	responseBody, _ := json.Marshal(chatCompletion)
+	dataChan <- string(responseBody)
+}
+
+// sendUsageChunk 发送包含 usage 信息的 chunk（类似 OpenAI 的 stream_options.include_usage 行为）
+// 这个 chunk 包含一个空 delta 的 choice 和 usage 信息
+func (h *ClaudeStreamHandler) sendUsageChunk(dataChan chan string) {
+	// 直接从 h.Usage 复制完整的 usage 信息（已经通过 ClaudeUsageToOpenaiUsage 转换过）
+	usageCopy := &types.Usage{
+		PromptTokens:             h.Usage.PromptTokens,
+		CompletionTokens:         h.Usage.CompletionTokens,
+		TotalTokens:              h.Usage.TotalTokens,
+		CacheCreationInputTokens: h.Usage.CacheCreationInputTokens,
+		CacheReadInputTokens:     h.Usage.CacheReadInputTokens,
+		PromptTokensDetails:      h.Usage.PromptTokensDetails,
+		CompletionTokensDetails:  h.Usage.CompletionTokensDetails,
+	}
+
+	// 创建一个空的 choice（模仿 OpenAI 的格式）
+	choice := types.ChatCompletionStreamChoice{
+		Index: 0,
+		Delta: types.ChatCompletionStreamChoiceDelta{
+			Role:    "",
+			Content: "",
+		},
+		FinishReason: nil,
+	}
+
+	chatCompletion := types.ChatCompletionStreamResponse{
+		ID:      fmt.Sprintf("chatcmpl-%s", utils.GetUUID()),
+		Object:  "chat.completion.chunk",
+		Created: utils.GetTimestamp(),
+		Model:   h.Request.Model,
+		Choices: []types.ChatCompletionStreamChoice{choice},
+		Usage:   usageCopy,
 	}
 
 	responseBody, _ := json.Marshal(chatCompletion)
