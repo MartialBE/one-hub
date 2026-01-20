@@ -1,6 +1,8 @@
 package claude
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -117,15 +119,29 @@ func (p *ClaudeProvider) getChatRequest(claudeRequest *ClaudeRequest) (*http.Req
 	return req, nil
 }
 
+// generateRandomUserId 生成随机的 user_id，格式: user_{random_hash}_account__session_{uuid}
+func generateRandomUserId() string {
+	// 生成 32 字节的随机数据，转换为 64 位十六进制字符串（模拟 SHA256）
+	randomBytes := make([]byte, 32)
+	rand.Read(randomBytes)
+	randomHash := hex.EncodeToString(randomBytes)
+
+	// 生成 UUID
+	sessionUUID := utils.GetUUID()
+
+	// 组合成完整的 user_id
+	return fmt.Sprintf("user_%s_account__session_%s", randomHash, sessionUUID)
+}
+
 func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest, *types.OpenAIErrorWithStatusCode) {
 	claudeRequest := ClaudeRequest{
 		Model:         request.Model,
 		Messages:      make([]Message, 0),
 		MaxTokens:     request.MaxTokens,
 		StopSequences: nil,
-		Temperature:   request.Temperature,
-		TopP:          request.TopP,
-		Stream:        request.Stream,
+		// Temperature:   request.Temperature,  // 已移除，不发送 temperature 字段
+		TopP:   request.TopP,
+		Stream: request.Stream,
 	}
 
 	if request.Stop != nil {
@@ -182,6 +198,16 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 		claudeRequest.System = systemMessage
 	}
 
+	// 如果最终还是没有 system 字段，添加默认的 Claude Code 标识（避免 403 错误）
+	if claudeRequest.System == nil {
+		claudeRequest.System = []map[string]string{
+			{
+				"type": "text",
+				"text": "You are Claude Code, Anthropic's official CLI for Claude.",
+			},
+		}
+	}
+
 	for _, tool := range request.Tools {
 		tool := Tools{
 			Name:        tool.Function.Name,
@@ -211,6 +237,12 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*ClaudeRequest
 					claudeRequest.Metadata = claudeMetadata
 				}
 			}
+		}
+	} else {
+		// 如果客户端没有携带 metadata，生成默认值（模拟 Claude Code 行为）
+		// 格式: user_{random_hash}_account__session_{random_uuid}
+		claudeRequest.Metadata = &ClaudeMetadata{
+			UserId: generateRandomUserId(),
 		}
 	}
 

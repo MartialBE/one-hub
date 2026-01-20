@@ -70,14 +70,14 @@ func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 	// 设置默认请求头（优先级最低）
 	setDefaultHeaders(headers)
 
-	// 透传所有原始请求头（会覆盖默认值）
-	if p.Context != nil && p.Context.Request != nil {
-		for key, values := range p.Context.Request.Header {
-			if len(values) > 0 {
-				headers[key] = values[0]
-			}
-		}
-	}
+	//// 透传所有原始请求头（会覆盖默认值）
+	//if p.Context != nil && p.Context.Request != nil {
+	//	for key, values := range p.Context.Request.Header {
+	//		if len(values) > 0 {
+	//			headers[key] = values[0]
+	//		}
+	//	}
+	//}
 
 	// 应用自定义 header（如果有配置，会覆盖前面的值）
 	if p.Channel.ModelHeaders != nil {
@@ -105,7 +105,8 @@ func (p *ClaudeProvider) GetRequestHeaders() (headers map[string]string) {
 // 设置默认请求头（模拟 Claude Code CLI 的请求头）
 func setDefaultHeaders(headers map[string]string) {
 	// 基础头
-	headers["Accept"] = "application/json"
+	headers["Content-Type"] = "application/json"
+	headers["Accept"] = "text/event-stream"
 	headers["accept-language"] = "*"
 	headers["accept-encoding"] = "gzip, deflate"
 
