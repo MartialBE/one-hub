@@ -648,7 +648,7 @@ type ResponsesUsageOutputTokensDetails struct {
 }
 
 type ResponsesUsageInputTokensDetails struct {
-	CachedTokens int `json:"cached_tokens,omitempty"`
+	CachedTokens int `json:"cached_tokens"`
 	TextTokens   int `json:"text_tokens,omitempty"`
 	ImageTokens  int `json:"image_tokens,omitempty"`
 }
