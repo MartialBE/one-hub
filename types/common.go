@@ -14,6 +14,10 @@ type Usage struct {
 	PromptTokensDetails     PromptTokensDetails     `json:"prompt_tokens_details"`
 	CompletionTokensDetails CompletionTokensDetails `json:"completion_tokens_details"`
 
+	// Claude 缓存字段（顶层）- 始终显示，即使为 0
+	CacheCreationInputTokens int `json:"cache_creation_input_tokens"`
+	CacheReadInputTokens     int `json:"cache_read_input_tokens"`
+
 	ExtraTokens  map[string]int          `json:"-"`
 	ExtraBilling map[string]ExtraBilling `json:"-"`
 	TextBuilder  strings.Builder         `json:"-"`
@@ -94,7 +98,7 @@ func (u *Usage) SetExtraTokens(key string, value int) {
 
 type PromptTokensDetails struct {
 	AudioTokens          int `json:"audio_tokens,omitempty"`
-	CachedTokens         int `json:"cached_tokens,omitempty"`
+	CachedTokens         int `json:"cached_tokens"` // 移除 omitempty，始终显示
 	TextTokens           int `json:"text_tokens,omitempty"`
 	ImageTokens          int `json:"image_tokens,omitempty"`
 	CachedTokensInternal int `json:"cached_tokens_internal,omitempty"`

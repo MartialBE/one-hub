@@ -308,6 +308,63 @@ const (
 	ChannelTypeXAI             = 56
 )
 
+// ChannelType2Name 将渠道类型 ID 映射到名称
+var ChannelType2Name = map[int]string{
+	ChannelTypeUnknown:         "Unknown",
+	ChannelTypeOpenAI:          "OpenAI",
+	ChannelTypeAzure:           "Azure",
+	ChannelTypeCustom:          "Custom",
+	ChannelTypePaLM:            "PaLM",
+	ChannelTypeAnthropic:       "Anthropic",
+	ChannelTypeBaidu:           "Baidu",
+	ChannelTypeZhipu:           "Zhipu",
+	ChannelTypeAli:             "Ali",
+	ChannelTypeXunfei:          "Xunfei",
+	ChannelType360:             "360",
+	ChannelTypeOpenRouter:      "OpenRouter",
+	ChannelTypeTencent:         "Tencent",
+	ChannelTypeAzureSpeech:     "AzureSpeech",
+	ChannelTypeGemini:          "Gemini",
+	ChannelTypeBaichuan:        "Baichuan",
+	ChannelTypeMiniMax:         "MiniMax",
+	ChannelTypeDeepseek:        "Deepseek",
+	ChannelTypeMoonshot:        "Moonshot",
+	ChannelTypeMistral:         "Mistral",
+	ChannelTypeGroq:            "Groq",
+	ChannelTypeBedrock:         "Bedrock",
+	ChannelTypeLingyi:          "Lingyi",
+	ChannelTypeMidjourney:      "Midjourney",
+	ChannelTypeCloudflareAI:    "CloudflareAI",
+	ChannelTypeCohere:          "Cohere",
+	ChannelTypeStabilityAI:     "StabilityAI",
+	ChannelTypeCoze:            "Coze",
+	ChannelTypeOllama:          "Ollama",
+	ChannelTypeHunyuan:         "Hunyuan",
+	ChannelTypeSuno:            "Suno",
+	ChannelTypeVertexAI:        "VertexAI",
+	ChannelTypeLLAMA:           "LLAMA",
+	ChannelTypeIdeogram:        "Ideogram",
+	ChannelTypeSiliconflow:     "Siliconflow",
+	ChannelTypeFlux:            "Flux",
+	ChannelTypeJina:            "Jina",
+	ChannelTypeRerank:          "Rerank",
+	ChannelTypeGithub:          "Github",
+	ChannelTypeRecraft:         "Recraft",
+	ChannelTypeReplicate:       "Replicate",
+	ChannelTypeKling:           "Kling",
+	ChannelTypeAzureDatabricks: "AzureDatabricks",
+	ChannelTypeAzureV1:         "AzureV1",
+	ChannelTypeXAI:             "XAI",
+}
+
+// GetChannelTypeName 获取渠道类型名称
+func GetChannelTypeName(channelType int) string {
+	if name, ok := ChannelType2Name[channelType]; ok {
+		return name
+	}
+	return "Unknown"
+}
+
 const (
 	RelayModeUnknown = iota
 	RelayModeChatCompletions
