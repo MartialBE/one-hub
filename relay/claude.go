@@ -142,6 +142,16 @@ func (r *relayClaudeOnly) HandleStreamError(err *types.OpenAIErrorWithStatusCode
 	r.c.Writer.Flush()
 }
 
+func ClaudeCountTokens(c *gin.Context) {
+	var req claude.ClaudeRequest
+	if err := common.UnmarshalBodyReusable(c, &req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"input_tokens": 0})
+		return
+	}
+	count, _ := CountTokenMessages(&req, 0)
+	c.JSON(http.StatusOK, gin.H{"input_tokens": count})
+}
+
 func CountTokenMessages(request *claude.ClaudeRequest, preCostType int) (int, error) {
 	if preCostType == config.PreContNotAll {
 		return 0, nil
