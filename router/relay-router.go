@@ -110,6 +110,7 @@ func setSunoRouter(router *gin.Engine) {
 func setClaudeRouter(router *gin.Engine) {
 	relayClaudeRouter := router.Group("/claude")
 	relayV1Router := relayClaudeRouter.Group("/v1")
+	relayV1Router.POST("/messages/count_tokens", relay.ClaudeCountTokens)
 	relayV1Router.Use(middleware.APIEnabled("claude"), middleware.RelayCluadePanicRecover(), middleware.ClaudeAuth(), middleware.Distribute(), middleware.DynamicRedisRateLimiter())
 	{
 		relayV1Router.POST("/messages", relay.Relay)
