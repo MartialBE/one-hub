@@ -11,6 +11,7 @@ import (
 
 type Category struct {
 	Category                  string
+	Publisher                 string
 	ChatComplete              ChatCompletionConvert
 	ResponseChatComplete      ChatCompletionResponse
 	ResponseChatCompleteStrem ChatCompletionStreamResponse

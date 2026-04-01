@@ -33,6 +33,7 @@ var claudeMap = map[string]string{
 func init() {
 	CategoryMap["claude"] = &Category{
 		Category:                  "claude",
+		Publisher:                 "anthropic",
 		ChatComplete:              ConvertClaudeFromChatOpenai,
 		ResponseChatComplete:      ConvertClaudeToChatOpenai,
 		ResponseChatCompleteStrem: ClaudeChatCompleteStrem,
