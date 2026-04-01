@@ -59,7 +59,7 @@ type VertexAIProvider struct {
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:           "https://%saiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:%s",
+		BaseURL:           "https://%saiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/%s/models/%s:%s",
 		ChatCompletions:   "/",
 		ImagesGenerations: "/predict",
 	}
@@ -76,10 +76,14 @@ func getKeyConfig(vertexAI *VertexAIProvider) {
 }
 
 func (p *VertexAIProvider) GetFullRequestURL(modelName string, other string) string {
-	if p.Region == "global" {
-		return fmt.Sprintf(p.GetBaseURL(), "", p.ProjectID, p.Region, modelName, other)
+	publisher := "google"
+	if p.Category != nil && p.Category.Publisher != "" {
+		publisher = p.Category.Publisher
 	}
-	return fmt.Sprintf(p.GetBaseURL(), p.Region+"-", p.ProjectID, p.Region, modelName, other)
+	if p.Region == "global" {
+		return fmt.Sprintf(p.GetBaseURL(), "", p.ProjectID, p.Region, publisher, modelName, other)
+	}
+	return fmt.Sprintf(p.GetBaseURL(), p.Region+"-", p.ProjectID, p.Region, publisher, modelName, other)
 }
 
 func (p *VertexAIProvider) GetRequestHeaders() (headers map[string]string) {
