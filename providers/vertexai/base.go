@@ -184,8 +184,8 @@ func errorHandle(vertexaiError *VertexaiError) *types.OpenAIError {
 	}
 
 	return &types.OpenAIError{
-		Message: "VertexAI错误",
-		Type:    "gemini_error",
+		Message: vertexaiError.Error.Message,
+		Type:    "vertexai_error",
 		Param:   vertexaiError.Error.Status,
 		Code:    vertexaiError.Error.Code,
 	}
