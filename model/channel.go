@@ -42,6 +42,9 @@ type Channel struct {
 	CompatibleResponse bool    `json:"compatible_response" gorm:"default:false"`
 	AllowExtraBody     bool    `json:"allow_extra_body" form:"allow_extra_body" gorm:"default:false"`
 
+	SystemPromptPrepend *string `json:"system_prompt_prepend" gorm:"type:text"`
+	SystemPromptAppend  *string `json:"system_prompt_append" gorm:"type:text"`
+
 	DisabledStream *datatypes.JSONSlice[string] `json:"disabled_stream,omitempty" gorm:"type:json"`
 
 	Plugin    *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`

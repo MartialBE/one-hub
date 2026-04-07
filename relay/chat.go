@@ -103,6 +103,7 @@ func (r *relayChat) send() (err *types.OpenAIErrorWithStatusCode, done bool) {
 	}
 
 	r.chatRequest.Model = r.modelName
+	r.applySystemPrompt()
 	// 内容审查
 	if config.EnableSafe {
 		for _, message := range r.chatRequest.Messages {
@@ -177,6 +178,47 @@ func (r *relayChat) getUsageResponse() string {
 	}
 
 	return ""
+}
+
+func (r *relayChat) applySystemPrompt() {
+	channel := r.provider.GetChannel()
+	prepend := ""
+	appendStr := ""
+	if channel.SystemPromptPrepend != nil {
+		prepend = *channel.SystemPromptPrepend
+	}
+	if channel.SystemPromptAppend != nil {
+		appendStr = *channel.SystemPromptAppend
+	}
+	if prepend == "" && appendStr == "" {
+		return
+	}
+
+	for i := range r.chatRequest.Messages {
+		if r.chatRequest.Messages[i].IsSystemRole() {
+			content := r.chatRequest.Messages[i].StringContent()
+			if prepend != "" {
+				content = prepend + "\n" + content
+			}
+			if appendStr != "" {
+				content = content + "\n" + appendStr
+			}
+			r.chatRequest.Messages[i].Content = content
+			return
+		}
+	}
+
+	content := prepend
+	if appendStr != "" {
+		if content != "" {
+			content += "\n"
+		}
+		content += appendStr
+	}
+	r.chatRequest.Messages = append([]types.ChatCompletionMessage{{
+		Role:    types.ChatMessageRoleSystem,
+		Content: content,
+	}}, r.chatRequest.Messages...)
 }
 
 func (r *relayChat) compatibleSend(resProvider providersBase.ResponsesInterface) (err *types.OpenAIErrorWithStatusCode, done bool) {
