@@ -376,6 +376,8 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
         }
 
         data.base_url = data.base_url ?? '';
+        data.system_prompt_prepend = data.system_prompt_prepend ?? '';
+        data.system_prompt_append = data.system_prompt_append ?? '';
         data.is_edit = true;
         if (data.plugin === null) {
           data.plugin = {};
@@ -1091,6 +1093,40 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, model
                     <FormHelperText id="helper-tex-allow_extra_body-label">{customizeT(inputPrompt.allow_extra_body)}</FormHelperText>
                   </FormControl>
                 )}
+                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
+                  <TextField
+                    multiline
+                    id="channel-system_prompt_prepend-label"
+                    label={customizeT(inputLabel.system_prompt_prepend)}
+                    value={values.system_prompt_prepend}
+                    name="system_prompt_prepend"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    minRows={2}
+                    maxRows={8}
+                    placeholder={customizeT(inputPrompt.system_prompt_prepend)}
+                  />
+                  <FormHelperText id="helper-tex-channel-system_prompt_prepend-label">
+                    {customizeT(inputPrompt.system_prompt_prepend)}
+                  </FormHelperText>
+                </FormControl>
+                <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
+                  <TextField
+                    multiline
+                    id="channel-system_prompt_append-label"
+                    label={customizeT(inputLabel.system_prompt_append)}
+                    value={values.system_prompt_append}
+                    name="system_prompt_append"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    minRows={2}
+                    maxRows={8}
+                    placeholder={customizeT(inputPrompt.system_prompt_append)}
+                  />
+                  <FormHelperText id="helper-tex-channel-system_prompt_append-label">
+                    {customizeT(inputPrompt.system_prompt_append)}
+                  </FormHelperText>
+                </FormControl>
                 {pluginList[values.type] &&
                   Object.keys(pluginList[values.type]).map((pluginId) => {
                     const plugin = pluginList[values.type][pluginId];
