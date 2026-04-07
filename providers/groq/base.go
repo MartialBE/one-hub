@@ -25,9 +25,10 @@ func (f GroqProviderFactory) Create(channel *model.Channel) base.ProviderInterfa
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:         "https://api.groq.com/openai",
-		ChatCompletions: "/v1/chat/completions",
-		ModelList:       "/v1/models",
+		BaseURL:             "https://api.groq.com/openai",
+		ChatCompletions:     "/v1/chat/completions",
+		AudioTranscriptions: "/v1/audio/transcriptions",
+		ModelList:           "/v1/models",
 	}
 }
 
