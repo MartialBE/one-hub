@@ -650,6 +650,11 @@ func mergeCustomParamsForPreMapping(requestMap map[string]interface{}, customPar
 			continue
 		}
 
+		if strVal, ok := value.(string); ok && strVal == "__delete__" {
+			delete(requestMap, key)
+			continue
+		}
+
 		// 根据覆盖设置决定如何添加参数
 		if shouldOverwrite {
 			// 覆盖模式：直接添加/覆盖参数
