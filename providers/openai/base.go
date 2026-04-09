@@ -231,6 +231,10 @@ func (p *OpenAIProvider) mergeCustomParams(requestMap map[string]interface{}, cu
 		if key == "stream" || key == "overwrite" || key == "per_model" || key == "pre_add" {
 			continue
 		}
+		if strVal, ok := value.(string); ok && strVal == "__delete__" {
+			delete(requestMap, key)
+			continue
+		}
 		// 根据覆盖设置决定如何添加参数
 		if shouldOverwrite {
 			// 覆盖模式：直接添加/覆盖参数
