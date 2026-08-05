@@ -91,7 +91,7 @@ func ValidateToken(token string) (tokenID, userID int, err error) {
 		return 0, 0, fmt.Errorf("签名解码失败")
 	}
 
-	if !bytes.Equal(decodedSignature, expectedSignature) {
+	if !hmac.Equal(decodedSignature, expectedSignature) {
 		return 0, 0, fmt.Errorf("签名验证失败")
 	}
 
