@@ -232,7 +232,9 @@ func ConvertFromChatOpenai(request *types.ChatCompletionRequest) (*GeminiChatReq
 				}
 			}
 
-			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, *function)
+			declaration := *function
+			declaration.Strict = nil
+			geminiChatTools.FunctionDeclarations = append(geminiChatTools.FunctionDeclarations, declaration)
 		}
 
 		if codeExecution && len(geminiRequest.Tools) == 0 {
